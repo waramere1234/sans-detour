@@ -26,12 +26,20 @@ export default function Play() {
 
   // Initial deck composition
   useEffect(() => {
+    // Guard: if user lands on /play with a complete session and isn't in
+    // refinement mode, send them to /result rather than starting a fresh deck.
+    const existing = loadSession();
+    const isAffinement = params.get("affinement") === "1";
+    if (existing && existing.votes.length >= TARGET && !isAffinement) {
+      navigate("/result", { replace: true });
+      return;
+    }
     fetchScrutins().then((p) => {
       setPool(p);
       getOrCreateSession();
       setDeck(composeDeck(p, { size: TARGET, capPerDossier: CAP_PER_DOSSIER }));
     });
-  }, []);
+  }, [navigate, params]);
 
   useEffect(() => {
     if (params.get("affinement") === "1") setRefinementMode(true);
@@ -140,7 +148,7 @@ export default function Play() {
           <b style={{ color: "var(--ink)", fontWeight: 500 }}>{progress}</b>
           {!refinementMode && ` / ${TARGET}`}
         </span>
-        {refinementMode && (
+        {showLiveScore && (
           <button
             onClick={() => navigate("/result")}
             style={{
@@ -154,7 +162,7 @@ export default function Play() {
               cursor: "pointer",
             }}
           >
-            Voir mon résultat
+            Mon résultat →
           </button>
         )}
       </div>

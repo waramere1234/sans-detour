@@ -1,10 +1,13 @@
 // src/components/Footer.tsx
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Wordmark } from "./Wordmark";
+import { loadSession } from "../lib/session";
 
 export interface FooterProps {
   freshness?: { lastSyncAt: string; total: number };
 }
+
+const MIN_FOR_RESULT_LINK = 5;
 
 function formatRelativeFr(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -15,6 +18,11 @@ function formatRelativeFr(iso: string): string {
 }
 
 export function Footer({ freshness }: FooterProps) {
+  const location = useLocation();
+  const session = loadSession();
+  const votes = session?.votes.length ?? 0;
+  const showResultLink = votes >= MIN_FOR_RESULT_LINK && location.pathname !== "/result";
+
   return (
     <footer
       className="sd-footer"
@@ -31,7 +39,14 @@ export function Footer({ freshness }: FooterProps) {
         letterSpacing: "0.06em",
       }}
     >
-      <Wordmark size={12} />
+      <Link to="/" style={{ textDecoration: "none", color: "inherit" }} aria-label="Accueil">
+        <Wordmark size={12} />
+      </Link>
+      {showResultLink && (
+        <Link to="/result" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}>
+          Mon résultat ({votes})
+        </Link>
+      )}
       <Link to="/methode" style={{ color: "var(--ink-2)", textDecoration: "none" }}>Méthode &amp; sources</Link>
       <Link to="/legal" style={{ color: "var(--ink-2)", textDecoration: "none" }}>Mentions légales</Link>
       <a href="mailto:contact@sansdetour.fr" style={{ color: "var(--ink-2)", textDecoration: "none" }}>contact</a>

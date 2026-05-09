@@ -26,6 +26,9 @@ export default function Result() {
   const top = ranked[0];
   const skips = (session?.votes.filter(v => v.choice === "skip").length) ?? 0;
   const total = session?.votes.length ?? 0;
+  const TARGET = 20;
+  const isPartial = total < TARGET;
+  const remaining = Math.max(0, TARGET - total);
 
   const reportedRef = useRef(false);
   useEffect(() => {
@@ -78,8 +81,8 @@ export default function Result() {
         <span style={{
           fontFamily: "var(--font-mono)", fontSize: 10.5,
           letterSpacing: "0.14em", textTransform: "uppercase",
-          color: "var(--ink-3)",
-        }}>RÉSULTAT · 17e LÉGISLATURE</span>
+          color: isPartial ? "var(--accent)" : "var(--ink-3)",
+        }}>{isPartial ? `RÉSULTAT PARTIEL · ${total}/${TARGET}` : "RÉSULTAT · 17e LÉGISLATURE"}</span>
         <h1 style={{
           fontFamily: "var(--font-sans)", fontWeight: 700,
           fontSize: 28, lineHeight: 1.15, letterSpacing: "-0.022em",
@@ -116,13 +119,20 @@ export default function Result() {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {isPartial && (
+          <button type="button"
+            onClick={() => navigate("/play")}
+            style={btnPrimary()}>→ Continuer le test ({remaining} {remaining === 1 ? "vote restant" : "votes restants"})</button>
+        )}
         <button type="button"
           onClick={share}
-          style={btnPrimary()}>📤 Partager mon résultat</button>
-        <button type="button"
-          onClick={() => { track("affinement_clicked"); navigate("/play?affinement=1"); }}
-          style={btnSecondary()}>↻ Continuer à affiner</button>
-        <button type="button" onClick={refaire} style={btnTertiary()}>↻ Refaire</button>
+          style={isPartial ? btnSecondary() : btnPrimary()}>📤 Partager mon résultat</button>
+        {!isPartial && (
+          <button type="button"
+            onClick={() => { track("affinement_clicked"); navigate("/play?affinement=1"); }}
+            style={btnSecondary()}>↻ Continuer à affiner</button>
+        )}
+        <button type="button" onClick={refaire} style={btnTertiary()}>↻ Refaire depuis le début</button>
       </div>
     </section>
   );

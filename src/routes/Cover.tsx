@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { Wordmark } from "../components/Wordmark";
 import { FreshnessBanner } from "../components/FreshnessBanner";
 import { fetchFreshness } from "../lib/scrutins";
-import { hasSeenCover, markCoverSeen } from "../lib/session";
+import { hasSeenCover, loadSession, markCoverSeen } from "../lib/session";
 import { track } from "../lib/analytics";
 import type { FreshnessInfo } from "../types";
+
+const TARGET = 20;
 
 export default function Cover() {
   const navigate = useNavigate();
@@ -14,7 +16,10 @@ export default function Cover() {
 
   useEffect(() => {
     if (hasSeenCover()) {
-      navigate("/play", { replace: true });
+      const s = loadSession();
+      const votes = s?.votes.length ?? 0;
+      if (votes >= TARGET) navigate("/result", { replace: true });
+      else navigate("/play", { replace: true });
       return;
     }
     fetchFreshness().then(setInfo).catch(() => {});
