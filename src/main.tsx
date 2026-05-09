@@ -1,5 +1,5 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./App";
 import Cover from "./routes/Cover";
@@ -9,8 +9,8 @@ import Methode from "./routes/Methode";
 import Legal from "./routes/Legal";
 import "./index.css";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
     <BrowserRouter>
       <App>
         <Routes>
@@ -22,5 +22,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         </Routes>
       </App>
     </BrowserRouter>
-  </React.StrictMode>,
+  </StrictMode>,
 );
