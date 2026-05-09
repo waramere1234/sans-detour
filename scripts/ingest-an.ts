@@ -196,23 +196,65 @@ function parseRaw(raw: ANScrutinRaw): Omit<ParsedScrutin, "titre_pedago" | "chap
 
 // ─────────────────────────────────────────────── titre pédago (LLM optional)
 
-const PROMPT_TEMPLATE = `Tu reçois le titre brut d'un scrutin solennel à l'Assemblée Nationale française.
-Génère trois choses :
-1. CHAPEAU : un chapeau contextuel ultra-court de la forme "[THÈME] · [DOSSIER]" (max 4 mots, en majuscules, sans ponctuation finale). Ex : "RETRAITES · PLFSS 2024".
-2. TITRE_PEDAGO : reformulation factuelle du sujet de fond du vote en une phrase de 12 mots maximum. Pas de prise de parti. Pas de qualificatif (éviter "controversé", "important", "scandaleux"). Vocabulaire accessible à un lycéen.
-3. CONTEXTE : une phrase de 25 mots maximum expliquant l'enjeu concret derrière ce vote — quelles personnes ou activités sont touchées, qu'est-ce qui change si la loi passe ou non. Factuel, neutre, accessible à un lycéen. Pas de jugement, pas d'adjectif chargé.
+// Neutralization-first system prompt. Sent identically with every call so it
+// can be prompt-cached (cache_control on the system block).
+const SYSTEM_PROMPT = `Tu reformules des votes solennels de l'Assemblée Nationale française pour une app non-partisane.
 
-Réponds en JSON strict : {"chapeau": "...", "titre_pedago": "...", "contexte": "..."}.
+Pour chaque scrutin tu dois renvoyer 3 champs :
 
-Titre brut :
-"""
-{TITRE_BRUT}
-"""
+1. CHAPEAU : "[THÈME] · [DOSSIER]" (max 4 mots, MAJUSCULES, sans ponctuation finale). Ex : "RETRAITES · PLFSS 2024".
 
-Dossier législatif (contexte, peut être vide) :
-"""
-{DOSSIER_TITRE}
-"""`;
+2. TITRE_PEDAGO : reformulation FACTUELLE du sujet en 1 phrase de 12 mots maximum, vocabulaire de lycéen.
+
+3. CONTEXTE : 1 phrase de 25 mots maximum expliquant l'enjeu CONCRET — qui est touché, ce qui change si la loi passe.
+   Le CONTEXTE doit contenir au moins UN élément concret parmi : un chiffre exact, une date, un mécanisme nommé, ou un groupe de personnes nommé.
+
+═══════════ RÈGLES DE NEUTRALISATION (NON NÉGOCIABLES) ═══════════
+
+Tu as accès à l'outil web_search. Tu peux faire 1 à 2 recherches pour trouver des éléments concrets sur le scrutin (chiffres, mécanismes, groupes touchés). MAIS la presse française est politisée, donc :
+
+A. **Tu ne reprends JAMAIS le framing d'une source.** Si Le Monde dit "loi controversée", Le Figaro dit "réforme nécessaire", Mediapart dit "scandale", tu ignores ces qualificatifs et tu gardes uniquement les FAITS sous-jacents (mécanisme + chiffre + qui est touché).
+
+B. **Liste noire de mots interdits dans ta sortie** : controversé, polémique, scandaleux, scandale, important, crucial, majeur, historique, nécessaire, urgent, ambitieux, courageux, brutal, drastique, radical, modeste, timide, attendu, salué, dénoncé, critiqué.
+
+C. **Liste noire de phrases creuses interdites** : "définit les règles", "encadre", "modernise", "renforce le cadre", "vise à améliorer", "événement majeur", "mesure phare", "réforme importante".
+
+D. **Si tu n'as PAS d'élément concret après recherche, dis-le.** Mets un CONTEXTE court et honnête, sans inventer. Mieux vaut "Texte technique modifiant l'ordonnance N° 2023-XX sur la procédure devant les chambres sociales" que d'inventer un "enjeu majeur pour les Français".
+
+E. **Verbes neutres uniquement** : "permet", "oblige à", "interdit", "augmente de X à Y", "réduit de X à Y", "crée", "supprime", "transfère à". Pas de "réforme", "moderniser", "améliorer".
+
+═══════════ EXEMPLES AVANT/APRÈS ═══════════
+
+❌ MAUVAIS (creux, copié de la presse) :
+{
+  "chapeau": "JEUX OLYMPIQUES · LOI 2030",
+  "titre_pedago": "Cadre législatif pour organiser les Jeux Olympiques 2030.",
+  "contexte": "La France accueillera les Jeux Olympiques en 2030. Cette loi définit les règles, pouvoirs et obligations des organisateurs pour préparer cet événement international majeur."
+}
+Pourquoi c'est mauvais : "définit les règles" et "événement international majeur" ne disent rien. Aucun chiffre, aucun mécanisme, aucun groupe précis touché.
+
+✅ BON (concret, vérifiable) :
+{
+  "chapeau": "JO 2030 · ALPES",
+  "titre_pedago": "Donner pouvoirs spéciaux aux JO d'hiver 2030 dans les Alpes.",
+  "contexte": "Crée un comité avec pouvoirs d'expropriation et d'exemption environnementale dans 6 communes des Alpes jusqu'en 2031. Coût estimé : 2 milliards € publics."
+}
+Pourquoi c'est bon : on sait QUI (6 communes), QUAND (jusqu'en 2031), COMBIEN (2 Mds €), et QUEL MÉCANISME (expropriation, exemption environnementale).
+
+❌ MAUVAIS (framing de presse partisane) :
+{
+  "contexte": "Réforme controversée des retraites jugée brutale par les syndicats et nécessaire par le gouvernement, qui suscite de fortes mobilisations."
+}
+
+✅ BON (faits sous le framing) :
+{
+  "contexte": "Recule l'âge légal de départ de 62 à 64 ans et accélère l'allongement de la durée de cotisation à 43 années dès 2027."
+}
+
+═══════════ FORMAT DE SORTIE ═══════════
+
+Tu réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans texte avant ou après :
+{"chapeau": "...", "titre_pedago": "...", "contexte": "..."}`;
 
 interface Summary {
   chapeau: string;
@@ -220,10 +262,36 @@ interface Summary {
   contexte: string;
 }
 
-async function summarizeWithLLM(titreBrut: string, dossierTitre: string): Promise<Summary> {
-  const prompt = PROMPT_TEMPLATE
-    .replace("{TITRE_BRUT}", titreBrut)
-    .replace("{DOSSIER_TITRE}", dossierTitre);
+interface AnthropicResponse {
+  content: Array<
+    | { type: "text"; text: string }
+    | { type: "thinking"; thinking?: string }
+    | { type: "server_tool_use"; name: string; input?: unknown }
+    | { type: "web_search_tool_result"; content?: unknown }
+    | { type: string; [key: string]: unknown }
+  >;
+  stop_reason: string;
+}
+
+async function summarizeWithLLM(
+  titreBrut: string,
+  dossierTitre: string,
+  numero: number,
+): Promise<Summary> {
+  const userMessage = `Numéro de scrutin : ${numero}
+URL AN : https://www.assemblee-nationale.fr/dyn/17/scrutins/${numero}
+
+Titre brut :
+"""
+${titreBrut}
+"""
+
+Dossier législatif :
+"""
+${dossierTitre}
+"""
+
+Cherche sur le web (1 à 2 recherches max) les détails concrets de ce scrutin : chiffres, mécanismes, groupes touchés. Croise les sources si possible. Puis réponds en JSON strict comme spécifié.`;
 
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -233,16 +301,40 @@ async function summarizeWithLLM(titreBrut: string, dossierTitre: string): Promis
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-haiku-4-5",
-      max_tokens: 400,
-      messages: [{ role: "user", content: prompt }],
+      model: "claude-opus-4-7",
+      max_tokens: 4096,
+      thinking: { type: "adaptive" },
+      output_config: { effort: "high" },
+      system: [
+        {
+          type: "text",
+          text: SYSTEM_PROMPT,
+          cache_control: { type: "ephemeral" },
+        },
+      ],
+      tools: [
+        {
+          type: "web_search_20260209",
+          name: "web_search",
+          max_uses: 2,
+        },
+      ],
+      messages: [{ role: "user", content: userMessage }],
     }),
   });
   if (!r.ok) throw new Error(`Anthropic ${r.status}: ${await r.text()}`);
-  const json = await r.json() as { content?: { text: string }[] };
-  const text = json.content?.[0]?.text ?? "";
+  const json = (await r.json()) as AnthropicResponse;
+
+  // Find the final text block (after any thinking / server_tool_use / web_search_tool_result blocks)
+  const textBlocks = json.content.filter(
+    (b): b is { type: "text"; text: string } => b.type === "text",
+  );
+  if (textBlocks.length === 0) {
+    throw new Error(`No text block in response. stop_reason=${json.stop_reason}, blocks=${json.content.map(b => b.type).join(",")}`);
+  }
+  const text = textBlocks[textBlocks.length - 1].text;
   const m = text.match(/\{[\s\S]*\}/);
-  if (!m) throw new Error("No JSON in LLM response");
+  if (!m) throw new Error(`No JSON in LLM response: ${text.slice(0, 200)}`);
   return JSON.parse(m[0]) as Summary;
 }
 
@@ -283,14 +375,36 @@ async function main(): Promise<void> {
   }
 
   const enriched: ParsedScrutin[] = [];
-  for (let i = 0; i < solennels.length; i++) {
-    const s = solennels[i];
-    const summary = ANTHROPIC_KEY
-      ? await summarizeWithLLM(s.titre_brut, s.dossier_titre)
-      : fallbackSummary(s.titre_brut, s.dossier_titre);
-    enriched.push({ ...s, ...summary });
-    if (ANTHROPIC_KEY) console.log(`  [${i + 1}/${solennels.length}] ${summary.chapeau} — ${summary.titre_pedago}`);
+  // Web-search calls take ~5-10s each. Run a small number in parallel to keep
+  // total runtime sensible (~46 calls × 8s sequential = 6 min; with CONCURRENCY=4
+  // we get ~90s). Anthropic Tier 1 allows enough RPM for this.
+  const CONCURRENCY = ANTHROPIC_KEY ? 4 : 1;
+  let done = 0;
+  async function processOne(s: typeof solennels[number]): Promise<void> {
+    try {
+      const summary = ANTHROPIC_KEY
+        ? await summarizeWithLLM(s.titre_brut, s.dossier_titre, s.numero)
+        : fallbackSummary(s.titre_brut, s.dossier_titre);
+      enriched.push({ ...s, ...summary });
+      done++;
+      console.log(`  [${done}/${solennels.length}] ${summary.chapeau} — ${summary.titre_pedago}`);
+    } catch (e) {
+      done++;
+      console.error(`  [${done}/${solennels.length}] ✕ scrutin ${s.numero}: ${(e as Error).message}`);
+      // Fall back to truncated title so the scrutin still gets ingested
+      const fb = fallbackSummary(s.titre_brut, s.dossier_titre);
+      enriched.push({ ...s, ...fb });
+    }
   }
+  // Simple worker pool
+  const queue = [...solennels];
+  const workers = Array.from({ length: CONCURRENCY }, async () => {
+    while (queue.length > 0) {
+      const s = queue.shift();
+      if (s) await processOne(s);
+    }
+  });
+  await Promise.all(workers);
 
   console.log(`↑ Upserting ${enriched.length} scrutins to Supabase…`);
   const sb = createClient(SUPABASE_URL!, SUPABASE_KEY!);
