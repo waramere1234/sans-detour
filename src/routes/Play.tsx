@@ -7,6 +7,7 @@ import { fetchScrutins } from "../lib/scrutins";
 import { composeDeck, drawNext } from "../lib/deck";
 import { computeAlignment, rankByAlignment } from "../lib/matching";
 import { getOrCreateSession, recordVote, loadSession } from "../lib/session";
+import { track } from "../lib/analytics";
 import type { Scrutin, UserVote, GroupCode, GroupAlignment } from "../types";
 import { GROUP_CODES } from "../types";
 
@@ -64,6 +65,7 @@ export default function Play() {
 
   function handleVote(scrutinId: string, choice: UserVote) {
     recordVote(scrutinId, choice);
+    track("vote", { choice });
     setTick((t) => t + 1);
 
     const remaining = deck.slice(1);

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchScrutins } from "../lib/scrutins";
 import { computeAlignment, rankByAlignment } from "../lib/matching";
@@ -6,6 +6,7 @@ import { loadSession, resetSession } from "../lib/session";
 import { PartyRow } from "../components/PartyRow";
 import { AuditTrail } from "../components/AuditTrail";
 import { getParty, getPartyColorVar } from "../lib/parties";
+import { track } from "../lib/analytics";
 import type { Scrutin, GroupCode } from "../types";
 
 export default function Result() {
@@ -26,6 +27,14 @@ export default function Result() {
   const skips = (session?.votes.filter(v => v.choice === "skip").length) ?? 0;
   const total = session?.votes.length ?? 0;
 
+  const reportedRef = useRef(false);
+  useEffect(() => {
+    if (top && !reportedRef.current) {
+      reportedRef.current = true;
+      track("result_reached", { counted: top.counted, top: top.group });
+    }
+  }, [top]);
+
   if (!top || pool.length === 0) {
     return <div style={{ padding: 24 }}>Chargement…</div>;
   }
@@ -37,6 +46,7 @@ export default function Result() {
   }
 
   async function share() {
+    track("share_clicked");
     const top6 = ranked.slice(0, 6);
     const t = top6.map(a => `${a.group}:${a.pct}`).join(",");
     const url = `${location.origin}/api/share-card.png?t=${t}&fmt=square`;
@@ -110,7 +120,7 @@ export default function Result() {
           onClick={share}
           style={btnPrimary()}>📤 Partager mon résultat</button>
         <button type="button"
-          onClick={() => navigate("/play?affinement=1")}
+          onClick={() => { track("affinement_clicked"); navigate("/play?affinement=1"); }}
           style={btnSecondary()}>↻ Continuer à affiner</button>
         <button type="button" onClick={refaire} style={btnTertiary()}>↻ Refaire</button>
       </div>

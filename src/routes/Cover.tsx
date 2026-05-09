@@ -5,6 +5,7 @@ import { Wordmark } from "../components/Wordmark";
 import { FreshnessBanner } from "../components/FreshnessBanner";
 import { fetchFreshness } from "../lib/scrutins";
 import { hasSeenCover, markCoverSeen } from "../lib/session";
+import { track } from "../lib/analytics";
 import type { FreshnessInfo } from "../types";
 
 export default function Cover() {
@@ -21,6 +22,7 @@ export default function Cover() {
 
   function start() {
     markCoverSeen();
+    track("cover_started");
     navigate("/play");
   }
 
