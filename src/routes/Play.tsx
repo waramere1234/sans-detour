@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { DeckStack } from "../components/DeckStack";
 import { ChipTop1 } from "../components/ChipTop1";
 import { RankingOverlay } from "../components/RankingOverlay";
@@ -16,9 +16,10 @@ const CAP_PER_DOSSIER = 2;
 
 export default function Play() {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const [pool, setPool] = useState<Scrutin[]>([]);
   const [deck, setDeck] = useState<Scrutin[]>([]);
-  const [refinementMode] = useState(false);
+  const [refinementMode, setRefinementMode] = useState(false);
   const [rankingOpen, setRankingOpen] = useState(false);
   const [tick, setTick] = useState(0); // force re-render after recordVote
 
@@ -30,6 +31,10 @@ export default function Play() {
       setDeck(composeDeck(p, { size: TARGET, capPerDossier: CAP_PER_DOSSIER }));
     });
   }, []);
+
+  useEffect(() => {
+    if (params.get("affinement") === "1") setRefinementMode(true);
+  }, [params]);
 
   const session = loadSession();
   const cardsSeenSet = useMemo(
