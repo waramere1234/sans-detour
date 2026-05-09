@@ -36,6 +36,28 @@ export default function Result() {
     navigate("/");
   }
 
+  async function share() {
+    const top6 = ranked.slice(0, 6);
+    const t = top6.map(a => `${a.group}:${a.pct}`).join(",");
+    const url = `${location.origin}/api/share-card.png?t=${t}&fmt=square`;
+
+    if (navigator.share) {
+      try {
+        const blob = await (await fetch(url)).blob();
+        const file = new File([blob], "sansdetour.png", { type: "image/png" });
+        await navigator.share({
+          files: [file],
+          text: `Mes affinités politiques réelles · top : ${getParty(top.group).short} ${top.pct}%`,
+          url: "https://sansdetour.fr",
+        });
+      } catch {
+        window.open(url, "_blank");
+      }
+    } else {
+      window.open(url, "_blank");
+    }
+  }
+
   return (
     <section style={{
       padding: "24px 22px 32px",
@@ -85,7 +107,7 @@ export default function Result() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <button type="button"
-          onClick={() => alert("Partage — voir Task 5.4")}
+          onClick={share}
           style={btnPrimary()}>📤 Partager mon résultat</button>
         <button type="button"
           onClick={() => navigate("/play?affinement=1")}
