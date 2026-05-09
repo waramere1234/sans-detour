@@ -1,40 +1,39 @@
 # ingest-scrutins
 
-Cron weekly · `0 4 * * 1` (Monday 04:00 UTC).
+> ⚠ **Status:** this Deno edge function is **NOT operational** in its current form. The original plan assumed AN exposes a single bulk JSON file with all scrutins; in reality the AN ships a 20 MB zip of ~6500 per-scrutin JSON files, which a Deno edge function can't unzip without extra plumbing.
+>
+> **Use [`scripts/ingest-an.ts`](../../../scripts/ingest-an.ts) instead** — a Node-side bootstrap script you run manually:
+>
+> ```
+> SUPABASE_URL=https://...supabase.co \
+> SUPABASE_SERVICE_ROLE_KEY=eyJ... \
+> ANTHROPIC_API_KEY=sk-ant-... \
+> npm run ingest:an
+> ```
+>
+> Re-run weekly (or whenever you want a refresh). Caches the zip in `/tmp/sd-an-cache` between runs.
+>
+> The constants in this folder (especially `GROUP_MAPPING` in `parse-scrutins.ts`) are kept synced with the bootstrap script so that when this edge function is rewritten to handle the per-file zip flow (or when the AN exposes a real bulk endpoint), no fresh research is needed.
 
-Pulls new solennels from `data.assemblee-nationale.fr`, computes group positions via 70% threshold, generates LLM summaries, upserts to `scrutins`.
+## Original cron design (deferred)
 
-## Manual trigger
+When operational, the function would run weekly · `0 4 * * 1` (Monday 04:00 UTC), pulling new SPS scrutins from `data.assemblee-nationale.fr`, computing group positions via the 70% threshold, generating LLM summaries, and upserting to `scrutins`.
 
-```
-npx supabase functions invoke ingest-scrutins
-```
+### Manual relecture des résumés pédago
 
-## Manual relecture des résumés pédago
-
-After each cron run, log into Supabase web UI, query:
+Whether ingestion runs via the script or (eventually) via cron, spot-check the LLM summaries weekly:
 
 ```sql
 select id, titre_brut, titre_pedago from scrutins
 where pedago_relu = false order by ingere_le desc;
 ```
 
-Spot-check ~5 minutes per week, flip `pedago_relu = true` once validated.
+Flip `pedago_relu = true` once validated.
 
-## Setup (one-time)
+## Verified facts (from data.assemblee-nationale.fr inspection)
 
-1. Deploy: `npx supabase functions deploy ingest-scrutins`
-2. Set env vars in Supabase dashboard → Edge Functions → Secrets:
-   - `SUPABASE_URL`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `ANTHROPIC_API_KEY`
-3. Schedule cron: Supabase web UI → Database → Functions → `ingest-scrutins` → Schedule, with expression `0 4 * * 1`.
-
-## Known soft spots
-
-The first invocation against real AN data will likely surface schema drift. To fix:
-
-- **`GROUP_MAPPING`** in `parse-scrutins.ts` only has 2 of 11 entries (EPR, RN). Inspect the AN payload's `organeRef` codes for each parliamentary group of the 17e legislature and fill in: LFI, GDR, ECO, SOC, LIOT, DEM, HOR, DR, UDR.
-- **`dossier_titre`** is set to `"TBD"`. Resolve via a parallel fetch of dossiers (or a lookup table) once the right endpoint is identified.
-- **AN payload root** — `fetch-an.ts` defensively unwraps `json.scrutins?.scrutin ?? json`. Confirm against actual response and tighten.
-- **`compute-positions.ts`** is a local copy of `src/lib/compute-positions.ts`. Keep in sync when the threshold logic changes.
+- **Bulk endpoint:** `https://data.assemblee-nationale.fr/static/openData/repository/17/loi/scrutins/Scrutins.json.zip` (~20 MB, ~6500 files)
+- **Solennel filter:** `scrutin.typeVote.codeTypeVote === "SPS"` (yields 46 entries as of 2026-05)
+- **Group mapping:** see `parse-scrutins.ts` — 12 organeRef codes mapped to 11 internal codes (UDR appears under two refs, PO847173 pre-2025-09 and PO872880 after)
+- **Dossier titre:** available directly at `scrutin.objet.dossierLegislatif.libelle` (no second endpoint needed); falls back to `objet.libelle` when the scrutin has no attached dossier
+- **AN URL pattern:** `https://www.assemblee-nationale.fr/dyn/17/scrutins/{numero}`

@@ -10,7 +10,8 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
-    "seed": "tsx scripts/seed-supabase.ts"
+    "seed": "tsx scripts/seed-supabase.ts",
+    "ingest:an": "tsx scripts/ingest-an.ts"
   },
   "dependencies": {
     "@resvg/resvg-wasm": "^2.6.2",

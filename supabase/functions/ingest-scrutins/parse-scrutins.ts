@@ -1,23 +1,37 @@
 // supabase/functions/ingest-scrutins/parse-scrutins.ts
 //
-// Translates a raw AN scrutin payload into the shape we persist. Two known
-// soft spots:
-//   1. GROUP_MAPPING is a stub — only 2 of the 11 groups for the 17e
-//      legislature are filled in. The remaining organeRef -> code mappings
-//      must be looked up against the live AN reference data and added here
-//      before this function produces meaningful output.
-//   2. dossier_titre is left as "TBD" — resolving the dossier label from
-//      `dossierLegislatifRef` requires a second AN endpoint that we have
-//      not wired up yet.
+// ⚠ STATUS: this Deno edge function is NOT the primary ingestion path right
+// now. The AN does not actually expose a single bulk JSON endpoint as the
+// original plan assumed — it ships a zip of ~6500 per-scrutin JSON files.
+// Use scripts/ingest-an.ts (Node-side bootstrap, run manually) which has
+// the correct shape, the verified GROUP_MAPPING, and handles the zip.
+//
+// The constants below (GROUP_MAPPING especially) are kept in sync so that
+// when this edge function is rewritten to handle the per-file zip flow,
+// no fresh research is needed.
 
 import type { ANScrutinRaw } from "./fetch-an.ts";
 
-// TODO(ingest): fill in the remaining 9 groupe-organeRef -> internal code
-// mappings (LFI, GDR, ECO, SOC, LIOT, DEM, HOR, DR, UDR) once we have the
-// AN reference list for the 17e legislature.
-const GROUP_MAPPING: Record<string, string> = {
-  PO845401: "EPR",
-  PO845405: "RN",
+/**
+ * Verified mapping from AN organeRef → internal GroupCode for the 17e
+ * legislature. PO847173 and PO872880 are both "Union des droites pour la
+ * République" (the group was reconstituted around 2025-09 with a new ref).
+ * PO840056 is the non-inscrits — excluded from the app.
+ */
+const GROUP_MAPPING: Record<string, string | null> = {
+  PO845401: "RN",
+  PO845407: "EPR",
+  PO845413: "LFI",
+  PO845419: "SOC",
+  PO845425: "DR",
+  PO845439: "ECO",
+  PO845454: "DEM",
+  PO845470: "HOR",
+  PO845485: "LIOT",
+  PO845514: "GDR",
+  PO847173: "UDR",
+  PO872880: "UDR",
+  PO840056: null,
 };
 
 interface VoteBreakdown {
@@ -78,8 +92,10 @@ export function parse(raw: ANScrutinRaw): ParsedScrutin {
   return {
     id: raw.uid,
     numero: raw.numero,
+    // dossier libelle is in objet.dossierLegislatif.libelle when non-null
+    // (verified in scripts/ingest-an.ts); the legacy raw.dossierLegislatifRef
+    // path is kept here only for backward-compat with the original plan.
     date: raw.dateScrutin,
-    // TODO(ingest): resolve dossier_titre from a second AN endpoint.
     dossier_id: raw.dossierLegislatifRef ?? "unknown",
     dossier_titre: "TBD",
     titre_brut: raw.titre,
