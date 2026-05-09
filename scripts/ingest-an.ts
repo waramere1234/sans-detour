@@ -325,16 +325,22 @@ Cherche sur le web (1 à 2 recherches max) les détails concrets de ce scrutin :
   if (!r.ok) throw new Error(`Anthropic ${r.status}: ${await r.text()}`);
   const json = (await r.json()) as AnthropicResponse;
 
-  // Find the final text block (after any thinking / server_tool_use / web_search_tool_result blocks)
+  // The model may emit multiple text blocks interleaved with server_tool_use /
+  // web_search_tool_result blocks (Opus often writes JSON spanning two text
+  // blocks: opening `{...,` then closing `...}`). Concatenate all text blocks
+  // and extract the JSON from the combined string.
   const textBlocks = json.content.filter(
     (b): b is { type: "text"; text: string } => b.type === "text",
   );
   if (textBlocks.length === 0) {
     throw new Error(`No text block in response. stop_reason=${json.stop_reason}, blocks=${json.content.map(b => b.type).join(",")}`);
   }
-  const text = textBlocks[textBlocks.length - 1].text;
-  const m = text.match(/\{[\s\S]*\}/);
-  if (!m) throw new Error(`No JSON in LLM response: ${text.slice(0, 200)}`);
+  const combined = textBlocks.map(b => b.text).join("\n");
+  // Greedy match from first `{` to last `}` (handles JSON wrapped in code fences too).
+  const m = combined.match(/\{[\s\S]*\}/);
+  if (!m) {
+    throw new Error(`No JSON in LLM response. blocks=${json.content.map(b => b.type).join(",")} text=${combined.slice(0, 300)}`);
+  }
   return JSON.parse(m[0]) as Summary;
 }
 
