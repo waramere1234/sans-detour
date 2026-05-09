@@ -137,6 +137,7 @@ interface ParsedScrutin {
   titre_brut: string;
   titre_pedago: string;
   chapeau: string;
+  contexte: string;
   position_par_groupe: Record<GroupCode, GroupPosition>;
   votes_bruts: Record<GroupCode, GroupVoteBreakdown>;
   est_solennel: boolean;
@@ -148,7 +149,7 @@ function n(s: string | null | undefined): number {
   return parseInt(s ?? "0", 10) || 0;
 }
 
-function parseRaw(raw: ANScrutinRaw): Omit<ParsedScrutin, "titre_pedago" | "chapeau"> {
+function parseRaw(raw: ANScrutinRaw): Omit<ParsedScrutin, "titre_pedago" | "chapeau" | "contexte"> {
   const votes_bruts = {} as Record<GroupCode, GroupVoteBreakdown>;
   const position_par_groupe = {} as Record<GroupCode, GroupPosition>;
 
@@ -196,11 +197,12 @@ function parseRaw(raw: ANScrutinRaw): Omit<ParsedScrutin, "titre_pedago" | "chap
 // ─────────────────────────────────────────────── titre pédago (LLM optional)
 
 const PROMPT_TEMPLATE = `Tu reçois le titre brut d'un scrutin solennel à l'Assemblée Nationale française.
-Génère deux choses :
+Génère trois choses :
 1. CHAPEAU : un chapeau contextuel ultra-court de la forme "[THÈME] · [DOSSIER]" (max 4 mots, en majuscules, sans ponctuation finale). Ex : "RETRAITES · PLFSS 2024".
 2. TITRE_PEDAGO : reformulation factuelle du sujet de fond du vote en une phrase de 12 mots maximum. Pas de prise de parti. Pas de qualificatif (éviter "controversé", "important", "scandaleux"). Vocabulaire accessible à un lycéen.
+3. CONTEXTE : une phrase de 25 mots maximum expliquant l'enjeu concret derrière ce vote — quelles personnes ou activités sont touchées, qu'est-ce qui change si la loi passe ou non. Factuel, neutre, accessible à un lycéen. Pas de jugement, pas d'adjectif chargé.
 
-Réponds en JSON strict : {"chapeau": "...", "titre_pedago": "..."}.
+Réponds en JSON strict : {"chapeau": "...", "titre_pedago": "...", "contexte": "..."}.
 
 Titre brut :
 """
@@ -215,6 +217,7 @@ Dossier législatif (contexte, peut être vide) :
 interface Summary {
   chapeau: string;
   titre_pedago: string;
+  contexte: string;
 }
 
 async function summarizeWithLLM(titreBrut: string, dossierTitre: string): Promise<Summary> {
@@ -231,7 +234,7 @@ async function summarizeWithLLM(titreBrut: string, dossierTitre: string): Promis
     },
     body: JSON.stringify({
       model: "claude-haiku-4-5",
-      max_tokens: 200,
+      max_tokens: 400,
       messages: [{ role: "user", content: prompt }],
     }),
   });
@@ -244,12 +247,18 @@ async function summarizeWithLLM(titreBrut: string, dossierTitre: string): Promis
 }
 
 function fallbackSummary(titreBrut: string, dossierTitre: string): Summary {
-  // Truncate to ~12 words for titre_pedago, derive a 3-word eyebrow from dossier.
+  // Truncate to ~12 words for titre_pedago, derive a 3-word eyebrow from dossier,
+  // and use the trimmed dossier title as a best-effort context line.
   const words = titreBrut.split(/\s+/).filter(Boolean);
   const titre_pedago = words.slice(0, 14).join(" ") + (words.length > 14 ? "…" : "");
   const dossierWords = (dossierTitre || "scrutin").split(/\s+/).filter(Boolean).slice(0, 3);
   const chapeau = dossierWords.join(" ").toUpperCase().replace(/[.,;:!?]+$/, "");
-  return { chapeau, titre_pedago };
+  // Fallback context: the dossier title trimmed to 25 words, or empty.
+  const ctxWords = (dossierTitre || "").split(/\s+/).filter(Boolean);
+  const contexte = ctxWords.length > 0
+    ? ctxWords.slice(0, 25).join(" ") + (ctxWords.length > 25 ? "…" : "")
+    : "";
+  return { chapeau, titre_pedago, contexte };
 }
 
 // ─────────────────────────────────────────────────────────────── orchestrator

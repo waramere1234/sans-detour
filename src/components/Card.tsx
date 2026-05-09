@@ -46,6 +46,13 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
         fontSize: 21, lineHeight: 1.3, letterSpacing: "-0.012em",
         color: "var(--ink)", textWrap: "pretty" as const,
       }}>{scrutin.titre_pedago}</div>
+      {scrutin.contexte && (
+        <div style={{
+          fontFamily: "var(--font-sans)", fontWeight: 400,
+          fontSize: 14, lineHeight: 1.5, letterSpacing: "-0.005em",
+          color: "var(--ink-2)", textWrap: "pretty" as const,
+        }}>{scrutin.contexte}</div>
+      )}
       <div style={{
         fontFamily: "var(--font-mono)", fontSize: 11,
         color: "var(--ink-3)", letterSpacing: "0.04em",
