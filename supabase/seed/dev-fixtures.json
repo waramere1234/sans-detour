@@ -26,7 +26,7 @@
       "UDR":  {"pour": 16, "contre": 0, "abstention": 0, "absent": 0},
       "RN":   {"pour": 1, "contre": 83, "abstention": 2, "absent": 2}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/1",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/1",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -57,7 +57,7 @@
       "UDR":  {"pour": 0, "contre": 16, "abstention": 0, "absent": 1},
       "RN":   {"pour": 82, "contre": 0, "abstention": 1, "absent": 4}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/2",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/2",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -88,7 +88,7 @@
       "UDR":  {"pour": 1, "contre": 0, "abstention": 14, "absent": 2},
       "RN":   {"pour": 84, "contre": 0, "abstention": 1, "absent": 2}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/3",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/3",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -119,7 +119,7 @@
       "UDR":  {"pour": 16, "contre": 0, "abstention": 0, "absent": 0},
       "RN":   {"pour": 0, "contre": 84, "abstention": 1, "absent": 3}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/4",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/4",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -150,7 +150,7 @@
       "UDR":  {"pour": 0, "contre": 17, "abstention": 0, "absent": 0},
       "RN":   {"pour": 1, "contre": 83, "abstention": 2, "absent": 2}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/5",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/5",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -181,7 +181,7 @@
       "UDR":  {"pour": 0, "contre": 16, "abstention": 0, "absent": 1},
       "RN":   {"pour": 4, "contre": 6, "abstention": 73, "absent": 3}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/6",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/6",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -212,7 +212,7 @@
       "UDR":  {"pour": 0, "contre": 15, "abstention": 1, "absent": 1},
       "RN":   {"pour": 5, "contre": 4, "abstention": 73, "absent": 3}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/7",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/7",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -243,7 +243,7 @@
       "UDR":  {"pour": 16, "contre": 0, "abstention": 0, "absent": 1},
       "RN":   {"pour": 84, "contre": 0, "abstention": 1, "absent": 3}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/8",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/8",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -274,7 +274,7 @@
       "UDR":  {"pour": 16, "contre": 0, "abstention": 0, "absent": 1},
       "RN":   {"pour": 83, "contre": 0, "abstention": 1, "absent": 3}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/9",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/9",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -305,7 +305,7 @@
       "UDR":  {"pour": 16, "contre": 0, "abstention": 0, "absent": 1},
       "RN":   {"pour": 84, "contre": 0, "abstention": 1, "absent": 3}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/10",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/10",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -336,7 +336,7 @@
       "UDR":  {"pour": 16, "contre": 0, "abstention": 0, "absent": 1},
       "RN":   {"pour": 85, "contre": 0, "abstention": 1, "absent": 2}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/11",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/11",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -367,7 +367,7 @@
       "UDR":  {"pour": 17, "contre": 0, "abstention": 0, "absent": 0},
       "RN":   {"pour": 84, "contre": 0, "abstention": 1, "absent": 3}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/12",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/12",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -398,7 +398,7 @@
       "UDR":  {"pour": 16, "contre": 0, "abstention": 0, "absent": 1},
       "RN":   {"pour": 35, "contre": 30, "abstention": 18, "absent": 5}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/13",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/13",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -429,7 +429,7 @@
       "UDR":  {"pour": 1, "contre": 14, "abstention": 1, "absent": 1},
       "RN":   {"pour": 6, "contre": 9, "abstention": 65, "absent": 7}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/14",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/14",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -460,7 +460,7 @@
       "UDR":  {"pour": 1, "contre": 1, "abstention": 13, "absent": 2},
       "RN":   {"pour": 84, "contre": 0, "abstention": 1, "absent": 3}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/15",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/15",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -491,7 +491,7 @@
       "UDR":  {"pour": 0, "contre": 16, "abstention": 1, "absent": 0},
       "RN":   {"pour": 5, "contre": 6, "abstention": 71, "absent": 4}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/16",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/16",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -522,7 +522,7 @@
       "UDR":  {"pour": 16, "contre": 0, "abstention": 0, "absent": 1},
       "RN":   {"pour": 1, "contre": 82, "abstention": 3, "absent": 2}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/17",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/17",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -553,7 +553,7 @@
       "UDR":  {"pour": 16, "contre": 0, "abstention": 0, "absent": 1},
       "RN":   {"pour": 84, "contre": 0, "abstention": 1, "absent": 3}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/18",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/18",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -584,7 +584,7 @@
       "UDR":  {"pour": 6, "contre": 7, "abstention": 3, "absent": 1},
       "RN":   {"pour": 0, "contre": 83, "abstention": 2, "absent": 3}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/19",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/19",
     "est_solennel": true,
     "pedago_relu": true
   },
@@ -615,7 +615,7 @@
       "UDR":  {"pour": 16, "contre": 0, "abstention": 0, "absent": 1},
       "RN":   {"pour": 0, "contre": 84, "abstention": 1, "absent": 3}
     },
-    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/20",
+    "url_an_officielle": "https://www.assemblee-nationale.fr/dyn/17/scrutins/20",
     "est_solennel": true,
     "pedago_relu": true
   }

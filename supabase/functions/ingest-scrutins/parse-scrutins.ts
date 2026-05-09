@@ -85,6 +85,6 @@ export function parse(raw: ANScrutinRaw): ParsedScrutin {
     titre_brut: raw.titre,
     votes_bruts,
     est_solennel: isSolemn,
-    url_an_officielle: `https://www.assemblee-nationale.fr/dyn/17/scrutins/detail/${raw.uid}`,
+    url_an_officielle: `https://www.assemblee-nationale.fr/dyn/17/scrutins/${raw.numero}`,
   };
 }
