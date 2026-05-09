@@ -78,8 +78,8 @@ export default function Methode() {
         <p>Sans Détour est un projet <b>indépendant</b>. Aucune affiliation parti / média / institution.</p>
         <p>Hébergement sur fonds personnels. Pas d'annonceur, pas de sponsor, pas de don accepté pendant les 6 mois précédant un scrutin national.</p>
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)" }}>
-          <li><a href="https://data.assemblee-nationale.fr/" target="_blank" rel="noreferrer">data.assemblee-nationale.fr</a> — open data officiel</li>
-          <li><a href="https://github.com/sansdetour" target="_blank" rel="noreferrer">github.com/sansdetour</a> — code source MIT</li>
+          <li><a href="https://data.assemblee-nationale.fr/" target="_blank" rel="noopener noreferrer">data.assemblee-nationale.fr</a> — open data officiel</li>
+          <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer">github.com/sansdetour</a> — code source MIT</li>
           <li><a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a> — signaler une erreur</li>
         </ul>
       </Section>

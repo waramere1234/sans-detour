@@ -1,4 +1,5 @@
 // src/components/RankingOverlay.tsx
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { GroupAlignment } from "../types";
 import { PartyRow } from "./PartyRow";
@@ -14,6 +15,17 @@ export interface RankingOverlayProps {
 
 export function RankingOverlay({ open, alignments, countedTotal, onClose }: RankingOverlayProps) {
   const ranked = rankByAlignment(alignments);
+
+  // Esc to dismiss the modal (a11y)
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
   return (
     <AnimatePresence>
       {open && (

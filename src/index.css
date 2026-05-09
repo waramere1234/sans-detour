@@ -75,7 +75,20 @@ html, body {
   animation: sd-blink 1s steps(1) infinite;
   flex: 0 0 auto;
 }
-@media (prefers-reduced-motion: reduce) {
-  .sd-wordmark .sd-caret { animation: none; }
-}
 @keyframes sd-blink { 50% { opacity: 0; } }
+
+/* Reduced-motion safety net (Task 8.3).
+ * Disables the caret blink and aggressively shortens any other CSS
+ * animation/transition. Framer Motion respects prefers-reduced-motion via
+ * its built-in useReducedMotion() hook, so drag-to-swipe still works
+ * (drag is user-initiated, not animated) but spring-based enter/exit on
+ * RankingOverlay collapses to near-instant. */
+@media (prefers-reduced-motion: reduce) {
+  .sd-wordmark .sd-caret { animation: none !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
