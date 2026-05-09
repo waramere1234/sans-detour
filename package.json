@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "seed": "tsx scripts/seed-supabase.ts"
   },
   "dependencies": {
     "@resvg/resvg-wasm": "^2.6.2",
@@ -32,6 +33,7 @@
     "@vitest/ui": "^4.1.5",
     "jsdom": "^29.1.1",
     "tailwindcss": "^4.3.0",
+    "tsx": "^4.21.0",
     "typescript": "~5.8.3",
     "vite": "^8.0.0",
     "vitest": "^4.1.5"
