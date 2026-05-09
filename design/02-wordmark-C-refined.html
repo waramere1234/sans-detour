@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Sans Détour — Wordmark C, micro-variantes & contextes</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: oklch(0.96 0.005 250);
+    --ink-2: oklch(0.72 0.01 250);
+    --ink-3: oklch(0.50 0.01 250);
+    --bg: oklch(0.18 0.012 250);
+    --bg-2: oklch(0.22 0.012 250);
+    --line: oklch(0.30 0.012 250);
+    --accent: oklch(0.72 0.14 55);
+    --sans:"IBM Plex Sans",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  body{padding:48px 32px 96px;max-width:1280px;margin:0 auto}
+
+  header{display:flex;flex-direction:column;gap:8px;padding-bottom:28px;border-bottom:1px solid var(--line);margin-bottom:40px}
+  .meta{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3)}
+  h1{font-size:22px;font-weight:600;margin:0;letter-spacing:-0.01em}
+  header p{margin:0;color:var(--ink-2);font-size:14px;max-width:64ch;line-height:1.55}
+
+  h2.section{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);font-weight:500;margin:48px 0 18px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+
+  .grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+  .card{background:var(--bg-2);border:1px solid var(--line);border-radius:4px;overflow:hidden;display:flex;flex-direction:column}
+  .card-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .card-head .label{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3)}
+  .card-head .title{font-size:13px;font-weight:600;color:var(--ink)}
+  .stage{aspect-ratio:5 / 3;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg)}
+  .notes{padding:14px 18px;font-size:12.5px;line-height:1.55;color:var(--ink-2);border-top:1px solid var(--line)}
+  .notes b{color:var(--ink);font-weight:600}
+
+  /* C micro-variants */
+  .wm-mono{font-family:var(--mono);font-weight:500;font-size:clamp(28px,4vw,42px);line-height:1;letter-spacing:-0.01em;color:var(--ink)}
+  .wm-mono .slash{color:var(--ink-3)}
+  .wm-mono .caret{color:var(--accent)}
+  .wm-mono .blink{animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .wm-mono .dot{color:var(--accent)}
+
+  .wm-c1 .caret{margin-left:2px}
+  .wm-c2{} /* sans caret */
+  .wm-c3 .arrow{color:var(--ink-3);margin-left:6px}
+  .wm-c4 .dot{color:var(--accent)}
+
+  /* hybride A+C : sans-serif lowercase + point */
+  .wm-hybrid{font-family:var(--sans);font-weight:600;font-size:clamp(36px,5vw,52px);letter-spacing:-0.02em;line-height:1}
+  .wm-hybrid .dot{color:var(--accent)}
+
+  /* — contexte 1 : header app — */
+  .ctx{background:var(--bg-2);border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-top:8px}
+  .ctx-head{padding:10px 14px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);display:flex;justify-content:space-between}
+
+  .phone{
+    margin:24px auto;
+    width:340px;max-width:100%;
+    aspect-ratio:9 / 19.5;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:32px;
+    padding:14px;
+    display:flex;flex-direction:column;
+    overflow:hidden;
+    box-shadow:0 1px 0 rgba(255,255,255,0.04) inset;
+  }
+  .phone .topbar{
+    display:flex;align-items:center;gap:12px;
+    padding:8px 4px 14px;
+    border-bottom:1px solid var(--line);
+  }
+  .phone .topbar .logo{font-family:var(--mono);font-weight:500;font-size:14px}
+  .phone .topbar .logo .slash{color:var(--ink-3)}
+  .phone .topbar .progress{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:0.04em}
+  .phone .body{flex:1;display:flex;align-items:center;justify-content:center;color:var(--ink-3);font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase}
+  .phone .body span{border:1px dashed var(--line);padding:14px 22px;border-radius:4px}
+
+  /* favicons */
+  .fav-row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-end;margin-top:10px}
+  .fav{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .fav .swatch{width:64px;height:64px;border:1px solid var(--line);border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:36px;color:var(--accent)}
+  .fav .swatch.bg-accent{background:var(--accent);color:var(--bg)}
+  .fav .swatch.alt{font-size:30px;color:var(--ink)}
+  .fav .swatch.alt .slash{color:var(--accent)}
+  .fav .swatch.dot-only{font-size:48px;color:var(--accent);font-weight:700}
+  .fav .lbl{font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3)}
+
+  /* share card top */
+  .share-square{
+    width:100%;max-width:520px;aspect-ratio:1/1;
+    background:var(--bg);
+    border:1px solid var(--line);border-radius:8px;
+    padding:36px;display:flex;flex-direction:column;gap:24px;
+    margin:18px auto 0;
+  }
+  .share-square .top{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:14px}
+  .share-square .top .wm{font-family:var(--mono);font-weight:500;font-size:18px}
+  .share-square .top .wm .slash{color:var(--ink-3)}
+  .share-square .top .tag{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3)}
+  .share-square .h{font-family:var(--sans);font-weight:600;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;color:var(--ink-2)}
+  .share-square .top1{font-family:var(--sans);font-weight:700;font-size:64px;letter-spacing:-0.03em;line-height:0.95}
+  .share-square .top1 .pct{color:var(--accent)}
+  .share-square .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;margin-top:auto}
+  .share-square .row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:13px;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:6px}
+  .share-square .url{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:0.06em;margin-top:14px;border-top:1px solid var(--line);padding-top:10px;display:flex;justify-content:space-between}
+
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:0.06em;color:var(--ink-3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+</style>
+</head>
+<body>
+  <header>
+    <span class="meta">02 · Wordmark C — micro-variantes & contextes</span>
+    <h1>On verrouille C : 4 micro-variantes + 1 hybride A+C, puis C en contexte réel.</h1>
+    <p>Trois questions à trancher : <b>séparateur</b> (slash, dot ou autre), <b>curseur clignotant</b> (oui / non / discret), <b>accent</b> (sur le séparateur ou ailleurs). L'orange reste un placeholder.</p>
+  </header>
+
+  <h2 class="section">Micro-variantes de C</h2>
+  <section class="grid-4">
+
+    <article class="card">
+      <div class="card-head"><span class="label">C1 · slash + caret blink</span></div>
+      <div class="stage"><div class="wm-mono wm-c1">sans<span class="slash">/</span>détour<span class="caret blink">_</span></div></div>
+      <div class="notes">Le plus "data-room vivante". <b>Risque</b> : le caret distrait dans un header. À garder pour l'écran cover éventuellement, pas partout.</div>
+    </article>
+
+    <article class="card">
+      <div class="card-head"><span class="label">C2 · slash seul (sobre)</span></div>
+      <div class="stage"><div class="wm-mono wm-c2">sans<span class="slash">/</span>détour</div></div>
+      <div class="notes">Lecture immédiate, durable, scale partout (header 14px ou cover 64px). <b>Recommandation par défaut.</b> Le slash en gris-3 garde le rythme sans bruit.</div>
+    </article>
+
+    <article class="card">
+      <div class="card-head"><span class="label">C3 · slash accentué</span></div>
+      <div class="stage"><div class="wm-mono wm-c2">sans<span class="slash" style="color:var(--accent)">/</span>détour</div></div>
+      <div class="notes">Le slash devient l'élément de marque coloré (= favicon "/"). Plus signé, plus marketé. <b>Risque</b> : couleur de l'accent à valider — si on prend rouge ou bleu fort, ça change tout.</div>
+    </article>
+
+    <article class="card">
+      <div class="card-head"><span class="label">C4 · point final (mono)</span></div>
+      <div class="stage"><div class="wm-mono wm-c4">sans détour<span class="dot">.</span></div></div>
+      <div class="notes">Sans slash : juste le mono lowercase + le point coloré. Plus posé, moins "tech". <b>Trade-off</b> : on perd le mark "/" comme favicon.</div>
+    </article>
+
+  </section>
+
+  <h2 class="section">Hybride A + C — pour comparaison</h2>
+  <section class="grid-4">
+    <article class="card" style="grid-column:1 / -1; max-width:680px">
+      <div class="card-head"><span class="label">H · sans-serif lowercase + point</span></div>
+      <div class="stage" style="aspect-ratio:6/2"><div class="wm-hybrid">sans détour<span class="dot">.</span></div></div>
+      <div class="notes">Plex Sans 600 lowercase + point. Plus "marque grand public", moins "outil de consultation". À mi-chemin entre A et C. <b>Si C te semble trop techy à l'usage</b>, c'est le repli logique.</div>
+    </article>
+  </section>
+
+  <h2 class="section">C en contexte — header app, favicon, share card</h2>
+
+  <div class="ctx">
+    <div class="ctx-head"><span>HEADER /play (mobile)</span><span>variante C2 — slash seul</span></div>
+    <div class="phone">
+      <div class="topbar">
+        <span class="logo">sans<span class="slash">/</span>détour</span>
+        <span class="progress">03 / 20</span>
+      </div>
+      <div class="body"><span>carte scrutin · placeholder</span></div>
+    </div>
+  </div>
+
+  <div class="ctx" style="margin-top:24px">
+    <div class="ctx-head"><span>FAVICON · APP ICON · STICKER</span><span>3 pistes mark</span></div>
+    <div class="fav-row" style="padding:24px 18px 28px">
+      <div class="fav"><div class="swatch">/</div><span class="lbl">slash · ink + bg sombre</span></div>
+      <div class="fav"><div class="swatch bg-accent">/</div><span class="lbl">slash · accent fond</span></div>
+      <div class="fav"><div class="swatch alt">s<span class="slash">/</span>d</div><span class="lbl">monogramme s/d</span></div>
+      <div class="fav"><div class="swatch dot-only">.</div><span class="lbl">point seul (si C4)</span></div>
+    </div>
+  </div>
+
+  <div class="ctx" style="margin-top:24px">
+    <div class="ctx-head"><span>SHARE CARD · square 1080×1080 (preview top + headline)</span><span>variante C2</span></div>
+    <div class="share-square">
+      <div class="top">
+        <div class="wm">sans<span class="slash">/</span>détour</div>
+        <div class="tag">LEURS VOTES, SANS LE MARKETING</div>
+      </div>
+      <div>
+        <div class="h">Mes affinités politiques réelles</div>
+        <div class="top1" style="margin-top:14px">LFI<br><span class="pct">71 %</span></div>
+      </div>
+      <div class="grid">
+        <div class="row"><span>EELV</span><span>68%</span></div>
+        <div class="row"><span>PS</span><span>62%</span></div>
+        <div class="row"><span>REN</span><span>38%</span></div>
+        <div class="row"><span>LR</span><span>24%</span></div>
+        <div class="row"><span>RN</span><span>18%</span></div>
+        <div class="row"><span>MoDem</span><span>34%</span></div>
+      </div>
+      <div class="url"><span>sansdetour.fr</span><span>20 scrutins · 17e légis.</span></div>
+    </div>
+  </div>
+
+  <footer>
+    <span>SANS DÉTOUR · DESIGN BOARD 02</span>
+    <span>RECO PAR DÉFAUT — C2 (slash sobre)</span>
+    <span>NEXT — palette &amp; couleurs partis</span>
+  </footer>
+</body>
+</html>

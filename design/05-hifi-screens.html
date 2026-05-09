@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Sans Détour — Écrans hi-fi · Cover · Deck · Result · Share</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* =====================================================
+     DESIGN SYSTEM — locked
+     ===================================================== */
+  :root{
+    /* Surfaces */
+    --bg: oklch(0.18 0.012 250);
+    --bg-2: oklch(0.22 0.012 250);
+    --bg-3: oklch(0.26 0.012 250);
+    --line: oklch(0.30 0.012 250);
+    --line-2: oklch(0.40 0.012 250);
+
+    /* Inks */
+    --ink:   oklch(0.96 0.005 250);
+    --ink-2: oklch(0.72 0.01 250);
+    --ink-3: oklch(0.50 0.01 250);
+    --ink-4: oklch(0.36 0.01 250);
+
+    /* Accent — D2 bleu république */
+    --accent:      oklch(0.78 0.14 230);
+    --accent-2:    oklch(0.86 0.10 230);
+    --accent-soft: oklch(0.78 0.14 230 / 0.14);
+    --accent-line: oklch(0.78 0.14 230 / 0.45);
+
+    /* Semantic */
+    --pour:   oklch(0.74 0.16 145);
+    --contre: oklch(0.66 0.18 25);
+
+    /* Party colors */
+    --p-lfi:  oklch(0.55 0.16 24);
+    --p-gdr:  oklch(0.55 0.10 18);
+    --p-eco:  oklch(0.66 0.14 145);
+    --p-soc:  oklch(0.72 0.14 0);
+    --p-liot: oklch(0.62 0.07 285);
+    --p-epr:  oklch(0.75 0.13 80);
+    --p-dem:  oklch(0.74 0.14 60);
+    --p-hor:  oklch(0.62 0.06 220);
+    --p-dr:   oklch(0.45 0.07 250);
+    --p-udr:  oklch(0.36 0.05 270);
+    --p-rn:   oklch(0.32 0.04 260);
+
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+
+  /* =====================================================
+     WORDMARK
+     ===================================================== */
+  .sd-wordmark{font-family:var(--mono);font-weight:500;line-height:1;letter-spacing:-0.01em;display:inline-flex;align-items:baseline;white-space:nowrap;color:var(--ink)}
+  .sd-wordmark .sd-slash{color:var(--ink-3)}
+  .sd-wordmark .sd-caret{display:inline-block;width:0.55ch;height:0.10em;background:var(--accent);margin-left:0.18ch;transform:translateY(0.05em);animation:sd-blink 1s steps(1) infinite;flex:0 0 auto}
+  @media(prefers-reduced-motion:reduce){.sd-wordmark .sd-caret{animation:none}}
+  @keyframes sd-blink{50%{opacity:0}}
+
+  /* =====================================================
+     BOARD CHROME
+     ===================================================== */
+  .board{padding:48px 32px 96px;max-width:1480px;margin:0 auto}
+  .board-head{display:flex;flex-direction:column;gap:8px;padding-bottom:28px;border-bottom:1px solid var(--line);margin-bottom:36px}
+  .meta{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3)}
+  h1.board-title{font-size:22px;font-weight:600;margin:0;letter-spacing:-0.01em}
+  .board-head p{margin:0;color:var(--ink-2);font-size:14px;max-width:64ch;line-height:1.55}
+  h2.section{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);font-weight:500;margin:48px 0 18px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  h2.section .small{color:var(--ink-2);text-transform:none;letter-spacing:0;font-family:var(--sans);font-size:13px;font-weight:400}
+
+  .frame-row{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;justify-content:flex-start}
+  .frame-col{display:flex;flex-direction:column;gap:10px}
+  .frame-cap{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);display:flex;justify-content:space-between;gap:16px;padding:0 4px}
+  .frame-cap .small{color:var(--ink-2);text-transform:none;font-size:11px;letter-spacing:0}
+
+  /* =====================================================
+     PHONE FRAME — 390 wide, height variable
+     ===================================================== */
+  .phone{
+    width:390px;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:36px;
+    padding:14px 12px 16px;
+    box-shadow: 0 0 0 1px oklch(0.30 0.012 250 / 0.4) inset, 0 24px 40px -24px #000;
+    overflow:hidden;
+    flex:0 0 auto;
+    position:relative;
+  }
+  .phone-screen{
+    background:var(--bg);
+    border-radius:24px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    position:relative;
+    display:flex;flex-direction:column;
+  }
+  .phone-screen.fixed-h{height:824px}
+
+  /* status bar minimal */
+  .stat{
+    height:30px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 18px;font-family:var(--mono);font-size:12px;color:var(--ink-2);
+    flex:0 0 auto;
+  }
+  .stat .right{display:flex;gap:6px;align-items:center;font-size:11px}
+  .stat .bar{display:inline-block;width:18px;height:9px;border:1px solid var(--ink-2);border-radius:2px;position:relative}
+  .stat .bar::after{content:"";position:absolute;inset:1px 7px 1px 1px;background:var(--ink-2);border-radius:1px}
+
+  /* =====================================================
+     COVER
+     ===================================================== */
+  .cover{flex:1;display:flex;flex-direction:column;padding:24px 22px 22px;gap:0}
+  .cover .top{display:flex;align-items:center;justify-content:space-between;padding-bottom:18px;border-bottom:1px solid var(--line)}
+  .cover .top .src{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);letter-spacing:0.12em;text-transform:uppercase;text-align:right;line-height:1.5}
+  .cover .top .src b{color:var(--ink-2);font-weight:500}
+  .cover .body{flex:1;display:flex;flex-direction:column;justify-content:space-between;padding:32px 0 16px;gap:32px}
+  .cover .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:500}
+  .cover h1{font-family:var(--sans);font-weight:700;font-size:38px;line-height:1.05;letter-spacing:-0.022em;margin:14px 0 0;color:var(--ink)}
+  .cover h1 .a{color:var(--ink)}
+  .cover h1 .dot{color:var(--accent)}
+  .cover h1 .l2{display:block;color:var(--ink)}
+  .cover .pitch{font-size:15px;line-height:1.55;color:var(--ink-2);letter-spacing:-0.005em;max-width:32ch;margin-top:24px}
+  .cover .gestes{display:flex;justify-content:space-between;gap:8px;margin-top:8px;border-top:1px solid var(--line);padding-top:16px}
+  .cover .gestes .g{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 0}
+  .cover .gestes .g .arrow{font-family:var(--mono);font-size:18px;color:var(--ink-2)}
+  .cover .gestes .g .lbl{font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3)}
+  .cover .gestes .g.contre .arrow{color:var(--contre)}
+  .cover .gestes .g.pour .arrow{color:var(--pour)}
+  .cover .cta-wrap{display:flex;flex-direction:column;gap:12px;margin-top:auto}
+  .cover .cta{
+    background:var(--accent);color:var(--bg);
+    font-family:var(--sans);font-weight:600;font-size:16px;letter-spacing:-0.01em;
+    padding:18px 18px;border:none;border-radius:6px;cursor:pointer;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+  }
+  .cover .cta .arr{font-family:var(--mono);font-weight:500}
+  .cover .cta-meta{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:0.06em;text-align:center}
+
+  /* =====================================================
+     DECK
+     ===================================================== */
+  .deck{flex:1;display:flex;flex-direction:column;padding:18px 16px 16px;gap:18px}
+  .deck .topbar{display:flex;align-items:center;gap:10px;justify-content:space-between}
+  .deck .topbar .progress{
+    font-family:var(--mono);font-size:12px;color:var(--ink-2);letter-spacing:0.04em;
+    background:transparent;border:1px solid var(--line);padding:7px 11px;border-radius:3px;
+  }
+  .deck .topbar .progress b{color:var(--ink);font-weight:500}
+  .chip-top1{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:7px 11px;border:1px solid var(--accent-line);
+    background: var(--accent-soft);
+    color:var(--accent);
+    font-family:var(--mono);font-size:11.5px;letter-spacing:0.04em;font-weight:500;
+    border-radius:3px;cursor:pointer;
+  }
+  .chip-top1 .pulse{
+    width:6px;height:6px;border-radius:50%;background:var(--accent);
+    box-shadow: 0 0 0 0 var(--accent);
+    animation: pulse 1.6s ease-out infinite;
+    flex:0 0 auto;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 var(--accent-line)}
+    70%{box-shadow:0 0 0 6px transparent}
+    100%{box-shadow:0 0 0 0 transparent}
+  }
+  @media(prefers-reduced-motion:reduce){.chip-top1 .pulse{animation:none}}
+  .chip-top1 b{color:var(--ink);font-weight:600}
+
+  .deck-stack{flex:1;position:relative;display:flex;align-items:center;justify-content:center;padding:6px 0}
+  .deck-stack .card{
+    position:absolute;left:8px;right:8px;
+    background:var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px 22px 22px;
+    display:flex;flex-direction:column;gap:18px;
+    box-shadow: 0 18px 30px -16px #000;
+  }
+  .deck-stack .card.c3{top:16px;transform: scale(0.93) translateY(8px);opacity:0.45;z-index:1;filter:blur(0.3px)}
+  .deck-stack .card.c2{top:8px;transform: scale(0.965) translateY(4px);opacity:0.75;z-index:2}
+  .deck-stack .card.c1{top:0;z-index:3;transform: rotate(-1.5deg) translateX(-12px)}
+  .deck-stack .card .chapeau{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:500}
+  .deck-stack .card .titre{font-family:var(--sans);font-weight:600;font-size:21px;line-height:1.3;letter-spacing:-0.012em;color:var(--ink);text-wrap:pretty}
+  .deck-stack .card .meta{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:0.04em;display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:14px;margin-top:auto}
+  .deck-stack .card.c1{height:340px}
+
+  /* swipe hints (gradient edges) */
+  .deck-stack .card .swipe-hint{
+    position:absolute;top:18px;left:18px;right:18px;
+    display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-4);
+  }
+
+  .deck .gestes-fb{display:flex;justify-content:space-between;gap:10px;flex:0 0 auto}
+  .deck .gestes-fb .b{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+    padding:14px 0;border:1px solid var(--line);border-radius:8px;background:var(--bg-2);
+    cursor:pointer;
+  }
+  .deck .gestes-fb .b .icon{font-size:18px;font-family:var(--mono);font-weight:500}
+  .deck .gestes-fb .b .lbl{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3)}
+  .deck .gestes-fb .contre .icon{color:var(--contre)}
+  .deck .gestes-fb .skip   .icon{color:var(--ink-3)}
+  .deck .gestes-fb .pour   .icon{color:var(--pour)}
+
+  /* =====================================================
+     OVERLAY RANKING — bottom sheet
+     ===================================================== */
+  .overlay-bg{
+    position:absolute;inset:0;
+    background:oklch(0.10 0.01 250 / 0.55);
+    backdrop-filter: blur(2px);
+    z-index:5;
+    display:flex;align-items:flex-end;
+  }
+  .overlay-sheet{
+    width:100%;
+    background:var(--bg);
+    border-top:1px solid var(--line);
+    border-top-left-radius:18px;border-top-right-radius:18px;
+    padding:14px 18px 22px;
+    display:flex;flex-direction:column;gap:14px;
+    max-height:78%;
+    overflow:hidden;
+  }
+  .overlay-sheet .handle{width:40px;height:4px;background:var(--ink-4);border-radius:2px;margin:2px auto 6px}
+  .overlay-sheet .o-head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:10px}
+  .overlay-sheet .o-head .ttl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-3)}
+  .overlay-sheet .o-head .ttl b{color:var(--ink);font-weight:500}
+  .overlay-sheet .o-head .close{font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:0.04em}
+  .overlay-sheet .list{display:flex;flex-direction:column;gap:8px;overflow:auto}
+  .overlay-sheet .footnote{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:0.04em;border-top:1px solid var(--line);padding-top:10px;text-align:center}
+
+  /* =====================================================
+     PARTI ROW (shared by overlay & result)
+     ===================================================== */
+  .pr{display:grid;grid-template-columns:54px 1fr 44px;gap:12px;align-items:center;font-size:13px;padding:6px 0}
+  .pr .nm{font-family:var(--mono);font-size:11px;color:var(--ink);letter-spacing:0.04em}
+  .pr .bar{height:6px;background:var(--bg-3);border-radius:1px;overflow:hidden}
+  .pr .bar i{display:block;height:100%}
+  .pr .pct{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);text-align:right;font-weight:500}
+  .pr.top .pct{color:var(--accent);font-weight:600}
+
+  /* =====================================================
+     RESULT
+     ===================================================== */
+  .result{flex:1;display:flex;flex-direction:column;padding:18px 16px 22px;gap:18px}
+  .result .nav{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .result .nav .back{font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:0.06em;text-transform:uppercase}
+  .result .head{padding:6px 0 14px;border-bottom:1px solid var(--line)}
+  .result .head .eye{font-family:var(--mono);font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-3)}
+  .result .head h2{font-family:var(--sans);font-weight:600;font-size:24px;line-height:1.22;letter-spacing:-0.018em;margin:8px 0 0;text-wrap:pretty}
+  .result .head h2 .top1{color:var(--accent)}
+  .result .head .sub{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);letter-spacing:0.04em;margin-top:8px}
+
+  .result .ranking{display:flex;flex-direction:column}
+  .result .ranking .row-x{
+    display:grid;grid-template-columns:54px 1fr 44px 14px;gap:12px;align-items:center;
+    padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer;
+  }
+  .result .ranking .row-x .nm{font-family:var(--mono);font-size:11.5px;color:var(--ink);letter-spacing:0.04em;font-weight:500}
+  .result .ranking .row-x .bar{height:6px;background:var(--bg-3);border-radius:1px;overflow:hidden}
+  .result .ranking .row-x .bar i{display:block;height:100%}
+  .result .ranking .row-x .pct{font-family:var(--mono);font-size:12px;color:var(--ink-2);text-align:right;font-weight:500}
+  .result .ranking .row-x .chev{color:var(--ink-3);font-family:var(--mono);font-size:11px;text-align:center}
+
+  .result .ranking .row-x.top .nm{color:var(--ink)}
+  .result .ranking .row-x.top .pct{color:var(--accent);font-weight:700}
+  .result .ranking .row-x.expanded{background:var(--bg-2);margin:0 -16px;padding-left:16px;padding-right:16px;border-color:var(--bg-2)}
+
+  .audit{
+    background:var(--bg-2);margin:0 -16px;padding:0 18px 18px;
+    display:flex;flex-direction:column;gap:14px;border-bottom:1px solid var(--line);
+  }
+  .audit .stats{display:flex;gap:14px;font-family:var(--mono);font-size:11.5px;color:var(--ink-2);letter-spacing:0.04em;padding-bottom:4px}
+  .audit .stats span{display:flex;align-items:center;gap:6px}
+  .audit .stats .ok{color:var(--pour)}
+  .audit .stats .mid{color:var(--ink-3)}
+  .audit .stats .ko{color:var(--contre)}
+  .audit .vlist{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+  .audit .v{display:flex;flex-direction:column;gap:6px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .audit .v:last-child{border:none}
+  .audit .v .vt{font-family:var(--sans);font-size:13.5px;line-height:1.4;color:var(--ink);font-weight:500;letter-spacing:-0.005em;text-wrap:pretty}
+  .audit .v .vmeta{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:0.04em;flex-wrap:wrap}
+  .audit .v .pic{display:inline-flex;align-items:center;gap:6px;padding:3px 7px;border-radius:2px;font-weight:500;border:1px solid var(--line)}
+  .audit .v .pic.pour{color:var(--pour);border-color:color-mix(in oklab,var(--pour) 30%, var(--line))}
+  .audit .v .pic.contre{color:var(--contre);border-color:color-mix(in oklab,var(--contre) 30%, var(--line))}
+  .audit .v .pic.abst{color:var(--ink-2)}
+  .audit .v .vs{color:var(--ink-3)}
+  .audit .v .ext{margin-left:auto;color:var(--accent);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+  .audit .divises{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:0.04em;border-top:1px dashed var(--line);padding-top:10px}
+
+  .actions{display:flex;flex-direction:column;gap:10px;padding:6px 0 0}
+  .actions .a-primary{background:var(--accent);color:var(--bg);border:none;font-family:var(--sans);font-weight:600;font-size:15px;letter-spacing:-0.005em;padding:16px 16px;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+  .actions .a-primary .arr{font-family:var(--mono)}
+  .actions .a-secondary,.actions .a-tertiary{background:transparent;color:var(--ink);border:1px solid var(--line);font-family:var(--sans);font-weight:500;font-size:14px;padding:12px 14px;border-radius:6px;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+  .actions .a-tertiary{color:var(--ink-2);border-style:dashed}
+  .actions .a-secondary .arr,.actions .a-tertiary .arr{font-family:var(--mono);color:var(--ink-3)}
+
+  /* =====================================================
+     SHARE CARDS
+     ===================================================== */
+  .share-row{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+
+  .share{
+    --pad: 64px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+    color:var(--ink);
+    display:flex;flex-direction:column;
+    position:relative;
+  }
+  .share .grain::before{
+    /* very subtle anchor */
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(ellipse at top right, color-mix(in oklab, var(--accent) 14%, transparent) 0%, transparent 55%);
+  }
+
+  /* square 1080x1080 displayed at 540 */
+  .share-square{width:540px;height:540px;padding:36px}
+  .share-square .top{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:18px;border-bottom:1px solid var(--line)}
+  .share-square .top .wm{font-family:var(--mono);font-weight:500;font-size:18px;display:inline-flex;align-items:baseline;letter-spacing:-0.01em}
+  .share-square .top .wm .sl{color:var(--ink-3)}
+  .share-square .top .wm .ca{display:inline-block;width:0.55ch;height:0.10em;background:var(--accent);margin-left:0.18ch;transform:translateY(0.05em)}
+  .share-square .top .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-3);text-align:right;line-height:1.55}
+  .share-square .h{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-3);margin-top:18px;font-weight:500}
+  .share-square .top1{font-family:var(--sans);font-weight:700;letter-spacing:-0.03em;line-height:0.92;margin-top:14px}
+  .share-square .top1 .nm{font-size:54px;color:var(--ink);display:block}
+  .share-square .top1 .pct{font-size:96px;color:var(--accent);display:block;margin-top:6px}
+  .share-square .grid6{display:grid;grid-template-columns:1fr 1fr;gap:6px 22px;margin-top:24px}
+  .share-square .gr{display:grid;grid-template-columns:42px 1fr 36px;gap:8px;align-items:center;border-top:1px solid var(--line);padding-top:6px}
+  .share-square .gr .nm{font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:0.04em}
+  .share-square .gr .b{height:4px;background:var(--bg-3);border-radius:1px;overflow:hidden}
+  .share-square .gr .b i{display:block;height:100%}
+  .share-square .gr .pct{font-family:var(--mono);font-size:11px;color:var(--ink-2);text-align:right}
+  .share-square .url{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:0.06em;margin-top:auto;border-top:1px solid var(--line);padding-top:12px;display:flex;justify-content:space-between}
+
+  /* story 1080x1920 displayed at 432x768 */
+  .share-story{width:432px;height:768px;padding:36px 32px}
+  .share-story .top{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .share-story .top .wm{font-family:var(--mono);font-weight:500;font-size:14px;display:inline-flex;align-items:baseline;letter-spacing:-0.01em}
+  .share-story .top .wm .sl{color:var(--ink-3)}
+  .share-story .top .wm .ca{display:inline-block;width:0.55ch;height:0.10em;background:var(--accent);margin-left:0.18ch;transform:translateY(0.05em)}
+  .share-story .top .tag{font-family:var(--mono);font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-3);text-align:right;line-height:1.55}
+  .share-story .h{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-3);margin-top:36px;font-weight:500}
+  .share-story .top1{font-family:var(--sans);font-weight:700;letter-spacing:-0.03em;line-height:0.92;margin-top:14px}
+  .share-story .top1 .nm{font-size:64px;color:var(--ink);display:block}
+  .share-story .top1 .pct{font-size:128px;color:var(--accent);display:block;margin-top:8px}
+  .share-story .list6{display:flex;flex-direction:column;gap:6px;margin-top:32px}
+  .share-story .row6{display:grid;grid-template-columns:54px 1fr 44px;gap:10px;align-items:center;border-top:1px solid var(--line);padding-top:6px}
+  .share-story .row6 .nm{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);letter-spacing:0.04em}
+  .share-story .row6 .b{height:4px;background:var(--bg-3);border-radius:1px;overflow:hidden}
+  .share-story .row6 .b i{display:block;height:100%}
+  .share-story .row6 .pct{font-family:var(--mono);font-size:11px;color:var(--ink-2);text-align:right}
+  .share-story .url{font-family:var(--mono);font-size:12px;color:var(--ink-3);letter-spacing:0.06em;margin-top:auto;border-top:1px solid var(--line);padding-top:14px;display:flex;justify-content:space-between}
+  .share-story .url b{color:var(--ink-2);font-weight:500}
+
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:0.06em;color:var(--ink-3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+</style>
+</head>
+<body>
+
+<div class="board">
+
+<header class="board-head">
+  <span class="meta">05 · Écrans hi-fi · Cover · Deck · Result · Share</span>
+  <h1 class="board-title">Système verrouillé · 6 écrans appliqués.</h1>
+  <p>Frames mobile à taille native (390 px de large). Chiffres et noms de partis sur des données fictives mais réalistes : 17e législature, scrutin "retraites 64 ans", session de 20 votes complétée. La carte LFI est dépliée sur le résultat pour montrer l'audit trail.</p>
+</header>
+
+<!-- =================== MOBILE 1 — COVER + DECK STATES =================== -->
+
+<h2 class="section">
+  <span>1 · Mobile · cover &amp; swipe deck</span>
+  <span class="small">3 frames · 390×844 · états : cover / deck normal / deck + overlay ranking ouvert</span>
+</h2>
+
+<div class="frame-row">
+
+  <!-- COVER -->
+  <div class="frame-col">
+    <div class="phone">
+      <div class="phone-screen fixed-h">
+        <div class="stat"><span>9:41</span><span class="right"><span>•••</span><span>5G</span><span class="bar"></span></span></div>
+        <div class="cover">
+          <div class="top">
+            <span class="sd-wordmark" style="font-size:18px">sans<span class="sd-slash">/</span>détour<span class="sd-caret"></span></span>
+            <span class="src">SOURCE OFFICIELLE<br><b>data.assemblee-nationale.fr</b></span>
+          </div>
+          <div class="body">
+            <div>
+              <span class="eyebrow">PROPOS</span>
+              <h1>Pas&nbsp;les programmes.<span class="l2">Les vrais votes<span class="dot">.</span></span></h1>
+              <p class="pitch">On ne te demande pas d'aimer un parti. On te montre ce que tu aurais voté et qui d'autre l'a voté à l'Assemblée Nationale.</p>
+            </div>
+            <div class="gestes">
+              <div class="g contre"><span class="arrow">←</span><span class="lbl">contre</span></div>
+              <div class="g"><span class="arrow">↓</span><span class="lbl">je passe</span></div>
+              <div class="g pour"><span class="arrow">→</span><span class="lbl">pour</span></div>
+            </div>
+            <div class="cta-wrap">
+              <button class="cta">Commencer<span class="arr">→</span></button>
+              <span class="cta-meta">≈ 5 min · 20 scrutins solennels · 17e légis.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-cap"><span>01 · COVER</span><span class="small">/</span></div>
+  </div>
+
+  <!-- DECK NORMAL -->
+  <div class="frame-col">
+    <div class="phone">
+      <div class="phone-screen fixed-h">
+        <div class="stat"><span>9:43</span><span class="right"><span>•••</span><span>5G</span><span class="bar"></span></span></div>
+        <div class="deck">
+          <div class="topbar">
+            <span class="chip-top1"><span class="pulse"></span>🏆 LFI <b>71 %</b></span>
+            <span class="progress"><b>07</b>&nbsp;/&nbsp;20</span>
+          </div>
+          <div class="deck-stack">
+            <!-- back cards -->
+            <div class="card c3">
+              <div class="chapeau">FISCALITÉ · PLF 2025</div>
+              <div class="titre">Supprimer la flat tax sur les dividendes.</div>
+              <div class="meta"><span>—</span><span>—</span></div>
+            </div>
+            <div class="card c2">
+              <div class="chapeau">SÉCURITÉ · LOI IMMIGRATION</div>
+              <div class="titre">Restreindre l'aide médicale d'État aux soins urgents.</div>
+              <div class="meta"><span>—</span><span>—</span></div>
+            </div>
+            <!-- front card -->
+            <div class="card c1">
+              <div class="chapeau">RETRAITES · PLFSS 2024</div>
+              <div class="titre">Reculer l'âge légal de départ à la retraite à 64 ans, à effet immédiat.</div>
+              <div class="meta"><span>10 mars 2024</span><span>scrutin&nbsp;n°&nbsp;2871</span></div>
+            </div>
+          </div>
+          <div class="gestes-fb">
+            <div class="b contre"><span class="icon">←</span><span class="lbl">contre</span></div>
+            <div class="b skip"><span class="icon">↓</span><span class="lbl">je passe</span></div>
+            <div class="b pour"><span class="icon">→</span><span class="lbl">pour</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-cap"><span>02 · DECK · chip top 1 actif</span><span class="small">/play · 7 votes</span></div>
+  </div>
+
+  <!-- DECK + OVERLAY -->
+  <div class="frame-col">
+    <div class="phone">
+      <div class="phone-screen fixed-h">
+        <div class="stat"><span>9:43</span><span class="right"><span>•••</span><span>5G</span><span class="bar"></span></span></div>
+        <div class="deck">
+          <div class="topbar">
+            <span class="chip-top1"><span class="pulse"></span>🏆 LFI <b>71 %</b></span>
+            <span class="progress"><b>07</b>&nbsp;/&nbsp;20</span>
+          </div>
+          <div class="deck-stack" style="opacity:0.4">
+            <div class="card c1">
+              <div class="chapeau">RETRAITES · PLFSS 2024</div>
+              <div class="titre">Reculer l'âge légal de départ à la retraite à 64 ans.</div>
+              <div class="meta"><span>10 mars 2024</span><span>scrutin&nbsp;n°&nbsp;2871</span></div>
+            </div>
+          </div>
+          <div class="gestes-fb" style="opacity:0.4">
+            <div class="b contre"><span class="icon">←</span><span class="lbl">contre</span></div>
+            <div class="b skip"><span class="icon">↓</span><span class="lbl">je passe</span></div>
+            <div class="b pour"><span class="icon">→</span><span class="lbl">pour</span></div>
+          </div>
+        </div>
+
+        <!-- overlay -->
+        <div class="overlay-bg">
+          <div class="overlay-sheet">
+            <div class="handle"></div>
+            <div class="o-head">
+              <span class="ttl">RANKING EN DIRECT · <b>7 SCRUTINS COMPTÉS</b></span>
+              <span class="close">Fermer ✕</span>
+            </div>
+            <div class="list">
+              <div class="pr top"><span class="nm">LFI</span><span class="bar"><i style="width:71%;background:var(--p-lfi)"></i></span><span class="pct">71%</span></div>
+              <div class="pr"><span class="nm">ECO</span><span class="bar"><i style="width:64%;background:var(--p-eco)"></i></span><span class="pct">64%</span></div>
+              <div class="pr"><span class="nm">SOC</span><span class="bar"><i style="width:60%;background:var(--p-soc)"></i></span><span class="pct">60%</span></div>
+              <div class="pr"><span class="nm">GDR</span><span class="bar"><i style="width:55%;background:var(--p-gdr)"></i></span><span class="pct">55%</span></div>
+              <div class="pr"><span class="nm">LIOT</span><span class="bar"><i style="width:46%;background:var(--p-liot)"></i></span><span class="pct">46%</span></div>
+              <div class="pr"><span class="nm">DEM</span><span class="bar"><i style="width:42%;background:var(--p-dem)"></i></span><span class="pct">42%</span></div>
+              <div class="pr"><span class="nm">EPR</span><span class="bar"><i style="width:36%;background:var(--p-epr)"></i></span><span class="pct">36%</span></div>
+              <div class="pr"><span class="nm">HOR</span><span class="bar"><i style="width:34%;background:var(--p-hor)"></i></span><span class="pct">34%</span></div>
+              <div class="pr"><span class="nm">DR</span><span class="bar"><i style="width:24%;background:var(--p-dr)"></i></span><span class="pct">24%</span></div>
+              <div class="pr"><span class="nm">UDR</span><span class="bar"><i style="width:20%;background:var(--p-udr)"></i></span><span class="pct">20%</span></div>
+              <div class="pr"><span class="nm">RN</span><span class="bar"><i style="width:18%;background:var(--p-rn)"></i></span><span class="pct">18%</span></div>
+            </div>
+            <div class="footnote">Continue à swiper. 13 scrutins restants. Le ranking se précise à chaque vote.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-cap"><span>03 · DECK · overlay ranking</span><span class="small">/play · tap chip</span></div>
+  </div>
+
+</div>
+
+<!-- =================== MOBILE 2 — RESULT (TALL) =================== -->
+
+<h2 class="section">
+  <span>2 · Mobile · résultat avec audit trail</span>
+  <span class="small">1 frame · 390 wide · contenu scroll vertical · LFI dépliée pour montrer le détail des votes</span>
+</h2>
+
+<div class="frame-row">
+  <div class="frame-col">
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="stat"><span>9:48</span><span class="right"><span>•••</span><span>5G</span><span class="bar"></span></span></div>
+        <div class="result">
+
+          <div class="nav">
+            <span class="back">‹ Refaire</span>
+            <span class="sd-wordmark" style="font-size:13px">sans<span class="sd-slash">/</span>détour<span class="sd-caret"></span></span>
+            <span class="back" style="visibility:hidden">‹</span>
+          </div>
+
+          <div class="head">
+            <span class="eye">RÉSULTAT · 17E LÉGISLATURE</span>
+            <h2>Tu votes comme <span class="top1">LFI</span> 7 fois sur 10.</h2>
+            <span class="sub">20 scrutins · 18 comptés · 2 skips</span>
+          </div>
+
+          <div class="ranking">
+            <div class="row-x top expanded"><span class="nm">LFI</span><span class="bar"><i style="width:71%;background:var(--p-lfi)"></i></span><span class="pct">71%</span><span class="chev">−</span></div>
+
+            <!-- AUDIT TRAIL -->
+            <div class="audit">
+              <div class="stats">
+                <span class="ok">✓ 12 alignés</span>
+                <span class="mid">~ 4 partiels</span>
+                <span class="ko">✗ 2 désaccords</span>
+              </div>
+              <div class="vlist">
+                <div class="v">
+                  <span class="vt">Reculer l'âge légal de départ à 64 ans.</span>
+                  <span class="vmeta">
+                    <span class="pic contre">Toi · contre</span>
+                    <span class="vs">≡</span>
+                    <span class="pic contre">LFI · contre</span>
+                    <a class="ext" href="#">fiche AN&nbsp;↗</a>
+                  </span>
+                </div>
+                <div class="v">
+                  <span class="vt">Encadrer les loyers dans les zones tendues.</span>
+                  <span class="vmeta">
+                    <span class="pic pour">Toi · pour</span>
+                    <span class="vs">≡</span>
+                    <span class="pic pour">LFI · pour</span>
+                    <a class="ext" href="#">fiche AN&nbsp;↗</a>
+                  </span>
+                </div>
+                <div class="v">
+                  <span class="vt">Relancer la filière nucléaire avec six EPR2.</span>
+                  <span class="vmeta">
+                    <span class="pic pour">Toi · pour</span>
+                    <span class="vs">≠</span>
+                    <span class="pic contre">LFI · contre</span>
+                    <a class="ext" href="#">fiche AN&nbsp;↗</a>
+                  </span>
+                </div>
+                <div class="v">
+                  <span class="vt">Inscrire la liberté de recourir à l'IVG dans la Constitution.</span>
+                  <span class="vmeta">
+                    <span class="pic pour">Toi · pour</span>
+                    <span class="vs">≡</span>
+                    <span class="pic pour">LFI · pour</span>
+                    <a class="ext" href="#">fiche AN&nbsp;↗</a>
+                  </span>
+                </div>
+                <div class="v">
+                  <span class="vt">Restreindre l'aide médicale d'État aux soins urgents.</span>
+                  <span class="vmeta">
+                    <span class="pic contre">Toi · contre</span>
+                    <span class="vs">≡</span>
+                    <span class="pic contre">LFI · contre</span>
+                    <a class="ext" href="#">fiche AN&nbsp;↗</a>
+                  </span>
+                </div>
+                <div class="v">
+                  <span class="vt">Supprimer la redevance audiovisuelle.</span>
+                  <span class="vmeta">
+                    <span class="pic abst">Toi · abstention</span>
+                    <span class="vs">~</span>
+                    <span class="pic contre">LFI · contre</span>
+                    <a class="ext" href="#">fiche AN&nbsp;↗</a>
+                  </span>
+                </div>
+              </div>
+              <div class="divises">3 scrutins non comptés (LFI groupe divisé).</div>
+            </div>
+
+            <div class="row-x"><span class="nm">ECO</span><span class="bar"><i style="width:66%;background:var(--p-eco)"></i></span><span class="pct">66%</span><span class="chev">+</span></div>
+            <div class="row-x"><span class="nm">SOC</span><span class="bar"><i style="width:62%;background:var(--p-soc)"></i></span><span class="pct">62%</span><span class="chev">+</span></div>
+            <div class="row-x"><span class="nm">GDR</span><span class="bar"><i style="width:54%;background:var(--p-gdr)"></i></span><span class="pct">54%</span><span class="chev">+</span></div>
+            <div class="row-x"><span class="nm">LIOT</span><span class="bar"><i style="width:48%;background:var(--p-liot)"></i></span><span class="pct">48%</span><span class="chev">+</span></div>
+            <div class="row-x"><span class="nm">DEM</span><span class="bar"><i style="width:42%;background:var(--p-dem)"></i></span><span class="pct">42%</span><span class="chev">+</span></div>
+            <div class="row-x"><span class="nm">EPR</span><span class="bar"><i style="width:38%;background:var(--p-epr)"></i></span><span class="pct">38%</span><span class="chev">+</span></div>
+            <div class="row-x"><span class="nm">HOR</span><span class="bar"><i style="width:36%;background:var(--p-hor)"></i></span><span class="pct">36%</span><span class="chev">+</span></div>
+            <div class="row-x"><span class="nm">DR</span><span class="bar"><i style="width:24%;background:var(--p-dr)"></i></span><span class="pct">24%</span><span class="chev">+</span></div>
+            <div class="row-x"><span class="nm">UDR</span><span class="bar"><i style="width:20%;background:var(--p-udr)"></i></span><span class="pct">20%</span><span class="chev">+</span></div>
+            <div class="row-x"><span class="nm">RN</span><span class="bar"><i style="width:18%;background:var(--p-rn)"></i></span><span class="pct">18%</span><span class="chev">+</span></div>
+          </div>
+
+          <div class="actions">
+            <button class="a-primary">Partager mon résultat<span class="arr">↗</span></button>
+            <button class="a-secondary">Continuer à affiner<span class="arr">→</span></button>
+            <button class="a-tertiary">Refaire avec un nouveau tirage<span class="arr">↻</span></button>
+          </div>
+
+          <div style="font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:0.04em;line-height:1.55;border-top:1px solid var(--line);padding-top:14px;text-align:center">
+            Méthode &amp; sources · Mentions légales · v1 · MAJ il y a 2 j
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="frame-cap"><span>04 · RESULT · LFI dépliée</span><span class="small">/result · scroll vertical</span></div>
+  </div>
+</div>
+
+<!-- =================== SHARE CARDS =================== -->
+
+<h2 class="section">
+  <span>3 · Carte partageable</span>
+  <span class="small">2 formats natifs · square 1080×1080 (50%) · story 1080×1920 (40%) — affichés réduits, mais ratios exacts</span>
+</h2>
+
+<div class="share-row">
+
+  <div class="frame-col">
+    <div class="share share-square">
+      <div class="grain"></div>
+      <div class="top">
+        <span class="wm">sans<span class="sl">/</span>détour<span class="ca"></span></span>
+        <span class="tag">LEURS VOTES, SANS<br>LE MARKETING.</span>
+      </div>
+      <span class="h">Mes affinités politiques réelles</span>
+      <div class="top1"><span class="nm">LFI</span><span class="pct">71 %</span></div>
+      <div class="grid6">
+        <div class="gr"><span class="nm">ECO</span><span class="b"><i style="width:66%;background:var(--p-eco)"></i></span><span class="pct">66%</span></div>
+        <div class="gr"><span class="nm">SOC</span><span class="b"><i style="width:62%;background:var(--p-soc)"></i></span><span class="pct">62%</span></div>
+        <div class="gr"><span class="nm">GDR</span><span class="b"><i style="width:54%;background:var(--p-gdr)"></i></span><span class="pct">54%</span></div>
+        <div class="gr"><span class="nm">LIOT</span><span class="b"><i style="width:48%;background:var(--p-liot)"></i></span><span class="pct">48%</span></div>
+        <div class="gr"><span class="nm">DEM</span><span class="b"><i style="width:42%;background:var(--p-dem)"></i></span><span class="pct">42%</span></div>
+        <div class="gr"><span class="nm">EPR</span><span class="b"><i style="width:38%;background:var(--p-epr)"></i></span><span class="pct">38%</span></div>
+      </div>
+      <div class="url"><span>sansdetour.fr</span><span>20 scrutins · 17e légis.</span></div>
+    </div>
+    <div class="frame-cap"><span>05 · SHARE · square</span><span class="small">1080×1080 (Insta feed, X, WA)</span></div>
+  </div>
+
+  <div class="frame-col">
+    <div class="share share-story">
+      <div class="grain"></div>
+      <div class="top">
+        <span class="wm">sans<span class="sl">/</span>détour<span class="ca"></span></span>
+        <span class="tag">LEURS VOTES,<br>SANS LE MARKETING.</span>
+      </div>
+      <span class="h">Mes affinités politiques réelles</span>
+      <div class="top1"><span class="nm">LFI</span><span class="pct">71 %</span></div>
+      <div class="list6">
+        <div class="row6"><span class="nm">ECO</span><span class="b"><i style="width:66%;background:var(--p-eco)"></i></span><span class="pct">66%</span></div>
+        <div class="row6"><span class="nm">SOC</span><span class="b"><i style="width:62%;background:var(--p-soc)"></i></span><span class="pct">62%</span></div>
+        <div class="row6"><span class="nm">GDR</span><span class="b"><i style="width:54%;background:var(--p-gdr)"></i></span><span class="pct">54%</span></div>
+        <div class="row6"><span class="nm">LIOT</span><span class="b"><i style="width:48%;background:var(--p-liot)"></i></span><span class="pct">48%</span></div>
+        <div class="row6"><span class="nm">DEM</span><span class="b"><i style="width:42%;background:var(--p-dem)"></i></span><span class="pct">42%</span></div>
+        <div class="row6"><span class="nm">EPR</span><span class="b"><i style="width:38%;background:var(--p-epr)"></i></span><span class="pct">38%</span></div>
+      </div>
+      <div class="url"><span><b>sansdetour.fr</b></span><span>20 scrutins · 17e légis.</span></div>
+    </div>
+    <div class="frame-cap"><span>06 · SHARE · story</span><span class="small">1080×1920 (Insta story, Snap, TikTok)</span></div>
+  </div>
+
+</div>
+
+<footer>
+  <span>SANS DÉTOUR · DESIGN BOARD 05</span>
+  <span>SYSTÈME LOCKED · D2 BLEU RÉPUBLIQUE</span>
+  <span>NEXT — 06 STATES &amp; ANIMATIONS · 07 UX WRITING</span>
+</footer>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Sans Détour — Méthode &amp; sources</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: oklch(0.18 0.012 250);
+  --bg-2: oklch(0.22 0.012 250);
+  --bg-3: oklch(0.26 0.012 250);
+  --line: oklch(0.30 0.012 250);
+  --ink: oklch(0.96 0.005 250);
+  --ink-2: oklch(0.72 0.01 250);
+  --ink-3: oklch(0.50 0.01 250);
+  --ink-4: oklch(0.36 0.01 250);
+  --accent: oklch(0.78 0.14 230);
+  --accent-soft: oklch(0.78 0.14 230 / 0.14);
+  --accent-line: oklch(0.78 0.14 230 / 0.45);
+  --pour: oklch(0.74 0.16 145);
+  --contre: oklch(0.66 0.18 25);
+  --sans:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+
+/* wordmark */
+.sd-wordmark{font-family:var(--mono);font-weight:500;line-height:1;letter-spacing:-0.01em;display:inline-flex;align-items:baseline;white-space:nowrap;color:var(--ink)}
+.sd-wordmark .sd-slash{color:var(--ink-3)}
+.sd-wordmark .sd-caret{display:inline-block;width:0.55ch;height:0.10em;background:var(--accent);margin-left:0.18ch;transform:translateY(0.05em);animation:blink 1s steps(1) infinite;flex:0 0 auto}
+@media(prefers-reduced-motion:reduce){.sd-wordmark .sd-caret{animation:none}}
+@keyframes blink{50%{opacity:0}}
+
+/* board chrome */
+.board{padding:48px 32px 96px;max-width:1480px;margin:0 auto}
+.bh{display:flex;flex-direction:column;gap:8px;padding-bottom:28px;border-bottom:1px solid var(--line);margin-bottom:36px}
+.meta{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3)}
+h1.bt{font-size:22px;font-weight:600;margin:0;letter-spacing:-0.01em}
+.bh p{margin:0;color:var(--ink-2);font-size:14px;max-width:64ch;line-height:1.55}
+h2.sec{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);font-weight:500;margin:48px 0 18px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+h2.sec .small{color:var(--ink-2);text-transform:none;letter-spacing:0;font-family:var(--sans);font-size:13px;font-weight:400}
+
+/* phone */
+.row{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:10px}
+.cap{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);display:flex;justify-content:space-between;gap:16px;padding:0 4px}
+.cap .small{color:var(--ink-2);text-transform:none;font-size:11px;letter-spacing:0}
+
+.phone{
+  width:390px;background:var(--bg);border:1px solid var(--line);
+  border-radius:36px;padding:14px 12px 16px;
+  box-shadow:0 0 0 1px oklch(0.30 0.012 250 / 0.4) inset, 0 24px 40px -24px #000;
+  flex:0 0 auto;
+}
+.scr{background:var(--bg);border-radius:24px;border:1px solid var(--line);display:flex;flex-direction:column;min-height:1180px}
+.stat{height:30px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-family:var(--mono);font-size:12px;color:var(--ink-2);flex:0 0 auto}
+.stat .right{display:flex;gap:6px;align-items:center;font-size:11px}
+.stat .bar{display:inline-block;width:18px;height:9px;border:1px solid var(--ink-2);border-radius:2px;position:relative}
+.stat .bar::after{content:"";position:absolute;inset:1px 7px 1px 1px;background:var(--ink-2);border-radius:1px}
+
+.page{flex:1;display:flex;flex-direction:column;padding:18px 18px 22px;gap:18px}
+
+.nav{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.nav .back{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);letter-spacing:0.06em;text-transform:uppercase}
+
+.head .eye{font-family:var(--mono);font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-3)}
+.head h2{font-family:var(--sans);font-weight:600;font-size:28px;line-height:1.15;letter-spacing:-0.022em;margin:8px 0 0;text-wrap:pretty}
+.head h2 .dot{color:var(--accent)}
+.head .sub{font-size:14px;color:var(--ink-2);line-height:1.55;margin-top:12px;letter-spacing:-0.005em}
+
+/* TOC */
+.toc{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--bg-2)}
+.toc a{display:grid;grid-template-columns:32px 1fr 18px;align-items:center;gap:10px;padding:11px 14px;text-decoration:none;color:var(--ink);border-top:1px solid var(--line);font-size:13px;letter-spacing:-0.005em}
+.toc a:first-child{border-top:none}
+.toc a .n{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:0.04em}
+.toc a .ar{font-family:var(--mono);font-size:11px;color:var(--ink-3);text-align:right}
+.toc a:hover{background:var(--bg-3)}
+
+/* numbered sections */
+.s{display:flex;flex-direction:column;gap:10px;padding-top:6px}
+.s .ch{display:flex;align-items:baseline;gap:10px}
+.s .ch .n{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:500;flex:0 0 auto}
+.s .ch h3{font-family:var(--sans);font-weight:600;font-size:18px;letter-spacing:-0.012em;line-height:1.3;margin:0;text-wrap:pretty}
+.s p{font-size:13.5px;line-height:1.6;color:var(--ink-2);margin:0;letter-spacing:-0.003em}
+.s p b{color:var(--ink);font-weight:600}
+.s code{font-family:var(--mono);font-size:12px;color:var(--ink);background:var(--bg-2);padding:1px 6px;border-radius:2px;border:1px solid var(--line)}
+
+/* formula card */
+.formula{background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:14px 16px;font-family:var(--mono);font-size:13px;color:var(--ink);line-height:1.7;letter-spacing:-0.005em;display:flex;flex-direction:column;gap:6px}
+.formula .lab{font-size:10.5px;color:var(--ink-3);letter-spacing:0.12em;text-transform:uppercase}
+.formula .op{color:var(--accent)}
+.formula .num{color:var(--ink)}
+.formula .var{color:var(--ink-2)}
+
+/* example walk-through */
+.example{border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.example .eh{background:var(--bg-2);padding:10px 14px;font-family:var(--mono);font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+.example .eh b{color:var(--accent);font-weight:500}
+.example .er{display:grid;grid-template-columns:1fr 70px 70px;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12.5px;line-height:1.4}
+.example .er:last-child{border:none}
+.example .er .t{color:var(--ink);text-wrap:pretty}
+.example .er .vt,.example .er .vg{font-family:var(--mono);font-size:11px;text-align:center;padding:3px 0;border-radius:2px;letter-spacing:0.04em}
+.example .er .vt.pour,.example .er .vg.pour{color:var(--pour);border:1px solid color-mix(in oklab,var(--pour) 30%,var(--line))}
+.example .er .vt.contre,.example .er .vg.contre{color:var(--contre);border:1px solid color-mix(in oklab,var(--contre) 30%,var(--line))}
+.example .er .vt.abst,.example .er .vg.abst{color:var(--ink-2);border:1px solid var(--line)}
+.example .er .vg.div{color:var(--ink-3);border:1px dashed var(--line)}
+.example .es{display:grid;grid-template-columns:1fr 1fr;font-family:var(--mono);font-size:11px;background:var(--bg-2);border-top:1px solid var(--line)}
+.example .es div{padding:10px 14px;display:flex;justify-content:space-between;color:var(--ink-2);letter-spacing:0.04em}
+.example .es div b{color:var(--accent);font-weight:600}
+
+/* freshness card */
+.fresh{border:1px solid var(--accent-line);background:var(--accent-soft);border-radius:6px;padding:14px 16px;display:flex;align-items:center;gap:14px}
+.fresh .pulse{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 var(--accent);animation:fp 2s ease-out infinite;flex:0 0 auto}
+@keyframes fp{0%{box-shadow:0 0 0 0 var(--accent-line)}70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
+@media(prefers-reduced-motion:reduce){.fresh .pulse{animation:none}}
+.fresh .t{font-family:var(--sans);font-weight:600;font-size:14px;color:var(--ink);letter-spacing:-0.005em}
+.fresh .meta{font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:0.04em;display:block;margin-top:3px;font-weight:400}
+
+/* sources list */
+.sources{display:flex;flex-direction:column}
+.src{display:grid;grid-template-columns:1fr auto;gap:12px;padding:11px 0;border-top:1px solid var(--line);align-items:baseline}
+.src:first-child{border-top:none}
+.src .t{font-size:13px;color:var(--ink);letter-spacing:-0.005em}
+.src .t b{font-weight:600}
+.src .t span{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:2px;letter-spacing:0.04em}
+.src .ext{font-family:var(--mono);font-size:11px;color:var(--accent);text-decoration:none;letter-spacing:0.04em;white-space:nowrap}
+
+/* indep card */
+.indep{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.indep .it{background:var(--bg-2);border:1px solid var(--line);border-radius:5px;padding:11px 13px;display:flex;flex-direction:column;gap:4px}
+.indep .it .lab{font-family:var(--mono);font-size:9.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.indep .it .v{font-size:13px;color:var(--ink);font-weight:500;letter-spacing:-0.005em;line-height:1.35;text-wrap:pretty}
+.indep .it.no .lab{color:var(--contre)}
+
+/* footer of methodo page */
+.endpage{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:0.06em;border-top:1px solid var(--line);padding-top:14px;display:flex;justify-content:space-between}
+
+/* desktop-style detail anchor — also show as a wider variant on the right */
+.desktop{
+  width:780px;flex:0 0 auto;background:var(--bg);
+  border:1px solid var(--line);border-radius:8px;
+  padding:36px 40px 36px;display:flex;flex-direction:column;gap:24px;
+}
+.desktop .nav{padding-bottom:14px}
+.desktop .head h2{font-size:36px;line-height:1.08}
+.desktop .head .sub{font-size:15px;max-width:60ch}
+.desktop .toc{background:transparent;flex-direction:row;flex-wrap:wrap}
+.desktop .toc a{flex:1 1 200px;border-top:none;border-left:1px solid var(--line);grid-template-columns:32px 1fr 18px}
+.desktop .toc a:first-child{border-left:none}
+.desktop .s .ch h3{font-size:20px}
+.desktop .s p{font-size:14px}
+.desktop .indep{grid-template-columns:repeat(4,1fr)}
+.desktop .formula{font-size:14px}
+
+footer.bf{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:0.06em;color:var(--ink-3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+</style>
+</head>
+<body>
+<div class="board">
+
+<header class="bh">
+  <span class="meta">08 · Page méthodologie · /methode</span>
+  <h1 class="bt">L'écran qui doit tenir la critique des journalistes et des sceptiques.</h1>
+  <p>Page accessible depuis le footer global et depuis le bouton "Méthode &amp; sources" de l'écran d'erreur fetch. Architecture en 6 sections numérotées + TOC en haut. Une seule règle : tout est sourçable, rien n'est suggéré. Si je dis "≥ 70 %", je donne la formule. Si je dis "open data", je donne l'URL.</p>
+</header>
+
+<!-- ===================== MOBILE ===================== -->
+
+<h2 class="sec"><span>Mobile · 390×scrolling</span><span class="small">Frame complet, scroll vertical · accessible depuis footer global</span></h2>
+
+<div class="row">
+  <div class="col">
+    <div class="phone"><div class="scr">
+      <div class="stat"><span>9:48</span><span class="right"><span>•••</span><span>5G</span><span class="bar"></span></span></div>
+      <div class="page">
+
+        <div class="nav">
+          <span class="back">‹ Retour</span>
+          <span class="sd-wordmark" style="font-size:13px">sans<span class="sd-slash">/</span>détour<span class="sd-caret"></span></span>
+          <span class="back" style="visibility:hidden">‹</span>
+        </div>
+
+        <div class="head">
+          <span class="eye">MÉTHODE &amp; SOURCES</span>
+          <h2>Comment on calcule, et avec quelles données<span class="dot">.</span></h2>
+          <p class="sub">Aucune opinion, aucun panel, aucune IA. Juste les votes officiels de l'Assemblée Nationale, et une formule de comparaison qu'on pose ici noir sur blanc.</p>
+        </div>
+
+        <div class="fresh">
+          <span class="pulse"></span>
+          <div>
+            <div class="t">Données à jour</div>
+            <span class="meta">87 scrutins · MAJ il y a 2 j · prochaine sync dans 5 j</span>
+          </div>
+        </div>
+
+        <div class="toc">
+          <a href="#s1"><span class="n">01</span><span>D'où viennent les données</span><span class="ar">→</span></a>
+          <a href="#s2"><span class="n">02</span><span>Quels scrutins on garde</span><span class="ar">→</span></a>
+          <a href="#s3"><span class="n">03</span><span>Comment on définit la position d'un groupe</span><span class="ar">→</span></a>
+          <a href="#s4"><span class="n">04</span><span>Comment on calcule ton alignement</span><span class="ar">→</span></a>
+          <a href="#s5"><span class="n">05</span><span>Ce qu'on ne fait pas avec tes données</span><span class="ar">→</span></a>
+          <a href="#s6"><span class="n">06</span><span>Indépendance &amp; financement</span><span class="ar">→</span></a>
+        </div>
+
+        <div class="s" id="s1">
+          <div class="ch"><span class="n">01</span><h3>D'où viennent les données</h3></div>
+          <p>Les votes proviennent de l'<b>open data officiel de l'Assemblée Nationale</b>, exposé sur <code>data.assemblee-nationale.fr</code>. Ce sont les mêmes fichiers que ceux utilisés par les médias de référence et le service interne de l'AN. Aucune retranscription manuelle, aucune source secondaire.</p>
+          <p>Mise à jour automatisée toutes les semaines. La date de dernière sync est affichée ci-dessus.</p>
+        </div>
+
+        <div class="s" id="s2">
+          <div class="ch"><span class="n">02</span><h3>Quels scrutins on garde</h3></div>
+          <p>On filtre uniquement les <b>scrutins solennels</b> — ceux où chaque député doit afficher son vote nominalement. On exclut les scrutins ordinaires (où l'AN ne compte que les votes contestés) et les votes en commission. Le pool actuel : <b>87 scrutins de la 17e législature</b>.</p>
+          <p>Pour ta session, on en tire 20 au hasard, en équilibrant les thèmes (économie, social, écologie, sécurité, institutionnel, international).</p>
+        </div>
+
+        <div class="s" id="s3">
+          <div class="ch"><span class="n">03</span><h3>Comment on définit la position d'un groupe</h3></div>
+          <p>Un groupe parlementaire compte plusieurs dizaines de députés qui ne votent pas toujours pareil. Pour résumer en une position unique :</p>
+          <div class="formula">
+            <span class="lab">Position du groupe sur un scrutin</span>
+            <span><span class="var">si</span> <span class="num">≥ 70 %</span> <span class="var">des votants effectifs du groupe</span> <span class="op">→</span> <span class="num">pour / contre / abst.</span></span>
+            <span><span class="var">sinon</span> <span class="op">→</span> <span class="num">groupe divisé</span></span>
+            <span><span class="var">absents</span> <span class="op">·</span> <span class="var">non-votants</span> <span class="op">→</span> <span class="num">exclus du calcul</span></span>
+          </div>
+          <p>Un scrutin sur lequel un groupe est <b>divisé</b> ne compte pas pour ce groupe — pas pour toi non plus, dans cette comparaison. Ces scrutins sont indiqués en bas de chaque carte parti dans ton résultat.</p>
+        </div>
+
+        <div class="s" id="s4">
+          <div class="ch"><span class="n">04</span><h3>Comment on calcule ton alignement</h3></div>
+          <p>Pour chaque groupe, on regarde ce que tu as voté <i>vs</i> ce que ce groupe a voté, scrutin par scrutin :</p>
+          <div class="formula">
+            <span class="lab">Score d'alignement avec un groupe</span>
+            <span><span class="num">+1</span> <span class="var">par scrutin où ton vote = position du groupe</span></span>
+            <span><span class="num">+0,5</span> <span class="var">si l'un des deux s'abstient et l'autre vote</span></span>
+            <span><span class="num">0</span> <span class="var">si désaccord net (pour vs contre)</span></span>
+            <span><span class="op">÷</span> <span class="var">nombre de scrutins comptés (groupe non divisé, tu n'as pas skip)</span></span>
+            <span><span class="op">×</span> <span class="num">100</span> <span class="var">→ pourcentage affiché</span></span>
+          </div>
+          <p>Le ranking apparaît dans l'app à partir du <b>5e scrutin compté</b> — en dessous, les pourcentages bougent trop pour signifier quoi que ce soit.</p>
+
+          <div class="example">
+            <div class="eh"><span>EXEMPLE — TOI VS LFI · 5 SCRUTINS</span><span><b>+3,5 / 4 = 87,5%</b></span></div>
+            <div class="er"><span class="t">Reculer l'âge légal à 64 ans.</span><span class="vt contre">contre</span><span class="vg contre">contre</span></div>
+            <div class="er"><span class="t">Encadrer les loyers en zone tendue.</span><span class="vt pour">pour</span><span class="vg pour">pour</span></div>
+            <div class="er"><span class="t">Relancer six EPR2.</span><span class="vt pour">pour</span><span class="vg contre">contre</span></div>
+            <div class="er"><span class="t">IVG dans la Constitution.</span><span class="vt pour">pour</span><span class="vg pour">pour</span></div>
+            <div class="er"><span class="t">Supprimer la redevance audiovisuelle.</span><span class="vt abst">abst.</span><span class="vg div">divisé</span></div>
+            <div class="es">
+              <div><span>+1</span><span>+1</span></div>
+              <div><span>0</span><span>+1</span></div>
+              <div><span>+0,5 abst./vote</span><span>exclu (divisé)</span></div>
+              <div><span>scrutins comptés</span><span><b>4</b></span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="s" id="s5">
+          <div class="ch"><span class="n">05</span><h3>Ce qu'on ne fait pas avec tes données</h3></div>
+          <div class="indep">
+            <div class="it no"><span class="lab">PAS DE</span><span class="v">Compte utilisateur</span></div>
+            <div class="it no"><span class="lab">PAS DE</span><span class="v">Cookie de tracking</span></div>
+            <div class="it no"><span class="lab">PAS DE</span><span class="v">Analytics nominatifs</span></div>
+            <div class="it no"><span class="lab">PAS DE</span><span class="v">Envoi serveur</span></div>
+          </div>
+          <p>Tes votes vivent dans le <code>localStorage</code> de ton navigateur. Si tu vides ton cache, ils disparaissent. C'est volontaire : on n'a aucun moyen technique de savoir comment tu as voté, ni qui tu es.</p>
+          <p>Le seul appel réseau, c'est le téléchargement initial du jeu de scrutins. Aucun POST.</p>
+        </div>
+
+        <div class="s" id="s6">
+          <div class="ch"><span class="n">06</span><h3>Indépendance &amp; financement</h3></div>
+          <p>Sans Détour est un projet <b>indépendant</b>. Aucune affiliation avec un parti politique, un média, ou une institution publique. Le code est ouvert, les données sont ouvertes, la formule est publiée ci-dessus.</p>
+          <p>Hébergement payé sur fonds personnels. Pas d'annonceur, pas de sponsor, pas de don accepté pendant les 6 mois précédant un scrutin national.</p>
+
+          <div class="sources">
+            <div class="src">
+              <span class="t"><b>Open data Assemblée Nationale</b><span>scrutins solennels · format JSON officiel</span></span>
+              <a class="ext" href="#">data.assemblee-nationale.fr&nbsp;↗</a>
+            </div>
+            <div class="src">
+              <span class="t"><b>Code source</b><span>repo public · MIT licence</span></span>
+              <a class="ext" href="#">github.com/sansdetour&nbsp;↗</a>
+            </div>
+            <div class="src">
+              <span class="t"><b>Composition des groupes</b><span>17e légis. · maj automatisée</span></span>
+              <a class="ext" href="#">assemblee-nationale.fr&nbsp;↗</a>
+            </div>
+            <div class="src">
+              <span class="t"><b>Contact</b><span>signaler une erreur, une omission</span></span>
+              <a class="ext" href="#">contact@sansdetour.fr&nbsp;↗</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="endpage">
+          <span>v1 · MAJ il y a 2 j</span>
+          <span>Mentions légales</span>
+        </div>
+
+      </div>
+    </div></div>
+    <div class="cap"><span>01 · MOBILE · /methode</span><span class="small">scroll vertical · ~1180 px</span></div>
+  </div>
+
+  <!-- ===================== DESKTOP DETAIL ===================== -->
+  <div class="col">
+    <div class="desktop">
+      <div class="nav">
+        <span class="back">‹ Retour</span>
+        <span class="sd-wordmark" style="font-size:18px">sans<span class="sd-slash">/</span>détour<span class="sd-caret"></span></span>
+        <span class="back" style="visibility:hidden">‹</span>
+      </div>
+      <div class="head">
+        <span class="eye">MÉTHODE &amp; SOURCES</span>
+        <h2>Comment on calcule,<br>et avec quelles données<span class="dot">.</span></h2>
+        <p class="sub">Aucune opinion, aucun panel, aucune IA. Juste les votes officiels de l'Assemblée Nationale, et une formule de comparaison qu'on pose ici noir sur blanc.</p>
+      </div>
+      <div class="fresh">
+        <span class="pulse"></span>
+        <div>
+          <div class="t">Données à jour · 87 scrutins · 17e législature</div>
+          <span class="meta">Dernière sync il y a 2 j · prochaine dans 5 j</span>
+        </div>
+      </div>
+
+      <div class="indep">
+        <div class="it"><span class="lab">SOURCE</span><span class="v">Open data AN officiel</span></div>
+        <div class="it"><span class="lab">FILTRE</span><span class="v">Scrutins solennels uniquement</span></div>
+        <div class="it"><span class="lab">SEUIL</span><span class="v">≥ 70 % pour qu'un groupe ait une position</span></div>
+        <div class="it"><span class="lab">MINIMUM</span><span class="v">5 scrutins comptés avant ranking</span></div>
+      </div>
+
+      <div class="s" id="s4d" style="border-top:1px solid var(--line);padding-top:18px">
+        <div class="ch"><span class="n">FORMULE</span><h3>Score d'alignement, par groupe</h3></div>
+        <div class="formula" style="font-size:14px">
+          <span class="lab">Pour chaque scrutin compté</span>
+          <span><span class="num">+1</span> <span class="var">si ton vote = position du groupe</span> <span class="op">·</span> <span class="num">+0,5</span> <span class="var">si abstention vs vote</span> <span class="op">·</span> <span class="num">0</span> <span class="var">si désaccord net</span></span>
+          <span class="lab" style="margin-top:6px">Position du groupe</span>
+          <span><span class="var">si</span> <span class="num">≥ 70 %</span> <span class="var">des votants effectifs du groupe → pour / contre / abst.</span> <span class="op">·</span> <span class="var">sinon</span> <span class="op">→</span> <span class="num">groupe divisé (exclu)</span></span>
+          <span class="lab" style="margin-top:6px">Score affiché</span>
+          <span><span class="op">Σ</span> points <span class="op">÷</span> scrutins comptés <span class="op">×</span> 100</span>
+        </div>
+      </div>
+    </div>
+    <div class="cap"><span>02 · DESKTOP · /methode (zone above-fold)</span><span class="small">v1 mobile-first, desktop = "wide page" même structure</span></div>
+  </div>
+</div>
+
+<footer class="bf">
+  <span>SANS DÉTOUR · DESIGN BOARD 08</span>
+  <span>MÉTHODE &amp; SOURCES</span>
+  <span>NEXT — spec génération share PNG</span>
+</footer>
+
+</div>
+</body>
+</html>

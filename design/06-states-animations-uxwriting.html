@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Sans Détour — States · animations · UX writing</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: oklch(0.18 0.012 250);
+  --bg-2: oklch(0.22 0.012 250);
+  --bg-3: oklch(0.26 0.012 250);
+  --line: oklch(0.30 0.012 250);
+  --ink: oklch(0.96 0.005 250);
+  --ink-2: oklch(0.72 0.01 250);
+  --ink-3: oklch(0.50 0.01 250);
+  --ink-4: oklch(0.36 0.01 250);
+  --accent: oklch(0.78 0.14 230);
+  --accent-soft: oklch(0.78 0.14 230 / 0.14);
+  --accent-line: oklch(0.78 0.14 230 / 0.45);
+  --pour: oklch(0.74 0.16 145);
+  --contre: oklch(0.66 0.18 25);
+  --warn: oklch(0.82 0.16 75);
+  --p-lfi: oklch(0.55 0.16 24);
+  --p-eco: oklch(0.66 0.14 145);
+  --p-soc: oklch(0.72 0.14 0);
+  --p-dem: oklch(0.74 0.14 60);
+  --sans:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.board{padding:48px 32px 96px;max-width:1480px;margin:0 auto}
+.bh{display:flex;flex-direction:column;gap:8px;padding-bottom:28px;border-bottom:1px solid var(--line);margin-bottom:36px}
+.meta{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3)}
+h1.bt{font-size:22px;font-weight:600;margin:0;letter-spacing:-0.01em}
+.bh p{margin:0;color:var(--ink-2);font-size:14px;max-width:64ch;line-height:1.55}
+h2.sec{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);font-weight:500;margin:48px 0 18px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+h3.sub{font-family:var(--mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);font-weight:500;margin:18px 0 10px}
+
+/* wordmark */
+.sd-wordmark{font-family:var(--mono);font-weight:500;line-height:1;letter-spacing:-0.01em;display:inline-flex;align-items:baseline;white-space:nowrap;color:var(--ink)}
+.sd-wordmark .sd-slash{color:var(--ink-3)}
+.sd-wordmark .sd-caret{display:inline-block;width:0.55ch;height:0.10em;background:var(--accent);margin-left:0.18ch;transform:translateY(0.05em);animation:blink 1s steps(1) infinite;flex:0 0 auto}
+@media(prefers-reduced-motion:reduce){.sd-wordmark .sd-caret,.skel,.pulse,.demo-bar i,.flip-chip{animation:none!important}}
+@keyframes blink{50%{opacity:0}}
+
+/* mini phone */
+.row{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:10px}
+.cap{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);display:flex;justify-content:space-between;gap:16px;padding:0 4px}
+.cap .small{color:var(--ink-2);text-transform:none;font-size:11px;letter-spacing:0}
+.phone{width:300px;background:var(--bg);border:1px solid var(--line);border-radius:28px;padding:10px 8px 12px;box-shadow:0 0 0 1px oklch(0.30 0.012 250 / 0.4) inset}
+.scr{background:var(--bg);border-radius:18px;border:1px solid var(--line);height:620px;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.stat{height:24px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-family:var(--mono);font-size:10px;color:var(--ink-3)}
+.body{flex:1;display:flex;flex-direction:column;padding:14px 14px 14px;gap:14px}
+
+.topbar{display:flex;justify-content:space-between;align-items:center}
+.topbar .progress{font-family:var(--mono);font-size:10.5px;color:var(--ink-2);border:1px solid var(--line);padding:5px 8px;border-radius:3px;letter-spacing:0.04em}
+
+/* skeleton */
+.skel{background:linear-gradient(100deg,var(--bg-2) 0% 30%,var(--bg-3) 50%,var(--bg-2) 70% 100%);background-size:200% 100%;animation:shimmer 1.4s linear infinite;border-radius:3px}
+@keyframes shimmer{0%{background-position:120% 0}100%{background-position:-120% 0}}
+.sk-card{flex:1;border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px;background:var(--bg-2)}
+.sk-line{height:11px}
+.sk-meta{height:9px;width:60%;margin-top:auto}
+.sk-chip{width:80px;height:22px;border-radius:3px}
+.sk-progress{width:54px;height:22px;border-radius:3px}
+
+/* error */
+.err{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:14px;padding:18px}
+.err .ic{font-family:var(--mono);font-size:34px;color:var(--warn);font-weight:500;line-height:1}
+.err h4{font-family:var(--sans);font-weight:600;font-size:17px;margin:0;letter-spacing:-0.01em;line-height:1.3}
+.err p{font-size:13px;line-height:1.5;color:var(--ink-2);margin:0;max-width:32ch}
+.err .ko{font-family:var(--mono);font-size:10px;color:var(--ink-4);letter-spacing:0.06em;border:1px solid var(--line);padding:5px 8px;border-radius:3px}
+.err button.cta{margin-top:6px;background:var(--accent);color:var(--bg);border:none;font-family:var(--sans);font-weight:600;font-size:14px;padding:12px 18px;border-radius:5px;cursor:pointer}
+.err button.gh{background:transparent;border:1px solid var(--line);color:var(--ink);padding:10px 14px;border-radius:5px;font-size:13px;font-family:var(--sans);font-weight:500;cursor:pointer}
+
+/* tuto overlay */
+.tuto{position:absolute;inset:0;background:oklch(0.10 0.01 250 / 0.7);backdrop-filter:blur(2px);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:28px;gap:18px;text-align:center}
+.tuto h4{font-family:var(--sans);font-weight:600;font-size:18px;margin:0;letter-spacing:-0.012em;text-wrap:pretty}
+.tuto .gestes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0}
+.tuto .g{display:flex;flex-direction:column;align-items:center;gap:4px}
+.tuto .g .a{font-family:var(--mono);font-size:18px}
+.tuto .g .l{font-family:var(--mono);font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3)}
+.tuto .g.contre .a{color:var(--contre)}
+.tuto .g.pour .a{color:var(--pour)}
+.tuto .ok{background:var(--accent);color:var(--bg);border:none;font-family:var(--sans);font-weight:600;font-size:14px;padding:11px 28px;border-radius:5px;cursor:pointer}
+.tuto p{font-size:12.5px;color:var(--ink-2);margin:0;line-height:1.5;max-width:30ch}
+
+/* pool épuisé */
+.pool{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;gap:14px;padding:18px}
+.pool .ic{font-family:var(--mono);font-size:34px;color:var(--accent);font-weight:500;line-height:1}
+.pool h4{font-family:var(--sans);font-weight:600;font-size:17px;margin:0;letter-spacing:-0.01em;line-height:1.3}
+.pool p{font-size:13px;line-height:1.5;color:var(--ink-2);margin:0}
+.pool .actions{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.pool .a-pri{background:var(--accent);color:var(--bg);border:none;font-family:var(--sans);font-weight:600;font-size:14px;padding:12px 14px;border-radius:5px;cursor:pointer}
+.pool .a-sec{background:transparent;border:1px solid var(--line);color:var(--ink);padding:10px 14px;border-radius:5px;font-size:13px;font-family:var(--sans);font-weight:500;cursor:pointer}
+
+/* anim demo cards */
+.anim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.anim{background:var(--bg-2);border:1px solid var(--line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
+.anim h4{font-family:var(--sans);font-weight:600;font-size:14px;margin:0;padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
+.anim h4 .tag{font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.anim .stage-a{padding:18px 16px;background:var(--bg);min-height:120px;display:flex;align-items:center;justify-content:center}
+.anim .desc{padding:12px 16px;font-size:12.5px;line-height:1.55;color:var(--ink-2);border-top:1px solid var(--line)}
+.anim .desc code{font-family:var(--mono);font-size:11px;color:var(--ink);background:var(--bg);padding:1px 5px;border-radius:2px;border:1px solid var(--line)}
+
+/* chip-flip demo */
+.chip-flip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--accent-line);background:var(--accent-soft);color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:0.04em;border-radius:3px;animation:flip 4s ease-in-out infinite}
+@keyframes flip{
+  0%,40%{content:""}
+  45%{transform:translateY(-3px) scale(0.96);filter:blur(0.5px);opacity:0.6}
+  50%{transform:translateY(3px) scale(0.96);filter:blur(0.5px);opacity:0}
+  55%{transform:translateY(-3px) scale(0.96);filter:blur(0.5px);opacity:0}
+  60%{transform:translateY(0) scale(1);filter:blur(0);opacity:1}
+  100%{transform:translateY(0) scale(1);filter:blur(0);opacity:1}
+}
+.chip-flip .pulse{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.chip-flip-after{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:0.04em}
+.fcontain{position:relative;width:100%;display:flex;justify-content:center}
+
+/* swipe demo */
+.sw-card{width:140px;height:120px;border:1px solid var(--line);background:var(--bg-2);border-radius:8px;padding:10px;font-family:var(--mono);font-size:9.5px;color:var(--ink-3);letter-spacing:0.08em;display:flex;flex-direction:column;justify-content:space-between;animation:swipe 3.5s ease-in-out infinite}
+@keyframes swipe{
+  0%,20%{transform:rotate(0deg) translateX(0);opacity:1}
+  35%{transform:rotate(-10deg) translateX(-100px);opacity:0.8}
+  45%{transform:rotate(-14deg) translateX(-160px);opacity:0}
+  46%,55%{transform:rotate(2deg) translateX(0) scale(0.96);opacity:0}
+  70%,100%{transform:rotate(0) translateX(0) scale(1);opacity:1}
+}
+.sw-card .t{color:var(--ink);font-size:11px;letter-spacing:-0.005em;font-family:var(--sans);font-weight:500;line-height:1.3;text-transform:none}
+
+/* bar reveal demo */
+.demo-bar{display:flex;flex-direction:column;gap:6px;width:100%}
+.demo-bar .r{display:grid;grid-template-columns:36px 1fr 32px;gap:8px;align-items:center}
+.demo-bar .nm{font-family:var(--mono);font-size:10px;color:var(--ink-2);letter-spacing:0.04em}
+.demo-bar .b{height:5px;background:var(--bg-3);border-radius:1px;overflow:hidden}
+.demo-bar .b i{display:block;height:100%;transform:scaleX(0);transform-origin:left;animation:reveal 2.4s cubic-bezier(.2,.8,.2,1) infinite}
+.demo-bar .b i.s2{animation-delay:0.06s}
+.demo-bar .b i.s3{animation-delay:0.12s}
+.demo-bar .b i.s4{animation-delay:0.18s}
+.demo-bar .pct{font-family:var(--mono);font-size:10px;color:var(--ink-2);text-align:right}
+@keyframes reveal{
+  0%,8%{transform:scaleX(0)}
+  44%{transform:scaleX(var(--w,0.5))}
+  88%{transform:scaleX(var(--w,0.5))}
+  100%{transform:scaleX(0)}
+}
+
+/* COPY TABLE */
+.copy{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.copy .group{border-bottom:1px solid var(--line)}
+.copy .group:last-child{border:none}
+.copy .gh{padding:10px 16px;font-family:var(--mono);font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink);background:var(--bg-2);font-weight:500;display:flex;justify-content:space-between}
+.copy .gh .where{color:var(--ink-3);font-size:10px;letter-spacing:0.06em}
+.copy .ln{display:grid;grid-template-columns:200px 1fr;gap:18px;padding:11px 16px;border-top:1px solid var(--line);font-size:13px;line-height:1.55}
+.copy .k{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:0.04em;padding-top:1px}
+.copy .v{color:var(--ink);text-wrap:pretty}
+.copy .v.muted{color:var(--ink-2)}
+.copy .v code{font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--bg-2);padding:1px 5px;border-radius:2px;border:1px solid var(--line)}
+.copy .v em{color:var(--ink-3);font-style:normal}
+
+footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:0.06em;color:var(--ink-3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+</style>
+</head>
+<body>
+
+<div class="board">
+
+<header class="bh">
+  <span class="meta">06 · States · animations · UX writing</span>
+  <h1 class="bt">Tout ce qui n'est pas un écran nominal — pannes, attentes, copy, motion.</h1>
+  <p>Ton non-négociable des copies : sérieux, factuel, sobre. Le produit dit "voilà ce qu'ils ont fait, à toi de juger" — jamais "viens t'amuser à swiper sur la politique". Pas d'emoji décoratif (sauf 🏆 du chip top 1, gardé), pas de point d'exclamation, pas de "tu" trop familier. On vouvoie le réel.</p>
+</header>
+
+<!-- ============================================================ -->
+<h2 class="sec">A · States — chargement, erreur, pool épuisé, tutoriel</h2>
+
+<div class="row">
+
+  <!-- SKELETON -->
+  <div class="col">
+    <div class="phone"><div class="scr">
+      <div class="stat"><span>9:43</span><span>5G</span></div>
+      <div class="body">
+        <div class="topbar"><span class="skel sk-chip"></span><span class="skel sk-progress"></span></div>
+        <div class="sk-card">
+          <span class="skel" style="height:9px;width:50%"></span>
+          <span class="skel sk-line"></span>
+          <span class="skel sk-line" style="width:90%"></span>
+          <span class="skel sk-line" style="width:65%"></span>
+          <span class="skel sk-meta"></span>
+        </div>
+        <div style="display:flex;gap:8px"><span class="skel" style="flex:1;height:42px;border-radius:6px"></span><span class="skel" style="flex:1;height:42px;border-radius:6px"></span><span class="skel" style="flex:1;height:42px;border-radius:6px"></span></div>
+      </div>
+    </div></div>
+    <div class="cap"><span>SKELETON · /play</span><span class="small">premier fetch</span></div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="col">
+    <div class="phone"><div class="scr">
+      <div class="stat"><span>9:43</span><span>5G</span></div>
+      <div class="body">
+        <div class="topbar"><span style="font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:0.06em">SANS<span style="color:var(--ink-4)">/</span>DÉTOUR</span><span></span></div>
+        <div class="err">
+          <span class="ic">!</span>
+          <h4>Impossible de charger les scrutins.</h4>
+          <p>L'open data de l'Assemblée Nationale n'a pas répondu. Ce n'est pas toi, c'est leur serveur.</p>
+          <span class="ko">err · fetch_open_data · 503</span>
+          <button class="cta">Réessayer</button>
+          <button class="gh">Méthode &amp; sources</button>
+        </div>
+      </div>
+    </div></div>
+    <div class="cap"><span>ERROR FETCH · /play</span><span class="small">API AN down</span></div>
+  </div>
+
+  <!-- POOL ÉPUISÉ -->
+  <div class="col">
+    <div class="phone"><div class="scr">
+      <div class="stat"><span>9:51</span><span>5G</span></div>
+      <div class="body">
+        <div class="topbar"><span style="display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid var(--accent-line);background:var(--accent-soft);color:var(--accent);font-family:var(--mono);font-size:10.5px;letter-spacing:0.04em;border-radius:3px"><span style="width:5px;height:5px;border-radius:50%;background:var(--accent)"></span>🏆 LFI&nbsp;<b style="color:var(--ink);font-weight:600">73%</b></span><span class="progress">87 / 87</span></div>
+        <div class="pool">
+          <span class="ic">∎</span>
+          <h4>Tu as voté sur tous les scrutins solennels disponibles.</h4>
+          <p>87 scrutins de la 17e législature, parcourus. Plus rien à affiner pour cette session — sauf si l'AN en publie de nouveaux.</p>
+          <div class="actions">
+            <button class="a-pri">Voir mon résultat</button>
+            <button class="a-sec">Refaire avec un nouveau tirage</button>
+          </div>
+        </div>
+      </div>
+    </div></div>
+    <div class="cap"><span>POOL ÉPUISÉ · /play</span><span class="small">mode affinement</span></div>
+  </div>
+
+  <!-- TUTORIEL -->
+  <div class="col">
+    <div class="phone"><div class="scr">
+      <div class="stat"><span>9:42</span><span>5G</span></div>
+      <div class="body" style="opacity:0.4">
+        <div class="topbar"><span style="display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid var(--line);font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:0.04em;border-radius:3px">en attente</span><span class="progress">01 / 20</span></div>
+        <div class="sk-card"><span style="font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase">RETRAITES · PLFSS 2024</span><span style="font-family:var(--sans);font-weight:600;font-size:14.5px;line-height:1.3;color:var(--ink)">Reculer l'âge légal de départ à 64 ans, à effet immédiat.</span></div>
+      </div>
+      <div class="tuto">
+        <span style="font-family:var(--mono);font-size:9.5px;color:var(--ink-3);letter-spacing:0.16em;text-transform:uppercase">Comment voter</span>
+        <h4>Une carte = un vrai scrutin solennel.<br>Réagis comme tu aurais voté.</h4>
+        <div class="gestes">
+          <div class="g contre"><span class="a">←</span><span class="l">contre</span></div>
+          <div class="g"><span class="a">↓</span><span class="l">je passe</span></div>
+          <div class="g pour"><span class="a">→</span><span class="l">pour</span></div>
+        </div>
+        <p>Tu peux aussi taper les boutons en bas de l'écran. Tes choix restent sur ton appareil — rien n'est envoyé.</p>
+        <button class="ok">J'ai compris</button>
+      </div>
+    </div></div>
+    <div class="cap"><span>TUTORIEL · /play</span><span class="small">1ère visite, dismissable</span></div>
+  </div>
+
+</div>
+
+<!-- ============================================================ -->
+<h2 class="sec">B · Animations — 5 motions, specs prêtes pour Framer Motion</h2>
+
+<div class="anim-grid">
+
+  <article class="anim">
+    <h4>1. Chip top 1 — flip<span class="tag">200 ms · easeOut</span></h4>
+    <div class="stage-a fcontain">
+      <span class="chip-flip"><span class="pulse"></span>🏆 LFI&nbsp;<b style="color:var(--ink);font-weight:600">71%</b></span>
+    </div>
+    <div class="desc">Quand le top 1 change, l'ancien chip <code>opacity → 0, y +6</code>, le nouveau entre <code>opacity 0 → 1, y −6 → 0</code>. <b>200 ms easeOut</b>. Pas de bounce — registre sobre. Le pulse autour du dot reste constant pendant la transition.</div>
+  </article>
+
+  <article class="anim">
+    <h4>2. Card swipe — drag &amp; release<span class="tag">Framer drag</span></h4>
+    <div class="stage-a">
+      <div class="sw-card"><span style="font-family:var(--mono);text-transform:uppercase">RETRAITES</span><span class="t">Reculer l'âge légal à 64 ans.</span><span>10 mars 2024</span></div>
+    </div>
+    <div class="desc"><code>drag="x"</code>, <code>dragConstraints</code> off, <code>onDragEnd</code> : si <code>|x| &gt; 100 &amp;&amp; velocity &gt; 200</code> → exit dans le sens du swipe (rotate <code>±14deg</code>, x <code>±400</code>, opacity 0, <b>250 ms</b>). Sinon retour <code>spring(stiffness 300, damping 28)</code>. Vertical down → idem axe Y, exit vers le bas.</div>
+  </article>
+
+  <article class="anim">
+    <h4>3. Bars de ranking — stagger reveal<span class="tag">600 ms · stagger 60</span></h4>
+    <div class="stage-a">
+      <div class="demo-bar">
+        <div class="r"><span class="nm">LFI</span><span class="b"><i style="--w:0.71;background:var(--p-lfi)"></i></span><span class="pct">71%</span></div>
+        <div class="r"><span class="nm">ECO</span><span class="b"><i class="s2" style="--w:0.66;background:var(--p-eco)"></i></span><span class="pct">66%</span></div>
+        <div class="r"><span class="nm">SOC</span><span class="b"><i class="s3" style="--w:0.62;background:var(--p-soc)"></i></span><span class="pct">62%</span></div>
+        <div class="r"><span class="nm">DEM</span><span class="b"><i class="s4" style="--w:0.42;background:var(--p-dem)"></i></span><span class="pct">42%</span></div>
+      </div>
+    </div>
+    <div class="desc">À l'ouverture du <code>/result</code> ou de l'overlay, chaque barre <code>scaleX 0 → 1</code> avec <code>transform-origin: left</code>, <b>600 ms cubic-bezier(.2,.8,.2,1)</b>, stagger <b>60 ms</b>. Le pourcentage compte de 0 à N en parallèle (<code>useMotionValue + useTransform</code>).</div>
+  </article>
+
+  <article class="anim">
+    <h4>4. Overlay sheet — slide up<span class="tag">320 ms · spring</span></h4>
+    <div class="stage-a" style="position:relative;overflow:hidden;height:140px">
+      <div style="position:absolute;left:0;right:0;bottom:0;background:var(--bg-2);border:1px solid var(--line);border-top-left-radius:14px;border-top-right-radius:14px;padding:10px 14px;animation:slideup 3s ease-in-out infinite">
+        <div style="width:30px;height:3px;background:var(--ink-4);border-radius:2px;margin:0 auto 8px"></div>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:0.1em;text-transform:uppercase">RANKING EN DIRECT · 7 SCRUTINS COMPTÉS</span>
+      </div>
+      <style>@keyframes slideup{0%,5%{transform:translateY(100%)}25%,75%{transform:translateY(0)}95%,100%{transform:translateY(100%)}}</style>
+    </div>
+    <div class="desc">Sheet <code>y: 100% → 0</code>, backdrop <code>opacity 0 → 0.55 + blur 0 → 2px</code>. <b>spring(stiffness 240, damping 30)</b>. Sortie : reverse, <b>220 ms easeIn</b>. Tap dehors ou drag down &gt; 80 px → dismiss.</div>
+  </article>
+
+  <article class="anim">
+    <h4>5. Caret du wordmark — blink<span class="tag">1 s · steps</span></h4>
+    <div class="stage-a">
+      <span class="sd-wordmark" style="font-size:24px">sans<span class="sd-slash">/</span>détour<span class="sd-caret"></span></span>
+    </div>
+    <div class="desc">Caret = boîte CSS, pas un caractère. <code>opacity 1 → 0 → 1</code>, <b>1 s steps(1)</b>. Désactivé sous <code>prefers-reduced-motion</code>. Aucune autre animation au-dessus — c'est la seule "vie" de l'app au repos, exprès.</div>
+  </article>
+
+  <article class="anim">
+    <h4>6. Reduced motion — fallback<span class="tag">a11y · WCAG</span></h4>
+    <div class="stage-a"><span style="font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:0.04em;text-align:center;line-height:1.7">prefers-reduced-motion: reduce<br><span style="color:var(--ink-3)">→ pas de blink, pas de pulse,<br>pas de stagger, pas de spring.<br>Tout devient instantané ou crossfade 120ms.</span></span></div>
+    <div class="desc">Tous les <code>@keyframes</code> au-dessus sont enveloppés dans une media query qui les coupe. Les transitions Framer Motion utilisent <code>useReducedMotion()</code> pour passer à <code>duration: 0.12, ease: "linear"</code>.</div>
+  </article>
+
+</div>
+
+<!-- ============================================================ -->
+<h2 class="sec">C · UX writing — copy de tous les écrans</h2>
+
+<div class="copy">
+
+  <div class="group">
+    <div class="gh"><span>C.1 · Cover</span><span class="where">/</span></div>
+    <div class="ln"><span class="k">eyebrow</span><span class="v">PROPOS</span></div>
+    <div class="ln"><span class="k">H1</span><span class="v">Pas les programmes. <em>·</em> Les vrais votes<span style="color:var(--accent)">.</span></span></div>
+    <div class="ln"><span class="k">pitch</span><span class="v muted">On ne te demande pas d'aimer un parti. On te montre ce que tu aurais voté et qui d'autre l'a voté à l'Assemblée Nationale.</span></div>
+    <div class="ln"><span class="k">gestes labels</span><span class="v">contre · je passe · pour</span></div>
+    <div class="ln"><span class="k">CTA primaire</span><span class="v">Commencer&nbsp;→</span></div>
+    <div class="ln"><span class="k">CTA méta</span><span class="v muted">≈ 5 min · 20 scrutins solennels · 17e légis.</span></div>
+    <div class="ln"><span class="k">source</span><span class="v muted">SOURCE OFFICIELLE — data.assemblee-nationale.fr</span></div>
+  </div>
+
+  <div class="group">
+    <div class="gh"><span>C.2 · Deck</span><span class="where">/play</span></div>
+    <div class="ln"><span class="k">progress chip</span><span class="v"><code>03</code> / 20</span></div>
+    <div class="ln"><span class="k">chip top 1</span><span class="v">🏆 [GROUPE] [N]&nbsp;%</span></div>
+    <div class="ln"><span class="k">chip top 1 · pré-seuil</span><span class="v muted">en attente <em>(avant le 5e vote compté)</em></span></div>
+    <div class="ln"><span class="k">card chapeau</span><span class="v"><code>THÈME · DOSSIER</code> <em>(majuscules, mono, 4 mots max)</em></span></div>
+    <div class="ln"><span class="k">card meta</span><span class="v muted">10 mars 2024 · scrutin n°&nbsp;2871</span></div>
+    <div class="ln"><span class="k">fallback buttons</span><span class="v">contre · je passe · pour <em>(jamais "non/oui/skip")</em></span></div>
+    <div class="ln"><span class="k">bouton mode affinement</span><span class="v">Voir mon résultat&nbsp;→</span></div>
+    <div class="ln"><span class="k">overlay header</span><span class="v">RANKING EN DIRECT · <em>[N] SCRUTINS COMPTÉS</em></span></div>
+    <div class="ln"><span class="k">overlay footer · début</span><span class="v muted">Ranking provisoire. Continue à swiper pour qu'il se précise.</span></div>
+    <div class="ln"><span class="k">overlay footer · suite</span><span class="v muted">Continue à swiper. [N] scrutins restants.</span></div>
+    <div class="ln"><span class="k">overlay close</span><span class="v">Fermer ✕</span></div>
+  </div>
+
+  <div class="group">
+    <div class="gh"><span>C.3 · Tutoriel 1ère visite</span><span class="where">/play (overlay)</span></div>
+    <div class="ln"><span class="k">eyebrow</span><span class="v">COMMENT VOTER</span></div>
+    <div class="ln"><span class="k">titre</span><span class="v">Une carte = un vrai scrutin solennel. Réagis comme tu aurais voté.</span></div>
+    <div class="ln"><span class="k">aide</span><span class="v muted">Tu peux aussi taper les boutons en bas de l'écran. Tes choix restent sur ton appareil — rien n'est envoyé.</span></div>
+    <div class="ln"><span class="k">CTA</span><span class="v">J'ai compris</span></div>
+  </div>
+
+  <div class="group">
+    <div class="gh"><span>C.4 · Résultat</span><span class="where">/result</span></div>
+    <div class="ln"><span class="k">eyebrow</span><span class="v">RÉSULTAT · 17e LÉGISLATURE</span></div>
+    <div class="ln"><span class="k">headline (≥ 70%)</span><span class="v">Tu votes comme [GROUPE] [N] fois sur 10.</span></div>
+    <div class="ln"><span class="k">headline (50–69%)</span><span class="v">Tu es surtout aligné avec [GROUPE] ([N]&nbsp;%).</span></div>
+    <div class="ln"><span class="k">headline (&lt; 50%)</span><span class="v">Pas de groupe net : ton meilleur score est [GROUPE] avec [N]&nbsp;%.</span></div>
+    <div class="ln"><span class="k">sous-titre</span><span class="v muted">20 scrutins · [N] comptés · [N] skip<em>(s)</em></span></div>
+    <div class="ln"><span class="k">audit · stats</span><span class="v">✓ [N] alignés · ~ [N] partiels · ✗ [N] désaccords</span></div>
+    <div class="ln"><span class="k">audit · pictos</span><span class="v">Toi · contre <em>≡</em> [GROUPE] · contre <em>(≡ aligné, ≠ désaccord, ~ partiel)</em></span></div>
+    <div class="ln"><span class="k">audit · lien</span><span class="v">fiche AN&nbsp;↗</span></div>
+    <div class="ln"><span class="k">audit · divisés</span><span class="v muted">[N] scrutins non comptés (groupe divisé).</span></div>
+    <div class="ln"><span class="k">action 1</span><span class="v">Partager mon résultat ↗</span></div>
+    <div class="ln"><span class="k">action 2</span><span class="v">Continuer à affiner →</span></div>
+    <div class="ln"><span class="k">action 3</span><span class="v muted">Refaire avec un nouveau tirage ↻</span></div>
+    <div class="ln"><span class="k">footer méta</span><span class="v muted">Méthode &amp; sources · Mentions légales · v1 · MAJ il y a [N] j</span></div>
+  </div>
+
+  <div class="group">
+    <div class="gh"><span>C.5 · Carte partageable</span><span class="where">share PNG</span></div>
+    <div class="ln"><span class="k">tagline</span><span class="v">LEURS VOTES, SANS LE MARKETING.</span></div>
+    <div class="ln"><span class="k">titre</span><span class="v">Mes affinités politiques réelles</span></div>
+    <div class="ln"><span class="k">légende basse</span><span class="v muted">sansdetour.fr · 20 scrutins · 17e légis.</span></div>
+    <div class="ln"><span class="k">alt text auto</span><span class="v muted">Ranking d'affinité avec les groupes parlementaires français, basé sur 20 scrutins solennels. Top 1 : [GROUPE] [N]&nbsp;%.</span></div>
+  </div>
+
+  <div class="group">
+    <div class="gh"><span>C.6 · États d'erreur &amp; vide</span><span class="where">/play, /result</span></div>
+    <div class="ln"><span class="k">fetch · 503 / timeout</span><span class="v">Impossible de charger les scrutins. <em>·</em> L'open data de l'Assemblée Nationale n'a pas répondu. Ce n'est pas toi, c'est leur serveur.</span></div>
+    <div class="ln"><span class="k">fetch · CTA</span><span class="v">Réessayer</span></div>
+    <div class="ln"><span class="k">fetch · sec.</span><span class="v">Méthode &amp; sources</span></div>
+    <div class="ln"><span class="k">fetch · code</span><span class="v"><code>err · fetch_open_data · 503</code></span></div>
+    <div class="ln"><span class="k">parse · 0 scrutin</span><span class="v">Aucun scrutin solennel disponible pour l'instant. <em>·</em> Reviens dans quelques jours — l'AN n'a pas publié de nouveau scrutin solennel récemment.</span></div>
+    <div class="ln"><span class="k">pool épuisé · titre</span><span class="v">Tu as voté sur tous les scrutins solennels disponibles.</span></div>
+    <div class="ln"><span class="k">pool épuisé · texte</span><span class="v muted">[N] scrutins de la 17e législature, parcourus. Plus rien à affiner pour cette session — sauf si l'AN en publie de nouveaux.</span></div>
+    <div class="ln"><span class="k">pool épuisé · CTA</span><span class="v">Voir mon résultat <em>·</em> Refaire avec un nouveau tirage</span></div>
+    <div class="ln"><span class="k">avant 5e vote · tooltip</span><span class="v muted">Le ranking apparaît à partir du 5e scrutin compté. Skip et "groupe divisé" ne comptent pas.</span></div>
+  </div>
+
+  <div class="group">
+    <div class="gh"><span>C.7 · Footer / méthodologie</span><span class="where">global</span></div>
+    <div class="ln"><span class="k">méthode · titre</span><span class="v">Comment on calcule</span></div>
+    <div class="ln"><span class="k">méthode · 1</span><span class="v muted">Source : open data de l'Assemblée Nationale. Filtre : scrutins solennels uniquement.</span></div>
+    <div class="ln"><span class="k">méthode · 2</span><span class="v muted">Position d'un groupe : pour / contre / abstention si ≥ 70 % de ses votants effectifs s'y rangent. Sinon, "groupe divisé" — ce scrutin ne compte pas pour ce groupe.</span></div>
+    <div class="ln"><span class="k">méthode · 3</span><span class="v muted">Ton alignement par groupe = moyenne des écarts entre ton choix et la position du groupe, sur les scrutins comptés. Skip exclu.</span></div>
+    <div class="ln"><span class="k">données</span><span class="v muted">Aucune donnée personnelle envoyée. Tes choix vivent en local sur ton appareil. Pas de cookie, pas de compte, pas d'analytics nominatifs.</span></div>
+    <div class="ln"><span class="k">indépendance</span><span class="v muted">Sans Détour est un projet indépendant. Aucun lien avec un parti, un média, ou une institution. Code et données ouverts.</span></div>
+    <div class="ln"><span class="k">freshness</span><span class="v muted">Données mises à jour automatiquement chaque semaine depuis l'Assemblée Nationale.</span></div>
+  </div>
+
+  <div class="group">
+    <div class="gh"><span>C.8 · Microcopy système</span><span class="where">global</span></div>
+    <div class="ln"><span class="k">title page (cover)</span><span class="v">sans/détour — Pas les programmes. Les vrais votes.</span></div>
+    <div class="ln"><span class="k">title page (play)</span><span class="v">sans/détour — En cours · [N]/20</span></div>
+    <div class="ln"><span class="k">title page (result)</span><span class="v">sans/détour — Aligné avec [GROUPE] à [N]&nbsp;%</span></div>
+    <div class="ln"><span class="k">og:description</span><span class="v">Découvre avec quels groupes parlementaires tu votes vraiment, basé sur leurs votes réels à l'Assemblée Nationale.</span></div>
+    <div class="ln"><span class="k">a11y · card</span><span class="v muted">Scrutin [N] sur 20. [TITRE]. Glisse à gauche pour voter contre, à droite pour voter pour, en bas pour passer.</span></div>
+    <div class="ln"><span class="k">a11y · barre</span><span class="v muted">[GROUPE], [N] pour cent d'alignement.</span></div>
+  </div>
+
+</div>
+
+<!-- ============================================================ -->
+<h2 class="sec">D · Tonalité — règles que je n'ai pas franchies</h2>
+
+<div class="copy" style="border:none">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
+    <div style="border:1px solid var(--line);border-radius:5px;padding:14px 16px"><div style="font-family:var(--mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:8px">on dit</div><div style="font-size:13px;line-height:1.55;color:var(--ink)">scrutin · groupe · alignement · vote · contre / pour / abstention · députés · AN · 17e légis. · partagé en local · source officielle</div></div>
+    <div style="border:1px solid var(--line);border-radius:5px;padding:14px 16px"><div style="font-family:var(--mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--contre);margin-bottom:8px">on ne dit pas</div><div style="font-size:13px;line-height:1.55;color:var(--ink-2)">match · profile · quiz · viens swiper · politique fun · #engagé · ton vote secret · 100% précis · découvre ton vrai toi · IA</div></div>
+    <div style="border:1px solid var(--line);border-radius:5px;padding:14px 16px"><div style="font-family:var(--mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px">conventions</div><div style="font-size:13px;line-height:1.55;color:var(--ink)">tutoiement, jamais "vous". <em style="color:var(--ink-3)">·</em> pas de point d'exclamation. <em style="color:var(--ink-3)">·</em> abréviations établies (PLFSS, AN). <em style="color:var(--ink-3)">·</em> chiffres en chiffres, pas en lettres. <em style="color:var(--ink-3)">·</em> emoji 🏆 toléré (chip top 1) — aucun autre.</div></div>
+  </div>
+</div>
+
+<footer>
+  <span>SANS DÉTOUR · DESIGN BOARD 06</span>
+  <span>STATES · ANIM · COPY</span>
+  <span>NEXT — passe couleurs partis avec sources Wikipédia FR · ratios contraste WCAG</span>
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Sans Détour — Party colors · validation</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: oklch(0.18 0.012 250);
+  --bg-2: oklch(0.22 0.012 250);
+  --bg-3: oklch(0.26 0.012 250);
+  --line: oklch(0.30 0.012 250);
+  --ink: oklch(0.96 0.005 250);
+  --ink-2: oklch(0.72 0.01 250);
+  --ink-3: oklch(0.50 0.01 250);
+  --ink-4: oklch(0.36 0.01 250);
+  --accent: oklch(0.78 0.14 230);
+  --accent-soft: oklch(0.78 0.14 230 / 0.14);
+  --accent-line: oklch(0.78 0.14 230 / 0.45);
+  --good: oklch(0.74 0.16 145);
+  --warn: oklch(0.82 0.16 75);
+  --bad: oklch(0.66 0.18 25);
+  --sans:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.board{padding:48px 32px 96px;max-width:1480px;margin:0 auto}
+.bh{display:flex;flex-direction:column;gap:8px;padding-bottom:28px;border-bottom:1px solid var(--line);margin-bottom:36px}
+.meta{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3)}
+h1.bt{font-size:22px;font-weight:600;margin:0;letter-spacing:-0.01em}
+.bh p{margin:0;color:var(--ink-2);font-size:14px;max-width:72ch;line-height:1.55}
+h2.sec{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);font-weight:500;margin:48px 0 18px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+
+/* methodo cards */
+.methodo{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:28px}
+.m-card{border:1px solid var(--line);border-radius:5px;padding:14px 16px;background:var(--bg-2)}
+.m-card .h{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.m-card .b{font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+.m-card .b code{font-family:var(--mono);font-size:11px;color:var(--ink);background:var(--bg);padding:1px 5px;border:1px solid var(--line);border-radius:2px}
+
+/* table */
+.tbl{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.tr{display:grid;grid-template-columns:60px 1fr 110px 110px 110px 1fr 80px;gap:14px;align-items:center;padding:14px 16px;border-top:1px solid var(--line)}
+.tr.head{background:var(--bg-2);border-top:none;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);font-weight:500;padding:11px 16px}
+.tr.head>*{padding:0}
+.code{font-family:var(--mono);font-size:11px;letter-spacing:0.06em;color:var(--ink);font-weight:500;text-transform:uppercase}
+.name{font-size:13px;line-height:1.4;color:var(--ink)}
+.name small{display:block;color:var(--ink-3);font-size:11px;margin-top:2px;font-family:var(--mono);letter-spacing:0.04em}
+.swatch{display:flex;align-items:center;gap:8px}
+.sw-chip{width:24px;height:24px;border-radius:4px;flex:0 0 auto;border:1px solid oklch(1 0 0 / 0.06)}
+.sw-hex{font-family:var(--mono);font-size:10.5px;color:var(--ink-2);letter-spacing:0.02em}
+.bar-prev{width:100%;height:6px;background:var(--bg-3);border-radius:1px;overflow:hidden;position:relative}
+.bar-prev i{display:block;height:100%;width:72%;border-radius:1px}
+.note{font-size:12px;line-height:1.5;color:var(--ink-2);text-wrap:pretty}
+.note .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;padding:2px 6px;border-radius:2px;margin-right:6px;display:inline-block;vertical-align:middle}
+.tag.ok{color:var(--good);border:1px solid var(--good);background:oklch(0.74 0.16 145 / 0.1)}
+.tag.todo{color:var(--warn);border:1px solid var(--warn);background:oklch(0.82 0.16 75 / 0.1)}
+.tag.shift{color:var(--accent);border:1px solid var(--accent-line);background:var(--accent-soft)}
+.ratio{font-family:var(--mono);font-size:12px;font-weight:500;text-align:right}
+.ratio small{display:block;font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);font-weight:400;margin-top:2px;font-family:var(--mono)}
+.ratio.aaa{color:var(--good)}
+.ratio.aa{color:var(--ink)}
+.ratio.ui{color:var(--warn)}
+.ratio.fail{color:var(--bad)}
+
+/* stress test */
+.stress{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px}
+.phone{width:100%;max-width:340px;background:var(--bg);border:1px solid var(--line);border-radius:28px;padding:14px 12px 16px;box-shadow:0 0 0 1px oklch(0.30 0.012 250 / 0.4) inset;margin:0 auto}
+.scr{background:var(--bg);border-radius:18px;border:1px solid var(--line);padding:18px 16px;display:flex;flex-direction:column;gap:14px}
+.s-eyebrow{font-family:var(--mono);font-size:9.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-3)}
+.s-h{font-family:var(--sans);font-weight:600;font-size:18px;line-height:1.25;letter-spacing:-0.012em;text-wrap:pretty}
+.s-h b{color:var(--accent);font-weight:600}
+.bars{display:flex;flex-direction:column;gap:9px;margin-top:6px}
+.bars .row{display:grid;grid-template-columns:48px 1fr 38px;gap:10px;align-items:center}
+.bars .nm{font-family:var(--mono);font-size:10px;color:var(--ink-2);letter-spacing:0.04em}
+.bars .b{height:5px;background:var(--bg-3);border-radius:1px;overflow:hidden}
+.bars .b i{display:block;height:100%;border-radius:1px}
+.bars .pct{font-family:var(--mono);font-size:10px;color:var(--ink-2);text-align:right}
+.stress-cap{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);text-align:center;margin-top:8px}
+
+footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:0.06em;color:var(--ink-3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+
+@media (max-width:900px){
+  .tr{grid-template-columns:50px 1fr 90px 90px;gap:10px;font-size:12px}
+  .tr .desktop{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="board">
+
+<header class="bh">
+  <span class="meta">07 · Party colors validated for dark template</span>
+  <h1 class="bt">11 groupes parlementaires de la 17e législature, adaptés au fond anthracite.</h1>
+  <p>Pour chaque groupe : la couleur officielle de référence (logo / charte / infobox Wikipédia FR), puis ma version <em style="font-style:normal;color:var(--ink)">adaptée dark</em> en oklch — éclaircie/désaturée juste assez pour rester lisible sur fond <code style="font-family:var(--mono);font-size:12px;color:var(--ink);background:var(--bg-2);padding:1px 6px;border-radius:2px;border:1px solid var(--line)">oklch(0.18 0.012 250)</code> tout en gardant l'identité reconnaissable. Ratios de contraste calculés en runtime contre le bg.</p>
+</header>
+
+<!-- methodo -->
+<div class="methodo">
+  <div class="m-card">
+    <div class="h">Source</div>
+    <div class="b">Hex officiel = couleur déclarée par le parti (logo, site, charte) ou par défaut l'infobox Wikipédia FR du groupe parlementaire. Citée nominativement par parti.</div>
+  </div>
+  <div class="m-card">
+    <div class="h">Adaptation</div>
+    <div class="b">L (oklch) cible <code>≥ 0.62</code> pour atteindre <code>3:1</code> contre le bg. Chroma préservé au max sans cramer. Hue shifté de quelques degrés uniquement quand deux partis se confondent visuellement (cluster bleu).</div>
+  </div>
+  <div class="m-card">
+    <div class="h">Cible WCAG</div>
+    <div class="b"><b>3:1 minimum</b> (UI components, AA — c'est ce qu'on cherche pour les barres). <b>4.5:1</b> visé partout où c'est possible. <b>7:1</b> = AAA, le top.</div>
+  </div>
+  <div class="m-card">
+    <div class="h">Limites</div>
+    <div class="b">Quelques teintes sont à confirmer avec toi : LIOT n'a pas de charte stable, EPR a glissé en 2024, UDR est trop récent. Marqués <span class="tag todo" style="font-size:9px">à valider</span>.</div>
+  </div>
+</div>
+
+<h2 class="sec">A · Couleurs par groupe — officielle vs adaptée</h2>
+
+<div class="tbl" id="ptbl">
+  <div class="tr head">
+    <span>code</span>
+    <span>groupe</span>
+    <span>officiel</span>
+    <span>adaptée dark</span>
+    <span>contraste</span>
+    <span class="desktop">commentaire</span>
+    <span style="text-align:right">verdict</span>
+  </div>
+</div>
+
+<h2 class="sec">B · Stress test — ranking complet, 11 groupes empilés</h2>
+<p style="color:var(--ink-2);font-size:13px;line-height:1.55;margin:0 0 18px;max-width:60ch">Cas le plus dur : tous les partis ensemble dans le résultat final. Si deux barres se confondent à l'œil, c'est ici que ça se voit. Le code mono à gauche reste de toute façon le repère sûr.</p>
+
+<div class="stress">
+  <div>
+    <div class="phone"><div class="scr">
+      <span class="s-eyebrow">RÉSULTAT · 17e LÉGIS.</span>
+      <span class="s-h">Tu votes comme <b>LFI</b> 7 fois sur 10.</span>
+      <div class="bars" id="bars-full"></div>
+    </div></div>
+    <div class="stress-cap">FULL RANKING · 11 groupes</div>
+  </div>
+  <div>
+    <div class="phone"><div class="scr">
+      <span class="s-eyebrow">CLUSTER BLEU · zoom différenciation</span>
+      <span class="s-h">Les 5 groupes de centre/droite côte à côte.</span>
+      <div class="bars" id="bars-blue"></div>
+    </div></div>
+    <div class="stress-cap">CLUSTER BLEU · HOR · DR · UDR · RN</div>
+  </div>
+</div>
+
+<h2 class="sec">C · À confirmer côté toi</h2>
+<div class="methodo" style="margin-bottom:0">
+  <div class="m-card">
+    <div class="h" style="color:var(--warn)">EPR</div>
+    <div class="b">J'ai retenu le jaune-or historique de Renaissance (<code>#FFCB05</code>). Si leur charte 2024 a basculé sur un mauve/violet, dis-le et je bascule sur <code>oklch(0.66 0.16 305)</code>.</div>
+  </div>
+  <div class="m-card">
+    <div class="h" style="color:var(--warn)">LIOT</div>
+    <div class="b">Pas de couleur officielle stable. J'ai choisi olive (<code>oklch(0.71 0.13 120)</code>) — éloigné du vert ECO et de tous les autres clusters. Confirme ou propose autre chose.</div>
+  </div>
+  <div class="m-card">
+    <div class="h" style="color:var(--warn)">UDR</div>
+    <div class="b">Groupe créé en 2024 (Ciotti). Pas de hex officiel publié à ma connaissance. J'ai dérivé un bleu-violet (<code>oklch(0.55 0.12 280)</code>) qui le sépare de RN/DR. À valider quand tu auras une source.</div>
+  </div>
+  <div class="m-card">
+    <div class="h" style="color:var(--good)">Tous les autres</div>
+    <div class="b">LFI · ECO · SOC · DEM · HOR · DR · RN · GDR sont dérivés de leurs hex officiels canoniques. Adaptation = pure question de luminosité pour le fond sombre.</div>
+  </div>
+</div>
+
+<footer>
+  <span>SANS DÉTOUR · DESIGN BOARD 07</span>
+  <span>PARTY COLORS · WCAG VALIDATED</span>
+  <span>BG = oklch(0.18 0.012 250)</span>
+</footer>
+
+</div>
+
+<script>
+const BG = { L: 0.024 }; // WCAG relative luminance approx for oklch(0.18 0.012 250)
+
+function hexToRgb(hex){
+  const h = hex.replace('#','');
+  return {
+    r: parseInt(h.slice(0,2),16),
+    g: parseInt(h.slice(2,4),16),
+    b: parseInt(h.slice(4,6),16),
+  };
+}
+function srgbToLin(c){
+  c = c/255;
+  return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4);
+}
+function relLum({r,g,b}){
+  return 0.2126*srgbToLin(r) + 0.7152*srgbToLin(g) + 0.0722*srgbToLin(b);
+}
+function ratioColor(rgb){
+  const L = relLum(rgb);
+  return (Math.max(L, BG.L) + 0.05) / (Math.min(L, BG.L) + 0.05);
+}
+function oklchToRgb(cssColor){
+  // Canvas always rasterises to sRGB regardless of input color space —
+  // unlike getComputedStyle which preserves oklch() verbatim in modern browsers.
+  const c = document.createElement('canvas');
+  c.width = c.height = 1;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = cssColor;
+  ctx.fillRect(0,0,1,1);
+  const d = ctx.getImageData(0,0,1,1).data;
+  return { r: d[0], g: d[1], b: d[2] };
+}
+function classify(r){
+  if (r >= 7) return 'aaa';
+  if (r >= 4.5) return 'aa';
+  if (r >= 3) return 'ui';
+  return 'fail';
+}
+function ratioLabel(r){
+  if (r >= 7) return 'AAA';
+  if (r >= 4.5) return 'AA';
+  if (r >= 3) return 'AA UI';
+  return 'FAIL';
+}
+
+const parties = [
+  { code:'LFI',  name:'La France Insoumise — NFP',           sub:'rouge crimson', off:'#CC2229', adapted:'oklch(0.62 0.18 25)',  src:'Wikipédia FR · LFI', verdict:'shift', tag:'identité conservée', note:'Rouge officiel direct, juste éclairci pour tenir sur dark.' , pct:71 },
+  { code:'ECO',  name:'Écologistes',                          sub:'vert nature',   off:'#77B82A', adapted:'oklch(0.72 0.16 145)', src:'Wikipédia FR · groupe Écologistes', verdict:'ok', tag:'1:1 officiel', note:'Le hex officiel passe quasi-natif sur dark, ratio confortable.' , pct:66 },
+  { code:'SOC',  name:'Socialistes & app.',                   sub:'rose au poing', off:'#E5007A', adapted:'oklch(0.70 0.16 5)',  src:'Wikipédia FR · PS',  verdict:'shift', tag:'désaturé', note:'Le rose officiel est trop saturé en dark — il "flashe". Désaturé vers corail.' , pct:62 },
+  { code:'LIOT', name:'Libertés, Indép., O-mer & Territoires',sub:'pas de charte', off:'#94B43B', adapted:'oklch(0.71 0.13 120)',src:'Wikipédia FR · LIOT', verdict:'todo', tag:'à valider', note:'Olive éloigné du vert ECO. Pas de hex officiel stable — choix arbitraire défendable.', pct:42 },
+  { code:'DEM',  name:'Démocrate (MoDem & app.)',             sub:'orange',        off:'#FF7F00', adapted:'oklch(0.74 0.16 50)', src:'Wikipédia FR · MoDem', verdict:'ok', tag:'identité conservée', note:'Orange officiel + petite désaturation pour ne pas heurter l\'accent jaune signal.', pct:38 },
+  { code:'EPR',  name:'Ensemble pour la République',          sub:'jaune-or Renaissance', off:'#FFCB05', adapted:'oklch(0.85 0.13 88)', src:'Wikipédia FR · EPR', verdict:'todo', tag:'à valider', note:'Jaune Renaissance historique. Si charte 2024 a basculé en mauve, je shift en oklch(0.66 0.16 305).', pct:35 },
+  { code:'HOR',  name:'Horizons & Indépendants',              sub:'bleu ciel',     off:'#0090BD', adapted:'oklch(0.68 0.12 220)', src:'Wikipédia FR · Horizons', verdict:'ok', tag:'identité conservée', note:'Bleu ciel officiel, parfaitement lisible. Hue préservée.', pct:30 },
+  { code:'DR',   name:'Droite Républicaine (ex-LR)',          sub:'bleu LR',       off:'#1F4E9C', adapted:'oklch(0.62 0.13 250)', src:'Wikipédia FR · LR', verdict:'shift', tag:'éclairci', note:'Bleu marine officiel trop sombre sur dark — éclairci pour atteindre 3:1.' , pct:24 },
+  { code:'UDR',  name:'Union des Droites (Ciotti)',           sub:'pas de charte', off:'#0F284C', adapted:'oklch(0.55 0.12 285)', src:'Wikipédia FR · UDR (en cours)', verdict:'todo', tag:'à valider', note:'Bleu navy officiel quasi-invisible. Hue shifté vers indigo pour différentier de RN/DR.', pct:18 },
+  { code:'RN',   name:'Rassemblement National',               sub:'bleu marine',   off:'#0D378A', adapted:'oklch(0.58 0.14 268)', src:'Wikipédia FR · RN', verdict:'shift', tag:'éclairci', note:'Marine officiel trop sombre. Éclairci, hue préservée — distinct des autres bleus.', pct:14 },
+  { code:'GDR',  name:'Gauche Démocrate et Républicaine',     sub:'rouge PCF',     off:'#CC0033', adapted:'oklch(0.55 0.20 12)',  src:'Wikipédia FR · GDR', verdict:'shift', tag:'différencié', note:'Rouge PCF assumé plus profond que LFI pour les distinguer en stack.', pct:12 },
+];
+
+const tbl = document.getElementById('ptbl');
+parties.forEach(p => {
+  const offRgb = hexToRgb(p.off);
+  const offR = ratioColor(offRgb);
+  const adaRgb = oklchToRgb(p.adapted);
+  const adaR = ratioColor(adaRgb);
+
+  const row = document.createElement('div');
+  row.className = 'tr';
+  row.innerHTML = `
+    <span class="code">${p.code}</span>
+    <span class="name">${p.name}<small>${p.sub}</small></span>
+    <span class="swatch"><span class="sw-chip" style="background:${p.off}"></span><span class="sw-hex">${p.off}<br><span style="color:var(--ink-3)">${offR.toFixed(2)}:1</span></span></span>
+    <span class="swatch"><span class="sw-chip" style="background:${p.adapted}"></span><span class="sw-hex">L=${p.adapted.match(/[\d.]+/)[0]}<br><span style="color:var(--ink-3)">${adaR.toFixed(2)}:1</span></span></span>
+    <span class="ratio ${classify(adaR)}">${adaR.toFixed(1)}:1<small>${ratioLabel(adaR)}</small></span>
+    <span class="note desktop"><span class="tag ${p.verdict}">${p.tag}</span>${p.note}<br><small style="color:var(--ink-4);font-family:var(--mono);font-size:10px;letter-spacing:0.04em">src — ${p.src}</small></span>
+    <span class="ratio ${classify(adaR)}" style="text-align:right">${p.verdict==='ok' ? '✓' : p.verdict==='shift' ? '✓ adapté' : '? à valider'}</span>
+  `;
+  tbl.appendChild(row);
+});
+
+// stress test bars
+const sortedAll = [...parties].sort((a,b) => b.pct - a.pct);
+const barsFull = document.getElementById('bars-full');
+sortedAll.forEach(p => {
+  const r = document.createElement('div');
+  r.className = 'row';
+  r.innerHTML = `<span class="nm">${p.code}</span><span class="b"><i style="width:${p.pct}%;background:${p.adapted}"></i></span><span class="pct">${p.pct}%</span>`;
+  barsFull.appendChild(r);
+});
+
+const blueCluster = parties.filter(p => ['HOR','DR','UDR','RN'].includes(p.code));
+blueCluster.push({ code:'EPR-alt', name:'EPR (si bascule mauve)', adapted:'oklch(0.66 0.16 305)', pct:33 });
+const barsBlue = document.getElementById('bars-blue');
+blueCluster.forEach(p => {
+  const r = document.createElement('div');
+  r.className = 'row';
+  r.innerHTML = `<span class="nm">${p.code}</span><span class="b"><i style="width:${p.pct ?? 50}%;background:${p.adapted}"></i></span><span class="pct">${p.pct ?? '–'}%</span>`;
+  barsBlue.appendChild(r);
+});
+</script>
+
+</body>
+</html>

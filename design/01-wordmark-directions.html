@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Sans Détour — Wordmark, directions A/B/C</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: oklch(0.96 0.005 250);
+    --ink-2: oklch(0.72 0.01 250);
+    --ink-3: oklch(0.50 0.01 250);
+    --bg: oklch(0.18 0.012 250);
+    --bg-2: oklch(0.22 0.012 250);
+    --line: oklch(0.30 0.012 250);
+    --accent: oklch(0.72 0.14 55); /* warm signal — placeholder, on tranchera plus tard */
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  body{padding:48px 32px 96px;max-width:1280px;margin:0 auto}
+
+  header{display:flex;flex-direction:column;gap:8px;padding-bottom:32px;border-bottom:1px solid var(--line);margin-bottom:48px}
+  .meta{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3)}
+  h1{font-size:22px;font-weight:600;margin:0;letter-spacing:-0.01em}
+  header p{margin:0;color:var(--ink-2);font-size:14px;max-width:62ch;line-height:1.55}
+
+  .grid{display:grid;grid-template-columns:1fr;gap:32px}
+  @media(min-width:980px){ .grid{grid-template-columns:1fr 1fr 1fr} }
+
+  .card{
+    background:var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:4px;
+    overflow:hidden;
+    display:flex;flex-direction:column;
+  }
+  .card-head{
+    padding:16px 20px;
+    border-bottom:1px solid var(--line);
+    display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  }
+  .card-head .label{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3)}
+  .card-head .title{font-size:14px;font-weight:600}
+
+  .stage{
+    aspect-ratio: 4 / 3;
+    display:flex;align-items:center;justify-content:center;
+    padding:32px;
+    background:var(--bg);
+  }
+
+  /* — A : Plex Sans bold, point appuyé — */
+  .wm-a{
+    font-family:var(--sans);
+    font-weight:700;
+    font-size:clamp(40px, 6vw, 64px);
+    letter-spacing:-0.025em;
+    line-height:1;
+    color:var(--ink);
+  }
+  .wm-a .dot{color:var(--accent)}
+
+  /* — B : Plex Sans uppercase, tracking large, institutionnel — */
+  .wm-b{
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:clamp(22px, 3.4vw, 34px);
+    letter-spacing:0.32em;
+    text-transform:uppercase;
+    line-height:1;
+    padding-left:0.32em; /* compense le tracking à droite */
+    border-top:1px solid var(--ink);
+    border-bottom:1px solid var(--ink);
+    padding-top:14px;padding-bottom:14px;
+  }
+
+  /* — C : Plex Mono lowercase, slash, terminal-coded — */
+  .wm-c{
+    font-family:var(--mono);
+    font-weight:500;
+    font-size:clamp(28px, 4.4vw, 44px);
+    letter-spacing:-0.01em;
+    line-height:1;
+    color:var(--ink);
+  }
+  .wm-c .slash{color:var(--ink-3)}
+  .wm-c .caret{color:var(--accent);animation: blink 1s steps(1) infinite}
+  @keyframes blink{ 50%{opacity:0} }
+
+  .notes{
+    padding:20px;
+    display:flex;flex-direction:column;gap:14px;
+    border-top:1px solid var(--line);
+    background:var(--bg-2);
+  }
+  .notes .row{display:flex;gap:12px;font-size:13px;line-height:1.5}
+  .notes .k{font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);min-width:88px;padding-top:2px}
+  .notes .v{color:var(--ink);flex:1}
+  .notes .v.muted{color:var(--ink-2)}
+
+  /* mini app preview band */
+  .preview-band{
+    margin-top:18px;
+    border-top:1px dashed var(--line);
+    padding:18px 20px 20px;
+    display:flex;align-items:center;gap:14px;
+    background:var(--bg-2);
+  }
+  .preview-band .pwm{font-size:14px;font-weight:700;letter-spacing:-0.02em}
+  .preview-band .chip{
+    font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;
+    color:var(--ink-2);border:1px solid var(--line);padding:4px 8px;border-radius:2px;
+  }
+  .preview-band .ml{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .b-pwm{ font-family:var(--sans); letter-spacing:0.18em; text-transform:uppercase; font-weight:600; font-size:11px}
+  .c-pwm{ font-family:var(--mono); font-weight:500; font-size:13px}
+  .c-pwm .slash{color:var(--ink-3)}
+
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:0.06em;color:var(--ink-3)}
+  footer .row{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+  <header>
+    <span class="meta">01 · Identité visuelle · Wordmark</span>
+    <h1>Trois directions de wordmark, fond sombre, registre civic-tech sobre.</h1>
+    <p>Système typo posé : <strong>IBM Plex Sans</strong> + <strong>IBM Plex Mono</strong>. Fond anthracite légèrement froid (oklch 0.18 / 0.012 / 250). L'accent orange est un placeholder — la palette se tranche à l'étape suivante.</p>
+  </header>
+
+  <section class="grid">
+
+    <!-- A -->
+    <article class="card">
+      <div class="card-head">
+        <span class="label">A · Le point appuyé</span>
+        <span class="title">Sans Détour<span style="color:var(--accent)">.</span></span>
+      </div>
+      <div class="stage">
+        <div class="wm-a">Sans Détour<span class="dot">.</span></div>
+      </div>
+      <div class="notes">
+        <div class="row"><span class="k">Logique</span><span class="v">Nom complet, casse normale, point coloré qui sert d'exclamation visuelle. Plex Sans Bold tracking serré.</span></div>
+        <div class="row"><span class="k">Lit comme</span><span class="v muted">Une phrase qu'on referme. Posé, déclaratif, presque un verdict.</span></div>
+        <div class="row"><span class="k">+</span><span class="v muted">Mémorable, le point devient l'élément graphique réutilisable (favicon, share card, sticker).</span></div>
+        <div class="row"><span class="k">−</span><span class="v muted">Ressemble à plusieurs marques (Brut., Le Slip Français…). Un peu attendu.</span></div>
+      </div>
+      <div class="preview-band">
+        <div class="pwm">Sans Détour<span style="color:var(--accent)">.</span></div>
+        <span class="chip">3 / 20</span>
+        <span class="ml">en haut de l'app</span>
+      </div>
+    </article>
+
+    <!-- B -->
+    <article class="card">
+      <div class="card-head">
+        <span class="label">B · Le bandeau institutionnel</span>
+        <span class="title">SANS DÉTOUR (filets)</span>
+      </div>
+      <div class="stage">
+        <div class="wm-b">SANS&nbsp;DÉTOUR</div>
+      </div>
+      <div class="notes">
+        <div class="row"><span class="k">Logique</span><span class="v">Capitales tracking large, encadrées de filets fins. Plex Sans 600. Référence : entêtes de documents officiels, JO, presse classique.</span></div>
+        <div class="row"><span class="k">Lit comme</span><span class="v muted">Un titre de rapport. Autorité, crédibilité, distance éditoriale.</span></div>
+        <div class="row"><span class="k">+</span><span class="v muted">Crédibilité maximale. Tient bien sur des bandeaux étroits. Pas de risque "trop fun".</span></div>
+        <div class="row"><span class="k">−</span><span class="v muted">Plus froid, moins "marque qu'on partage". Difficile à compresser en favicon / petit format.</span></div>
+      </div>
+      <div class="preview-band">
+        <div class="b-pwm" style="border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:6px 0;">SANS&nbsp;DÉTOUR</div>
+        <span class="chip">3 / 20</span>
+        <span class="ml">en haut de l'app</span>
+      </div>
+    </article>
+
+    <!-- C -->
+    <article class="card">
+      <div class="card-head">
+        <span class="label">C · Le terminal civic</span>
+        <span class="title">sans/détour</span>
+      </div>
+      <div class="stage">
+        <div class="wm-c">sans<span class="slash">/</span>détour<span class="caret">_</span></div>
+      </div>
+      <div class="notes">
+        <div class="row"><span class="k">Logique</span><span class="v">Mono lowercase, slash en séparateur, curseur clignotant. Plex Mono 500. Référence : data-room, dépôt open data, registre public.</span></div>
+        <div class="row"><span class="k">Lit comme</span><span class="v muted">Un endpoint d'API ou un nom de dataset. Outil de consultation, pas média.</span></div>
+        <div class="row"><span class="k">+</span><span class="v muted">Très distinctif, signe la posture "données brutes". Le slash devient le mark (favicon = "/").</span></div>
+        <div class="row"><span class="k">−</span><span class="v muted">Plus risqué grand public, peut sembler "tech only". Le curseur clignotant est un parti-pris fort.</span></div>
+      </div>
+      <div class="preview-band">
+        <div class="c-pwm">sans<span class="slash">/</span>détour</div>
+        <span class="chip">3 / 20</span>
+        <span class="ml">en haut de l'app</span>
+      </div>
+    </article>
+
+  </section>
+
+  <footer>
+    <div class="row">
+      <span>SANS DÉTOUR · DESIGN BOARD 01</span>
+      <span>FONT — IBM PLEX SANS / IBM PLEX MONO</span>
+      <span>BG — OKLCH 0.18 0.012 250</span>
+    </div>
+  </footer>
+
+</body>
+</html>
