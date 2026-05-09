@@ -1,1 +1,211 @@
-export default function Play() { return <div style={{padding:24}}>play</div>; }
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useNavigate } from "react-router-dom";
+import { DeckStack } from "../components/DeckStack";
+import { ChipTop1 } from "../components/ChipTop1";
+import { RankingOverlay } from "../components/RankingOverlay";
+import { fetchScrutins } from "../lib/scrutins";
+import { composeDeck, drawNext } from "../lib/deck";
+import { computeAlignment, rankByAlignment } from "../lib/matching";
+import { getOrCreateSession, recordVote, loadSession } from "../lib/session";
+import type { Scrutin, UserVote, GroupCode, GroupAlignment } from "../types";
+import { GROUP_CODES } from "../types";
+
+const TARGET = 20;
+const MIN_FOR_LIVE = 5;
+const CAP_PER_DOSSIER = 2;
+
+export default function Play() {
+  const navigate = useNavigate();
+  const [pool, setPool] = useState<Scrutin[]>([]);
+  const [deck, setDeck] = useState<Scrutin[]>([]);
+  const [refinementMode] = useState(false);
+  const [rankingOpen, setRankingOpen] = useState(false);
+  const [tick, setTick] = useState(0); // force re-render after recordVote
+
+  // Initial deck composition
+  useEffect(() => {
+    fetchScrutins().then((p) => {
+      setPool(p);
+      getOrCreateSession();
+      setDeck(composeDeck(p, { size: TARGET, capPerDossier: CAP_PER_DOSSIER }));
+    });
+  }, []);
+
+  const session = loadSession();
+  const cardsSeenSet = useMemo(
+    () => new Set(session?.cards_seen ?? []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [session, tick],
+  );
+  const seenDossierCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const id of session?.cards_seen ?? []) {
+      const sc = pool.find((s) => s.id === id);
+      if (sc) m.set(sc.dossier_id, (m.get(sc.dossier_id) ?? 0) + 1);
+    }
+    return m;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, pool, tick]);
+
+  const alignments: Record<GroupCode, GroupAlignment> = useMemo(
+    () => computeAlignment(pool, session?.votes ?? []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pool, session, tick],
+  );
+  const countedTotal = Math.max(...GROUP_CODES.map((c) => alignments[c].counted), 0);
+  const showLiveScore = countedTotal >= MIN_FOR_LIVE;
+  const ranked = rankByAlignment(alignments);
+  const top1 = ranked[0];
+
+  function handleVote(scrutinId: string, choice: UserVote) {
+    recordVote(scrutinId, choice);
+    setTick((t) => t + 1);
+
+    const remaining = deck.slice(1);
+    if (remaining.length === 0) {
+      if ((session?.votes.length ?? 0) + 1 >= TARGET) {
+        navigate("/result");
+        return;
+      }
+      const next = drawNext(pool, new Set([...cardsSeenSet, scrutinId]), {
+        capPerDossier: CAP_PER_DOSSIER,
+        seenDossierCounts,
+      });
+      setDeck(next ? [next] : []);
+      if (!next) navigate("/result");
+    } else {
+      setDeck(remaining);
+    }
+
+    if ((session?.votes.length ?? 0) + 1 === TARGET && !refinementMode) {
+      navigate("/result");
+    }
+  }
+
+  if (deck.length === 0 && pool.length > 0) {
+    return (
+      <div style={{ padding: 24 }}>
+        Pool épuisé.{" "}
+        <button onClick={() => navigate("/result")}>Voir mon résultat</button>
+      </div>
+    );
+  }
+  if (deck.length === 0) return <div style={{ padding: 24 }}>Chargement…</div>;
+
+  const progress = (session?.cards_seen.length ?? 0) + 1;
+
+  return (
+    <section
+      style={{
+        padding: "18px 16px 16px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 18,
+        minHeight: "calc(100dvh - 60px)",
+        maxWidth: 480,
+        margin: "0 auto",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 10,
+        }}
+      >
+        {showLiveScore && top1 ? (
+          <ChipTop1 topGroup={top1.group} pct={top1.pct} onTap={() => setRankingOpen(true)} />
+        ) : (
+          <span />
+        )}
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 12,
+            color: "var(--ink-2)",
+            letterSpacing: "0.04em",
+            border: "1px solid var(--line)",
+            padding: "7px 11px",
+            borderRadius: 3,
+          }}
+        >
+          <b style={{ color: "var(--ink)", fontWeight: 500 }}>{progress}</b>
+          {!refinementMode && ` / ${TARGET}`}
+        </span>
+        {refinementMode && (
+          <button
+            onClick={() => navigate("/result")}
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 11,
+              border: "1px solid var(--line)",
+              color: "var(--ink-2)",
+              background: "transparent",
+              padding: "7px 11px",
+              borderRadius: 3,
+              cursor: "pointer",
+            }}
+          >
+            Voir mon résultat
+          </button>
+        )}
+      </div>
+
+      <DeckStack scrutins={deck} onVote={handleVote} />
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 12,
+          paddingTop: 8,
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => handleVote(deck[0].id, "contre")}
+          style={btnFallback("var(--contre)")}
+        >
+          ← Contre
+        </button>
+        <button
+          type="button"
+          onClick={() => handleVote(deck[0].id, "skip")}
+          style={btnFallback("var(--ink-2)")}
+        >
+          ↓ Je passe
+        </button>
+        <button
+          type="button"
+          onClick={() => handleVote(deck[0].id, "pour")}
+          style={btnFallback("var(--pour)")}
+        >
+          Pour →
+        </button>
+      </div>
+
+      <RankingOverlay
+        open={rankingOpen}
+        alignments={alignments}
+        countedTotal={countedTotal}
+        onClose={() => setRankingOpen(false)}
+      />
+    </section>
+  );
+}
+
+function btnFallback(color: string): CSSProperties {
+  return {
+    flex: 1,
+    padding: "12px 8px",
+    borderRadius: 6,
+    background: "transparent",
+    border: `1px solid ${color}`,
+    color,
+    fontFamily: "var(--font-mono)",
+    fontSize: 12,
+    letterSpacing: "0.04em",
+    cursor: "pointer",
+  };
+}
