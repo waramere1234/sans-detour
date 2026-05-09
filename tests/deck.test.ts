@@ -46,6 +46,34 @@ describe("composeDeck (PRD § 9.3)", () => {
     const b = composeDeck(pool, { size: 20, capPerDossier: 2, seed: 7 });
     expect(a.map(s => s.id)).toEqual(b.map(s => s.id));
   });
+
+  it("excludes already-seen scrutins (resume mid-session)", () => {
+    const pool = Array.from({ length: 30 }, (_, i) => mk(`s${i}`, `d${i % 15}`));
+    const seen = new Set(["s0", "s5", "s10", "s15", "s20"]);
+    const deck = composeDeck(pool, {
+      size: 20,
+      capPerDossier: 2,
+      excludeIds: seen,
+      seed: 42,
+    });
+    for (const s of deck) {
+      expect(seen.has(s.id)).toBe(false);
+    }
+  });
+
+  it("respects cap when seenDossierCounts is pre-populated", () => {
+    // d0 already has 2 cards seen → cap reached, no new d0 in deck
+    const pool = Array.from({ length: 40 }, (_, i) => mk(`s${i}`, `d${i % 10}`));
+    const deck = composeDeck(pool, {
+      size: 20,
+      capPerDossier: 2,
+      seenDossierCounts: new Map([["d0", 2]]),
+      seed: 42,
+    });
+    for (const s of deck) {
+      expect(s.dossier_id).not.toBe("d0");
+    }
+  });
 });
 
 describe("drawNext (mode affinement)", () => {

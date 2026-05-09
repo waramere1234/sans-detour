@@ -37,7 +37,25 @@ export default function Play() {
     fetchScrutins().then((p) => {
       setPool(p);
       getOrCreateSession();
-      setDeck(composeDeck(p, { size: TARGET, capPerDossier: CAP_PER_DOSSIER }));
+      // Resume-aware composition: skip already-seen scrutins so they
+      // never reappear, and only request the number of cards still needed.
+      const seenIds = new Set(existing?.cards_seen ?? []);
+      const seenCounts = new Map<string, number>();
+      for (const id of existing?.cards_seen ?? []) {
+        const sc = p.find((x) => x.id === id);
+        if (sc) seenCounts.set(sc.dossier_id, (seenCounts.get(sc.dossier_id) ?? 0) + 1);
+      }
+      const remainingTarget = isAffinement
+        ? TARGET   // affinement mode: keep drawing as long as pool allows
+        : Math.max(0, TARGET - seenIds.size);
+      setDeck(
+        composeDeck(p, {
+          size: remainingTarget,
+          capPerDossier: CAP_PER_DOSSIER,
+          excludeIds: seenIds,
+          seenDossierCounts: seenCounts,
+        }),
+      );
     });
   }, [navigate, params]);
 

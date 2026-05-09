@@ -4,6 +4,10 @@ import type { Scrutin } from "../types";
 export interface ComposeOptions {
   size: number;
   capPerDossier: number;
+  /** Scrutins already seen this session — must not appear in the new deck. */
+  excludeIds?: Set<string>;
+  /** Per-dossier counts already accumulated this session — respected by cap. */
+  seenDossierCounts?: Map<string, number>;
   seed?: number;
 }
 
@@ -28,16 +32,19 @@ function shuffle<T>(arr: T[], rng: () => number): T[] {
   return a;
 }
 
-/** Compose a deck of `size` scrutins from `pool`, capping per dossier. */
+/** Compose a deck of `size` scrutins from `pool`, capping per dossier and
+ * skipping any scrutin already in `excludeIds` (already seen this session). */
 export function composeDeck(pool: Scrutin[], opts: ComposeOptions): Scrutin[] {
   const seed = opts.seed ?? Math.floor(Math.random() * 2 ** 31);
   const rng = mulberry32(seed);
   const shuffled = shuffle(pool, rng);
-  const counts = new Map<string, number>();
+  const counts = new Map<string, number>(opts.seenDossierCounts ?? []);
+  const exclude = opts.excludeIds ?? new Set<string>();
   const deck: Scrutin[] = [];
 
   for (const s of shuffled) {
     if (deck.length >= opts.size) break;
+    if (exclude.has(s.id)) continue;
     const c = counts.get(s.dossier_id) ?? 0;
     if (c >= opts.capPerDossier) continue;
     deck.push(s);
