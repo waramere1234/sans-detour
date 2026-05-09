@@ -1,7 +1,81 @@
-:root {
-  font-family: system-ui, sans-serif;
-  background: #1d1f24;
-  color: #f0f1f3;
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
+
+:root {
+  /* Surfaces */
+  --bg: oklch(0.18 0.012 250);
+  --bg-2: oklch(0.22 0.012 250);
+  --bg-3: oklch(0.26 0.012 250);
+  --line: oklch(0.30 0.012 250);
+  --line-2: oklch(0.40 0.012 250);
+
+  /* Inks */
+  --ink:   oklch(0.96 0.005 250);
+  --ink-2: oklch(0.72 0.01  250);
+  --ink-3: oklch(0.50 0.01  250);
+  --ink-4: oklch(0.36 0.01  250);
+
+  /* Accent — bleu république (D2) */
+  --accent:      oklch(0.78 0.14 230);
+  --accent-soft: oklch(0.78 0.14 230 / 0.14);
+  --accent-line: oklch(0.78 0.14 230 / 0.45);
+
+  /* Semantic */
+  --pour:   oklch(0.74 0.16 145);
+  --contre: oklch(0.66 0.18 25);
+  --warn:   oklch(0.82 0.16 75);
+
+  /* Party colors — 17e légis (validés WCAG ≥3:1 vs --bg) */
+  --p-lfi:  oklch(0.62 0.18 25);
+  --p-gdr:  oklch(0.55 0.20 12);
+  --p-eco:  oklch(0.72 0.16 145);
+  --p-soc:  oklch(0.70 0.16 5);
+  --p-liot: oklch(0.71 0.13 120);
+  --p-epr:  oklch(0.85 0.13 88);
+  --p-dem:  oklch(0.74 0.16 50);
+  --p-hor:  oklch(0.68 0.12 220);
+  --p-dr:   oklch(0.62 0.13 250);
+  --p-udr:  oklch(0.55 0.12 285);
+  --p-rn:   oklch(0.58 0.14 268);
+}
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
 * { box-sizing: border-box; }
-html, body, #root { margin: 0; min-height: 100vh; }
+
+/* Wordmark — see design board 03 */
+.sd-wordmark {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.sd-wordmark .sd-slash { color: var(--ink-3); }
+.sd-wordmark .sd-caret {
+  display: inline-block;
+  width: 0.55ch;
+  height: 0.10em;
+  background: var(--accent);
+  margin-left: 0.18ch;
+  transform: translateY(0.05em);
+  animation: sd-blink 1s steps(1) infinite;
+  flex: 0 0 auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sd-wordmark .sd-caret { animation: none; }
+}
+@keyframes sd-blink { 50% { opacity: 0; } }
