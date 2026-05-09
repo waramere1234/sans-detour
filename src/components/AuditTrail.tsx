@@ -53,11 +53,19 @@ export function AuditTrail({ alignment, scrutins, votes }: AuditTrailProps) {
         }}>
           <span style={{ color: r.color, fontWeight: 600 }}>{r.icon}</span>
           <span style={{ color: "var(--ink)" }}>{r.sc.titre_pedago}</span>
-          <a href={r.sc.url_an_officielle} target="_blank" rel="noopener noreferrer"
-            style={{
-              fontFamily: "var(--font-mono)", fontSize: 10,
-              color: "var(--ink-3)", letterSpacing: "0.04em", textDecoration: "none",
-            }}>AN ↗</a>
+          {r.sc.url_an_officielle ? (
+            <a href={r.sc.url_an_officielle} target="_blank" rel="noopener noreferrer"
+              style={{
+                fontFamily: "var(--font-mono)", fontSize: 10,
+                color: "var(--ink-3)", letterSpacing: "0.04em", textDecoration: "none",
+              }}>AN ↗</a>
+          ) : (
+            <span title="Donnée de démonstration — sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production"
+              style={{
+                fontFamily: "var(--font-mono)", fontSize: 10,
+                color: "var(--ink-4)", letterSpacing: "0.04em",
+              }}>démo</span>
+          )}
         </div>
       ))}
     </div>

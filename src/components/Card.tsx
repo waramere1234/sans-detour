@@ -54,7 +54,9 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
         paddingTop: 14, marginTop: "auto",
       }}>
         <span>{new Date(scrutin.date).toLocaleDateString("fr-FR")}</span>
-        <span>scrutin n° {scrutin.numero}</span>
+        {scrutin.url_an_officielle
+          ? <span>scrutin n° {scrutin.numero}</span>
+          : <span style={{ color: "var(--accent)" }} title="Donnée de démonstration — sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production">exemple démo</span>}
       </div>
     </motion.div>
   );
