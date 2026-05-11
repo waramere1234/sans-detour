@@ -11,7 +11,8 @@
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
     "seed": "tsx scripts/seed-supabase.ts",
-    "ingest:an": "tsx scripts/ingest-an.ts"
+    "ingest:an": "tsx scripts/ingest-an.ts",
+    "debug:batch": "tsx scripts/debug-batch.ts"
   },
   "dependencies": {
     "@resvg/resvg-wasm": "^2.6.2",

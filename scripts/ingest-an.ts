@@ -407,7 +407,10 @@ interface BatchResultLine {
   custom_id: string;
   result:
     | { type: "succeeded"; message: AnthropicResponse }
-    | { type: "errored"; error: { type: string; message: string } }
+    // The Anthropic batch result shape for an errored request — the exact
+    // wrapping has shifted across SDK versions, so we treat error/message as
+    // best-effort and fall back to dumping the raw result on logging.
+    | { type: "errored"; error?: { type?: string; message?: string } }
     | { type: "canceled" }
     | { type: "expired" };
 }
@@ -421,6 +424,7 @@ async function fetchBatchResults(batchId: string): Promise<Map<string, Summary>>
   const out = new Map<string, Summary>();
   let okCount = 0;
   let errCount = 0;
+  let firstErrorLine: string | null = null;
   for (const line of text.split("\n").filter((l) => l.trim())) {
     const result = JSON.parse(line) as BatchResultLine;
     if (result.result.type === "succeeded") {
@@ -432,7 +436,10 @@ async function fetchBatchResults(batchId: string): Promise<Map<string, Summary>>
         errCount++;
       }
     } else if (result.result.type === "errored") {
-      console.error(`  ✕ ${result.custom_id}: ${result.result.error.type} — ${result.result.error.message}`);
+      const err = result.result.error;
+      const detail = err?.message ?? err?.type ?? JSON.stringify(result.result);
+      console.error(`  ✕ ${result.custom_id}: ${detail}`);
+      if (!firstErrorLine) firstErrorLine = line;
       errCount++;
     } else {
       console.error(`  ✕ ${result.custom_id}: ${result.result.type}`);
@@ -440,6 +447,11 @@ async function fetchBatchResults(batchId: string): Promise<Map<string, Summary>>
     }
   }
   console.log(`  parsed ${okCount} summaries, ${errCount} failed`);
+  if (errCount > 0 && firstErrorLine) {
+    // Surface the raw first error line in full so we can debug shape mismatches.
+    console.error("\n— Raw first error result (for debugging) —");
+    console.error(firstErrorLine);
+  }
   return out;
 }
 
