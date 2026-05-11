@@ -138,12 +138,20 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
             color: "var(--ink)",
           }}>{scrutin.titre_pedago}</div>
 
-          {/* Single substantive explanation field. This is where the real content lives. */}
+          {/* Single substantive explanation field. This is where the real content lives.
+              Two transforms applied client-side so old ingest data renders cleanly without
+              a re-run: (1) strip trailing "Vote : X oui, Y non" patterns the LLM sometimes
+              appended (the vote outcome is computed elsewhere in the app — putting it here
+              spoils the user's own vote and conflates "what the law does" with "what
+              happened"). (2) Render **bold** markdown markup as styled <strong> so the LLM
+              can emphasize key facts (numbers, mechanisms, dates). */}
           <div style={{
             fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.6,
             color: "var(--ink-2)", textWrap: "pretty" as const,
           }}>
-            {scrutin.contexte || (
+            {scrutin.contexte ? (
+              renderWithBold(stripVoteResult(scrutin.contexte))
+            ) : (
               <em style={{ color: "var(--ink-3)" }}>
                 Aucune explication détaillée disponible pour ce scrutin. Le titre officiel ci-dessous donne le sujet général.
               </em>
@@ -183,3 +191,32 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
   );
 }
 
+/** Strip trailing "Vote : X oui, Y non" / "Résultat : ..." fragments the LLM
+ *  sometimes appends. The vote outcome is computed elsewhere; including it
+ *  in the explanation conflates "what the law does" with "what happened at
+ *  the vote", which spoils the user's own vote and is off-topic. */
+function stripVoteResult(text: string): string {
+  // Find the first occurrence of " Vote :" or " Résultat :" (whitespace-bounded
+  // so we don't strip on internal lowercase mentions like "ce vote a un impact")
+  // and cut everything from there. Case-insensitive on the marker.
+  const m = text.match(/\s+(Vote|Résultat)\s*[:.]/i);
+  if (!m || m.index === undefined) return text;
+  return text.slice(0, m.index).trim();
+}
+
+/** Parse **bold** markdown markup and return alternating text / <strong> nodes.
+ *  The LLM is instructed to wrap 2-3 key facts (numbers, mechanisms, dates)
+ *  in **...** so they pop visually. Falls back gracefully on plain text. */
+function renderWithBold(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*]+?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
+      return (
+        <strong key={i} style={{ color: "var(--ink)", fontWeight: 600 }}>
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
