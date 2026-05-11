@@ -105,13 +105,18 @@ export function AuditTrail({ alignment, scrutins, votes }: AuditTrailProps) {
 
 /** Extract the first "Concrètement :" or "Par exemple :" sentence from the
  *  contexte field. Returns null if neither marker is present (fallback data
- *  doesn't have these). Strips any inline **bold** markup to keep the
- *  bullet visually compact in the dense list view. */
+ *  doesn't have these). Strips Anthropic web_search citation tags, **bold**
+ *  markup, and trailing punctuation to keep the bullet visually compact. */
 function extractConcrete(contexte?: string): string | null {
   if (!contexte) return null;
+  // Strip Anthropic <cite ...> tags first (the LLM injects them when using
+  // web_search and they would leak into the bullet text otherwise).
+  const cleaned = contexte
+    .replace(/<cite[^>]*>([\s\S]*?)<\/cite>/g, "$1")
+    .replace(/<\/?cite[^>]*>/g, "");
   // Match "Concrètement :" or "Par exemple :" followed by content up to the
   // next sentence boundary (period followed by space + capital, or end of string).
-  const m = contexte.match(/(?:Concrètement|Par exemple)\s*:?\s*([^]+?)(?=\.\s+[A-Z]|\.?$)/i);
+  const m = cleaned.match(/(?:Concrètement|Par exemple)\s*:?\s*([^]+?)(?=\.\s+[A-Z]|\.?$)/i);
   if (!m) return null;
   const sentence = m[1].trim().replace(/\.$/, "");
   // Strip **bold** markers — the AuditTrail row is dense, no need for emphasis

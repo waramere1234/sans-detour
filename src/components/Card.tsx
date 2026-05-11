@@ -150,7 +150,7 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
             color: "var(--ink-2)", textWrap: "pretty" as const,
           }}>
             {scrutin.contexte ? (
-              renderWithBold(stripVoteResult(scrutin.contexte))
+              renderWithBold(scrutin.contexte)
             ) : (
               <em style={{ color: "var(--ink-3)" }}>
                 Aucune explication détaillée disponible pour ce scrutin. Le titre officiel ci-dessous donne le sujet général.
@@ -191,6 +191,20 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
   );
 }
 
+/** Strip Anthropic web_search citation markup like
+ *  `<cite index="20-2,20-3">text</cite>` — preserve the inner text, drop the
+ *  wrapper. Also drops any orphan opening/closing tags. */
+function stripCitations(text: string): string {
+  return text
+    // Wrapped citations: keep inner text, drop tags
+    .replace(/<cite[^>]*>([\s\S]*?)<\/cite>/g, "$1")
+    // Orphan tags (defensive — if a stream truncates mid-tag)
+    .replace(/<\/?cite[^>]*>/g, "")
+    // Collapse any double spaces or stray whitespace introduced by removal
+    .replace(/[ \t]+/g, " ")
+    .trim();
+}
+
 /** Strip trailing "Vote : X oui, Y non" / "Résultat : ..." fragments the LLM
  *  sometimes appends. The vote outcome is computed elsewhere; including it
  *  in the explanation conflates "what the law does" with "what happened at
@@ -206,9 +220,11 @@ function stripVoteResult(text: string): string {
 
 /** Parse **bold** markdown markup and return alternating text / <strong> nodes.
  *  The LLM is instructed to wrap 2-3 key facts (numbers, mechanisms, dates)
- *  in **...** so they pop visually. Falls back gracefully on plain text. */
+ *  in **...** so they pop visually. Applies citation/vote-result cleanup
+ *  first so we never render Anthropic markup or vote spoilers. */
 function renderWithBold(text: string): React.ReactNode {
-  const parts = text.split(/(\*\*[^*]+?\*\*)/g);
+  const cleaned = stripVoteResult(stripCitations(text));
+  const parts = cleaned.split(/(\*\*[^*]+?\*\*)/g);
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
       return (
