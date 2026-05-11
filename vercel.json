@@ -3,6 +3,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
+    { "source": "/api/share-card.svg", "destination": "/api/share-card" },
     { "source": "/api/share-card.png", "destination": "/api/share-card" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]

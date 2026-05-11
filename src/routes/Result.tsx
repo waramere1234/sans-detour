@@ -52,12 +52,12 @@ export default function Result() {
     track("share_clicked");
     const top6 = ranked.slice(0, 6);
     const t = top6.map(a => `${a.group}:${a.pct}`).join(",");
-    const url = `${location.origin}/api/share-card.png?t=${t}&fmt=square`;
+    const url = `${location.origin}/api/share-card.svg?t=${t}&fmt=square`;
 
     if (navigator.share) {
       try {
         const blob = await (await fetch(url)).blob();
-        const file = new File([blob], "sansdetour.png", { type: "image/png" });
+        const file = new File([blob], "sansdetour.svg", { type: "image/svg+xml" });
         await navigator.share({
           files: [file],
           text: `Mes affinités politiques réelles · top : ${getParty(top.group).short} ${top.pct}%`,

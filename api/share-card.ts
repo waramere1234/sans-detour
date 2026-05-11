@@ -1,11 +1,12 @@
 // api/share-card.ts
+//
+// Generates a shareable card as inline SVG. Originally rendered to PNG via
+// resvg-wasm, but compiling and running the WASM on a Vercel Hobby Node
+// serverless function consistently exceeded the 10 s timeout. SVG is rendered
+// in 1–2 s by Satori alone, embeds cleanly in browser tabs and the Web Share
+// API, and is good enough for V1.
 import satori from "satori";
-import { initWasm, Resvg } from "@resvg/resvg-wasm";
 
-// Node.js serverless runtime: Edge was tried first but the embedded WASM
-// pushed the function bundle past Hobby's 1 MB Edge limit. Node has a 50 MB
-// bundle limit (plenty for resvg-wasm) and lets us fetch the WASM at runtime
-// without the "Wasm code generation disallowed" restriction Edge imposes.
 export const config = { runtime: "nodejs" };
 
 interface Bar { code: string; pct: number; }
@@ -28,25 +29,13 @@ const INK_2 = "#a7adb8";
 const FALLBACK_FONT_URL =
   "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ibmplexmono/IBMPlexMono-Regular.ttf";
 
-// resvg WASM is copied from node_modules to public/resvg.wasm by the prebuild
-// script so Vercel serves it from the same-origin static CDN. Fetching from
-// unpkg on cold start was pushing the Node function past Hobby's 10s timeout.
-let wasmReady: Promise<void> | null = null;
-function ensureWasm(origin: string): Promise<void> {
-  if (!wasmReady) {
-    wasmReady = initWasm(fetch(`${origin}/resvg.wasm`)).catch((err: unknown) => {
-      // Reset so a subsequent invocation can retry on transient failure.
-      wasmReady = null;
-      throw err;
-    });
-  }
-  return wasmReady;
-}
-
-async function loadFont(url: string): Promise<ArrayBuffer> {
-  const r = await fetch(url);
+let fontCache: ArrayBuffer | null = null;
+async function loadFont(): Promise<ArrayBuffer> {
+  if (fontCache) return fontCache;
+  const r = await fetch(FALLBACK_FONT_URL);
   if (!r.ok) throw new Error(`Font fetch failed: ${r.status}`);
-  return await r.arrayBuffer();
+  fontCache = await r.arrayBuffer();
+  return fontCache;
 }
 
 // Satori's first argument is typed as React.ReactNode. We pass a plain
@@ -56,8 +45,7 @@ type SatoriTree = Parameters<typeof satori>[0];
 
 export default async function handler(req: Request): Promise<Response> {
   try {
-    const reqUrl = new URL(req.url);
-    const { searchParams } = reqUrl;
+    const { searchParams } = new URL(req.url);
     const fmt = searchParams.get("fmt") === "story" ? "story" : "square";
     const bars = parseTopParam(searchParams.get("t")).slice(0, 8);
     if (bars.length === 0) {
@@ -68,10 +56,7 @@ export default async function handler(req: Request): Promise<Response> {
     const H = fmt === "square" ? 1080 : 1920;
     const top = bars[0];
 
-    const [font] = await Promise.all([
-      loadFont(FALLBACK_FONT_URL),
-      ensureWasm(reqUrl.origin),
-    ]);
+    const font = await loadFont();
 
     const tree = {
       type: "div",
@@ -109,10 +94,9 @@ export default async function handler(req: Request): Promise<Response> {
       fonts: [{ name: "Plex", data: font, weight: 400, style: "normal" }],
     });
 
-    const png = new Resvg(svg).render().asPng();
-    return new Response(png, {
+    return new Response(svg, {
       headers: {
-        "Content-Type": "image/png",
+        "Content-Type": "image/svg+xml; charset=utf-8",
         "Cache-Control": "public, max-age=3600, immutable",
       },
     });
