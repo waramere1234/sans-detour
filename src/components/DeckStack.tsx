@@ -1,9 +1,7 @@
 // src/components/DeckStack.tsx
-import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import type { Scrutin, UserVote } from "../types";
 import { Card } from "./Card";
-import { CardDetailOverlay } from "./CardDetailOverlay";
 
 export interface DeckStackProps {
   scrutins: Scrutin[];   // current deck (head = top card)
@@ -11,8 +9,6 @@ export interface DeckStackProps {
 }
 
 export function DeckStack({ scrutins, onVote }: DeckStackProps) {
-  const [detailScrutin, setDetailScrutin] = useState<Scrutin | null>(null);
-
   if (scrutins.length === 0) return null;
   const visible = scrutins.slice(0, 3);
 
@@ -45,21 +41,11 @@ export function DeckStack({ scrutins, onVote }: DeckStackProps) {
                 pointerEvents: isTop ? "auto" : "none",
               }}
             >
-              <Card
-                scrutin={s}
-                topMost={isTop}
-                onSwipe={(dir) => handleSwipe(s, dir)}
-                onShowDetail={isTop ? () => setDetailScrutin(s) : undefined}
-              />
+              <Card scrutin={s} topMost={isTop} onSwipe={(dir) => handleSwipe(s, dir)} />
             </div>
           );
         })}
       </AnimatePresence>
-      <CardDetailOverlay
-        open={detailScrutin !== null}
-        scrutin={detailScrutin}
-        onClose={() => setDetailScrutin(null)}
-      />
     </div>
   );
 }
