@@ -418,14 +418,54 @@ function extractSummaryFromMessage(message: AnthropicResponse): Summary {
   if (!m) {
     throw new Error(`No JSON in response. text=${combined.slice(0, 300)}`);
   }
-  const parsed = JSON.parse(m[0]) as Summary;
-  // Defensive: if the LLM returned a partial / malformed analyse object,
-  // either drop it or coerce missing arrays to []. Avoids the UI rendering
-  // .map() on undefined.
+  // JSON.parse rejects raw control characters (newlines, tabs, etc.) inside
+  // string literals — even though they're common in LLM output when the model
+  // formats long text. Sanitize: replace literal control chars INSIDE string
+  // values with their escaped form so JSON.parse accepts them.
+  const safe = sanitizeJsonControlChars(m[0]);
+  const parsed = JSON.parse(safe) as Summary;
   if (parsed.analyse) {
     parsed.analyse = normalizeAnalyse(parsed.analyse);
   }
   return parsed;
+}
+
+/** Walk the JSON text byte-by-byte; when inside a string literal, escape any
+ *  literal control char (\n, \t, \r, etc.) so JSON.parse won't reject. */
+function sanitizeJsonControlChars(json: string): string {
+  let out = "";
+  let inString = false;
+  let escapeNext = false;
+  for (let i = 0; i < json.length; i++) {
+    const c = json[i];
+    if (escapeNext) {
+      out += c;
+      escapeNext = false;
+      continue;
+    }
+    if (c === "\\") {
+      out += c;
+      escapeNext = true;
+      continue;
+    }
+    if (c === '"') {
+      inString = !inString;
+      out += c;
+      continue;
+    }
+    if (inString) {
+      const code = c.charCodeAt(0);
+      if (code === 0x0a) { out += "\\n"; continue; }
+      if (code === 0x0d) { out += "\\r"; continue; }
+      if (code === 0x09) { out += "\\t"; continue; }
+      if (code < 0x20) {
+        out += "\\u" + code.toString(16).padStart(4, "0");
+        continue;
+      }
+    }
+    out += c;
+  }
+  return out;
 }
 
 function asStringArray(v: unknown): string[] {
@@ -628,15 +668,40 @@ async function main(): Promise<void> {
 
   // Upsert in chunks to stay under PostgREST limits.
   const CHUNK = 100;
+  let analyseFieldDropped = false;
   for (let i = 0; i < enriched.length; i += CHUNK) {
-    const chunk = enriched.slice(i, i + CHUNK);
-    const { error } = await sb.from("scrutins").upsert(chunk);
+    let chunk = enriched.slice(i, i + CHUNK);
+    if (analyseFieldDropped) {
+      chunk = chunk.map(({ analyse: _drop, ...rest }) => rest as ParsedScrutin);
+    }
+    let { error } = await sb.from("scrutins").upsert(chunk);
+
+    // Defensive retry: if the `analyse` column is missing from the DB schema
+    // (user hasn't applied migration 0003 yet), the row insert fails with
+    // PGRST204. Retry the same chunk WITHOUT the analyse field so at least
+    // the new chapeau/titre_pedago/contexte data lands — much better than
+    // losing the whole batch when the user paid for the LLM calls already.
+    if (error && error.code === "PGRST204" && /analyse/i.test(error.message ?? "")) {
+      console.warn(
+        "⚠ `analyse` column missing in DB — migration 0003 not yet applied.\n" +
+        "  Falling back to upsert WITHOUT the analyse field so the rest of\n" +
+        "  this run is not lost. Apply supabase/migrations/0003_add_analyse.sql\n" +
+        "  then re-run to populate analyse.",
+      );
+      analyseFieldDropped = true;
+      chunk = chunk.map(({ analyse: _drop, ...rest }) => rest as ParsedScrutin);
+      ({ error } = await sb.from("scrutins").upsert(chunk));
+    }
+
     if (error) {
       console.error(`✕ Chunk ${i}-${i + chunk.length} failed:`, error);
       process.exit(1);
     }
   }
-  console.log(`✓ Done. ${enriched.length} solennels in scrutins table.`);
+  const note = analyseFieldDropped
+    ? "\n  (analyse field dropped — apply migration 0003 and re-run to populate)"
+    : "";
+  console.log(`✓ Done. ${enriched.length} solennels in scrutins table.${note}`);
 }
 
 main().catch(e => {

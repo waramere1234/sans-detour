@@ -9,8 +9,10 @@ export interface AnalyseOverlayProps {
   onClose: () => void;
 }
 
+/** Card-shaped analyse panel that appears in place of the front of the card.
+ *  Same dimensions, same visual language. Tap anywhere on the panel (except
+ *  on links) closes it and reveals the original card. */
 export function AnalyseOverlay({ open, scrutin, onClose }: AnalyseOverlayProps) {
-  // Esc to dismiss (a11y) — mirrors RankingOverlay
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
@@ -20,36 +22,61 @@ export function AnalyseOverlay({ open, scrutin, onClose }: AnalyseOverlayProps) 
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
+  function handleTap(e: React.MouseEvent | React.PointerEvent) {
+    // Don't close when tapping a link (the user wants to follow it) or the
+    // explicit Fermer button (it has its own handler).
+    const target = e.target as HTMLElement | null;
+    if (target && target.closest("a, button")) return;
+    onClose();
+  }
+
   return (
     <AnimatePresence>
       {open && scrutin && (
         <>
+          {/* Subtle scrim behind the panel to dim the rest of the page */}
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={onClose}
             style={{
               position: "fixed", inset: 0,
-              background: "oklch(0.10 0.01 250 / 0.7)",
+              background: "oklch(0.10 0.01 250 / 0.6)",
               backdropFilter: "blur(2px)",
               zIndex: 100,
             }}
           />
+
+          {/* The card-shaped panel — same width, padding, radius, background
+              as the actual cards. Anchored to the center of the viewport so
+              it overlays the card stack regardless of scroll position. */}
           <motion.div
             role="dialog" aria-modal="true" aria-label="Analyse du scrutin"
-            initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 30, stiffness: 280 }}
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.92 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            onClick={handleTap}
             style={{
-              position: "fixed", left: 0, right: 0, bottom: 0,
-              maxHeight: "85dvh", overflow: "auto",
-              background: "var(--bg)",
-              borderTop: "1px solid var(--line)",
-              borderRadius: "20px 20px 0 0",
-              padding: "20px 22px 32px",
+              position: "fixed",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "min(calc(100vw - 32px), 464px)",
+              maxHeight: "85dvh",
+              overflow: "auto",
+              background: "var(--bg-2)",
+              border: "1px solid var(--line)",
+              borderRadius: 14,
+              padding: 22,
+              boxShadow: "0 24px 48px -20px #000",
               zIndex: 101,
-              display: "flex", flexDirection: "column", gap: 18,
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+              cursor: "pointer",
             }}
           >
-            {/* Header */}
+            {/* Header — eyebrow + Fermer button */}
             <div style={{
               display: "flex", justifyContent: "space-between", alignItems: "baseline",
               paddingBottom: 10, borderBottom: "1px solid var(--line)",
@@ -76,10 +103,9 @@ export function AnalyseOverlay({ open, scrutin, onClose }: AnalyseOverlayProps) 
                 }}>Fermer</button>
             </div>
 
-            {/* Title — same wording as front for orientation */}
             <div style={{
               fontFamily: "var(--font-sans)", fontWeight: 600,
-              fontSize: 18, lineHeight: 1.3, letterSpacing: "-0.012em",
+              fontSize: 16, lineHeight: 1.3, letterSpacing: "-0.012em",
               color: "var(--ink)",
             }}>{scrutin.titre_pedago}</div>
 
@@ -96,32 +122,32 @@ export function AnalyseOverlay({ open, scrutin, onClose }: AnalyseOverlayProps) 
               </>
             ) : (
               <div style={{
-                background: "var(--bg-2)",
                 border: "1px dashed var(--line)",
                 borderRadius: 6,
-                padding: "20px 18px",
-                fontFamily: "var(--font-sans)", fontSize: 13, lineHeight: 1.55,
+                padding: "16px 18px",
+                fontFamily: "var(--font-sans)", fontSize: 12.5, lineHeight: 1.55,
                 color: "var(--ink-2)", textAlign: "center",
               }}>
                 Analyse détaillée pas encore disponible pour ce scrutin.<br/>
-                <span style={{ color: "var(--ink-3)", fontSize: 11.5 }}>
+                <span style={{ color: "var(--ink-3)", fontSize: 11 }}>
                   Sera générée au prochain run du pipeline d'ingestion.
                 </span>
               </div>
             )}
 
-            {/* Footer with AN link */}
+            {/* Footer — tap hint + AN link */}
             <div style={{
               marginTop: "auto",
               paddingTop: 12, borderTop: "1px solid var(--line)",
-              display: "flex", justifyContent: "flex-end", alignItems: "center",
+              display: "flex", justifyContent: "space-between", alignItems: "center",
               fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.04em",
             }}>
+              <span style={{ color: "var(--ink-3)" }}>tap pour revenir ‹</span>
               {scrutin.url_an_officielle ? (
                 <a href={scrutin.url_an_officielle}
                   target="_blank" rel="noopener noreferrer"
                   style={{ color: "var(--accent)", textDecoration: "none" }}>
-                  Voir le texte sur AN ↗
+                  Voir sur AN ↗
                 </a>
               ) : (
                 <span style={{ color: "var(--ink-4)" }}>donnée démo</span>
@@ -137,7 +163,7 @@ export function AnalyseOverlay({ open, scrutin, onClose }: AnalyseOverlayProps) 
 function Section({ title, bullets }: { title: string; bullets: string[] }) {
   if (bullets.length === 0) return null;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <span style={{
         fontFamily: "var(--font-mono)", fontSize: 10,
         letterSpacing: "0.14em", textTransform: "uppercase",
@@ -145,11 +171,11 @@ function Section({ title, bullets }: { title: string; bullets: string[] }) {
       }}>{title}</span>
       <ul style={{
         margin: 0, paddingLeft: 18,
-        display: "flex", flexDirection: "column", gap: 6,
+        display: "flex", flexDirection: "column", gap: 4,
       }}>
         {bullets.map((b, i) => (
           <li key={i} style={{
-            fontFamily: "var(--font-sans)", fontSize: 13.5, lineHeight: 1.55,
+            fontFamily: "var(--font-sans)", fontSize: 13, lineHeight: 1.55,
             color: "var(--ink-2)", textWrap: "pretty" as const,
           }}>
             {renderWithBold(stripCitations(b))}
@@ -167,7 +193,7 @@ function DoubleSection({
 }) {
   if (positifs.length + negatifs.length + neutres.length === 0) return null;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <span style={{
         fontFamily: "var(--font-mono)", fontSize: 10,
         letterSpacing: "0.14em", textTransform: "uppercase",
@@ -191,18 +217,18 @@ function ImpactList({ accent, label, bullets }: { accent: string; label: string;
   return (
     <div style={{
       borderLeft: `2px solid ${accent}`,
-      paddingLeft: 12,
-      display: "flex", flexDirection: "column", gap: 4,
+      paddingLeft: 10,
+      display: "flex", flexDirection: "column", gap: 3,
     }}>
       <span style={{
         fontFamily: "var(--font-mono)", fontSize: 9.5,
         letterSpacing: "0.12em", textTransform: "uppercase",
         color: accent, fontWeight: 500,
       }}>{label}</span>
-      <ul style={{ margin: 0, paddingLeft: 16, display: "flex", flexDirection: "column", gap: 4 }}>
+      <ul style={{ margin: 0, paddingLeft: 16, display: "flex", flexDirection: "column", gap: 3 }}>
         {bullets.map((b, i) => (
           <li key={i} style={{
-            fontFamily: "var(--font-sans)", fontSize: 13, lineHeight: 1.55,
+            fontFamily: "var(--font-sans)", fontSize: 12.5, lineHeight: 1.55,
             color: "var(--ink-2)", textWrap: "pretty" as const,
           }}>
             {renderWithBold(stripCitations(b))}
@@ -213,9 +239,7 @@ function ImpactList({ accent, label, bullets }: { accent: string; label: string;
   );
 }
 
-// — Shared helpers (also live in Card.tsx). Inline here to keep AnalyseOverlay
-// self-contained; could be hoisted to src/lib/text-format.ts later. —
-
+// Shared text-format helpers (also live in Card.tsx; small enough to inline)
 function stripCitations(text: string): string {
   return text
     .replace(/<cite[^>]*>([\s\S]*?)<\/cite>/g, "$1")
