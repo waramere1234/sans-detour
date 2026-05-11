@@ -172,18 +172,27 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
             <span>n° {scrutin.numero} · {new Date(scrutin.date).toLocaleDateString("fr-FR")}</span>
           </div>
 
-          {/* Same titre_pedago for orientation, whichever variant */}
-          <div style={{
-            fontFamily: "var(--font-sans)", fontWeight: 600,
-            fontSize: 18, lineHeight: 1.3, letterSpacing: "-0.012em",
-            color: "var(--ink)",
-          }}>{scrutin.titre_pedago}</div>
-
-          {/* Variant body */}
+          {/* The explanation variant keeps the big titre as anchor; the
+              analyse variant goes lighter (the titre is already on the front
+              the user just flipped from). */}
           {backVariant === "explanation" ? (
-            <ExplanationBody scrutin={scrutin} />
+            <>
+              <div style={{
+                fontFamily: "var(--font-sans)", fontWeight: 600,
+                fontSize: 18, lineHeight: 1.3, letterSpacing: "-0.012em",
+                color: "var(--ink)",
+              }}>{scrutin.titre_pedago}</div>
+              <ExplanationBody scrutin={scrutin} />
+            </>
           ) : (
-            <AnalyseBody scrutin={scrutin} />
+            <>
+              <div style={{
+                fontFamily: "var(--font-sans)", fontWeight: 500,
+                fontSize: 13, lineHeight: 1.35,
+                color: "var(--ink-3)", textWrap: "pretty" as const,
+              }}>{scrutin.titre_pedago}</div>
+              <AnalyseBody scrutin={scrutin} />
+            </>
           )}
 
           {/* Shared footer */}
@@ -257,38 +266,68 @@ function AnalyseBody({ scrutin }: { scrutin: Scrutin }) {
       </div>
     );
   }
+  const intro = extractIntro(scrutin.contexte);
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <Section title="Mesures principales" bullets={a.mesures_principales} />
-      <DoubleSection
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Intro — one-paragraph summary, no chrome, just a stronger body type
+          that sets the stage before the colored sections. */}
+      {intro && (
+        <p style={{
+          margin: 0,
+          fontFamily: "var(--font-sans)", fontWeight: 500,
+          fontSize: 14.5, lineHeight: 1.55, letterSpacing: "-0.005em",
+          color: "var(--ink)", textWrap: "pretty" as const,
+          paddingBottom: 4, borderBottom: "1px solid var(--line)",
+        }}>
+          {renderWithBold(intro)}
+        </p>
+      )}
+
+      {/* Each section gets its own color so the eye can scan in 2 seconds. */}
+      <ColoredSection accent="var(--accent)" title="Mesures principales" bullets={a.mesures_principales} />
+
+      <ColoredImpact
         positifs={a.concernes_positifs}
         negatifs={a.concernes_negatifs}
         neutres={a.concernes_neutres}
       />
-      <Section title="Calendrier" bullets={a.calendrier} />
-      <Section title="Exceptions et cas particuliers" bullets={a.exceptions} />
+
+      <ColoredSection accent="var(--warn)" title="Calendrier" bullets={a.calendrier} />
+
+      <ColoredSection accent="var(--ink-3)" title="Exceptions et cas particuliers" bullets={a.exceptions} />
     </div>
   );
 }
 
-function Section({ title, bullets }: { title: string; bullets: string[] }) {
+/** Section title in the accent color, with a thin colored left border on the
+ *  bullet list. Bullets themselves stay in --ink-2 for readability — the color
+ *  carries the structure, not the prose. */
+function ColoredSection({
+  accent, title, bullets,
+}: {
+  accent: string; title: string; bullets: string[];
+}) {
   if (bullets.length === 0) return null;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <span style={{
         fontFamily: "var(--font-mono)", fontSize: 10,
         letterSpacing: "0.14em", textTransform: "uppercase",
-        color: "var(--ink-3)", fontWeight: 500,
+        color: accent, fontWeight: 600,
       }}>{title}</span>
       <ul style={{
-        margin: 0, paddingLeft: 18,
-        display: "flex", flexDirection: "column", gap: 4,
+        margin: 0, paddingLeft: 14,
+        borderLeft: `2px solid ${accent}`,
+        display: "flex", flexDirection: "column", gap: 5,
+        listStyle: "none",
       }}>
         {bullets.map((b, i) => (
           <li key={i} style={{
             fontFamily: "var(--font-sans)", fontSize: 13, lineHeight: 1.55,
             color: "var(--ink-2)", textWrap: "pretty" as const,
+            paddingLeft: 4,
           }}>
+            <span style={{ color: accent, marginRight: 6 }}>•</span>
             {renderWithBold(b)}
           </li>
         ))}
@@ -297,57 +336,76 @@ function Section({ title, bullets }: { title: string; bullets: string[] }) {
   );
 }
 
-function DoubleSection({
+/** Qui est concerné — split into colored positive / negative / neutral lists. */
+function ColoredImpact({
   positifs, negatifs, neutres,
 }: {
   positifs: string[]; negatifs: string[]; neutres: string[];
 }) {
   if (positifs.length + negatifs.length + neutres.length === 0) return null;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       <span style={{
         fontFamily: "var(--font-mono)", fontSize: 10,
         letterSpacing: "0.14em", textTransform: "uppercase",
-        color: "var(--ink-3)", fontWeight: 500,
+        color: "var(--ink-3)", fontWeight: 600,
       }}>Qui est concerné</span>
 
       {positifs.length > 0 && (
-        <ImpactList accent="var(--pour)" label="Impact positif" bullets={positifs} />
+        <ColoredSubList accent="var(--pour)" label="Bénéficient" bullets={positifs} />
       )}
       {negatifs.length > 0 && (
-        <ImpactList accent="var(--contre)" label="Impact négatif" bullets={negatifs} />
+        <ColoredSubList accent="var(--contre)" label="Contraints" bullets={negatifs} />
       )}
       {neutres.length > 0 && (
-        <ImpactList accent="var(--ink-3)" label="Neutre ou à surveiller" bullets={neutres} />
+        <ColoredSubList accent="var(--ink-3)" label="À surveiller" bullets={neutres} />
       )}
     </div>
   );
 }
 
-function ImpactList({ accent, label, bullets }: { accent: string; label: string; bullets: string[] }) {
+function ColoredSubList({
+  accent, label, bullets,
+}: {
+  accent: string; label: string; bullets: string[];
+}) {
   return (
-    <div style={{
-      borderLeft: `2px solid ${accent}`,
-      paddingLeft: 10,
-      display: "flex", flexDirection: "column", gap: 3,
-    }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
       <span style={{
         fontFamily: "var(--font-mono)", fontSize: 9.5,
         letterSpacing: "0.12em", textTransform: "uppercase",
-        color: accent, fontWeight: 500,
+        color: accent, fontWeight: 600,
       }}>{label}</span>
-      <ul style={{ margin: 0, paddingLeft: 16, display: "flex", flexDirection: "column", gap: 3 }}>
+      <ul style={{
+        margin: 0, paddingLeft: 14,
+        borderLeft: `2px solid ${accent}`,
+        display: "flex", flexDirection: "column", gap: 4,
+        listStyle: "none",
+      }}>
         {bullets.map((b, i) => (
           <li key={i} style={{
             fontFamily: "var(--font-sans)", fontSize: 12.5, lineHeight: 1.55,
             color: "var(--ink-2)", textWrap: "pretty" as const,
+            paddingLeft: 4,
           }}>
+            <span style={{ color: accent, marginRight: 6 }}>•</span>
             {renderWithBold(b)}
           </li>
         ))}
       </ul>
     </div>
   );
+}
+
+/** Pull the first sentence(s) of the contexte BEFORE any "Concrètement :" or
+ *  "Par exemple :" marker — that opening is the "what does the law do"
+ *  summary, which makes a perfect intro for the analyse view. Falls back to
+ *  the whole contexte if no marker is found. */
+function extractIntro(contexte?: string): string | null {
+  if (!contexte) return null;
+  const cleaned = stripVoteResult(stripCitations(contexte));
+  const m = cleaned.match(/^([\s\S]+?\.)\s+(Concrètement|Par exemple)\b/i);
+  return m ? m[1].trim() : cleaned;
 }
 
 // ─────────────────────────────────────────────────── TEXT HELPERS
