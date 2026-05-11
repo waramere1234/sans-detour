@@ -34,7 +34,7 @@ export function DeckStack({ scrutins, onVote }: DeckStackProps) {
               key={s.id}
               style={{
                 position: "absolute",
-                left: 8, right: 8, top: offset,
+                left: 8, right: 8, top: offset, bottom: offset,
                 transform: `scale(${scale}) translateY(${offset / 2}px)`,
                 opacity,
                 zIndex: 10 - i,

@@ -80,6 +80,7 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
         // gestures on the front so swipe-down works as expected.
         touchAction: topMost && !flipped ? "none" : "auto",
         perspective: 1500,
+        height: "100%",
       }}
     >
       <motion.div
@@ -88,10 +89,11 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
         style={{
           position: "relative",
           transformStyle: "preserve-3d",
+          height: "100%",
         }}
       >
         {/* FRONT — the question. Chapeau + "+ analyse" button + title + footer. */}
-        <div style={{ ...FACE_STYLE, gap: 22, justifyContent: "space-between", minHeight: 260 }}>
+        <div style={{ ...FACE_STYLE, gap: 22, justifyContent: "space-between", height: "100%" }}>
           <div style={{
             display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12,
           }}>
