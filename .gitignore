@@ -6,3 +6,4 @@ dist
 *.tsbuildinfo
 *.bak
 .claude/worktrees
+public/resvg.wasm

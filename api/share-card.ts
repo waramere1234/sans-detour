@@ -28,13 +28,13 @@ const INK_2 = "#a7adb8";
 const FALLBACK_FONT_URL =
   "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ibmplexmono/IBMPlexMono-Regular.ttf";
 
-const RESVG_WASM_URL =
-  "https://unpkg.com/@resvg/resvg-wasm@2.6.2/index_bg.wasm";
-
+// resvg WASM is copied from node_modules to public/resvg.wasm by the prebuild
+// script so Vercel serves it from the same-origin static CDN. Fetching from
+// unpkg on cold start was pushing the Node function past Hobby's 10s timeout.
 let wasmReady: Promise<void> | null = null;
-function ensureWasm(): Promise<void> {
+function ensureWasm(origin: string): Promise<void> {
   if (!wasmReady) {
-    wasmReady = initWasm(fetch(RESVG_WASM_URL)).catch((err: unknown) => {
+    wasmReady = initWasm(fetch(`${origin}/resvg.wasm`)).catch((err: unknown) => {
       // Reset so a subsequent invocation can retry on transient failure.
       wasmReady = null;
       throw err;
@@ -56,7 +56,8 @@ type SatoriTree = Parameters<typeof satori>[0];
 
 export default async function handler(req: Request): Promise<Response> {
   try {
-    const { searchParams } = new URL(req.url);
+    const reqUrl = new URL(req.url);
+    const { searchParams } = reqUrl;
     const fmt = searchParams.get("fmt") === "story" ? "story" : "square";
     const bars = parseTopParam(searchParams.get("t")).slice(0, 8);
     if (bars.length === 0) {
@@ -69,7 +70,7 @@ export default async function handler(req: Request): Promise<Response> {
 
     const [font] = await Promise.all([
       loadFont(FALLBACK_FONT_URL),
-      ensureWasm(),
+      ensureWasm(reqUrl.origin),
     ]);
 
     const tree = {

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "cp node_modules/@resvg/resvg-wasm/index_bg.wasm public/resvg.wasm",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest",
