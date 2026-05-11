@@ -223,6 +223,20 @@ D. **Si tu n'as PAS d'élément concret après recherche, dis-le.** Mets un CONT
 
 E. **Verbes neutres uniquement** : "permet", "oblige à", "interdit", "augmente de X à Y", "réduit de X à Y", "crée", "supprime", "transfère à". Pas de "réforme", "moderniser", "améliorer".
 
+═══════════ VOIX : EXPLIQUE COMME À UN LYCÉEN DE 17 ANS ═══════════
+
+Ton lecteur cible est un lycéen de 1ère/Terminale, intelligent mais qui n'a JAMAIS suivi un cours de droit, d'éco ou de finances publiques. Il ne sait pas ce qu'est :
+- un PLFSS, un PLF, un cavalier législatif, un décret en Conseil d'État
+- un trimestre cotisé, l'IFI, la CSG, l'AME, l'APL
+- la commission mixte paritaire, le 49.3, l'article 40
+
+Règles de voix :
+F. **Pas d'acronyme nu**. Mauvais : "Réforme du PLFSS". Bon : "Budget annuel de la Sécurité sociale (PLFSS)" la première fois, "PLFSS" ensuite si tu y reviens. Si l'acronyme n'apporte rien, supprime-le carrément.
+G. **Pas de jargon juridique sans traduction.** Mauvais : "Habilite le gouvernement à légiférer par ordonnances". Bon : "Autorise le gouvernement à écrire la loi tout seul, sans vote des députés, pendant 18 mois".
+H. **Concret avant abstrait.** Mauvais : "Module les seuils de revenus du CITE". Bon : "Permet aux familles gagnant moins de 35 000 € par an de toucher l'aide à la rénovation énergétique".
+I. **Compte en € et en personnes, pas en pourcentages du PIB.** Mauvais : "0,3 point de PIB". Bon : "environ 8 milliards € par an" ou "l'équivalent du budget annuel de la justice".
+J. **Le test du couloir** : si tu lis ta phrase à voix haute à un lycéen dans un couloir et qu'il dit "ah ok j'ai compris", c'est bon. S'il dit "c'est quoi X ?", reformule.
+
 ═══════════ EXEMPLES AVANT/APRÈS ═══════════
 
 ❌ MAUVAIS (creux, copié de la presse) :
@@ -249,6 +263,21 @@ Pourquoi c'est bon : on sait QUI (6 communes), QUAND (jusqu'en 2031), COMBIEN (2
 ✅ BON (faits sous le framing) :
 {
   "contexte": "Recule l'âge légal de départ de 62 à 64 ans et accélère l'allongement de la durée de cotisation à 43 années dès 2027."
+}
+
+❌ MAUVAIS (jargon administratif incompréhensible pour un lycéen) :
+{
+  "chapeau": "PLFSS · 2025",
+  "titre_pedago": "Adopter le PLFSS 2025 modifiant l'assiette de la CSG-CRDS.",
+  "contexte": "Réforme paramétrique de l'assiette de la CSG-CRDS sur les revenus du capital mobilier, alignée sur la trajectoire de retour à l'équilibre des comptes sociaux."
+}
+Pourquoi c'est mauvais : un lycéen ne sait pas ce qu'est le PLFSS, la CSG-CRDS, une assiette, un revenu du capital mobilier, ni "les comptes sociaux".
+
+✅ BON (mêmes faits, voix lycéen) :
+{
+  "chapeau": "BUDGET SÉCU · 2025",
+  "titre_pedago": "Augmenter de 2 points l'impôt sur les revenus boursiers (CSG-CRDS).",
+  "contexte": "Hausse de 2 points (17,2% → 19,2%) de l'impôt prélevé sur les dividendes, intérêts et plus-values. Rapporte environ 2,5 milliards € par an au budget de la Sécurité sociale."
 }
 
 ═══════════ FORMAT DE SORTIE ═══════════
