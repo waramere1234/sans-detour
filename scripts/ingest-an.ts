@@ -217,8 +217,8 @@ Pour chaque scrutin tu dois renvoyer 3 champs :
    **MARKUP DES POINTS CLÉS — OBLIGATOIRE.** Mets en gras avec la syntaxe markdown ** ... ** (deux astérisques avant, deux après) **EXACTEMENT 2 à 3** informations clés : chiffres précis (ex : **64 ans**, **2 milliards €**), mécanismes nommés (ex : **parquet spécialisé**), ou groupes identifiés (ex : **18 millions d'actifs**). Pas plus de 3 — il faut que ça pop, pas que tout soit en gras.
 
    **INTERDICTIONS STRICTES sur le CONTEXTE** :
-   - **AUCUNE balise HTML ou XML** : pas de `<cite>`, `<a>`, `<b>`, etc. Texte brut + markdown gras uniquement.
-   - **AUCUN marqueur de citation** comme `[1]`, `[source]`, `(d'après Le Monde)`.
+   - **AUCUNE balise HTML ou XML** : pas de "<cite>", "<a>", "<b>", etc. Texte brut + markdown gras uniquement.
+   - **AUCUN marqueur de citation** comme "[1]", "[source]", "(d'après Le Monde)".
    - PAS de résultat du vote ("Vote : 396 oui", "Adoptée par 320 voix", "Rejetée à l'unanimité") — calculé ailleurs dans l'app.
    - PAS de qui a voté quoi ("La majorité a voté pour", "Le RN s'est opposé").
    - PAS de framing émotionnel ("réforme courageuse", "scandale", "majeur", "important").
