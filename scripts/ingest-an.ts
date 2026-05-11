@@ -213,7 +213,7 @@ Pour chaque scrutin tu dois renvoyer 3 champs :
 
    Le CONTEXTE doit contenir au moins UN chiffre exact ET au moins UN nom propre ou groupe identifié. C'est NON NÉGOCIABLE. Si tu n'as pas l'info après recherche, dis "Information détaillée non disponible publiquement" plutôt que de combler avec du vide.
 
-   **MARKUP DES POINTS CLÉS — OBLIGATOIRE.** Mets en gras avec `**...**` (syntaxe markdown) les 2 à 4 informations les plus importantes : chiffres précis (ex : `**64 ans**`, `**2 milliards €**`), mécanismes nommés (ex : `**parquet spécialisé**`, `**expropriation**`), ou groupes identifiés (ex : `**18 millions d'actifs**`). Pas plus de 4 passages en gras par contexte — il faut que ça pop, pas que tout le texte soit en gras.
+   **MARKUP DES POINTS CLÉS — OBLIGATOIRE.** Mets en gras avec la syntaxe markdown ** ... ** (deux astérisques avant, deux après) les 2 à 4 informations les plus importantes : chiffres précis (ex : **64 ans**, **2 milliards €**), mécanismes nommés (ex : **parquet spécialisé**, **expropriation**), ou groupes identifiés (ex : **18 millions d'actifs**). Pas plus de 4 passages en gras par contexte — il faut que ça pop, pas que tout le texte soit en gras.
 
    **INTERDICTIONS STRICTES sur le CONTEXTE** :
    - PAS de résultat du vote ("Vote : 396 oui", "Adoptée par 320 voix", "Rejetée à l'unanimité") — le résultat est calculé ailleurs dans l'app, le mentionner spoile et confond l'utilisateur sur ce qu'il vote LUI.
