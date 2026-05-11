@@ -1,6 +1,11 @@
 // api/share-card.ts
 import satori from "satori";
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
+// Vercel Edge Runtime disallows runtime WASM compilation (fetch + instantiate).
+// The bundler must statically embed the wasm via the ?module suffix, which
+// yields a ready-to-use WebAssembly.Module at build time.
+// @ts-expect-error - ?module import is resolved by Vercel/esbuild, not TS
+import resvgWasm from "@resvg/resvg-wasm/index_bg.wasm?module";
 
 export const config = { runtime: "edge" };
 
@@ -24,16 +29,12 @@ const INK_2 = "#a7adb8";
 const FALLBACK_FONT_URL =
   "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ibmplexmono/IBMPlexMono-Regular.ttf";
 
-// Resvg WASM must be initialized exactly once per cold start. We fetch the
-// wasm binary from the package's CDN at runtime to avoid bundler-specific
-// `?module` imports (which TypeScript would not understand without a shim).
-const RESVG_WASM_URL =
-  "https://unpkg.com/@resvg/resvg-wasm@2.6.2/index_bg.wasm";
-
+// Resvg WASM must be initialized exactly once per cold start. The imported
+// resvgWasm is already a WebAssembly.Module embedded at build time.
 let wasmReady: Promise<void> | null = null;
 function ensureWasm(): Promise<void> {
   if (!wasmReady) {
-    wasmReady = initWasm(fetch(RESVG_WASM_URL)).catch((err: unknown) => {
+    wasmReady = initWasm(resvgWasm).catch((err: unknown) => {
       // Reset so a subsequent invocation can retry on transient failure.
       wasmReady = null;
       throw err;
