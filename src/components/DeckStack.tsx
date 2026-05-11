@@ -1,7 +1,9 @@
 // src/components/DeckStack.tsx
+import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import type { Scrutin, UserVote } from "../types";
 import { Card } from "./Card";
+import { AnalyseOverlay } from "./AnalyseOverlay";
 
 export interface DeckStackProps {
   scrutins: Scrutin[];   // current deck (head = top card)
@@ -9,6 +11,8 @@ export interface DeckStackProps {
 }
 
 export function DeckStack({ scrutins, onVote }: DeckStackProps) {
+  const [analyseScrutin, setAnalyseScrutin] = useState<Scrutin | null>(null);
+
   if (scrutins.length === 0) return null;
   const visible = scrutins.slice(0, 3);
 
@@ -41,11 +45,21 @@ export function DeckStack({ scrutins, onVote }: DeckStackProps) {
                 pointerEvents: isTop ? "auto" : "none",
               }}
             >
-              <Card scrutin={s} topMost={isTop} onSwipe={(dir) => handleSwipe(s, dir)} />
+              <Card
+                scrutin={s}
+                topMost={isTop}
+                onSwipe={(dir) => handleSwipe(s, dir)}
+                onShowAnalyse={isTop ? () => setAnalyseScrutin(s) : undefined}
+              />
             </div>
           );
         })}
       </AnimatePresence>
+      <AnalyseOverlay
+        open={analyseScrutin !== null}
+        scrutin={analyseScrutin}
+        onClose={() => setAnalyseScrutin(null)}
+      />
     </div>
   );
 }

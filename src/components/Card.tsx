@@ -7,6 +7,7 @@ export interface CardProps {
   scrutin: Scrutin;
   topMost: boolean;       // is this the front card (interactive)?
   onSwipe?: (dir: "left" | "right" | "down") => void;
+  onShowAnalyse?: () => void;
 }
 
 const SWIPE_THRESHOLD = 120;
@@ -27,7 +28,7 @@ const FACE_STYLE: React.CSSProperties = {
   WebkitBackfaceVisibility: "hidden",
 };
 
-export function Card({ scrutin, topMost, onSwipe }: CardProps) {
+export function Card({ scrutin, topMost, onSwipe, onShowAnalyse }: CardProps) {
   const [flipped, setFlipped] = useState(false);
 
   // Tap (no drag movement) toggles flip. Skip when the tap landed on an
@@ -76,12 +77,35 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
         {/* FRONT — the question. Just chapeau + title + footer. The full
             explanation lives on the back to avoid paraphrase redundancy. */}
         <div style={{ ...FACE_STYLE, gap: 22, justifyContent: "space-between", minHeight: 260 }}>
-          {/* Chapeau as eyebrow */}
+          {/* Top row: chapeau eyebrow (left) + analyse icon (right) */}
           <div style={{
-            fontFamily: "var(--font-mono)", fontSize: 11,
-            letterSpacing: "0.12em", textTransform: "uppercase",
-            color: "var(--accent)", fontWeight: 500,
-          }}>{scrutin.chapeau}</div>
+            display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12,
+          }}>
+            <div style={{
+              fontFamily: "var(--font-mono)", fontSize: 11,
+              letterSpacing: "0.12em", textTransform: "uppercase",
+              color: "var(--accent)", fontWeight: 500,
+              flex: 1,
+            }}>{scrutin.chapeau}</div>
+            {topMost && onShowAnalyse && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onShowAnalyse(); }}
+                onPointerDown={(e) => e.stopPropagation()}
+                aria-label="Ouvrir l'analyse détaillée du scrutin"
+                style={{
+                  background: "transparent",
+                  border: "1px solid var(--line)",
+                  color: scrutin.analyse ? "var(--accent)" : "var(--ink-3)",
+                  fontFamily: "var(--font-mono)", fontSize: 10,
+                  padding: "3px 8px", borderRadius: 3,
+                  cursor: "pointer", letterSpacing: "0.08em",
+                  whiteSpace: "nowrap",
+                  textTransform: "uppercase",
+                }}
+              >+ analyse</button>
+            )}
+          </div>
 
           {/* The question — bigger now that it's the only content above the footer */}
           <div style={{

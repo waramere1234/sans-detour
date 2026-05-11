@@ -138,6 +138,7 @@ interface ParsedScrutin {
   titre_pedago: string;
   chapeau: string;
   contexte: string;
+  analyse?: ScrutinAnalyse;
   position_par_groupe: Record<GroupCode, GroupPosition>;
   votes_bruts: Record<GroupCode, GroupVoteBreakdown>;
   est_solennel: boolean;
@@ -294,15 +295,58 @@ Pourquoi c'est mauvais : un lycéen ne sait pas ce qu'est le PLFSS, la CSG-CRDS,
   "contexte": "L'impôt sur les intérêts boursiers et plus-values passe de **17,2% à 19,2%** pour les **4 millions de foyers français** qui détiennent des actions ou de l'assurance-vie. Concrètement : sur 1000€ de plus-value, tu paies 192€ d'impôt au lieu de 172€."
 }
 
+═══════════ 4ème CHAMP : ANALYSE STRUCTURÉE ═══════════
+
+En plus des 3 champs ci-dessus, tu produis aussi une ANALYSE structurée — un breakdown factuel en 6 listes, qui répond aux 4 questions naturelles d'un citoyen : QUOI, POUR QUI, QUAND, EXCEPTIONS.
+
+Format :
+{
+  "mesures_principales": [...],   // 3 à 5 bullets : ce que la loi crée / interdit / modifie. Chaque bullet en 1 phrase courte avec 1-2 chiffres en **gras**.
+  "concernes_positifs": [...],     // 1 à 4 bullets : personnes/secteurs avec impact positif (qui gagne quoi). Format : "[groupe] : [ce que ça change pour eux]".
+  "concernes_negatifs": [...],     // 1 à 4 bullets : personnes/secteurs avec impact négatif (qui perd quoi). Même format.
+  "concernes_neutres": [...],      // 0 à 3 bullets : impact mixte ou à surveiller. Tableau vide [] si rien à dire.
+  "calendrier": [...],             // 1 à 4 bullets : "Entrée en vigueur : [date]", échéances intermédiaires si applicable.
+  "exceptions": [...]              // 0 à 3 bullets : exemptions, dérogations, périodes transitoires. Tableau vide [] si la loi n'en a pas.
+}
+
+Règles ANALYSE :
+- **PUREMENT FACTUEL** — pas de "juste / injuste", "ambitieux / timide". Que des faits sourcés.
+- **Markup ** ... ** ** autorisé et encouragé pour les chiffres/mécanismes clés dans CHAQUE bullet.
+- **Toutes les mêmes interdictions que pour le CONTEXTE** : pas de HTML/XML, pas de marqueurs de citation, pas de résultat du vote, pas de framing émotionnel.
+- Si tu n'as pas d'info concrète pour une catégorie, **tableau vide []** plutôt que d'inventer.
+- Pour concernes_negatifs : sois honnête. Une loi crée toujours des "perdants" (même administrativement). Si tu n'en mets pas, c'est suspect.
+
 ═══════════ FORMAT DE SORTIE ═══════════
 
 Tu réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans texte avant ou après :
-{"chapeau": "...", "titre_pedago": "...", "contexte": "..."}`;
+{
+  "chapeau": "...",
+  "titre_pedago": "...",
+  "contexte": "...",
+  "analyse": {
+    "mesures_principales": [...],
+    "concernes_positifs": [...],
+    "concernes_negatifs": [...],
+    "concernes_neutres": [...],
+    "calendrier": [...],
+    "exceptions": [...]
+  }
+}`;
 
 interface Summary {
   chapeau: string;
   titre_pedago: string;
   contexte: string;
+  analyse?: ScrutinAnalyse;
+}
+
+interface ScrutinAnalyse {
+  mesures_principales: string[];
+  concernes_positifs: string[];
+  concernes_negatifs: string[];
+  concernes_neutres: string[];
+  calendrier: string[];
+  exceptions: string[];
 }
 
 interface AnthropicResponse {
@@ -336,7 +380,10 @@ Cherche sur le web (1 à 2 recherches max) les détails concrets de ce scrutin :
 function buildRequestParams(scrutin: { titre_brut: string; dossier_titre: string; numero: number }): Record<string, unknown> {
   return {
     model: "claude-haiku-4-5",
-    max_tokens: 2048,
+    // 4096 instead of 2048: the analyse field adds 6 string[] arrays with
+    // multiple bullets each. Total output now lands around 600-900 tokens
+    // including the 4-field wrapper JSON. 4096 leaves plenty of headroom.
+    max_tokens: 4096,
     system: [
       {
         type: "text",
@@ -371,7 +418,31 @@ function extractSummaryFromMessage(message: AnthropicResponse): Summary {
   if (!m) {
     throw new Error(`No JSON in response. text=${combined.slice(0, 300)}`);
   }
-  return JSON.parse(m[0]) as Summary;
+  const parsed = JSON.parse(m[0]) as Summary;
+  // Defensive: if the LLM returned a partial / malformed analyse object,
+  // either drop it or coerce missing arrays to []. Avoids the UI rendering
+  // .map() on undefined.
+  if (parsed.analyse) {
+    parsed.analyse = normalizeAnalyse(parsed.analyse);
+  }
+  return parsed;
+}
+
+function asStringArray(v: unknown): string[] {
+  if (!Array.isArray(v)) return [];
+  return v.filter((x): x is string => typeof x === "string");
+}
+
+function normalizeAnalyse(a: Partial<ScrutinAnalyse> | undefined | null): ScrutinAnalyse | undefined {
+  if (!a || typeof a !== "object") return undefined;
+  return {
+    mesures_principales: asStringArray(a.mesures_principales),
+    concernes_positifs: asStringArray(a.concernes_positifs),
+    concernes_negatifs: asStringArray(a.concernes_negatifs),
+    concernes_neutres: asStringArray(a.concernes_neutres),
+    calendrier: asStringArray(a.calendrier),
+    exceptions: asStringArray(a.exceptions),
+  };
 }
 
 // ─────────────────────────────────────────────────────── Batches API client
