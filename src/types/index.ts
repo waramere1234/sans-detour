@@ -35,6 +35,9 @@ export interface Scrutin {
   analyse_loi?: ScrutinAnalyse;  // structured 4-axis breakdown (migration 0003).
                                  // Column named `analyse_loi` because ANALYSE
                                  // is a PostgreSQL reserved word.
+  points_cles?: string[];        // exactly 3 short factual bullets, 7 words
+                                 // max each, shown on the card front below
+                                 // the titre_pedago (migration 0004).
   position_par_groupe: Record<GroupCode, GroupPosition>;
   votes_bruts: Record<GroupCode, GroupVoteBreakdown>;
   url_an_officielle: string;

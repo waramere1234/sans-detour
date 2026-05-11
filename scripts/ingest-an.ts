@@ -139,6 +139,7 @@ interface ParsedScrutin {
   chapeau: string;
   contexte: string;
   analyse_loi?: ScrutinAnalyse;
+  points_cles?: string[];
   position_par_groupe: Record<GroupCode, GroupPosition>;
   votes_bruts: Record<GroupCode, GroupVoteBreakdown>;
   est_solennel: boolean;
@@ -316,6 +317,37 @@ Règles ANALYSE :
 - Si tu n'as pas d'info concrète pour une catégorie, **tableau vide []** plutôt que d'inventer.
 - Pour concernes_negatifs : sois honnête. Une loi crée toujours des "perdants" (même administrativement). Si tu n'en mets pas, c'est suspect.
 
+═══════════ 5ème CHAMP : POINTS_CLES (RÉSUMÉ RECTO) ═══════════
+
+En plus, tu produis 3 points-clés ULTRA-COURTS affichés directement sous le titre, sur le recto de la carte. Objectif : permettre à un lycéen de voter pour/contre en 5 secondes sans flipper la carte. Ce sont les 3 facettes les plus saillantes du texte de loi.
+
+Format :
+{
+  "points_cles": ["bullet 1", "bullet 2", "bullet 3"]
+}
+
+Règles strictes :
+- **EXACTEMENT 3 bullets**, pas 2 pas 4.
+- **7 mots maximum par bullet.** Tu comptes les mots AVANT de répondre. Si tu dépasses, coupe. Les mots type "de", "à", "le", "des" comptent comme des mots.
+- Chaque bullet décrit UNE facette différente du texte : un chiffre, un mécanisme, ou un public touché. Pas de redondance entre les 3.
+- Pas de phrase complète obligatoire — un fragment télégraphique est OK (ex : "Âge légal : 62 → 64 ans").
+- Mêmes interdictions que CONTEXTE/ANALYSE : pas de framing émotionnel, pas de jargon non traduit, pas de HTML/XML, pas de marqueurs de citation, pas de résultat du vote.
+- Ne pas paraphraser le titre_pedago ; ces 3 points-clés DOIVENT ajouter de l'info.
+
+Exemples :
+
+❌ MAUVAIS (verbeux, dépasse 7 mots, paraphrase le titre) :
+["La loi recule l'âge légal de départ à 64 ans pour tous", "Cela concerne environ 18 millions de Français nés après 1968", "Des exceptions sont prévues pour les carrières longues et la pénibilité"]
+
+✅ BON (3 facettes distinctes, ≤ 7 mots chacun, télégraphique) :
+["Âge légal : 62 → 64 ans", "18 millions d'actifs nés après 1968", "Carrières longues et pénibilité exemptées"]
+
+✅ BON pour la rétention administrative :
+["Rétention max : 90 → 210 jours", "Étendue aux suspects de terrorisme", "Surveillance possible après libération"]
+
+✅ BON pour un budget de la Sécu :
+["Déficit prévu : 14 milliards € en 2026", "Hausse cotisation employeurs +0,3 point", "Gel pensions retraite jusqu'en juillet"]
+
 ═══════════ FORMAT DE SORTIE ═══════════
 
 Tu réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans texte avant ou après :
@@ -323,6 +355,7 @@ Tu réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans texte avan
   "chapeau": "...",
   "titre_pedago": "...",
   "contexte": "...",
+  "points_cles": ["...", "...", "..."],
   "analyse_loi": {
     "mesures_principales": [...],
     "concernes_positifs": [...],
@@ -338,6 +371,7 @@ interface Summary {
   titre_pedago: string;
   contexte: string;
   analyse_loi?: ScrutinAnalyse;
+  points_cles?: string[];
 }
 
 interface ScrutinAnalyse {
@@ -427,7 +461,24 @@ function extractSummaryFromMessage(message: AnthropicResponse): Summary {
   if (parsed.analyse_loi) {
     parsed.analyse_loi = normalizeAnalyse(parsed.analyse_loi);
   }
+  parsed.points_cles = normalizePointsCles(parsed.points_cles);
   return parsed;
+}
+
+// Cap each bullet at 7 words and keep at most 3. Drop empties and trims.
+// Hard cap defends the UI from a model that ignored the prompt constraint.
+function normalizePointsCles(v: unknown): string[] | undefined {
+  if (!Array.isArray(v)) return undefined;
+  const cleaned = v
+    .filter((x): x is string => typeof x === "string")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+    .slice(0, 3)
+    .map((s) => {
+      const words = s.split(/\s+/);
+      return words.length <= 7 ? s : words.slice(0, 7).join(" ") + "…";
+    });
+  return cleaned.length > 0 ? cleaned : undefined;
 }
 
 /** Walk the JSON text byte-by-byte; when inside a string literal, escape any
@@ -679,18 +730,20 @@ async function main(): Promise<void> {
   // Upsert in chunks to stay under PostgREST limits.
   const CHUNK = 100;
   let analyseLoiDropped = false;
+  let pointsClesDropped = false;
   for (let i = 0; i < enriched.length; i += CHUNK) {
     let chunk = enriched.slice(i, i + CHUNK);
     if (analyseLoiDropped) {
       chunk = chunk.map(({ analyse_loi: _drop, ...rest }) => rest as ParsedScrutin);
     }
+    if (pointsClesDropped) {
+      chunk = chunk.map(({ points_cles: _drop, ...rest }) => rest as ParsedScrutin);
+    }
     let { error } = await sb.from("scrutins").upsert(chunk);
 
-    // Defensive retry: if the `analyse_loi` column is missing from the DB
-    // schema (user hasn't applied migration 0003 yet), the row insert fails
-    // with PGRST204. Retry the same chunk WITHOUT the analyse_loi field so
-    // the new chapeau/titre_pedago/contexte data lands — much better than
-    // losing the whole batch when the user paid for the LLM calls already.
+    // Defensive retry per missing-column case. The user may have applied
+    // some but not all migrations; rather than lose the whole paid-for
+    // batch we drop the offending field and retry.
     if (error && error.code === "PGRST204" && /analyse_loi/i.test(error.message ?? "")) {
       console.warn(
         "⚠ `analyse_loi` column missing in DB — migration 0003 not yet applied.\n" +
@@ -702,15 +755,27 @@ async function main(): Promise<void> {
       chunk = chunk.map(({ analyse_loi: _drop, ...rest }) => rest as ParsedScrutin);
       ({ error } = await sb.from("scrutins").upsert(chunk));
     }
+    if (error && error.code === "PGRST204" && /points_cles/i.test(error.message ?? "")) {
+      console.warn(
+        "⚠ `points_cles` column missing in DB — migration 0004 not yet applied.\n" +
+        "  Falling back to upsert WITHOUT the points_cles field so the rest of\n" +
+        "  this run is not lost. Apply supabase/migrations/0004_add_points_cles.sql\n" +
+        "  then re-run to populate points_cles.",
+      );
+      pointsClesDropped = true;
+      chunk = chunk.map(({ points_cles: _drop, ...rest }) => rest as ParsedScrutin);
+      ({ error } = await sb.from("scrutins").upsert(chunk));
+    }
 
     if (error) {
       console.error(`✕ Chunk ${i}-${i + chunk.length} failed:`, error);
       process.exit(1);
     }
   }
-  const note = analyseLoiDropped
-    ? "\n  (analyse_loi field dropped — apply migration 0003 and re-run to populate)"
-    : "";
+  const notes: string[] = [];
+  if (analyseLoiDropped) notes.push("analyse_loi dropped — apply migration 0003");
+  if (pointsClesDropped) notes.push("points_cles dropped — apply migration 0004");
+  const note = notes.length > 0 ? `\n  (${notes.join("; ")} and re-run)` : "";
   console.log(`✓ Done. ${enriched.length} solennels in scrutins table.${note}`);
 }
 

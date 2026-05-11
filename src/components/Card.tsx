@@ -125,11 +125,31 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
 
           <div style={{
             flex: 1,
-            display: "flex", alignItems: "center",
-            fontFamily: "var(--font-sans)", fontWeight: 600,
-            fontSize: 24, lineHeight: 1.25, letterSpacing: "-0.014em",
-            color: "var(--ink)", textWrap: "pretty" as const,
-          }}>{scrutin.titre_pedago}</div>
+            display: "flex", flexDirection: "column", justifyContent: "center",
+            gap: 16,
+          }}>
+            <div style={{
+              fontFamily: "var(--font-sans)", fontWeight: 600,
+              fontSize: 24, lineHeight: 1.25, letterSpacing: "-0.014em",
+              color: "var(--ink)", textWrap: "pretty" as const,
+            }}>{scrutin.titre_pedago}</div>
+            {scrutin.points_cles && scrutin.points_cles.length > 0 && (
+              <ul style={{
+                listStyle: "none", padding: 0, margin: 0,
+                display: "flex", flexDirection: "column", gap: 6,
+                fontFamily: "var(--font-mono)", fontSize: 12,
+                lineHeight: 1.4, color: "var(--ink-2)",
+                letterSpacing: "-0.005em",
+              }}>
+                {scrutin.points_cles.slice(0, 3).map((p, i) => (
+                  <li key={i} style={{ display: "flex", gap: 8 }}>
+                    <span style={{ color: "var(--accent)", flex: "0 0 auto" }}>·</span>
+                    <span>{p}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
 
           <div style={{
             fontFamily: "var(--font-mono)", fontSize: 11,
