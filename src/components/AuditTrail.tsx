@@ -1,6 +1,7 @@
 // src/components/AuditTrail.tsx
 import type { GroupAlignment, Scrutin, SessionVote } from "../types";
 import { alignmentScore } from "../lib/matching";
+import { getParty } from "../lib/parties";
 
 export interface AuditTrailProps {
   alignment: GroupAlignment;
@@ -10,6 +11,7 @@ export interface AuditTrailProps {
 
 export function AuditTrail({ alignment, scrutins, votes }: AuditTrailProps) {
   const byId = new Map(scrutins.map(s => [s.id, s]));
+  const partyName = getParty(alignment.group).name;
 
   const rows = votes
     .filter(v => v.choice !== "skip")
@@ -39,35 +41,79 @@ export function AuditTrail({ alignment, scrutins, votes }: AuditTrailProps) {
       fontSize: 12,
       lineHeight: 1.5,
     }}>
-      <div style={{ display: "flex", gap: 14, marginBottom: 10, flexWrap: "wrap" }}>
+      {/* Party full name header */}
+      <div style={{
+        fontFamily: "var(--font-sans)", fontWeight: 600,
+        fontSize: 14, color: "var(--ink)",
+        marginBottom: 4,
+      }}>
+        {alignment.group} <span style={{ color: "var(--ink-3)", fontWeight: 400 }}>· {partyName}</span>
+      </div>
+
+      {/* Breakdown chips */}
+      <div style={{
+        display: "flex", gap: 14, marginBottom: 12, flexWrap: "wrap",
+        paddingBottom: 10, borderBottom: "1px solid var(--line)",
+      }}>
         <span><span style={{ color: "var(--pour)" }}>✓ {alignment.perfect}</span> alignés</span>
         <span><span style={{ color: "var(--warn)" }}>≈ {alignment.partial}</span> partiels</span>
         <span><span style={{ color: "var(--contre)" }}>✕ {alignment.conflict}</span> opposés</span>
         <span style={{ color: "var(--ink-3)" }}>÷ {alignment.divided_excluded} divisé non comptés</span>
       </div>
-      {rows.map(r => (
-        <div key={r.v.scrutin_id} style={{
-          display: "grid", gridTemplateColumns: "20px 1fr auto",
-          alignItems: "baseline", gap: 8,
-          padding: "6px 0", borderTop: "1px dashed var(--line)",
-        }}>
-          <span style={{ color: r.color, fontWeight: 600 }}>{r.icon}</span>
-          <span style={{ color: "var(--ink)" }}>{r.sc.titre_pedago}</span>
-          {r.sc.url_an_officielle ? (
-            <a href={r.sc.url_an_officielle} target="_blank" rel="noopener noreferrer"
-              style={{
-                fontFamily: "var(--font-mono)", fontSize: 10,
-                color: "var(--ink-3)", letterSpacing: "0.04em", textDecoration: "none",
-              }}>AN ↗</a>
-          ) : (
-            <span title="Donnée de démonstration — sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production"
-              style={{
-                fontFamily: "var(--font-mono)", fontSize: 10,
-                color: "var(--ink-4)", letterSpacing: "0.04em",
-              }}>démo</span>
-          )}
-        </div>
-      ))}
+
+      {/* Per-scrutin breakdown */}
+      {rows.map(r => {
+        const concrete = extractConcrete(r.sc.contexte);
+        return (
+          <div key={r.v.scrutin_id} style={{
+            display: "grid",
+            gridTemplateColumns: "20px 1fr auto",
+            alignItems: "baseline", columnGap: 8, rowGap: 4,
+            padding: "10px 0", borderTop: "1px dashed var(--line)",
+          }}>
+            <span style={{ color: r.color, fontWeight: 600 }}>{r.icon}</span>
+
+            {/* Title + optional concrete bullet */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <span style={{ color: "var(--ink)", fontWeight: 500 }}>{r.sc.titre_pedago}</span>
+              {concrete && (
+                <ul style={{ margin: 0, paddingLeft: 18, color: "var(--ink-2)", fontSize: 11.5, lineHeight: 1.5 }}>
+                  <li style={{ textWrap: "pretty" as const }}>{concrete}</li>
+                </ul>
+              )}
+            </div>
+
+            {r.sc.url_an_officielle ? (
+              <a href={r.sc.url_an_officielle} target="_blank" rel="noopener noreferrer"
+                style={{
+                  fontFamily: "var(--font-mono)", fontSize: 10,
+                  color: "var(--ink-3)", letterSpacing: "0.04em", textDecoration: "none",
+                }}>AN ↗</a>
+            ) : (
+              <span title="Donnée de démonstration — sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production"
+                style={{
+                  fontFamily: "var(--font-mono)", fontSize: 10,
+                  color: "var(--ink-4)", letterSpacing: "0.04em",
+                }}>démo</span>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
+}
+
+/** Extract the first "Concrètement :" or "Par exemple :" sentence from the
+ *  contexte field. Returns null if neither marker is present (fallback data
+ *  doesn't have these). Strips any inline **bold** markup to keep the
+ *  bullet visually compact in the dense list view. */
+function extractConcrete(contexte?: string): string | null {
+  if (!contexte) return null;
+  // Match "Concrètement :" or "Par exemple :" followed by content up to the
+  // next sentence boundary (period followed by space + capital, or end of string).
+  const m = contexte.match(/(?:Concrètement|Par exemple)\s*:?\s*([^]+?)(?=\.\s+[A-Z]|\.?$)/i);
+  if (!m) return null;
+  const sentence = m[1].trim().replace(/\.$/, "");
+  // Strip **bold** markers — the AuditTrail row is dense, no need for emphasis
+  return sentence.replace(/\*\*(.+?)\*\*/g, "$1");
 }
