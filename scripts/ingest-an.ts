@@ -273,12 +273,8 @@ interface AnthropicResponse {
   stop_reason: string;
 }
 
-async function summarizeWithLLM(
-  titreBrut: string,
-  dossierTitre: string,
-  numero: number,
-): Promise<Summary> {
-  const userMessage = `Numéro de scrutin : ${numero}
+function buildUserMessage(titreBrut: string, dossierTitre: string, numero: number): string {
+  return `Numéro de scrutin : ${numero}
 URL AN : https://www.assemblee-nationale.fr/dyn/17/scrutins/${numero}
 
 Titre brut :
@@ -292,56 +288,126 @@ ${dossierTitre}
 """
 
 Cherche sur le web (1 à 2 recherches max) les détails concrets de ce scrutin : chiffres, mécanismes, groupes touchés. Croise les sources si possible. Puis réponds en JSON strict comme spécifié.`;
+}
 
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": ANTHROPIC_KEY!,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: "claude-opus-4-7",
-      max_tokens: 4096,
-      thinking: { type: "adaptive" },
-      output_config: { effort: "high" },
-      system: [
-        {
-          type: "text",
-          text: SYSTEM_PROMPT,
-          cache_control: { type: "ephemeral" },
-        },
-      ],
-      tools: [
-        {
-          type: "web_search_20260209",
-          name: "web_search",
-          max_uses: 2,
-        },
-      ],
-      messages: [{ role: "user", content: userMessage }],
-    }),
-  });
-  if (!r.ok) throw new Error(`Anthropic ${r.status}: ${await r.text()}`);
-  const json = (await r.json()) as AnthropicResponse;
+function buildRequestParams(scrutin: { titre_brut: string; dossier_titre: string; numero: number }): Record<string, unknown> {
+  return {
+    model: "claude-haiku-4-5",
+    max_tokens: 2048,
+    system: [
+      {
+        type: "text",
+        text: SYSTEM_PROMPT,
+        cache_control: { type: "ephemeral" },
+      },
+    ],
+    tools: [
+      {
+        type: "web_search_20260209",
+        name: "web_search",
+        max_uses: 2,
+      },
+    ],
+    messages: [{ role: "user", content: buildUserMessage(scrutin.titre_brut, scrutin.dossier_titre, scrutin.numero) }],
+  };
+}
 
-  // The model may emit multiple text blocks interleaved with server_tool_use /
-  // web_search_tool_result blocks (Opus often writes JSON spanning two text
-  // blocks: opening `{...,` then closing `...}`). Concatenate all text blocks
-  // and extract the JSON from the combined string.
-  const textBlocks = json.content.filter(
+function extractSummaryFromMessage(message: AnthropicResponse): Summary {
+  const textBlocks = message.content.filter(
     (b): b is { type: "text"; text: string } => b.type === "text",
   );
   if (textBlocks.length === 0) {
-    throw new Error(`No text block in response. stop_reason=${json.stop_reason}, blocks=${json.content.map(b => b.type).join(",")}`);
+    throw new Error(`No text block. stop_reason=${message.stop_reason}, blocks=${message.content.map((b) => b.type).join(",")}`);
   }
-  const combined = textBlocks.map(b => b.text).join("\n");
-  // Greedy match from first `{` to last `}` (handles JSON wrapped in code fences too).
+  const combined = textBlocks.map((b) => b.text).join("\n");
   const m = combined.match(/\{[\s\S]*\}/);
   if (!m) {
-    throw new Error(`No JSON in LLM response. blocks=${json.content.map(b => b.type).join(",")} text=${combined.slice(0, 300)}`);
+    throw new Error(`No JSON in response. text=${combined.slice(0, 300)}`);
   }
   return JSON.parse(m[0]) as Summary;
+}
+
+// ─────────────────────────────────────────────────────── Batches API client
+
+const COMMON_HEADERS = () => ({
+  "content-type": "application/json",
+  "x-api-key": ANTHROPIC_KEY!,
+  "anthropic-version": "2023-06-01",
+});
+
+async function submitBatch(scrutins: ParsedScrutin[]): Promise<string> {
+  const requests = scrutins.map((s) => ({
+    custom_id: s.id, // e.g. "VTANR5L17V1234"
+    params: buildRequestParams(s),
+  }));
+  const r = await fetch("https://api.anthropic.com/v1/messages/batches", {
+    method: "POST",
+    headers: COMMON_HEADERS(),
+    body: JSON.stringify({ requests }),
+  });
+  if (!r.ok) throw new Error(`Batch submit failed: ${r.status} ${await r.text()}`);
+  const json = (await r.json()) as { id: string };
+  return json.id;
+}
+
+interface BatchStatus {
+  processing_status: "in_progress" | "canceling" | "ended";
+  request_counts: { processing: number; succeeded: number; errored: number; canceled: number; expired: number };
+}
+
+async function pollBatch(batchId: string): Promise<BatchStatus> {
+  // Poll every 15s — typical batch completes in 2-10 min for 46 items.
+  while (true) {
+    const r = await fetch(`https://api.anthropic.com/v1/messages/batches/${batchId}`, {
+      headers: COMMON_HEADERS(),
+    });
+    if (!r.ok) throw new Error(`Batch poll failed: ${r.status} ${await r.text()}`);
+    const json = (await r.json()) as BatchStatus;
+    const c = json.request_counts;
+    console.log(`  status: ${json.processing_status} · processing=${c.processing} succeeded=${c.succeeded} errored=${c.errored}`);
+    if (json.processing_status === "ended") return json;
+    await new Promise((res) => setTimeout(res, 15000));
+  }
+}
+
+interface BatchResultLine {
+  custom_id: string;
+  result:
+    | { type: "succeeded"; message: AnthropicResponse }
+    | { type: "errored"; error: { type: string; message: string } }
+    | { type: "canceled" }
+    | { type: "expired" };
+}
+
+async function fetchBatchResults(batchId: string): Promise<Map<string, Summary>> {
+  const r = await fetch(`https://api.anthropic.com/v1/messages/batches/${batchId}/results`, {
+    headers: COMMON_HEADERS(),
+  });
+  if (!r.ok) throw new Error(`Batch results failed: ${r.status} ${await r.text()}`);
+  const text = await r.text();
+  const out = new Map<string, Summary>();
+  let okCount = 0;
+  let errCount = 0;
+  for (const line of text.split("\n").filter((l) => l.trim())) {
+    const result = JSON.parse(line) as BatchResultLine;
+    if (result.result.type === "succeeded") {
+      try {
+        out.set(result.custom_id, extractSummaryFromMessage(result.result.message));
+        okCount++;
+      } catch (e) {
+        console.error(`  ✕ ${result.custom_id} parse: ${(e as Error).message}`);
+        errCount++;
+      }
+    } else if (result.result.type === "errored") {
+      console.error(`  ✕ ${result.custom_id}: ${result.result.error.type} — ${result.result.error.message}`);
+      errCount++;
+    } else {
+      console.error(`  ✕ ${result.custom_id}: ${result.result.type}`);
+      errCount++;
+    }
+  }
+  console.log(`  parsed ${okCount} summaries, ${errCount} failed`);
+  return out;
 }
 
 function fallbackSummary(titreBrut: string, dossierTitre: string): Summary {
@@ -381,36 +447,36 @@ async function main(): Promise<void> {
   }
 
   const enriched: ParsedScrutin[] = [];
-  // Web-search calls take ~5-10s each. Run a small number in parallel to keep
-  // total runtime sensible (~46 calls × 8s sequential = 6 min; with CONCURRENCY=4
-  // we get ~90s). Anthropic Tier 1 allows enough RPM for this.
-  const CONCURRENCY = ANTHROPIC_KEY ? 4 : 1;
-  let done = 0;
-  async function processOne(s: typeof solennels[number]): Promise<void> {
-    try {
-      const summary = ANTHROPIC_KEY
-        ? await summarizeWithLLM(s.titre_brut, s.dossier_titre, s.numero)
-        : fallbackSummary(s.titre_brut, s.dossier_titre);
-      enriched.push({ ...s, ...summary });
-      done++;
-      console.log(`  [${done}/${solennels.length}] ${summary.chapeau} — ${summary.titre_pedago}`);
-    } catch (e) {
-      done++;
-      console.error(`  [${done}/${solennels.length}] ✕ scrutin ${s.numero}: ${(e as Error).message}`);
-      // Fall back to truncated title so the scrutin still gets ingested
+
+  if (!ANTHROPIC_KEY) {
+    // Fallback path: no LLM, just truncated summaries.
+    for (const s of solennels) {
       const fb = fallbackSummary(s.titre_brut, s.dossier_titre);
       enriched.push({ ...s, ...fb });
     }
-  }
-  // Simple worker pool
-  const queue = [...solennels];
-  const workers = Array.from({ length: CONCURRENCY }, async () => {
-    while (queue.length > 0) {
-      const s = queue.shift();
-      if (s) await processOne(s);
+  } else {
+    // LLM path: submit one Batches API job for all 46 scrutins.
+    // 50% off all tokens, runs server-side concurrently, no rate-limit juggling.
+    // Typical completion: 2-10 min for 46 items.
+    console.log(`↑ Submitting batch of ${solennels.length} requests (Haiku 4.5 + web_search, 50% off via Batches API)…`);
+    const batchId = await submitBatch(solennels as ParsedScrutin[]);
+    console.log(`✓ Batch ${batchId} submitted. Polling every 15s…`);
+    await pollBatch(batchId);
+    console.log(`↓ Fetching results…`);
+    const results = await fetchBatchResults(batchId);
+
+    for (const s of solennels) {
+      const summary = results.get(s.id);
+      if (summary) {
+        enriched.push({ ...s, ...summary } as ParsedScrutin);
+        console.log(`  ✓ ${s.numero} · ${summary.chapeau} — ${summary.titre_pedago}`);
+      } else {
+        const fb = fallbackSummary(s.titre_brut, s.dossier_titre);
+        enriched.push({ ...s, ...fb } as ParsedScrutin);
+        console.log(`  ⚠ ${s.numero}: using fallback (LLM result missing)`);
+      }
     }
-  });
-  await Promise.all(workers);
+  }
 
   console.log(`↑ Upserting ${enriched.length} scrutins to Supabase…`);
   const sb = createClient(SUPABASE_URL!, SUPABASE_KEY!);
