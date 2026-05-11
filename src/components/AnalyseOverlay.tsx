@@ -109,16 +109,16 @@ export function AnalyseOverlay({ open, scrutin, onClose }: AnalyseOverlayProps) 
               color: "var(--ink)",
             }}>{scrutin.titre_pedago}</div>
 
-            {scrutin.analyse ? (
+            {scrutin.analyse_loi ? (
               <>
-                <Section title="Mesures principales" bullets={scrutin.analyse.mesures_principales} />
+                <Section title="Mesures principales" bullets={scrutin.analyse_loi.mesures_principales} />
                 <DoubleSection
-                  positifs={scrutin.analyse.concernes_positifs}
-                  negatifs={scrutin.analyse.concernes_negatifs}
-                  neutres={scrutin.analyse.concernes_neutres}
+                  positifs={scrutin.analyse_loi.concernes_positifs}
+                  negatifs={scrutin.analyse_loi.concernes_negatifs}
+                  neutres={scrutin.analyse_loi.concernes_neutres}
                 />
-                <Section title="Calendrier" bullets={scrutin.analyse.calendrier} />
-                <Section title="Exceptions et cas particuliers" bullets={scrutin.analyse.exceptions} />
+                <Section title="Calendrier" bullets={scrutin.analyse_loi.calendrier} />
+                <Section title="Exceptions et cas particuliers" bullets={scrutin.analyse_loi.exceptions} />
               </>
             ) : (
               <div style={{

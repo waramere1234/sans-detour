@@ -138,7 +138,7 @@ interface ParsedScrutin {
   titre_pedago: string;
   chapeau: string;
   contexte: string;
-  analyse?: ScrutinAnalyse;
+  analyse_loi?: ScrutinAnalyse;
   position_par_groupe: Record<GroupCode, GroupPosition>;
   votes_bruts: Record<GroupCode, GroupVoteBreakdown>;
   est_solennel: boolean;
@@ -323,7 +323,7 @@ Tu réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans texte avan
   "chapeau": "...",
   "titre_pedago": "...",
   "contexte": "...",
-  "analyse": {
+  "analyse_loi": {
     "mesures_principales": [...],
     "concernes_positifs": [...],
     "concernes_negatifs": [...],
@@ -337,7 +337,7 @@ interface Summary {
   chapeau: string;
   titre_pedago: string;
   contexte: string;
-  analyse?: ScrutinAnalyse;
+  analyse_loi?: ScrutinAnalyse;
 }
 
 interface ScrutinAnalyse {
@@ -424,8 +424,8 @@ function extractSummaryFromMessage(message: AnthropicResponse): Summary {
   // values with their escaped form so JSON.parse accepts them.
   const safe = sanitizeJsonControlChars(m[0]);
   const parsed = JSON.parse(safe) as Summary;
-  if (parsed.analyse) {
-    parsed.analyse = normalizeAnalyse(parsed.analyse);
+  if (parsed.analyse_loi) {
+    parsed.analyse_loi = normalizeAnalyse(parsed.analyse_loi);
   }
   return parsed;
 }
@@ -668,28 +668,28 @@ async function main(): Promise<void> {
 
   // Upsert in chunks to stay under PostgREST limits.
   const CHUNK = 100;
-  let analyseFieldDropped = false;
+  let analyseLoiDropped = false;
   for (let i = 0; i < enriched.length; i += CHUNK) {
     let chunk = enriched.slice(i, i + CHUNK);
-    if (analyseFieldDropped) {
-      chunk = chunk.map(({ analyse: _drop, ...rest }) => rest as ParsedScrutin);
+    if (analyseLoiDropped) {
+      chunk = chunk.map(({ analyse_loi: _drop, ...rest }) => rest as ParsedScrutin);
     }
     let { error } = await sb.from("scrutins").upsert(chunk);
 
-    // Defensive retry: if the `analyse` column is missing from the DB schema
-    // (user hasn't applied migration 0003 yet), the row insert fails with
-    // PGRST204. Retry the same chunk WITHOUT the analyse field so at least
+    // Defensive retry: if the `analyse_loi` column is missing from the DB
+    // schema (user hasn't applied migration 0003 yet), the row insert fails
+    // with PGRST204. Retry the same chunk WITHOUT the analyse_loi field so
     // the new chapeau/titre_pedago/contexte data lands — much better than
     // losing the whole batch when the user paid for the LLM calls already.
-    if (error && error.code === "PGRST204" && /analyse/i.test(error.message ?? "")) {
+    if (error && error.code === "PGRST204" && /analyse_loi/i.test(error.message ?? "")) {
       console.warn(
-        "⚠ `analyse` column missing in DB — migration 0003 not yet applied.\n" +
-        "  Falling back to upsert WITHOUT the analyse field so the rest of\n" +
+        "⚠ `analyse_loi` column missing in DB — migration 0003 not yet applied.\n" +
+        "  Falling back to upsert WITHOUT the analyse_loi field so the rest of\n" +
         "  this run is not lost. Apply supabase/migrations/0003_add_analyse.sql\n" +
-        "  then re-run to populate analyse.",
+        "  then re-run to populate analyse_loi.",
       );
-      analyseFieldDropped = true;
-      chunk = chunk.map(({ analyse: _drop, ...rest }) => rest as ParsedScrutin);
+      analyseLoiDropped = true;
+      chunk = chunk.map(({ analyse_loi: _drop, ...rest }) => rest as ParsedScrutin);
       ({ error } = await sb.from("scrutins").upsert(chunk));
     }
 
@@ -698,8 +698,8 @@ async function main(): Promise<void> {
       process.exit(1);
     }
   }
-  const note = analyseFieldDropped
-    ? "\n  (analyse field dropped — apply migration 0003 and re-run to populate)"
+  const note = analyseLoiDropped
+    ? "\n  (analyse_loi field dropped — apply migration 0003 and re-run to populate)"
     : "";
   console.log(`✓ Done. ${enriched.length} solennels in scrutins table.${note}`);
 }

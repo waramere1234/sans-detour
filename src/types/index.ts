@@ -32,7 +32,9 @@ export interface Scrutin {
   titre_brut: string;          // raw AN title
   titre_pedago: string;        // 12-word generated summary
   contexte?: string;           // 1-line stake/context, ≤ 25 words (added in migration 0002)
-  analyse?: ScrutinAnalyse;    // structured 4-axis breakdown (added in migration 0003)
+  analyse_loi?: ScrutinAnalyse;  // structured 4-axis breakdown (migration 0003).
+                                 // Column named `analyse_loi` because ANALYSE
+                                 // is a PostgreSQL reserved word.
   position_par_groupe: Record<GroupCode, GroupPosition>;
   votes_bruts: Record<GroupCode, GroupVoteBreakdown>;
   url_an_officielle: string;

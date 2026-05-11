@@ -96,7 +96,7 @@ export function Card({ scrutin, topMost, onSwipe, onShowAnalyse }: CardProps) {
                 style={{
                   background: "transparent",
                   border: "1px solid var(--line)",
-                  color: scrutin.analyse ? "var(--accent)" : "var(--ink-3)",
+                  color: scrutin.analyse_loi ? "var(--accent)" : "var(--ink-3)",
                   fontFamily: "var(--font-mono)", fontSize: 10,
                   padding: "3px 8px", borderRadius: 3,
                   cursor: "pointer", letterSpacing: "0.08em",
