@@ -339,6 +339,10 @@ function buildRequestParams(scrutin: { titre_brut: string; dossier_titre: string
         type: "web_search_20260209",
         name: "web_search",
         max_uses: 2,
+        // Haiku 4.5 doesn't support programmatic tool calling; web_search must
+        // be declared as direct-caller only. Without this, batch returns 400
+        // with "does not support programmatic tool calling".
+        allowed_callers: ["direct"],
       },
     ],
     messages: [{ role: "user", content: buildUserMessage(scrutin.titre_brut, scrutin.dossier_titre, scrutin.numero) }],
@@ -407,10 +411,18 @@ interface BatchResultLine {
   custom_id: string;
   result:
     | { type: "succeeded"; message: AnthropicResponse }
-    // The Anthropic batch result shape for an errored request — the exact
-    // wrapping has shifted across SDK versions, so we treat error/message as
-    // best-effort and fall back to dumping the raw result on logging.
-    | { type: "errored"; error?: { type?: string; message?: string } }
+    // Empirically, Anthropic wraps batch errors as
+    //   { type: "errored", error: { type: "error", error: { type, message } } }
+    // — the inner `error.error` is where the user-facing fields live. We type
+    // the outer loosely and probe both shapes when logging.
+    | {
+        type: "errored";
+        error?: {
+          type?: string;
+          message?: string;
+          error?: { type?: string; message?: string };
+        };
+      }
     | { type: "canceled" }
     | { type: "expired" };
 }
@@ -437,7 +449,10 @@ async function fetchBatchResults(batchId: string): Promise<Map<string, Summary>>
       }
     } else if (result.result.type === "errored") {
       const err = result.result.error;
-      const detail = err?.message ?? err?.type ?? JSON.stringify(result.result);
+      // Anthropic wraps the user-facing error one level deeper:
+      // result.error.error.{type,message}
+      const inner = err?.error;
+      const detail = inner?.message ?? err?.message ?? inner?.type ?? err?.type ?? JSON.stringify(result.result);
       console.error(`  ✕ ${result.custom_id}: ${detail}`);
       if (!firstErrorLine) firstErrorLine = line;
       errCount++;
