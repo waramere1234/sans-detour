@@ -7,10 +7,11 @@ export interface CardProps {
   scrutin: Scrutin;
   topMost: boolean;       // is this the front card (interactive)?
   onSwipe?: (dir: "left" | "right" | "down") => void;
-  onShowAnalyse?: () => void;
 }
 
 const SWIPE_THRESHOLD = 120;
+
+type BackVariant = "explanation" | "analyse";
 
 // Shared card-face style so front and back have identical visual dimensions.
 const FACE_STYLE: React.CSSProperties = {
@@ -28,17 +29,32 @@ const FACE_STYLE: React.CSSProperties = {
   WebkitBackfaceVisibility: "hidden",
 };
 
-export function Card({ scrutin, topMost, onSwipe, onShowAnalyse }: CardProps) {
+export function Card({ scrutin, topMost, onSwipe }: CardProps) {
   const [flipped, setFlipped] = useState(false);
+  // Which content shows on the back when flipped: the explanation (default,
+  // triggered by tapping the card body) or the structured analyse (triggered
+  // by the "+ analyse" button on the front).
+  const [backVariant, setBackVariant] = useState<BackVariant>("explanation");
 
-  // Tap (no drag movement) toggles flip. Skip when the tap landed on an
-  // interactive descendant (anchor, button) so links / buttons still work
-  // on the back without immediately flipping the card back.
+  // Tap (no drag movement) toggles flip. Tap on the card body → flip to
+  // explanation. Tap on an <a>/<button> child is ignored so links and the
+  // "+ analyse" button still fire their own onClick handlers.
   function handleTap(e: MouseEvent | TouchEvent | PointerEvent) {
     if (!topMost) return;
     const target = e.target as HTMLElement | null;
     if (target && target.closest("a, button")) return;
-    setFlipped((f) => !f);
+    setFlipped((f) => {
+      if (!f) {
+        // Front → back: body taps always go to the explanation variant.
+        setBackVariant("explanation");
+      }
+      return !f;
+    });
+  }
+
+  function showAnalyse() {
+    setBackVariant("analyse");
+    setFlipped(true);
   }
 
   function handleDragEnd(_: unknown, info: PanInfo) {
@@ -74,10 +90,8 @@ export function Card({ scrutin, topMost, onSwipe, onShowAnalyse }: CardProps) {
           transformStyle: "preserve-3d",
         }}
       >
-        {/* FRONT — the question. Just chapeau + title + footer. The full
-            explanation lives on the back to avoid paraphrase redundancy. */}
+        {/* FRONT — the question. Chapeau + "+ analyse" button + title + footer. */}
         <div style={{ ...FACE_STYLE, gap: 22, justifyContent: "space-between", minHeight: 260 }}>
-          {/* Top row: chapeau eyebrow (left) + analyse icon (right) */}
           <div style={{
             display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12,
           }}>
@@ -87,12 +101,12 @@ export function Card({ scrutin, topMost, onSwipe, onShowAnalyse }: CardProps) {
               color: "var(--accent)", fontWeight: 500,
               flex: 1,
             }}>{scrutin.chapeau}</div>
-            {topMost && onShowAnalyse && (
+            {topMost && (
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); onShowAnalyse(); }}
+                onClick={(e) => { e.stopPropagation(); showAnalyse(); }}
                 onPointerDown={(e) => e.stopPropagation()}
-                aria-label="Ouvrir l'analyse détaillée du scrutin"
+                aria-label="Voir l'analyse détaillée du scrutin"
                 style={{
                   background: "transparent",
                   border: "1px solid var(--line)",
@@ -107,7 +121,6 @@ export function Card({ scrutin, topMost, onSwipe, onShowAnalyse }: CardProps) {
             )}
           </div>
 
-          {/* The question — bigger now that it's the only content above the footer */}
           <div style={{
             flex: 1,
             display: "flex", alignItems: "center",
@@ -116,7 +129,6 @@ export function Card({ scrutin, topMost, onSwipe, onShowAnalyse }: CardProps) {
             color: "var(--ink)", textWrap: "pretty" as const,
           }}>{scrutin.titre_pedago}</div>
 
-          {/* Footer */}
           <div style={{
             fontFamily: "var(--font-mono)", fontSize: 11,
             color: "var(--ink-3)", letterSpacing: "0.04em",
@@ -132,7 +144,10 @@ export function Card({ scrutin, topMost, onSwipe, onShowAnalyse }: CardProps) {
           </div>
         </div>
 
-        {/* BACK — same bounding box as front, rotated 180° so it shows after flip. */}
+        {/* BACK — same bounding box as front, rotated 180° so it shows after flip.
+            Content switches based on backVariant: explanation (tap card) or
+            analyse (tap "+ analyse"). Both share the same header and footer
+            so the flip lands on a consistent visual shell. */}
         <div
           style={{
             ...FACE_STYLE,
@@ -143,7 +158,7 @@ export function Card({ scrutin, topMost, onSwipe, onShowAnalyse }: CardProps) {
             gap: 16,
           }}
         >
-          {/* Header: eyebrow scrutin + date */}
+          {/* Shared header */}
           <div style={{
             display: "flex", justifyContent: "space-between", alignItems: "baseline",
             fontFamily: "var(--font-mono)", fontSize: 10,
@@ -151,49 +166,27 @@ export function Card({ scrutin, topMost, onSwipe, onShowAnalyse }: CardProps) {
             color: "var(--ink-3)",
             paddingBottom: 8, borderBottom: "1px solid var(--line)",
           }}>
-            <span style={{ color: "var(--accent)" }}>{scrutin.chapeau}</span>
+            <span style={{ color: "var(--accent)" }}>
+              {backVariant === "analyse" ? "Analyse · " : ""}{scrutin.chapeau}
+            </span>
             <span>n° {scrutin.numero} · {new Date(scrutin.date).toLocaleDateString("fr-FR")}</span>
           </div>
 
-          {/* Big title — same wording as the front so the user knows what they're reading about */}
+          {/* Same titre_pedago for orientation, whichever variant */}
           <div style={{
             fontFamily: "var(--font-sans)", fontWeight: 600,
             fontSize: 18, lineHeight: 1.3, letterSpacing: "-0.012em",
             color: "var(--ink)",
           }}>{scrutin.titre_pedago}</div>
 
-          {/* Single substantive explanation field. This is where the real content lives.
-              Two transforms applied client-side so old ingest data renders cleanly without
-              a re-run: (1) strip trailing "Vote : X oui, Y non" patterns the LLM sometimes
-              appended (the vote outcome is computed elsewhere in the app — putting it here
-              spoils the user's own vote and conflates "what the law does" with "what
-              happened"). (2) Render **bold** markdown markup as styled <strong> so the LLM
-              can emphasize key facts (numbers, mechanisms, dates). */}
-          <div style={{
-            fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.6,
-            color: "var(--ink-2)", textWrap: "pretty" as const,
-          }}>
-            {scrutin.contexte ? (
-              renderWithBold(scrutin.contexte)
-            ) : (
-              <em style={{ color: "var(--ink-3)" }}>
-                Aucune explication détaillée disponible pour ce scrutin. Le titre officiel ci-dessous donne le sujet général.
-              </em>
-            )}
-          </div>
+          {/* Variant body */}
+          {backVariant === "explanation" ? (
+            <ExplanationBody scrutin={scrutin} />
+          ) : (
+            <AnalyseBody scrutin={scrutin} />
+          )}
 
-          {/* Discreet collapsible-feel — titre brut as small print, not as a section */}
-          <div style={{
-            fontFamily: "var(--font-mono)", fontSize: 10,
-            color: "var(--ink-3)", letterSpacing: "0.04em",
-            paddingTop: 8, borderTop: "1px dashed var(--line)",
-            lineHeight: 1.5,
-          }}>
-            <span style={{ textTransform: "uppercase", letterSpacing: "0.12em" }}>Intitulé officiel AN · </span>
-            <span style={{ fontFamily: "var(--font-sans)", fontSize: 11.5 }}>{scrutin.titre_brut}</span>
-          </div>
-
-          {/* Footer: back hint + AN link */}
+          {/* Shared footer */}
           <div style={{
             marginTop: "auto",
             paddingTop: 12, borderTop: "1px solid var(--line)",
@@ -205,7 +198,7 @@ export function Card({ scrutin, topMost, onSwipe, onShowAnalyse }: CardProps) {
               ? <a href={scrutin.url_an_officielle}
                   target="_blank" rel="noopener noreferrer"
                   style={{ color: "var(--accent)", textDecoration: "none" }}>
-                  Voir le texte sur AN ↗
+                  Voir sur AN ↗
                 </a>
               : <span style={{ color: "var(--accent)" }}>donnée démo</span>}
           </div>
@@ -215,16 +208,157 @@ export function Card({ scrutin, topMost, onSwipe, onShowAnalyse }: CardProps) {
   );
 }
 
+// ─────────────────────────────────────────────────── BACK VARIANTS
+
+function ExplanationBody({ scrutin }: { scrutin: Scrutin }) {
+  return (
+    <>
+      <div style={{
+        fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.6,
+        color: "var(--ink-2)", textWrap: "pretty" as const,
+      }}>
+        {scrutin.contexte ? (
+          renderWithBold(scrutin.contexte)
+        ) : (
+          <em style={{ color: "var(--ink-3)" }}>
+            Aucune explication détaillée disponible pour ce scrutin. Le titre officiel ci-dessous donne le sujet général.
+          </em>
+        )}
+      </div>
+
+      <div style={{
+        fontFamily: "var(--font-mono)", fontSize: 10,
+        color: "var(--ink-3)", letterSpacing: "0.04em",
+        paddingTop: 8, borderTop: "1px dashed var(--line)",
+        lineHeight: 1.5,
+      }}>
+        <span style={{ textTransform: "uppercase", letterSpacing: "0.12em" }}>Intitulé officiel AN · </span>
+        <span style={{ fontFamily: "var(--font-sans)", fontSize: 11.5 }}>{scrutin.titre_brut}</span>
+      </div>
+    </>
+  );
+}
+
+function AnalyseBody({ scrutin }: { scrutin: Scrutin }) {
+  const a = scrutin.analyse_loi;
+  if (!a) {
+    return (
+      <div style={{
+        border: "1px dashed var(--line)",
+        borderRadius: 6,
+        padding: "16px 18px",
+        fontFamily: "var(--font-sans)", fontSize: 12.5, lineHeight: 1.55,
+        color: "var(--ink-2)", textAlign: "center",
+      }}>
+        Analyse détaillée pas encore disponible pour ce scrutin.<br/>
+        <span style={{ color: "var(--ink-3)", fontSize: 11 }}>
+          Sera générée au prochain run du pipeline d'ingestion.
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <Section title="Mesures principales" bullets={a.mesures_principales} />
+      <DoubleSection
+        positifs={a.concernes_positifs}
+        negatifs={a.concernes_negatifs}
+        neutres={a.concernes_neutres}
+      />
+      <Section title="Calendrier" bullets={a.calendrier} />
+      <Section title="Exceptions et cas particuliers" bullets={a.exceptions} />
+    </div>
+  );
+}
+
+function Section({ title, bullets }: { title: string; bullets: string[] }) {
+  if (bullets.length === 0) return null;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <span style={{
+        fontFamily: "var(--font-mono)", fontSize: 10,
+        letterSpacing: "0.14em", textTransform: "uppercase",
+        color: "var(--ink-3)", fontWeight: 500,
+      }}>{title}</span>
+      <ul style={{
+        margin: 0, paddingLeft: 18,
+        display: "flex", flexDirection: "column", gap: 4,
+      }}>
+        {bullets.map((b, i) => (
+          <li key={i} style={{
+            fontFamily: "var(--font-sans)", fontSize: 13, lineHeight: 1.55,
+            color: "var(--ink-2)", textWrap: "pretty" as const,
+          }}>
+            {renderWithBold(b)}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function DoubleSection({
+  positifs, negatifs, neutres,
+}: {
+  positifs: string[]; negatifs: string[]; neutres: string[];
+}) {
+  if (positifs.length + negatifs.length + neutres.length === 0) return null;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <span style={{
+        fontFamily: "var(--font-mono)", fontSize: 10,
+        letterSpacing: "0.14em", textTransform: "uppercase",
+        color: "var(--ink-3)", fontWeight: 500,
+      }}>Qui est concerné</span>
+
+      {positifs.length > 0 && (
+        <ImpactList accent="var(--pour)" label="Impact positif" bullets={positifs} />
+      )}
+      {negatifs.length > 0 && (
+        <ImpactList accent="var(--contre)" label="Impact négatif" bullets={negatifs} />
+      )}
+      {neutres.length > 0 && (
+        <ImpactList accent="var(--ink-3)" label="Neutre ou à surveiller" bullets={neutres} />
+      )}
+    </div>
+  );
+}
+
+function ImpactList({ accent, label, bullets }: { accent: string; label: string; bullets: string[] }) {
+  return (
+    <div style={{
+      borderLeft: `2px solid ${accent}`,
+      paddingLeft: 10,
+      display: "flex", flexDirection: "column", gap: 3,
+    }}>
+      <span style={{
+        fontFamily: "var(--font-mono)", fontSize: 9.5,
+        letterSpacing: "0.12em", textTransform: "uppercase",
+        color: accent, fontWeight: 500,
+      }}>{label}</span>
+      <ul style={{ margin: 0, paddingLeft: 16, display: "flex", flexDirection: "column", gap: 3 }}>
+        {bullets.map((b, i) => (
+          <li key={i} style={{
+            fontFamily: "var(--font-sans)", fontSize: 12.5, lineHeight: 1.55,
+            color: "var(--ink-2)", textWrap: "pretty" as const,
+          }}>
+            {renderWithBold(b)}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────── TEXT HELPERS
+
 /** Strip Anthropic web_search citation markup like
  *  `<cite index="20-2,20-3">text</cite>` — preserve the inner text, drop the
  *  wrapper. Also drops any orphan opening/closing tags. */
 function stripCitations(text: string): string {
   return text
-    // Wrapped citations: keep inner text, drop tags
     .replace(/<cite[^>]*>([\s\S]*?)<\/cite>/g, "$1")
-    // Orphan tags (defensive — if a stream truncates mid-tag)
     .replace(/<\/?cite[^>]*>/g, "")
-    // Collapse any double spaces or stray whitespace introduced by removal
     .replace(/[ \t]+/g, " ")
     .trim();
 }
@@ -234,18 +368,14 @@ function stripCitations(text: string): string {
  *  in the explanation conflates "what the law does" with "what happened at
  *  the vote", which spoils the user's own vote and is off-topic. */
 function stripVoteResult(text: string): string {
-  // Find the first occurrence of " Vote :" or " Résultat :" (whitespace-bounded
-  // so we don't strip on internal lowercase mentions like "ce vote a un impact")
-  // and cut everything from there. Case-insensitive on the marker.
   const m = text.match(/\s+(Vote|Résultat)\s*[:.]/i);
   if (!m || m.index === undefined) return text;
   return text.slice(0, m.index).trim();
 }
 
 /** Parse **bold** markdown markup and return alternating text / <strong> nodes.
- *  The LLM is instructed to wrap 2-3 key facts (numbers, mechanisms, dates)
- *  in **...** so they pop visually. Applies citation/vote-result cleanup
- *  first so we never render Anthropic markup or vote spoilers. */
+ *  Applies citation/vote-result cleanup first so we never render Anthropic
+ *  markup or vote spoilers. */
 function renderWithBold(text: string): React.ReactNode {
   const cleaned = stripVoteResult(stripCitations(text));
   const parts = cleaned.split(/(\*\*[^*]+?\*\*)/g);
