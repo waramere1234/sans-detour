@@ -6,11 +6,12 @@ export interface CardProps {
   scrutin: Scrutin;
   topMost: boolean;       // is this the front card (interactive)?
   onSwipe?: (dir: "left" | "right" | "down") => void;
+  onShowDetail?: () => void;
 }
 
 const SWIPE_THRESHOLD = 120;
 
-export function Card({ scrutin, topMost, onSwipe }: CardProps) {
+export function Card({ scrutin, topMost, onSwipe, onShowDetail }: CardProps) {
   return (
     <motion.div
       drag={topMost}
@@ -56,11 +57,21 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
       <div style={{
         fontFamily: "var(--font-mono)", fontSize: 11,
         color: "var(--ink-3)", letterSpacing: "0.04em",
-        display: "flex", justifyContent: "space-between",
+        display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8,
         borderTop: "1px solid var(--line)",
         paddingTop: 14, marginTop: "auto",
       }}>
         <span>{new Date(scrutin.date).toLocaleDateString("fr-FR")}</span>
+        {topMost && onShowDetail && (
+          <button type="button" onClick={onShowDetail}
+            aria-label="Voir les détails du scrutin"
+            style={{
+              background: "transparent", border: "1px solid var(--line)",
+              color: "var(--ink-2)", fontFamily: "var(--font-mono)",
+              fontSize: 10, padding: "3px 8px", borderRadius: 3,
+              cursor: "pointer", letterSpacing: "0.04em",
+            }}>Détails ›</button>
+        )}
         {scrutin.url_an_officielle
           ? <span>scrutin n° {scrutin.numero}</span>
           : <span style={{ color: "var(--accent)" }} title="Donnée de démonstration — sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production">exemple démo</span>}
