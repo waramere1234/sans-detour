@@ -73,31 +73,32 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
           transformStyle: "preserve-3d",
         }}
       >
-        {/* FRONT — sets the card's natural height. */}
-        <div style={FACE_STYLE}>
+        {/* FRONT — the question. Just chapeau + title + footer. The full
+            explanation lives on the back to avoid paraphrase redundancy. */}
+        <div style={{ ...FACE_STYLE, gap: 22, justifyContent: "space-between", minHeight: 260 }}>
+          {/* Chapeau as eyebrow */}
           <div style={{
             fontFamily: "var(--font-mono)", fontSize: 11,
             letterSpacing: "0.12em", textTransform: "uppercase",
             color: "var(--accent)", fontWeight: 500,
           }}>{scrutin.chapeau}</div>
+
+          {/* The question — bigger now that it's the only content above the footer */}
           <div style={{
+            flex: 1,
+            display: "flex", alignItems: "center",
             fontFamily: "var(--font-sans)", fontWeight: 600,
-            fontSize: 21, lineHeight: 1.3, letterSpacing: "-0.012em",
+            fontSize: 24, lineHeight: 1.25, letterSpacing: "-0.014em",
             color: "var(--ink)", textWrap: "pretty" as const,
           }}>{scrutin.titre_pedago}</div>
-          {scrutin.contexte && (
-            <div style={{
-              fontFamily: "var(--font-sans)", fontWeight: 400,
-              fontSize: 14, lineHeight: 1.5, letterSpacing: "-0.005em",
-              color: "var(--ink-2)", textWrap: "pretty" as const,
-            }}>{scrutin.contexte}</div>
-          )}
+
+          {/* Footer */}
           <div style={{
             fontFamily: "var(--font-mono)", fontSize: 11,
             color: "var(--ink-3)", letterSpacing: "0.04em",
             display: "flex", justifyContent: "space-between", alignItems: "center",
             borderTop: "1px solid var(--line)",
-            paddingTop: 14, marginTop: "auto",
+            paddingTop: 14,
           }}>
             <span>{new Date(scrutin.date).toLocaleDateString("fr-FR")}</span>
             <span style={{ color: "var(--ink-2)" }}>tap pour détails ›</span>
