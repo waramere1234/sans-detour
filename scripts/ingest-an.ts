@@ -614,14 +614,24 @@ async function main(): Promise<void> {
   const files = (await fs.readdir(JSON_DIR)).filter(f => f.endsWith(".json"));
   console.log(`◯ Scanning ${files.length} scrutin files…`);
 
-  const solennels: Awaited<ReturnType<typeof parseRaw>>[] = [];
+  const allSolennels: Awaited<ReturnType<typeof parseRaw>>[] = [];
   for (const f of files) {
     const raw = JSON.parse(await fs.readFile(path.join(JSON_DIR, f), "utf-8"));
     const s = raw.scrutin ?? raw;
     if (s.typeVote?.codeTypeVote !== "SPS") continue;
-    solennels.push(parseRaw(s));
+    allSolennels.push(parseRaw(s));
   }
-  console.log(`◯ Found ${solennels.length} scrutins solennels (SPS)`);
+  console.log(`◯ Found ${allSolennels.length} scrutins solennels (SPS)`);
+
+  // Cost-controlled test mode: INGEST_LIMIT=N processes only the first N
+  // scrutins. Useful to validate prompt/UI changes for ~$0.01 instead of the
+  // full ~$0.30 batch. Drops to "all" when unset or invalid.
+  const limitRaw = process.env.INGEST_LIMIT;
+  const limit = limitRaw ? Math.max(1, parseInt(limitRaw, 10) || 0) : undefined;
+  const solennels = limit ? allSolennels.slice(0, limit) : allSolennels;
+  if (limit) {
+    console.log(`⚠ INGEST_LIMIT=${limit} — processing only the first ${solennels.length}/${allSolennels.length} scrutins (test mode)`);
+  }
 
   if (!ANTHROPIC_KEY) {
     console.warn("⚠ ANTHROPIC_API_KEY not set — using fallback summaries (re-run later with key to upgrade)");
