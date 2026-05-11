@@ -115,59 +115,52 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
             inset: 0,
             transform: "rotateY(180deg)",
             overflow: "auto",
-            gap: 14,
+            gap: 16,
           }}
         >
+          {/* Header: eyebrow scrutin + date */}
           <div style={{
             display: "flex", justifyContent: "space-between", alignItems: "baseline",
             fontFamily: "var(--font-mono)", fontSize: 10,
             letterSpacing: "0.12em", textTransform: "uppercase",
             color: "var(--ink-3)",
-            paddingBottom: 6, borderBottom: "1px solid var(--line)",
+            paddingBottom: 8, borderBottom: "1px solid var(--line)",
           }}>
-            <span>Détails du scrutin</span>
+            <span style={{ color: "var(--accent)" }}>{scrutin.chapeau}</span>
             <span>n° {scrutin.numero} · {new Date(scrutin.date).toLocaleDateString("fr-FR")}</span>
           </div>
 
-          <BackSection eyebrow="Chapeau">
-            <span style={{
-              fontFamily: "var(--font-mono)", fontSize: 12,
-              letterSpacing: "0.12em", textTransform: "uppercase",
-              color: "var(--accent)", fontWeight: 500,
-            }}>{scrutin.chapeau}</span>
-          </BackSection>
+          {/* Big title — same wording as the front so the user knows what they're reading about */}
+          <div style={{
+            fontFamily: "var(--font-sans)", fontWeight: 600,
+            fontSize: 18, lineHeight: 1.3, letterSpacing: "-0.012em",
+            color: "var(--ink)",
+          }}>{scrutin.titre_pedago}</div>
 
-          <BackSection eyebrow="Reformulation">
-            <p style={{
-              fontFamily: "var(--font-sans)", fontWeight: 600,
-              fontSize: 15, lineHeight: 1.35, letterSpacing: "-0.012em",
-              color: "var(--ink)", margin: 0,
-            }}>{scrutin.titre_pedago}</p>
-          </BackSection>
+          {/* Single substantive explanation field. This is where the real content lives. */}
+          <div style={{
+            fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.6,
+            color: "var(--ink-2)", textWrap: "pretty" as const,
+          }}>
+            {scrutin.contexte || (
+              <em style={{ color: "var(--ink-3)" }}>
+                Aucune explication détaillée disponible pour ce scrutin. Le titre officiel ci-dessous donne le sujet général.
+              </em>
+            )}
+          </div>
 
-          {scrutin.contexte && (
-            <BackSection eyebrow="Contexte">
-              <p style={{
-                fontFamily: "var(--font-sans)", fontSize: 13, lineHeight: 1.55,
-                color: "var(--ink-2)", margin: 0,
-              }}>{scrutin.contexte}</p>
-            </BackSection>
-          )}
+          {/* Discreet collapsible-feel — titre brut as small print, not as a section */}
+          <div style={{
+            fontFamily: "var(--font-mono)", fontSize: 10,
+            color: "var(--ink-3)", letterSpacing: "0.04em",
+            paddingTop: 8, borderTop: "1px dashed var(--line)",
+            lineHeight: 1.5,
+          }}>
+            <span style={{ textTransform: "uppercase", letterSpacing: "0.12em" }}>Intitulé officiel AN · </span>
+            <span style={{ fontFamily: "var(--font-sans)", fontSize: 11.5 }}>{scrutin.titre_brut}</span>
+          </div>
 
-          <BackSection eyebrow="Titre officiel (AN)">
-            <p style={{
-              fontFamily: "var(--font-sans)", fontSize: 12, lineHeight: 1.55,
-              color: "var(--ink-2)", margin: 0,
-            }}>{scrutin.titre_brut}</p>
-          </BackSection>
-
-          <BackSection eyebrow="Dossier législatif">
-            <p style={{
-              fontFamily: "var(--font-sans)", fontSize: 12, lineHeight: 1.55,
-              color: "var(--ink-2)", margin: 0,
-            }}>{scrutin.dossier_titre}</p>
-          </BackSection>
-
+          {/* Footer: back hint + AN link */}
           <div style={{
             marginTop: "auto",
             paddingTop: 12, borderTop: "1px solid var(--line)",
@@ -179,7 +172,7 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
               ? <a href={scrutin.url_an_officielle}
                   target="_blank" rel="noopener noreferrer"
                   style={{ color: "var(--accent)", textDecoration: "none" }}>
-                  Voir sur AN ↗
+                  Voir le texte sur AN ↗
                 </a>
               : <span style={{ color: "var(--accent)" }}>donnée démo</span>}
           </div>
@@ -189,15 +182,3 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
   );
 }
 
-function BackSection({ eyebrow, children }: { eyebrow: string; children: React.ReactNode }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      <span style={{
-        fontFamily: "var(--font-mono)", fontSize: 9,
-        letterSpacing: "0.12em", textTransform: "uppercase",
-        color: "var(--ink-3)", fontWeight: 500,
-      }}>{eyebrow}</span>
-      {children}
-    </div>
-  );
-}
