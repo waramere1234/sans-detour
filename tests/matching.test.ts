@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { computeAlignment, alignmentScore } from "../src/lib/matching";
-import type { Scrutin, SessionVote } from "../src/types";
+import {
+  computeAlignment, alignmentScore,
+  computeAlignmentPersonnalites, alignmentScorePersonnalite,
+} from "../src/lib/matching";
+import type { Scrutin, SessionVote, PersonnaliteVote } from "../src/types";
 
 function mkScrutin(id: string, positions: Partial<Record<string, "pour" | "contre" | "abstention" | "divisé">>): Scrutin {
   return {
@@ -87,5 +90,60 @@ describe("computeAlignment (full session)", () => {
     const result = computeAlignment(scrutins, votes);
     expect(result.LFI.counted).toBe(1);
     expect(result.RN.counted).toBe(1);
+  });
+});
+
+describe("alignmentScorePersonnalite (single scrutin)", () => {
+  it("matches the group formula on actual votes", () => {
+    expect(alignmentScorePersonnalite("pour", "pour")).toBe(1);
+    expect(alignmentScorePersonnalite("pour", "contre")).toBe(0);
+    expect(alignmentScorePersonnalite("pour", "abstention")).toBe(0.5);
+  });
+  it("returns null when the personality was absent or not yet a député", () => {
+    expect(alignmentScorePersonnalite("pour", "absent")).toBeNull();
+    expect(alignmentScorePersonnalite("pour", "non_dispo")).toBeNull();
+  });
+  it("returns null when the user skipped", () => {
+    expect(alignmentScorePersonnalite("skip", "pour")).toBeNull();
+  });
+});
+
+describe("computeAlignmentPersonnalites (full session)", () => {
+  function mkScrutinPers(id: string, votes: Partial<Record<string, PersonnaliteVote>>): Scrutin {
+    return {
+      ...mkScrutin(id, { LFI: "pour", RN: "contre" }),
+      votes_personnalites: votes as any,
+    };
+  }
+  it("returns 0 counted when no scrutin has personnalité data", () => {
+    const result = computeAlignmentPersonnalites(
+      [mkScrutin("s1", { LFI: "pour" })],
+      [{ scrutin_id: "s1", choice: "pour", voted_at: 1 }],
+    );
+    expect(result.le_pen.counted).toBe(0);
+  });
+  it("computes alignment and tracks absent / non_dispo exclusions", () => {
+    const scrutins: Scrutin[] = [
+      mkScrutinPers("s1", { le_pen: "pour",       bardella: "non_dispo" }),
+      mkScrutinPers("s2", { le_pen: "abstention", bardella: "absent"   }),
+      mkScrutinPers("s3", { le_pen: "contre",     bardella: "pour"     }),
+    ];
+    const votes: SessionVote[] = [
+      { scrutin_id: "s1", choice: "pour", voted_at: 1 },
+      { scrutin_id: "s2", choice: "pour", voted_at: 2 },
+      { scrutin_id: "s3", choice: "pour", voted_at: 3 },
+    ];
+    const r = computeAlignmentPersonnalites(scrutins, votes);
+    // Le Pen: s1=+1, s2=+0.5, s3=0 → 1.5/3 = 50%
+    expect(r.le_pen.pct).toBe(50);
+    expect(r.le_pen.counted).toBe(3);
+    expect(r.le_pen.perfect).toBe(1);
+    expect(r.le_pen.partial).toBe(1);
+    expect(r.le_pen.conflict).toBe(1);
+    // Bardella: s1=non_dispo, s2=absent, s3=+1 → 1/1 = 100%
+    expect(r.bardella.pct).toBe(100);
+    expect(r.bardella.counted).toBe(1);
+    expect(r.bardella.non_dispo_excluded).toBe(1);
+    expect(r.bardella.absent_excluded).toBe(1);
   });
 });

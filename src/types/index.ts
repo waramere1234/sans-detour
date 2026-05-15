@@ -15,6 +15,23 @@ export const THEMES = [
 ] as const;
 export type Theme = typeof THEMES[number];
 
+/** Codes for the 10 presidentially-relevant personalities of the 17e
+ *  legislature whose individual votes we extract from the AN nominative
+ *  vote breakdown. Each code maps to a député in `PERSONNALITES`
+ *  (src/lib/personnalites.ts). */
+export const PERSONNALITE_CODES = [
+  "le_pen", "bardella", "faure", "tondelier",
+  "wauquiez", "attal", "darmanin", "ciotti",
+  "bompard", "panot",
+] as const;
+export type PersonnaliteCode = typeof PERSONNALITE_CODES[number];
+
+/** Vote of a single named personality on a single scrutin. Adds "absent"
+ *  (was on the AN roster that day, didn't vote) and "non_dispo" (wasn't a
+ *  député at all on that date — e.g. Bardella after his July 2024 resignation)
+ *  on top of the group-level positions. */
+export type PersonnaliteVote = "pour" | "contre" | "abstention" | "absent" | "non_dispo";
+
 /** Position taken by a parliamentary group on a single scrutin. */
 export type GroupPosition = "pour" | "contre" | "abstention" | "divisé";
 
@@ -48,6 +65,11 @@ export interface Scrutin {
                                  // the titre_pedago (migration 0004).
   theme?: Theme;                 // thematic bucket used by the deck composer
                                  // to enforce diversity (migration 0005).
+  votes_personnalites?: Partial<Record<PersonnaliteCode, PersonnaliteVote>>;
+                                 // individual votes of the 10 indexed
+                                 // personalities (migration 0006). Partial
+                                 // because some personalities may not be
+                                 // députés at a given date (non_dispo).
   position_par_groupe: Record<GroupCode, GroupPosition>;
   votes_bruts: Record<GroupCode, GroupVoteBreakdown>;
   url_an_officielle: string;
@@ -92,6 +114,21 @@ export interface GroupAlignment {
   partial: number;             // pour/abstention or contre/abstention
   conflict: number;            // pour/contre
   divided_excluded: number;    // scrutins where group was "divisé" (not counted)
+}
+
+/** Per-personality alignment result. Same shape as GroupAlignment with two
+ *  extra exclusion counters: scrutins where the personality wasn't a député
+ *  yet/anymore (non_dispo) or didn't vote (absent), which are dropped from
+ *  the denominator so the percentage stays meaningful on a small base. */
+export interface PersonnaliteAlignment {
+  personnalite: PersonnaliteCode;
+  pct: number;
+  counted: number;             // scrutins where the personality voted and user not "skip"
+  perfect: number;
+  partial: number;
+  conflict: number;
+  absent_excluded: number;     // personality didn't vote (non-votant)
+  non_dispo_excluded: number;  // personality not a député at that date
 }
 
 /** Freshness metadata of the database. */

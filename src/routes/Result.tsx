@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchScrutins } from "../lib/scrutins";
-import { computeAlignment, rankByAlignment } from "../lib/matching";
+import {
+  computeAlignment, rankByAlignment,
+  computeAlignmentPersonnalites, rankPersonnalitesByAlignment,
+} from "../lib/matching";
 import { loadSession, resetSession } from "../lib/session";
 import { PartyRow } from "../components/PartyRow";
+import { PersonnaliteRow } from "../components/PersonnaliteRow";
 import { AuditTrail } from "../components/AuditTrail";
 import { getParty, getPartyColorVar } from "../lib/parties";
 import { track } from "../lib/analytics";
@@ -24,6 +28,17 @@ export default function Result() {
   );
   const ranked = rankByAlignment(alignments);
   const top = ranked[0];
+
+  const personnaliteAlignments = useMemo(
+    () => computeAlignmentPersonnalites(pool, session?.votes ?? []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pool, session],
+  );
+  const rankedPersonnalites = rankPersonnalitesByAlignment(personnaliteAlignments);
+  // Hide personalities the user has zero comparable data on (e.g. when the
+  // session's 20 scrutins all predate Bardella's mandate).
+  const personnalitesWithData = rankedPersonnalites.filter((p) => p.counted > 0);
+  const [showPersonnalites, setShowPersonnalites] = useState(false);
   const skips = (session?.votes.filter(v => v.choice === "skip").length) ?? 0;
   const total = session?.votes.length ?? 0;
   const TARGET = 20;
@@ -119,6 +134,52 @@ export default function Result() {
         ))}
       </div>
 
+      {personnalitesWithData.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <button
+            type="button"
+            onClick={() => {
+              const next = !showPersonnalites;
+              setShowPersonnalites(next);
+              if (next) track("personnalites_revealed");
+            }}
+            style={togglePersonnalitesBtn(showPersonnalites)}
+            aria-expanded={showPersonnalites}
+          >
+            <span>{showPersonnalites ? "▾" : "▸"} Voir les personnalités</span>
+            <span style={{
+              fontFamily: "var(--font-mono)", fontSize: 10.5,
+              color: "var(--ink-3)", letterSpacing: "0.04em",
+            }}>{personnalitesWithData.length} indexées</span>
+          </button>
+
+          {showPersonnalites && (
+            <div>
+              <p style={{
+                margin: "0 0 6px",
+                fontFamily: "var(--font-mono)", fontSize: 10.5,
+                color: "var(--ink-3)", letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}>
+                Alignement avec figures du mandat
+              </p>
+              {personnalitesWithData.map((p) => (
+                <PersonnaliteRow key={p.personnalite} alignment={p} />
+              ))}
+              <p style={{
+                margin: "10px 0 0",
+                fontFamily: "var(--font-mono)", fontSize: 10,
+                color: "var(--ink-3)", lineHeight: 1.5,
+              }}>
+                Basé uniquement sur leurs votes effectifs à l'Assemblée Nationale.
+                Mélenchon, Philippe et Glucksmann ne siègent pas dans la 17ᵉ législature
+                et ne peuvent donc pas être mesurés ici.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {isPartial && (
           <button type="button"
@@ -159,5 +220,19 @@ function btnTertiary(): CSSProperties {
     padding: "10px 16px",
     fontFamily: "var(--font-mono)", fontSize: 12, cursor: "pointer",
     letterSpacing: "0.04em",
+  };
+}
+function togglePersonnalitesBtn(open: boolean): CSSProperties {
+  return {
+    background: open ? "var(--bg-2)" : "transparent",
+    color: "var(--ink)",
+    border: `1px solid var(--line)`,
+    borderRadius: 4,
+    padding: "10px 14px",
+    fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 500,
+    cursor: "pointer",
+    display: "flex", justifyContent: "space-between", alignItems: "center",
+    gap: 12,
+    letterSpacing: "-0.005em",
   };
 }
