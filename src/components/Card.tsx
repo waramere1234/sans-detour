@@ -419,9 +419,13 @@ function stripCitations(text: string): string {
 /** Strip trailing "Vote : X oui, Y non" / "Résultat : ..." fragments the LLM
  *  sometimes appends. The vote outcome is computed elsewhere; including it
  *  in the explanation conflates "what the law does" with "what happened at
- *  the vote", which spoils the user's own vote and is off-topic. */
+ *  the vote", which spoils the user's own vote and is off-topic.
+ *
+ *  Matches ONLY the colon form (`Vote :`, `Résultat :`) because that's the
+ *  LLM's appendage style. Matching `.` would eat ordinary French usage like
+ *  "passer un texte sans vote." which truncates the contexte mid-sentence. */
 function stripVoteResult(text: string): string {
-  const m = text.match(/\s+(Vote|Résultat)\s*[:.]/i);
+  const m = text.match(/\s+(Vote|Résultat)\s*:/i);
   if (!m || m.index === undefined) return text;
   return text.slice(0, m.index).trim();
 }
