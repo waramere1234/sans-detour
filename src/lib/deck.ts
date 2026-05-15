@@ -32,23 +32,53 @@ function shuffle<T>(arr: T[], rng: () => number): T[] {
   return a;
 }
 
-/** Compose a deck of `size` scrutins from `pool`, capping per dossier and
- * skipping any scrutin already in `excludeIds` (already seen this session). */
+/** Compose a deck of `size` scrutins from `pool` while:
+ *  - capping at `capPerDossier` per legislative dossier (V1 behavior),
+ *  - excluding already-seen ids,
+ *  - balancing themes via a round-robin walk: one scrutin per theme per pass,
+ *    so a 20-card session naturally spreads across the available themes
+ *    instead of clustering on whatever's most numerous in the pool.
+ *
+ *  Themes are taken from `scrutin.theme`; scrutins without a theme fall into
+ *  an "autre" bucket so older rows (pre-migration 0005) still flow through. */
 export function composeDeck(pool: Scrutin[], opts: ComposeOptions): Scrutin[] {
   const seed = opts.seed ?? Math.floor(Math.random() * 2 ** 31);
   const rng = mulberry32(seed);
-  const shuffled = shuffle(pool, rng);
   const counts = new Map<string, number>(opts.seenDossierCounts ?? []);
   const exclude = opts.excludeIds ?? new Set<string>();
-  const deck: Scrutin[] = [];
 
-  for (const s of shuffled) {
-    if (deck.length >= opts.size) break;
+  // Bucket the pool by theme, shuffled within each bucket so the round-robin
+  // walk picks a different representative every session.
+  const buckets = new Map<string, Scrutin[]>();
+  for (const s of pool) {
     if (exclude.has(s.id)) continue;
-    const c = counts.get(s.dossier_id) ?? 0;
-    if (c >= opts.capPerDossier) continue;
-    deck.push(s);
-    counts.set(s.dossier_id, c + 1);
+    const t = s.theme ?? "autre";
+    const b = buckets.get(t);
+    if (b) b.push(s); else buckets.set(t, [s]);
+  }
+  for (const [k, v] of buckets) buckets.set(k, shuffle(v, rng));
+
+  // Theme order is itself randomized per session so no single theme is
+  // systematically favored when the pool is unbalanced.
+  const themeOrder = shuffle([...buckets.keys()], rng);
+
+  const deck: Scrutin[] = [];
+  let pickedThisPass = true;
+  while (deck.length < opts.size && pickedThisPass) {
+    pickedThisPass = false;
+    for (const theme of themeOrder) {
+      if (deck.length >= opts.size) break;
+      const bucket = buckets.get(theme)!;
+      while (bucket.length > 0) {
+        const s = bucket.shift()!;
+        const c = counts.get(s.dossier_id) ?? 0;
+        if (c >= opts.capPerDossier) continue;
+        deck.push(s);
+        counts.set(s.dossier_id, c + 1);
+        pickedThisPass = true;
+        break;
+      }
+    }
   }
 
   return deck;

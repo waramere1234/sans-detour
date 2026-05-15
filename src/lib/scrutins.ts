@@ -10,7 +10,6 @@ export async function fetchScrutins(): Promise<Scrutin[]> {
   const { data, error } = await supabase
     .from("scrutins")
     .select("*")
-    .eq("est_solennel", true)
     .order("date", { ascending: false });
   if (error) throw error;
   return (data ?? []) as Scrutin[];
@@ -33,8 +32,7 @@ export async function fetchFreshness(): Promise<FreshnessInfo> {
   const lastSync = data?.[0]?.ingere_le ?? new Date().toISOString();
   const { count } = await supabase
     .from("scrutins")
-    .select("*", { count: "exact", head: true })
-    .eq("est_solennel", true);
+    .select("*", { count: "exact", head: true });
   return {
     total_scrutins: count ?? 0,
     last_sync_at: lastSync,

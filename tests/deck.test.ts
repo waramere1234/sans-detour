@@ -1,12 +1,13 @@
 import { describe, it, expect } from "vitest";
 import { composeDeck, drawNext } from "../src/lib/deck";
-import type { Scrutin } from "../src/types";
+import type { Scrutin, Theme } from "../src/types";
 
-function mk(id: string, dossier: string): Scrutin {
+function mk(id: string, dossier: string, theme?: Theme): Scrutin {
   return {
     id, numero: 0, date: "2024-01-01",
     dossier_id: dossier, dossier_titre: dossier,
     chapeau: "X", titre_brut: "...", titre_pedago: "...",
+    theme,
     position_par_groupe: {} as any, votes_bruts: {} as any,
     url_an_officielle: "", est_solennel: true, pedago_relu: true,
   };
@@ -73,6 +74,33 @@ describe("composeDeck (PRD § 9.3)", () => {
     for (const s of deck) {
       expect(s.dossier_id).not.toBe("d0");
     }
+  });
+
+  it("spreads themes via round-robin when the pool is heavily skewed", () => {
+    // 40 cards on "retraites", 10 on "écologie", 10 on "immigration", 10 on "santé".
+    // Without theme balancing a random sampling of 20 would land mostly on retraites;
+    // the round-robin should pull from each bucket before piling up.
+    const pool: Scrutin[] = [
+      ...Array.from({ length: 40 }, (_, i) => mk(`r${i}`, `dR${i}`, "retraites")),
+      ...Array.from({ length: 10 }, (_, i) => mk(`e${i}`, `dE${i}`, "écologie")),
+      ...Array.from({ length: 10 }, (_, i) => mk(`m${i}`, `dM${i}`, "immigration")),
+      ...Array.from({ length: 10 }, (_, i) => mk(`s${i}`, `dS${i}`, "santé")),
+    ];
+    const deck = composeDeck(pool, { size: 20, capPerDossier: 2, seed: 42 });
+    const byTheme = new Map<string, number>();
+    for (const s of deck) {
+      const t = s.theme ?? "autre";
+      byTheme.set(t, (byTheme.get(t) ?? 0) + 1);
+    }
+    // All 4 themes represented, and no theme dominates more than half the deck.
+    expect(byTheme.size).toBe(4);
+    for (const n of byTheme.values()) expect(n).toBeLessThanOrEqual(10);
+  });
+
+  it("works when no scrutin has a theme (pre-migration rows fall in 'autre')", () => {
+    const pool = Array.from({ length: 30 }, (_, i) => mk(`s${i}`, `d${i % 15}`));
+    const deck = composeDeck(pool, { size: 20, capPerDossier: 2, seed: 11 });
+    expect(deck).toHaveLength(20);
   });
 });
 

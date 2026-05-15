@@ -20,7 +20,8 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
 import { computeGroupPosition } from "../src/lib/compute-positions";
-import type { GroupCode, GroupPosition, GroupVoteBreakdown } from "../src/types";
+import { THEMES } from "../src/types";
+import type { GroupCode, GroupPosition, GroupVoteBreakdown, Theme } from "../src/types";
 
 // ───────────────────────────────────────────────────────────────── config
 
@@ -140,11 +141,29 @@ interface ParsedScrutin {
   contexte: string;
   analyse_loi?: ScrutinAnalyse;
   points_cles?: string[];
+  theme?: Theme;
   position_par_groupe: Record<GroupCode, GroupPosition>;
   votes_bruts: Record<GroupCode, GroupVoteBreakdown>;
   est_solennel: boolean;
   url_an_officielle: string;
   pedago_relu: boolean;
+}
+
+// ───────────────────────────── corpus filter (V2: SPS + SOR/MOC selected)
+
+/** Keep a scrutin if it's a solennel (SPS) OR a non-procedural ordinary vote:
+ *  final vote on a whole text ("sur l'ensemble"), a motion (censure / rejet /
+ *  renvoi / référendaire), or a proposition de résolution. Other ordinary
+ *  scrutins (amendment-level, sub-clause votes) are dropped to keep the deck
+ *  legible. */
+function isEligibleScrutin(raw: ANScrutinRaw): boolean {
+  const code = raw.typeVote?.codeTypeVote;
+  if (code === "SPS") return true;
+  const titre = raw.objet?.libelle ?? "";
+  if (/sur l'ensemble/i.test(titre)) return true;
+  if (/\bmotion (de censure|référendaire|de rejet|de renvoi)\b/i.test(titre)) return true;
+  if (/proposition de résolution/i.test(titre)) return true;
+  return false;
 }
 
 function n(s: string | null | undefined): number {
@@ -348,6 +367,24 @@ Exemples :
 ✅ BON pour un budget de la Sécu :
 ["Déficit prévu : 14 milliards € en 2026", "Hausse cotisation employeurs +0,3 point", "Gel pensions retraite jusqu'en juillet"]
 
+═══════════ 6ème CHAMP : THEME (BUCKET POUR DIVERSITÉ DU DECK) ═══════════
+
+Tu classes le scrutin dans EXACTEMENT UNE des catégories suivantes (chaîne exacte, sans accent ni modification) :
+
+- "pouvoir-achat"   → salaires, prix, énergie, logement, aides au revenu
+- "retraites"       → âge, cotisations, pensions, régimes spéciaux
+- "immigration"     → titres de séjour, naturalisation, asile, intégration, AME
+- "sécurité"        → police, justice pénale, terrorisme, renseignement, prisons
+- "écologie"        → climat, biodiversité, agriculture, énergies, transports
+- "santé"           → hôpital, médecine, médicaments, Sécu (volet soins)
+- "école"           → éducation, université, formation professionnelle
+- "fiscalité"       → impôts, taxes, niches fiscales, budget de l'État
+- "institutions"    → constitution, mode de scrutin, libertés publiques, médias
+- "international"   → diplomatie, défense, Europe, résolutions étrangères
+- "autre"           → seulement si rien ne colle (à éviter au maximum)
+
+Règle : choisis la catégorie DOMINANTE. Une loi sur l'âge de la retraite ET son financement → "retraites" (plus saillant que "fiscalité"). Une motion de censure sur la politique migratoire → "immigration" (sujet de fond, pas "institutions").
+
 ═══════════ FORMAT DE SORTIE ═══════════
 
 Tu réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans texte avant ou après :
@@ -355,6 +392,7 @@ Tu réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans texte avan
   "chapeau": "...",
   "titre_pedago": "...",
   "contexte": "...",
+  "theme": "...",
   "points_cles": ["...", "...", "..."],
   "analyse_loi": {
     "mesures_principales": [...],
@@ -372,6 +410,7 @@ interface Summary {
   contexte: string;
   analyse_loi?: ScrutinAnalyse;
   points_cles?: string[];
+  theme?: Theme;
 }
 
 interface ScrutinAnalyse {
@@ -462,7 +501,16 @@ function extractSummaryFromMessage(message: AnthropicResponse): Summary {
     parsed.analyse_loi = normalizeAnalyse(parsed.analyse_loi);
   }
   parsed.points_cles = normalizePointsCles(parsed.points_cles);
+  parsed.theme = normalizeTheme(parsed.theme);
   return parsed;
+}
+
+// Validate against the THEMES enum; anything off-list collapses to "autre" so
+// a misbehaving model can never inject an arbitrary bucket label into the DB.
+function normalizeTheme(v: unknown): Theme | undefined {
+  if (typeof v !== "string") return undefined;
+  const lower = v.trim().toLowerCase();
+  return (THEMES as readonly string[]).includes(lower) ? (lower as Theme) : "autre";
 }
 
 // Cap each bullet at 7 words and keep at most 3. Drop empties and trims.
@@ -665,23 +713,26 @@ async function main(): Promise<void> {
   const files = (await fs.readdir(JSON_DIR)).filter(f => f.endsWith(".json"));
   console.log(`◯ Scanning ${files.length} scrutin files…`);
 
-  const allSolennels: Awaited<ReturnType<typeof parseRaw>>[] = [];
+  const allEligible: Awaited<ReturnType<typeof parseRaw>>[] = [];
+  let spsCount = 0;
+  let otherCount = 0;
   for (const f of files) {
     const raw = JSON.parse(await fs.readFile(path.join(JSON_DIR, f), "utf-8"));
     const s = raw.scrutin ?? raw;
-    if (s.typeVote?.codeTypeVote !== "SPS") continue;
-    allSolennels.push(parseRaw(s));
+    if (!isEligibleScrutin(s)) continue;
+    if (s.typeVote?.codeTypeVote === "SPS") spsCount++; else otherCount++;
+    allEligible.push(parseRaw(s));
   }
-  console.log(`◯ Found ${allSolennels.length} scrutins solennels (SPS)`);
+  console.log(`◯ Found ${allEligible.length} eligible scrutins (${spsCount} SPS + ${otherCount} ordinaires/motions/résolutions)`);
 
   // Cost-controlled test mode: INGEST_LIMIT=N processes only the first N
-  // scrutins. Useful to validate prompt/UI changes for ~$0.01 instead of the
-  // full ~$0.30 batch. Drops to "all" when unset or invalid.
+  // scrutins. Useful to validate prompt/UI changes for a few cents instead of
+  // the full batch. Drops to "all" when unset or invalid.
   const limitRaw = process.env.INGEST_LIMIT;
   const limit = limitRaw ? Math.max(1, parseInt(limitRaw, 10) || 0) : undefined;
-  const solennels = limit ? allSolennels.slice(0, limit) : allSolennels;
+  const solennels = limit ? allEligible.slice(0, limit) : allEligible;
   if (limit) {
-    console.log(`⚠ INGEST_LIMIT=${limit} — processing only the first ${solennels.length}/${allSolennels.length} scrutins (test mode)`);
+    console.log(`⚠ INGEST_LIMIT=${limit} — processing only the first ${solennels.length}/${allEligible.length} scrutins (test mode)`);
   }
 
   if (!ANTHROPIC_KEY) {
@@ -697,9 +748,9 @@ async function main(): Promise<void> {
       enriched.push({ ...s, ...fb });
     }
   } else {
-    // LLM path: submit one Batches API job for all 46 scrutins.
+    // LLM path: submit one Batches API job for the whole eligible set.
     // 50% off all tokens, runs server-side concurrently, no rate-limit juggling.
-    // Typical completion: 2-10 min for 46 items.
+    // Typical completion: a few minutes; scales linearly with batch size.
     console.log(`↑ Submitting batch of ${solennels.length} requests (Haiku 4.5 + web_search, 50% off via Batches API)…`);
     const batchId = await submitBatch(solennels as ParsedScrutin[]);
     console.log(`✓ Batch ${batchId} submitted. Polling every 15s…`);
@@ -731,6 +782,7 @@ async function main(): Promise<void> {
   const CHUNK = 100;
   let analyseLoiDropped = false;
   let pointsClesDropped = false;
+  let themeDropped = false;
   for (let i = 0; i < enriched.length; i += CHUNK) {
     let chunk = enriched.slice(i, i + CHUNK);
     if (analyseLoiDropped) {
@@ -738,6 +790,9 @@ async function main(): Promise<void> {
     }
     if (pointsClesDropped) {
       chunk = chunk.map(({ points_cles: _drop, ...rest }) => rest as ParsedScrutin);
+    }
+    if (themeDropped) {
+      chunk = chunk.map(({ theme: _drop, ...rest }) => rest as ParsedScrutin);
     }
     let { error } = await sb.from("scrutins").upsert(chunk);
 
@@ -766,6 +821,17 @@ async function main(): Promise<void> {
       chunk = chunk.map(({ points_cles: _drop, ...rest }) => rest as ParsedScrutin);
       ({ error } = await sb.from("scrutins").upsert(chunk));
     }
+    if (error && error.code === "PGRST204" && /theme/i.test(error.message ?? "")) {
+      console.warn(
+        "⚠ `theme` column missing in DB — migration 0005 not yet applied.\n" +
+        "  Falling back to upsert WITHOUT the theme field so the rest of\n" +
+        "  this run is not lost. Apply supabase/migrations/0005_add_theme.sql\n" +
+        "  then re-run to populate theme.",
+      );
+      themeDropped = true;
+      chunk = chunk.map(({ theme: _drop, ...rest }) => rest as ParsedScrutin);
+      ({ error } = await sb.from("scrutins").upsert(chunk));
+    }
 
     if (error) {
       console.error(`✕ Chunk ${i}-${i + chunk.length} failed:`, error);
@@ -775,8 +841,9 @@ async function main(): Promise<void> {
   const notes: string[] = [];
   if (analyseLoiDropped) notes.push("analyse_loi dropped — apply migration 0003");
   if (pointsClesDropped) notes.push("points_cles dropped — apply migration 0004");
+  if (themeDropped) notes.push("theme dropped — apply migration 0005");
   const note = notes.length > 0 ? `\n  (${notes.join("; ")} and re-run)` : "";
-  console.log(`✓ Done. ${enriched.length} solennels in scrutins table.${note}`);
+  console.log(`✓ Done. ${enriched.length} scrutins in scrutins table.${note}`);
 }
 
 main().catch(e => {

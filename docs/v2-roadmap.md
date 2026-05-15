@@ -1,11 +1,52 @@
 # Sans Détour — V2 Roadmap
 
-> Status: **idéation**. À démarrer une fois V1 en prod et premières métriques d'usage.
-> Date d'enregistrement : 2026-05-11.
+> Status: **en cours**. Focus 2027 (présidentielle). Les chantiers sont
+> additifs : on garde le principe "swipe sur votes réels", on n'ajoute pas
+> de programmes ni de déclarations.
 
 ---
 
-## Feature phare V2 : Pré-vote sur dossiers à venir
+## Feature 1 — Corpus élargi + thématisation ✅ (code prêt, ingestion à lancer)
+
+**Objectif** : passer de 46 SPS à ~150 votes en gardant le principe "1 carte = 1 vote réel à l'AN".
+
+**Périmètre du filtre d'ingestion** :
+- Tous les scrutins solennels (SPS) — déjà inclus en V1.
+- Scrutins ordinaires (SOR) dont le titre contient "sur l'ensemble" → vote final d'une loi.
+- Motions : de censure, de rejet, de renvoi, référendaires.
+- Propositions de résolution (Palestine, Ukraine, Mercosur, etc.).
+- **Exclus pour l'instant** : amendements (trop bruyants à filtrer automatiquement, à curer en V2.1).
+
+**Thématisation** : nouvelle colonne `theme` (migration `0005_add_theme.sql`), valeurs dans `THEMES` (`src/types/index.ts`) :
+> pouvoir-achat · retraites · immigration · sécurité · écologie · santé · école · fiscalité · institutions · international · autre
+
+Tagué par le même LLM lors de l'ingestion (1 champ de plus dans le JSON, coût additionnel quasi-nul). Validation post-LLM dans `normalizeTheme` : tout label hors enum collapse vers `autre`.
+
+**Composition de deck** (`src/lib/deck.ts`) : round-robin par thème — l'ordre des thèmes est lui-même mélangé par session, et on pioche un scrutin de chaque thème avant de revenir au premier. Garantit la diversité sans hard-cap. Le cap par dossier de V1 reste actif.
+
+**Front** : `fetchScrutins` ne filtre plus sur `est_solennel = true` (le filtrage qualité se fait à l'ingestion). Aucun changement d'UI nécessaire à ce stade.
+
+**À faire pour activer** :
+1. Appliquer la migration `0005_add_theme.sql` sur Supabase.
+2. Lancer `npm run ingest:an` (coût Anthropic ~$1-1.50 pour ~150 votes en Batches API).
+
+---
+
+## Feature 2 — Personnalités présidentielles (à venir)
+
+Indexer les votes individuels des ~10 figures connues (Mélenchon, Le Pen, Bardella, Faure, Tondelier, Wauquiez, Attal, Darmanin, etc.) + toggle "Voir les personnalités" en Result. Reste basé uniquement sur les votes effectifs.
+
+## Feature 3 — Ton député (à venir)
+
+Champ code postal optionnel sur la cover → ligne d'alignement avec son député local. Quick win qui exploite l'indexation faite en feature 2.
+
+---
+
+## Idée parking — Pré-vote sur dossiers à venir
+
+> Conservée en réserve : intéressante mais hors scope du sprint 2027 actuel
+> (focus features 1-3 ci-dessus). À reprendre après la présidentielle ou si
+> les métriques V1 montrent une forte demande de "boucle de retour".
 
 ### Idée
 

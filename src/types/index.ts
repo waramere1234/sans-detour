@@ -7,6 +7,14 @@ export const GROUP_CODES = [
 ] as const;
 export type GroupCode = typeof GROUP_CODES[number];
 
+/** Thematic buckets used by the deck composer to enforce diversity (V2).
+ *  "autre" is the catch-all for votes that don't fit a major 2027 theme. */
+export const THEMES = [
+  "pouvoir-achat", "retraites", "immigration", "sécurité", "écologie",
+  "santé", "école", "fiscalité", "institutions", "international", "autre",
+] as const;
+export type Theme = typeof THEMES[number];
+
 /** Position taken by a parliamentary group on a single scrutin. */
 export type GroupPosition = "pour" | "contre" | "abstention" | "divisé";
 
@@ -38,6 +46,8 @@ export interface Scrutin {
   points_cles?: string[];        // exactly 3 short factual bullets, 7 words
                                  // max each, shown on the card front below
                                  // the titre_pedago (migration 0004).
+  theme?: Theme;                 // thematic bucket used by the deck composer
+                                 // to enforce diversity (migration 0005).
   position_par_groupe: Record<GroupCode, GroupPosition>;
   votes_bruts: Record<GroupCode, GroupVoteBreakdown>;
   url_an_officielle: string;
