@@ -58,9 +58,55 @@ Les compteurs des trois caps sont resume-aware via `seenDossierCounts` et `seenC
 
 ---
 
-## Feature 2 — Personnalités présidentielles (à venir)
+## Feature 2 — Personnalités présidentielles ✅ (livré et en prod)
 
-Indexer les votes individuels des ~10 figures connues (Mélenchon, Le Pen, Bardella, Faure, Tondelier, Wauquiez, Attal, Darmanin, etc.) + toggle "Voir les personnalités" en Result. Reste basé uniquement sur les votes effectifs.
+**Objectif atteint** : exposer un alignement utilisateur ↔ personnalité connue, en plus du V1 utilisateur ↔ groupe parlementaire. Toujours sur des votes effectifs uniquement.
+
+### Personnalités indexées (8)
+
+| # | Personnalité | acteurRef | Groupe | Couverture (sur 100 scrutins) |
+|---|---|---|---|---:|
+| 1 | Mathilde Panot | PA720892 | LFI | 78 |
+| 2 | Manuel Bompard | PA793444 | LFI | 70 |
+| 3 | Cyrielle Chatelain | PA794008 | ECO | 67 |
+| 4 | Marine Le Pen | PA720614 | RN | 58 |
+| 5 | Éric Ciotti | PA330240 | UDR | 56 |
+| 6 | Gabriel Attal | PA722190 | EPR | 52 |
+| 7 | Olivier Faure | PA609332 | SOC | 50 |
+| 8 | Laurent Wauquiez | PA267285 | DR | 50 |
+
+Distribution : 2 LFI · 1 ECO · 1 SOC · 1 EPR · 1 DR · 1 UDR · 1 RN.
+
+### Exclus par contrainte structurelle
+
+- **Mélenchon / Philippe / Glucksmann** : ne siègent pas dans la 17ᵉ (national, mairie, eurodéputé).
+- **Bardella** : élu député en 2024, démissionné avant siège (mandat européen conservé). 0 vote AN.
+- **Tondelier** : secrétaire nationale EELV + conseillère régionale, jamais députée. ECO représenté par Chatelain.
+- **Darmanin** : ministre sur quasi-totalité du mandat (suppléant siège), 3 votes effectifs uniquement — trop fin pour produire un signal.
+
+### Schema
+
+- Migration `0006_add_votes_personnalites.sql` ajoute `votes_personnalites jsonb` à `scrutins`.
+- Format : `{ "le_pen": "pour", "faure": "contre", "chatelain": "abstention", "attal": "non_dispo", ... }`.
+- Valeurs possibles : `pour` · `contre` · `abstention` · `absent` (sur le mandat mais n'a pas voté) · `non_dispo` (pas député à cette date).
+
+### Ingestion
+
+- `scripts/ingest-personnalites.ts` : lit le cache local des scrutins, scanne `decompteNominatif.pours/contres/abstentions/nonVotants` pour les 8 acteurRefs hardcodés, patche les 100 lignes via `.update().eq()` par batch de 20 (pas `.upsert()` — INSERT sans NOT NULL violation).
+- Coût Anthropic : 0$.
+
+### Algorithme
+
+- `matching.ts` : `computeAlignmentPersonnalites` + `rankPersonnalitesByAlignment`. Même formule que les groupes (pour=1, contre=-1, abstention=0), mais avec deux compteurs d'exclusion (`absent_excluded`, `non_dispo_excluded`) — la non-disponibilité n'écrase pas le %.
+
+### UI
+
+- `src/components/PersonnaliteRow.tsx` : ligne avec dot de couleur parti, barre de progression, % + nombre comparable. Auto-dim à `counted < 3` quand l'échantillon est trop fin pour le user.
+- `src/routes/Result.tsx` : toggle "Voir les personnalités" sous les groupes, dépliable. Note de transparence sur les exclus.
+
+## Feature 3 — Ton député (à venir)
+
+Champ code postal optionnel sur la cover → ligne d'alignement avec son député local. Quick win qui exploite l'infra individual-votes déjà en place pour la P1.
 
 ## Feature 3 — Ton député (à venir)
 
