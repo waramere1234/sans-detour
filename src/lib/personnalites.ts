@@ -80,17 +80,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     acteur_ref: "PA722190",
     presidentiable: true,
   },
-  darmanin: {
-    code: "darmanin",
-    display_name: "Gérald Darmanin",
-    short_name: "Darmanin",
-    group_code: "EPR",
-    prenom: "Gérald",
-    nom: "Darmanin",
-    departement: "Nord",
-    acteur_ref: "PA607846",
-    presidentiable: true,
-  },
   ciotti: {
     code: "ciotti",
     display_name: "Éric Ciotti",

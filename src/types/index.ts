@@ -15,7 +15,7 @@ export const THEMES = [
 ] as const;
 export type Theme = typeof THEMES[number];
 
-/** Codes for the 9 presidentially-relevant personalities of the 17e
+/** Codes for the 8 presidentially-relevant personalities of the 17e
  *  legislature whose individual votes we extract from the AN nominative
  *  vote breakdown. Each code maps to a député in `PERSONNALITES`
  *  (src/lib/personnalites.ts).
@@ -26,10 +26,13 @@ export type Theme = typeof THEMES[number];
  *  - Bardella: elected député in 2024 but resigned before sitting (kept his
  *    European mandate). Zero AN votes.
  *  - Tondelier: EELV national secretary + regional councillor; never député.
- *    ECO is represented by Cyrielle Chatelain (présidente du groupe ECO). */
+ *    ECO is represented by Cyrielle Chatelain (présidente du groupe ECO).
+ *  - Darmanin: Ministre de l'Intérieur then Garde des Sceaux through most
+ *    of the 17e — only 3 effective votes during the Sept-Dec 2024 Barnier
+ *    window. Excluded to keep the personality list informative. */
 export const PERSONNALITE_CODES = [
   "le_pen", "faure", "chatelain", "wauquiez",
-  "attal", "darmanin", "ciotti",
+  "attal", "ciotti",
   "bompard", "panot",
 ] as const;
 export type PersonnaliteCode = typeof PERSONNALITE_CODES[number];

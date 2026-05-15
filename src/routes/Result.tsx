@@ -174,7 +174,8 @@ export default function Result() {
                 Basé uniquement sur leurs votes effectifs à l'Assemblée Nationale.
                 Mélenchon, Philippe, Glucksmann, Tondelier ne siègent pas dans la
                 17ᵉ législature ; Bardella, élu en 2024, a démissionné avant de
-                siéger. Aucun d'eux ne peut être mesuré ici.
+                siéger ; Darmanin est ministre sur la quasi-totalité du mandat
+                (son suppléant vote à sa place). Aucun d'eux n'est mesuré ici.
               </p>
             </div>
           )}
