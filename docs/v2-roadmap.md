@@ -6,29 +6,55 @@
 
 ---
 
-## Feature 1 — Corpus élargi + thématisation ✅ (code prêt, ingestion à lancer)
+## Feature 1 — Corpus élargi + thématisation ✅ (livré et en prod)
 
-**Objectif** : passer de 46 SPS à ~150 votes en gardant le principe "1 carte = 1 vote réel à l'AN".
+**Objectif atteint** : passer de 46 SPS à ~100 votes en gardant le principe "1 carte = 1 vote réel à l'AN".
 
-**Périmètre du filtre d'ingestion** :
-- Tous les scrutins solennels (SPS) — déjà inclus en V1.
-- Scrutins ordinaires (SOR) dont le titre contient "sur l'ensemble" → vote final d'une loi.
-- Motions : de censure, de rejet, de renvoi, référendaires.
-- Propositions de résolution (Palestine, Ukraine, Mercosur, etc.).
-- **Exclus pour l'instant** : amendements (trop bruyants à filtrer automatiquement, à curer en V2.1).
+### Filtre d'ingestion final (`scripts/ingest-an.ts` · `isEligibleScrutin`)
 
-**Thématisation** : nouvelle colonne `theme` (migration `0005_add_theme.sql`), valeurs dans `THEMES` (`src/types/index.ts`) :
+**Inclus** :
+- Tous les scrutins solennels (SPS) qui ne sont pas des amendements.
+- Scrutins ordinaires dont le titre contient "sur l'ensemble" → vote final d'une loi.
+- **Motions de censure** et **motions référendaires** (signal politique fort, rares).
+- Propositions de résolution (Palestine, Ukraine, Mercosur, etc.) — hors amendements.
+
+**Exclus** :
+- Tout titre contenant `amendement` ou `à l'article` (sous-clauses, trop bruyantes à présenter).
+- **Motions de rejet préalable et de renvoi en commission** (procédurales — discriminent "majorité vs opposition" plutôt que gauche/droite).
+
+### Thématisation
+
+Colonne `theme` (migration `0005_add_theme.sql`), valeurs dans `THEMES` (`src/types/index.ts`) :
 > pouvoir-achat · retraites · immigration · sécurité · écologie · santé · école · fiscalité · institutions · international · autre
 
-Tagué par le même LLM lors de l'ingestion (1 champ de plus dans le JSON, coût additionnel quasi-nul). Validation post-LLM dans `normalizeTheme` : tout label hors enum collapse vers `autre`.
+Tagué par le même LLM lors de l'ingestion (1 champ de plus dans le JSON). Validation post-LLM dans `normalizeTheme` : tout label hors enum collapse vers `autre`.
 
-**Composition de deck** (`src/lib/deck.ts`) : round-robin par thème — l'ordre des thèmes est lui-même mélangé par session, et on pioche un scrutin de chaque thème avant de revenir au premier. Garantit la diversité sans hard-cap. Le cap par dossier de V1 reste actif.
+### Composition de deck (`src/lib/deck.ts`)
 
-**Front** : `fetchScrutins` ne filtre plus sur `est_solennel = true` (le filtrage qualité se fait à l'ingestion). Aucun changement d'UI nécessaire à ce stade.
+Trois caps cumulatifs sur le tirage de 20 cartes :
+1. **Round-robin par thème** — l'ordre des thèmes est mélangé par session, on pioche un scrutin de chaque thème avant de revenir au premier.
+2. **`capPerDossier = 2`** (V1) — max 2 cartes par dossier législatif.
+3. **`capPerChapeauPrefix = 2`** (V2) — max 2 cartes partageant le préfixe de chapeau (le segment avant " · "). Catche les clusters style UKRAINE / MAYOTTE / MOTION CENSURE où plusieurs scrutins distincts portent sur le même sujet politique mais ont des `dossier_id` STANDALONE différents.
 
-**À faire pour activer** :
-1. Appliquer la migration `0005_add_theme.sql` sur Supabase.
-2. Lancer `npm run ingest:an` (coût Anthropic ~$1-1.50 pour ~150 votes en Batches API).
+Les compteurs des trois caps sont resume-aware via `seenDossierCounts` et `seenChapeauPrefixCounts` — un reload mi-session ne casse pas la contrainte.
+
+### Front (`src/lib/scrutins.ts`)
+
+`fetchScrutins` filtre désormais sur **`points_cles IS NOT NULL`** : exclut les ~8% de rows en fallback (LLM call échoué, pas de contexte, pas d'analyse) qui ne sont pas votables. Le filtre `est_solennel = true` a été retiré (le filtrage qualité est à l'ingestion).
+
+### Outils annexes
+
+- `scripts/resume-ingest.ts` : récupération d'un batch déjà payé chez Anthropic en cas d'échec d'upsert. Re-parse la cache AN locale, applique le filtre courant, merge avec les summaries existantes, upsert + delete des rows désormais inéligibles. Coût : 0$ Anthropic.
+
+### État Supabase post-ingestion (mai 2026)
+
+- **100 scrutins** en base (post-resserrage du filtre), dont **92 votables** (avec points_cles) — les 8 fallback sont en DB mais exclus du front.
+- Distribution thématique : `institutions` 27% · `sécurité` 15% · `international` 13% · `santé` 12% · `fiscalité` 7% · `écologie` 5% · `pouvoir-achat` 3% · `autre` 8% · `retraites` 1% · `immigration` 1% · `école` 0%.
+- **Limite structurelle** : retraites/immigration/école sous-représentés. C'est la réalité de la 17ᵉ législature (dissolutions, gouvernements courts → peu de lois finalisées sur ces sujets). Non corrigible sans rompre le principe "vote réel".
+
+### Reste à faire (cosmétique, non bloquant)
+
+- ~7 chapeaux mal formés ("LA MOTION DE…", "L'ARTICLE UNIQUE DE…", "PROJET DE LOI") — 3 options : laisser / patcher SQL / re-ingestion avec prompt renforcé.
 
 ---
 
