@@ -125,12 +125,16 @@ function parseRaw(raw: ANScrutinRaw): ParsedRaw {
   };
 }
 
+// MUST stay in sync with scripts/ingest-an.ts isEligibleScrutin.
 function isEligibleScrutin(raw: ANScrutinRaw): boolean {
   const code = raw.typeVote?.codeTypeVote;
-  if (code === "SPS") return true;
   const titre = raw.objet?.libelle ?? "";
+  if (/\bamendements?\b/i.test(titre)) return false;
+  if (/\bà l'article\b/i.test(titre)) return false;
+  if (code === "SPS") return true;
   if (/sur l'ensemble/i.test(titre)) return true;
-  if (/\bmotion (de censure|référendaire|de rejet|de renvoi)\b/i.test(titre)) return true;
+  if (/\bmotion de censure\b/i.test(titre)) return true;
+  if (/\bmotion référendaire\b/i.test(titre)) return true;
   if (/proposition de résolution/i.test(titre)) return true;
   return false;
 }
@@ -327,7 +331,26 @@ async function main(): Promise<void> {
     }
     console.log(`  ✓ chunk ${i}-${i + chunk.length}`);
   }
-  console.log(`✓ Done. ${rows.length} rows in scrutins.`);
+
+  // Clean up rows that are no longer eligible (e.g., amendments now excluded
+  // by a tightened filter). Keeps the DB in sync with the current corpus
+  // definition without requiring a manual truncate.
+  const eligibleIds = new Set([...eligible.keys()]);
+  const { data: existing, error: listErr } = await sb.from("scrutins").select("id");
+  if (listErr) {
+    console.warn(`⚠ Could not list existing rows for cleanup: ${listErr.message}`);
+  } else {
+    const stale = (existing ?? []).map((r) => r.id as string).filter((id) => !eligibleIds.has(id));
+    if (stale.length > 0) {
+      console.log(`↓ Deleting ${stale.length} stale rows (no longer eligible under current filter)…`);
+      const { error: delErr } = await sb.from("scrutins").delete().in("id", stale);
+      if (delErr) console.warn(`⚠ Delete failed: ${delErr.message}`);
+    } else {
+      console.log(`✓ No stale rows to delete.`);
+    }
+  }
+
+  console.log(`✓ Done. ${rows.length} rows ingested.`);
   console.log(`  (${ok} with full LLM enrichment, ${err} on fallback summary)`);
 }
 

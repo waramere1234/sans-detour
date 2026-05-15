@@ -7,9 +7,14 @@ export async function fetchScrutins(): Promise<Scrutin[]> {
   if (!supabase) {
     return fixtures as Scrutin[];
   }
+  // Filter on points_cles IS NOT NULL: a card without points_cles came from
+  // the ingest fallback (LLM call failed) and is unvotable — no contexte, no
+  // analyse, just a truncated raw title. Skip them in the deck rather than
+  // ship cards the user can't position on.
   const { data, error } = await supabase
     .from("scrutins")
     .select("*")
+    .not("points_cles", "is", null)
     .order("date", { ascending: false });
   if (error) throw error;
   return (data ?? []) as Scrutin[];
@@ -32,7 +37,8 @@ export async function fetchFreshness(): Promise<FreshnessInfo> {
   const lastSync = data?.[0]?.ingere_le ?? new Date().toISOString();
   const { count } = await supabase
     .from("scrutins")
-    .select("*", { count: "exact", head: true });
+    .select("*", { count: "exact", head: true })
+    .not("points_cles", "is", null);
   return {
     total_scrutins: count ?? 0,
     last_sync_at: lastSync,
