@@ -5,6 +5,11 @@
 // Anthropic batch results, re-applies the (now-fixed) parsing, and upserts
 // to Supabase. No new LLM cost.
 //
+// Unlike the main script, this one re-parses the local AN JSON cache to
+// rebuild a FULL ParsedScrutin row (numero, date, votes, dossier, …) so an
+// upsert that lands as INSERT (when the row never made it to DB on the prior
+// run) doesn't fail on NOT NULL constraints.
+//
 // Usage:
 //   SUPABASE_URL=... \
 //   SUPABASE_SERVICE_ROLE_KEY=... \
@@ -15,6 +20,8 @@
 import { createClient } from "@supabase/supabase-js";
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { computeGroupPosition } from "../src/lib/compute-positions";
+import type { GroupCode, GroupPosition, GroupVoteBreakdown } from "../src/types";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -26,31 +33,109 @@ if (!SUPABASE_URL || !SUPABASE_KEY || !ANTHROPIC_KEY || !BATCH_ID) {
   process.exit(1);
 }
 
-// Reuse the exact same parser the main script now uses, so behavior matches.
-// We dynamically import after the env check so the missing-env error wins.
-const ingest = await import("./ingest-an.ts" as string).catch(() => null);
-// The functions we need are not currently exported. Re-implement minimal
-// pieces here to keep this script standalone — small surface, easy to audit.
-void ingest;
-
 const JSON_DIR = path.join("/tmp/sd-an-cache", "json");
 
-interface ANRaw { uid: string; numero: string; }
+// ──────────────────── AN parsing (mirrors ingest-an.ts intentionally) ────────
 
-async function loadParsedFromCache(): Promise<Map<string, { id: string; numero: number }>> {
-  // We only need the ids/numeros — the rest of ParsedScrutin (votes_bruts,
-  // position_par_groupe, etc.) is already in Supabase from the prior partial
-  // run. The recovery only patches the LLM-derived columns: chapeau,
-  // titre_pedago, contexte, theme, analyse_loi, points_cles.
-  const files = (await fs.readdir(JSON_DIR)).filter((f) => f.endsWith(".json"));
-  const out = new Map<string, { id: string; numero: number }>();
-  for (const f of files) {
-    const raw = JSON.parse(await fs.readFile(path.join(JSON_DIR, f), "utf-8"));
-    const s: ANRaw = raw.scrutin ?? raw;
-    out.set(s.uid, { id: s.uid, numero: parseInt(s.numero, 10) });
-  }
-  return out;
+const GROUP_MAPPING: Record<string, GroupCode | null> = {
+  PO845401: "RN",
+  PO845407: "EPR",
+  PO845413: "LFI",
+  PO845419: "SOC",
+  PO845425: "DR",
+  PO845439: "ECO",
+  PO845454: "DEM",
+  PO845470: "HOR",
+  PO845485: "LIOT",
+  PO845514: "GDR",
+  PO847173: "UDR",
+  PO872880: "UDR",
+  PO840056: null,
+};
+
+interface ANGroupVote {
+  organeRef: string;
+  vote: { decompteVoix: { nonVotants: string; pour: string; contre: string; abstentions: string; nonVotantsVolontaires: string }; };
 }
+interface ANScrutinRaw {
+  uid: string;
+  numero: string;
+  dateScrutin: string;
+  typeVote: { codeTypeVote: string; libelleTypeVote: string };
+  objet: { libelle: string; dossierLegislatif: { libelle: string; dossierRef: string } | null };
+  ventilationVotes: { organe: { groupes: { groupe: ANGroupVote[] } } };
+}
+
+interface ParsedRaw {
+  id: string;
+  numero: number;
+  date: string;
+  dossier_id: string;
+  dossier_titre: string;
+  titre_brut: string;
+  position_par_groupe: Record<GroupCode, GroupPosition>;
+  votes_bruts: Record<GroupCode, GroupVoteBreakdown>;
+  est_solennel: boolean;
+  url_an_officielle: string;
+  pedago_relu: boolean;
+}
+
+function n(s: string | null | undefined): number {
+  return parseInt(s ?? "0", 10) || 0;
+}
+
+function parseRaw(raw: ANScrutinRaw): ParsedRaw {
+  const votes_bruts = {} as Record<GroupCode, GroupVoteBreakdown>;
+  const position_par_groupe = {} as Record<GroupCode, GroupPosition>;
+  for (const g of raw.ventilationVotes?.organe?.groupes?.groupe ?? []) {
+    const code = GROUP_MAPPING[g.organeRef];
+    if (!code) continue;
+    const dv = g.vote.decompteVoix;
+    const breakdown: GroupVoteBreakdown = {
+      pour: n(dv.pour),
+      contre: n(dv.contre),
+      abstention: n(dv.abstentions),
+      absent: n(dv.nonVotants) + n(dv.nonVotantsVolontaires),
+    };
+    if (votes_bruts[code]) {
+      votes_bruts[code] = {
+        pour: votes_bruts[code].pour + breakdown.pour,
+        contre: votes_bruts[code].contre + breakdown.contre,
+        abstention: votes_bruts[code].abstention + breakdown.abstention,
+        absent: votes_bruts[code].absent + breakdown.absent,
+      };
+    } else {
+      votes_bruts[code] = breakdown;
+    }
+    position_par_groupe[code] = computeGroupPosition(votes_bruts[code]);
+  }
+  const dossier = raw.objet?.dossierLegislatif;
+  return {
+    id: raw.uid,
+    numero: parseInt(raw.numero, 10),
+    date: raw.dateScrutin,
+    dossier_id: dossier?.dossierRef ?? `STANDALONE-${raw.uid}`,
+    dossier_titre: dossier?.libelle ?? raw.objet?.libelle?.slice(0, 120) ?? "Sans dossier",
+    titre_brut: raw.objet?.libelle ?? "",
+    position_par_groupe,
+    votes_bruts,
+    est_solennel: raw.typeVote?.codeTypeVote === "SPS",
+    url_an_officielle: `https://www.assemblee-nationale.fr/dyn/17/scrutins/${raw.numero}`,
+    pedago_relu: false,
+  };
+}
+
+function isEligibleScrutin(raw: ANScrutinRaw): boolean {
+  const code = raw.typeVote?.codeTypeVote;
+  if (code === "SPS") return true;
+  const titre = raw.objet?.libelle ?? "";
+  if (/sur l'ensemble/i.test(titre)) return true;
+  if (/\bmotion (de censure|référendaire|de rejet|de renvoi)\b/i.test(titre)) return true;
+  if (/proposition de résolution/i.test(titre)) return true;
+  return false;
+}
+
+// ──────────────────────────── LLM summary parsing ────────────────────────────
 
 interface AnthropicTextBlock { type: "text"; text: string }
 interface AnthropicMessage { content: Array<AnthropicTextBlock | { type: string }>; stop_reason: string }
@@ -91,7 +176,6 @@ interface Summary {
 function asStringArray(v: unknown): string[] {
   return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
 }
-
 function normalizeAnalyse(a: unknown): ScrutinAnalyse | undefined {
   if (!a || typeof a !== "object") return undefined;
   const o = a as Record<string, unknown>;
@@ -104,7 +188,6 @@ function normalizeAnalyse(a: unknown): ScrutinAnalyse | undefined {
     exceptions: asStringArray(o.exceptions),
   };
 }
-
 function normalizePointsCles(v: unknown): string[] | undefined {
   if (!Array.isArray(v)) return undefined;
   const cleaned = v
@@ -118,13 +201,11 @@ function normalizePointsCles(v: unknown): string[] | undefined {
     });
   return cleaned.length > 0 ? cleaned : undefined;
 }
-
 function normalizeTheme(v: unknown): Theme | undefined {
   if (typeof v !== "string") return undefined;
   const lower = v.trim().toLowerCase();
   return (THEMES as readonly string[]).includes(lower) ? (lower as Theme) : "autre";
 }
-
 function sanitizeJsonControlChars(json: string): string {
   let out = ""; let inString = false; let escapeNext = false;
   for (let i = 0; i < json.length; i++) {
@@ -149,7 +230,7 @@ function extractSummary(message: AnthropicMessage): Summary {
   if (textBlocks.length === 0) throw new Error(`No text block. stop_reason=${message.stop_reason}`);
   const combined = textBlocks.map((b) => b.text).join("\n");
   const m = combined.match(/\{[\s\S]*\}/);
-  if (!m) throw new Error(`No JSON in response`);
+  if (!m) throw new Error(`No JSON in response. text=${combined.slice(0, 200)}…`);
   const raw = JSON.parse(sanitizeJsonControlChars(m[0])) as Record<string, unknown>;
   const chapeau = typeof raw.chapeau === "string" ? raw.chapeau.trim() : "";
   const titre_pedago = typeof raw.titre_pedago === "string" ? raw.titre_pedago.trim() : "";
@@ -163,9 +244,38 @@ function extractSummary(message: AnthropicMessage): Summary {
   };
 }
 
+// ────────────────────────────── fallback summary ─────────────────────────────
+
+function fallbackSummary(titreBrut: string, dossierTitre: string): Summary {
+  const words = titreBrut.split(/\s+/).filter(Boolean);
+  const titre_pedago = words.slice(0, 14).join(" ") + (words.length > 14 ? "…" : "");
+  const dossierWords = (dossierTitre || "scrutin").split(/\s+/).filter(Boolean).slice(0, 3);
+  const chapeau = dossierWords.join(" ").toUpperCase().replace(/[.,;:!?]+$/, "");
+  const ctxWords = (dossierTitre || "").split(/\s+/).filter(Boolean);
+  const contexte = ctxWords.length > 0
+    ? ctxWords.slice(0, 25).join(" ") + (ctxWords.length > 25 ? "…" : "")
+    : "";
+  return { chapeau, titre_pedago, contexte };
+}
+
+// ─────────────────────────────────── main ────────────────────────────────────
+
+async function loadEligibleScrutins(): Promise<Map<string, ParsedRaw>> {
+  const files = (await fs.readdir(JSON_DIR)).filter((f) => f.endsWith(".json"));
+  const out = new Map<string, ParsedRaw>();
+  for (const f of files) {
+    const raw = JSON.parse(await fs.readFile(path.join(JSON_DIR, f), "utf-8"));
+    const s: ANScrutinRaw = raw.scrutin ?? raw;
+    if (!isEligibleScrutin(s)) continue;
+    const parsed = parseRaw(s);
+    out.set(parsed.id, parsed);
+  }
+  return out;
+}
+
 async function main(): Promise<void> {
-  const cache = await loadParsedFromCache();
-  console.log(`◯ Loaded ${cache.size} scrutin ids from local AN cache`);
+  const eligible = await loadEligibleScrutins();
+  console.log(`◯ Loaded ${eligible.size} eligible scrutins from local AN cache`);
 
   console.log(`↓ Fetching batch ${BATCH_ID} results from Anthropic…`);
   const r = await fetch(`https://api.anthropic.com/v1/messages/batches/${BATCH_ID}/results`, {
@@ -194,23 +304,19 @@ async function main(): Promise<void> {
       err++;
     }
   }
-  console.log(`✓ Parsed ${ok} summaries (${err} failed → fallback in main script)`);
+  console.log(`✓ Parsed ${ok} summaries (${err} failed → fallback applied)`);
 
-  // Patch only the LLM-derived columns. We DO NOT touch position_par_groupe,
-  // votes_bruts, dossier_*, date, est_solennel — those are already correct
-  // from the prior partial run and don't depend on the LLM.
+  // Build full rows for every eligible scrutin: parsed AN data + (LLM summary
+  // OR fallback). This way an upsert that lands as INSERT for a row that
+  // never reached the DB on the prior run still satisfies all NOT NULL
+  // constraints (numero, date, votes_bruts, …).
+  const rows = [...eligible.values()].map((parsed) => {
+    const s = summaries.get(parsed.id) ?? fallbackSummary(parsed.titre_brut, parsed.dossier_titre);
+    return { ...parsed, ...s };
+  });
+
   const sb = createClient(SUPABASE_URL!, SUPABASE_KEY!);
-  const rows = [...summaries.entries()].map(([id, s]) => ({
-    id,
-    chapeau: s.chapeau,
-    titre_pedago: s.titre_pedago,
-    contexte: s.contexte,
-    theme: s.theme,
-    analyse_loi: s.analyse_loi,
-    points_cles: s.points_cles,
-  }));
-
-  console.log(`↑ Patching ${rows.length} rows in scrutins…`);
+  console.log(`↑ Upserting ${rows.length} rows in scrutins…`);
   const CHUNK = 100;
   for (let i = 0; i < rows.length; i += CHUNK) {
     const chunk = rows.slice(i, i + CHUNK);
@@ -221,7 +327,8 @@ async function main(): Promise<void> {
     }
     console.log(`  ✓ chunk ${i}-${i + chunk.length}`);
   }
-  console.log(`✓ Done. ${rows.length} rows patched.`);
+  console.log(`✓ Done. ${rows.length} rows in scrutins.`);
+  console.log(`  (${ok} with full LLM enrichment, ${err} on fallback summary)`);
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
