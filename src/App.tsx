@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Footer } from "./components/Footer";
+import { TopBar } from "./components/TopBar";
 
 export default function App({ children }: { children: ReactNode }) {
   return (
@@ -10,8 +10,8 @@ export default function App({ children }: { children: ReactNode }) {
       background: "var(--bg)",
       color: "var(--ink)",
     }}>
+      <TopBar />
       <main style={{ flex: 1 }}>{children}</main>
-      <Footer />
     </div>
   );
 }

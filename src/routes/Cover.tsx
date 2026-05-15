@@ -1,5 +1,5 @@
 // src/routes/Cover.tsx
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Wordmark } from "../components/Wordmark";
 import { FreshnessBanner } from "../components/FreshnessBanner";
@@ -143,6 +143,25 @@ export default function Cover() {
           <span>Commencer</span>
           <span style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}>≈ 5 min · 20 votes →</span>
         </button>
+
+        {/* Discreet secondary nav for the Cover only — the TopBar (and its
+            menu sheet) is hidden on this route because the Cover already
+            shows a wordmark in its header, so we surface the same links
+            inline here. */}
+        <nav style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 18,
+          fontFamily: "var(--font-mono)",
+          fontSize: 10.5,
+          letterSpacing: "0.06em",
+          color: "var(--ink-3)",
+        }}>
+          <Link to="/methode" style={{ color: "inherit", textDecoration: "none" }}>Méthode &amp; sources</Link>
+          <Link to="/legal" style={{ color: "inherit", textDecoration: "none" }}>Mentions légales</Link>
+          <a href="mailto:contact@sansdetour.fr" style={{ color: "inherit", textDecoration: "none" }}>Contact</a>
+        </nav>
       </div>
     </section>
   );
