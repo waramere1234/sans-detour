@@ -4,7 +4,7 @@ import { DeckStack } from "../components/DeckStack";
 import { ChipTop1 } from "../components/ChipTop1";
 import { RankingOverlay } from "../components/RankingOverlay";
 import { fetchScrutins } from "../lib/scrutins";
-import { composeDeck, drawNext } from "../lib/deck";
+import { composeDeck, drawNext, chapeauPrefix } from "../lib/deck";
 import { computeAlignment, rankByAlignment } from "../lib/matching";
 import { getOrCreateSession, recordVote, loadSession } from "../lib/session";
 import { track } from "../lib/analytics";
@@ -14,6 +14,7 @@ import { GROUP_CODES } from "../types";
 const TARGET = 20;
 const MIN_FOR_LIVE = 5;
 const CAP_PER_DOSSIER = 2;
+const CAP_PER_CHAPEAU_PREFIX = 2;
 
 export default function Play() {
   const navigate = useNavigate();
@@ -41,9 +42,14 @@ export default function Play() {
       // never reappear, and only request the number of cards still needed.
       const seenIds = new Set(existing?.cards_seen ?? []);
       const seenCounts = new Map<string, number>();
+      const seenPrefixCounts = new Map<string, number>();
       for (const id of existing?.cards_seen ?? []) {
         const sc = p.find((x) => x.id === id);
-        if (sc) seenCounts.set(sc.dossier_id, (seenCounts.get(sc.dossier_id) ?? 0) + 1);
+        if (sc) {
+          seenCounts.set(sc.dossier_id, (seenCounts.get(sc.dossier_id) ?? 0) + 1);
+          const pref = chapeauPrefix(sc);
+          seenPrefixCounts.set(pref, (seenPrefixCounts.get(pref) ?? 0) + 1);
+        }
       }
       const remainingTarget = isAffinement
         ? TARGET   // affinement mode: keep drawing as long as pool allows
@@ -52,8 +58,10 @@ export default function Play() {
         composeDeck(p, {
           size: remainingTarget,
           capPerDossier: CAP_PER_DOSSIER,
+          capPerChapeauPrefix: CAP_PER_CHAPEAU_PREFIX,
           excludeIds: seenIds,
           seenDossierCounts: seenCounts,
+          seenChapeauPrefixCounts: seenPrefixCounts,
         }),
       );
     });
@@ -74,6 +82,18 @@ export default function Play() {
     for (const id of session?.cards_seen ?? []) {
       const sc = pool.find((s) => s.id === id);
       if (sc) m.set(sc.dossier_id, (m.get(sc.dossier_id) ?? 0) + 1);
+    }
+    return m;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, pool, tick]);
+  const seenPrefixCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const id of session?.cards_seen ?? []) {
+      const sc = pool.find((s) => s.id === id);
+      if (sc) {
+        const pref = chapeauPrefix(sc);
+        m.set(pref, (m.get(pref) ?? 0) + 1);
+      }
     }
     return m;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -102,7 +122,9 @@ export default function Play() {
       }
       const next = drawNext(pool, new Set([...cardsSeenSet, scrutinId]), {
         capPerDossier: CAP_PER_DOSSIER,
+        capPerChapeauPrefix: CAP_PER_CHAPEAU_PREFIX,
         seenDossierCounts,
+        seenChapeauPrefixCounts: seenPrefixCounts,
       });
       setDeck(next ? [next] : []);
       if (!next) navigate("/result");

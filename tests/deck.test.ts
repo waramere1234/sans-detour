@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { composeDeck, drawNext } from "../src/lib/deck";
+import { composeDeck, drawNext, chapeauPrefix } from "../src/lib/deck";
 import type { Scrutin, Theme } from "../src/types";
 
-function mk(id: string, dossier: string, theme?: Theme): Scrutin {
+function mk(id: string, dossier: string, theme?: Theme, chapeau = "X"): Scrutin {
   return {
     id, numero: 0, date: "2024-01-01",
     dossier_id: dossier, dossier_titre: dossier,
-    chapeau: "X", titre_brut: "...", titre_pedago: "...",
+    chapeau, titre_brut: "...", titre_pedago: "...",
     theme,
     position_par_groupe: {} as any, votes_bruts: {} as any,
     url_an_officielle: "", est_solennel: true, pedago_relu: true,
@@ -101,6 +101,47 @@ describe("composeDeck (PRD § 9.3)", () => {
     const pool = Array.from({ length: 30 }, (_, i) => mk(`s${i}`, `d${i % 15}`));
     const deck = composeDeck(pool, { size: 20, capPerDossier: 2, seed: 11 });
     expect(deck).toHaveLength(20);
+  });
+
+  it("respects capPerChapeauPrefix across dossiers (MAYOTTE-style cluster)", () => {
+    // 5 scrutins sharing the chapeau prefix "MAYOTTE" but each in a separate
+    // dossier — exactly the case that bypasses capPerDossier for STANDALONE
+    // SOR rows. Plus 30 unrelated scrutins so the deck has room.
+    const pool: Scrutin[] = [
+      ...Array.from({ length: 5 }, (_, i) => mk(`m${i}`, `dM${i}`, "institutions", `MAYOTTE · POINT ${i}`)),
+      ...Array.from({ length: 30 }, (_, i) => mk(`o${i}`, `dO${i}`, "santé", `SANTÉ · DOSSIER ${i}`)),
+    ];
+    const deck = composeDeck(pool, {
+      size: 20, capPerDossier: 2, capPerChapeauPrefix: 2, seed: 42,
+    });
+    const mayottes = deck.filter((s) => chapeauPrefix(s) === "mayotte");
+    expect(mayottes.length).toBeLessThanOrEqual(2);
+  });
+
+  it("respects pre-populated seenChapeauPrefixCounts (resume mid-session)", () => {
+    const pool: Scrutin[] = Array.from({ length: 30 }, (_, i) =>
+      mk(`s${i}`, `d${i}`, "santé", `SANTÉ · DOSSIER ${i % 3}`),
+    );
+    // Pretend the user already saw 2 cards with prefix "santé"; cap should
+    // block any further "santé" card from joining the new deck.
+    const deck = composeDeck(pool, {
+      size: 20, capPerDossier: 2, capPerChapeauPrefix: 2,
+      seenChapeauPrefixCounts: new Map([["santé", 2]]),
+      seed: 7,
+    });
+    expect(deck).toHaveLength(0);
+  });
+});
+
+describe("chapeauPrefix", () => {
+  it("extracts the segment before ' · '", () => {
+    expect(chapeauPrefix(mk("a", "d", undefined, "MAYOTTE · CYCLONE"))).toBe("mayotte");
+  });
+  it("returns the whole chapeau when no separator", () => {
+    expect(chapeauPrefix(mk("a", "d", undefined, "BUDGET"))).toBe("budget");
+  });
+  it("handles empty / missing chapeau", () => {
+    expect(chapeauPrefix(mk("a", "d", undefined, ""))).toBe("");
   });
 });
 

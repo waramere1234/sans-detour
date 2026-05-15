@@ -4,10 +4,18 @@ import type { Scrutin } from "../types";
 export interface ComposeOptions {
   size: number;
   capPerDossier: number;
+  /** Optional cap on how many scrutins sharing the same chapeau prefix
+   *  (the text before " · ") may appear. Catches subject clusters that
+   *  the dossier cap misses — e.g. multiple MAYOTTE scrutins each with a
+   *  STANDALONE dossier_id slip past capPerDossier but share the same
+   *  political subject. Set undefined to disable. */
+  capPerChapeauPrefix?: number;
   /** Scrutins already seen this session — must not appear in the new deck. */
   excludeIds?: Set<string>;
   /** Per-dossier counts already accumulated this session — respected by cap. */
   seenDossierCounts?: Map<string, number>;
+  /** Per-prefix counts already accumulated this session — respected by cap. */
+  seenChapeauPrefixCounts?: Map<string, number>;
   seed?: number;
 }
 
@@ -32,8 +40,21 @@ function shuffle<T>(arr: T[], rng: () => number): T[] {
   return a;
 }
 
+/** Extract the chapeau prefix used by the per-subject cap. The chapeau format
+ *  is "[SUBJECT] · [DETAIL]" so we take everything before the first " · ".
+ *  Lowercased + trimmed for case-insensitive matching across the LLM's
+ *  cosmetic variations. */
+export function chapeauPrefix(s: Scrutin): string {
+  const c = s.chapeau ?? "";
+  const idx = c.indexOf(" · ");
+  return (idx > 0 ? c.slice(0, idx) : c).trim().toLowerCase();
+}
+
 /** Compose a deck of `size` scrutins from `pool` while:
  *  - capping at `capPerDossier` per legislative dossier (V1 behavior),
+ *  - optionally capping at `capPerChapeauPrefix` per subject (V2 — catches
+ *    UKRAINE / MAYOTTE / MOTION CENSURE clusters that bypass the dossier cap
+ *    because their rows have STANDALONE dossier_ids),
  *  - excluding already-seen ids,
  *  - balancing themes via a round-robin walk: one scrutin per theme per pass,
  *    so a 20-card session naturally spreads across the available themes
@@ -45,6 +66,7 @@ export function composeDeck(pool: Scrutin[], opts: ComposeOptions): Scrutin[] {
   const seed = opts.seed ?? Math.floor(Math.random() * 2 ** 31);
   const rng = mulberry32(seed);
   const counts = new Map<string, number>(opts.seenDossierCounts ?? []);
+  const prefixCounts = new Map<string, number>(opts.seenChapeauPrefixCounts ?? []);
   const exclude = opts.excludeIds ?? new Set<string>();
 
   // Bucket the pool by theme, shuffled within each bucket so the round-robin
@@ -73,6 +95,12 @@ export function composeDeck(pool: Scrutin[], opts: ComposeOptions): Scrutin[] {
         const s = bucket.shift()!;
         const c = counts.get(s.dossier_id) ?? 0;
         if (c >= opts.capPerDossier) continue;
+        if (opts.capPerChapeauPrefix !== undefined) {
+          const prefix = chapeauPrefix(s);
+          const pc = prefixCounts.get(prefix) ?? 0;
+          if (pc >= opts.capPerChapeauPrefix) continue;
+          prefixCounts.set(prefix, pc + 1);
+        }
         deck.push(s);
         counts.set(s.dossier_id, c + 1);
         pickedThisPass = true;
@@ -87,6 +115,8 @@ export function composeDeck(pool: Scrutin[], opts: ComposeOptions): Scrutin[] {
 export interface DrawNextOptions {
   capPerDossier: number;
   seenDossierCounts: Map<string, number>;
+  capPerChapeauPrefix?: number;
+  seenChapeauPrefixCounts?: Map<string, number>;
   seed?: number;
 }
 
@@ -103,6 +133,11 @@ export function drawNext(
     if (seenIds.has(s.id)) continue;
     const c = opts.seenDossierCounts.get(s.dossier_id) ?? 0;
     if (c >= opts.capPerDossier) continue;
+    if (opts.capPerChapeauPrefix !== undefined) {
+      const prefix = chapeauPrefix(s);
+      const pc = opts.seenChapeauPrefixCounts?.get(prefix) ?? 0;
+      if (pc >= opts.capPerChapeauPrefix) continue;
+    }
     return s;
   }
   return null;
