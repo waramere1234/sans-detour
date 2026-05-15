@@ -288,24 +288,8 @@ function AnalyseBody({ scrutin }: { scrutin: Scrutin }) {
       </div>
     );
   }
-  const intro = extractIntro(scrutin.contexte);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {/* Intro — one-paragraph summary, no chrome, just a stronger body type
-          that sets the stage before the colored sections. */}
-      {intro && (
-        <p style={{
-          margin: 0,
-          fontFamily: "var(--font-sans)", fontWeight: 500,
-          fontSize: 14.5, lineHeight: 1.55, letterSpacing: "-0.005em",
-          color: "var(--ink)", textWrap: "pretty" as const,
-          paddingBottom: 4, borderBottom: "1px solid var(--line)",
-        }}>
-          {renderWithBold(intro)}
-        </p>
-      )}
-
-      {/* Each section gets its own color so the eye can scan in 2 seconds. */}
       <ColoredSection accent="var(--accent)" title="Mesures principales" bullets={a.mesures_principales} />
 
       <ColoredImpact
@@ -417,17 +401,6 @@ function ColoredSubList({
       </ul>
     </div>
   );
-}
-
-/** Pull the first sentence(s) of the contexte BEFORE any "Concrètement :" or
- *  "Par exemple :" marker — that opening is the "what does the law do"
- *  summary, which makes a perfect intro for the analyse view. Falls back to
- *  the whole contexte if no marker is found. */
-function extractIntro(contexte?: string): string | null {
-  if (!contexte) return null;
-  const cleaned = stripVoteResult(stripCitations(contexte));
-  const m = cleaned.match(/^([\s\S]+?\.)\s+(Concrètement|Par exemple)\b/i);
-  return m ? m[1].trim() : cleaned;
 }
 
 // ─────────────────────────────────────────────────── TEXT HELPERS
