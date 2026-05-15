@@ -172,8 +172,9 @@ export default function Result() {
                 color: "var(--ink-3)", lineHeight: 1.5,
               }}>
                 Basé uniquement sur leurs votes effectifs à l'Assemblée Nationale.
-                Mélenchon, Philippe et Glucksmann ne siègent pas dans la 17ᵉ législature
-                et ne peuvent donc pas être mesurés ici.
+                Mélenchon, Philippe, Glucksmann, Tondelier ne siègent pas dans la
+                17ᵉ législature ; Bardella, élu en 2024, a démissionné avant de
+                siéger. Aucun d'eux ne peut être mesuré ici.
               </p>
             </div>
           )}

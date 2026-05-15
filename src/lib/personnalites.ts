@@ -10,21 +10,17 @@ export interface PersonnaliteMeta {
   /** Parliamentary group the personality sits with on the deck UI — drives
    *  the color via PARTIES. */
   group_code: GroupCode;
-  /** First name / last name as written on the AN open-data deputies file.
-   *  Used by scripts/ingest-personnalites.ts to resolve `acteurRef` without
-   *  hard-coding fragile internal AN IDs. */
+  /** First name / last name as written on the AN open-data deputies file. */
   prenom: string;
   nom: string;
-  /** Department or circumscription, included for disambiguation when two
-   *  députés share a surname (e.g. several "Le Pen" across history). */
   departement?: string;
-  /** Optional acteurRef override. Filled in only when the name-based
-   *  resolver would be ambiguous or wrong; normally left undefined and the
-   *  ingest script writes it back here. */
-  acteur_ref?: string;
+  /** AN actor identifier (PA…). Hardcoded after manual lookup on
+   *  assemblee-nationale.fr/dyn/deputes/<ref> to avoid relying on the
+   *  AMO20/AMO30 bulk download (the URL has been moving on the AN side and
+   *  returned 404 on the original attempt). Verified May 2026. */
+  acteur_ref: string;
   /** True if the personality is a declared or strongly-pressed 2027
-   *  presidential candidate. Currently informational; the UI uses it later
-   *  to highlight the toggle. */
+   *  presidential candidate. Currently informational. */
   presidentiable: boolean;
 }
 
@@ -37,15 +33,7 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     prenom: "Marine",
     nom: "Le Pen",
     departement: "Pas-de-Calais",
-    presidentiable: true,
-  },
-  bardella: {
-    code: "bardella",
-    display_name: "Jordan Bardella",
-    short_name: "Bardella",
-    group_code: "RN",
-    prenom: "Jordan",
-    nom: "Bardella",
+    acteur_ref: "PA720614",
     presidentiable: true,
   },
   faure: {
@@ -56,17 +44,19 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     prenom: "Olivier",
     nom: "Faure",
     departement: "Seine-et-Marne",
+    acteur_ref: "PA609332",
     presidentiable: true,
   },
-  tondelier: {
-    code: "tondelier",
-    display_name: "Marine Tondelier",
-    short_name: "Tondelier",
+  chatelain: {
+    code: "chatelain",
+    display_name: "Cyrielle Chatelain",
+    short_name: "Chatelain",
     group_code: "ECO",
-    prenom: "Marine",
-    nom: "Tondelier",
-    departement: "Pas-de-Calais",
-    presidentiable: true,
+    prenom: "Cyrielle",
+    nom: "Chatelain",
+    departement: "Isère",
+    acteur_ref: "PA794008",
+    presidentiable: false,
   },
   wauquiez: {
     code: "wauquiez",
@@ -76,6 +66,7 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     prenom: "Laurent",
     nom: "Wauquiez",
     departement: "Haute-Loire",
+    acteur_ref: "PA267285",
     presidentiable: true,
   },
   attal: {
@@ -86,6 +77,7 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     prenom: "Gabriel",
     nom: "Attal",
     departement: "Hauts-de-Seine",
+    acteur_ref: "PA722190",
     presidentiable: true,
   },
   darmanin: {
@@ -96,6 +88,7 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     prenom: "Gérald",
     nom: "Darmanin",
     departement: "Nord",
+    acteur_ref: "PA607846",
     presidentiable: true,
   },
   ciotti: {
@@ -106,6 +99,7 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     prenom: "Éric",
     nom: "Ciotti",
     departement: "Alpes-Maritimes",
+    acteur_ref: "PA330240",
     presidentiable: true,
   },
   bompard: {
@@ -116,6 +110,7 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     prenom: "Manuel",
     nom: "Bompard",
     departement: "Bouches-du-Rhône",
+    acteur_ref: "PA793444",
     presidentiable: false,
   },
   panot: {
@@ -126,6 +121,7 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     prenom: "Mathilde",
     nom: "Panot",
     departement: "Val-de-Marne",
+    acteur_ref: "PA720892",
     presidentiable: false,
   },
 };

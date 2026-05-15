@@ -124,9 +124,9 @@ describe("computeAlignmentPersonnalites (full session)", () => {
   });
   it("computes alignment and tracks absent / non_dispo exclusions", () => {
     const scrutins: Scrutin[] = [
-      mkScrutinPers("s1", { le_pen: "pour",       bardella: "non_dispo" }),
-      mkScrutinPers("s2", { le_pen: "abstention", bardella: "absent"   }),
-      mkScrutinPers("s3", { le_pen: "contre",     bardella: "pour"     }),
+      mkScrutinPers("s1", { le_pen: "pour",       chatelain: "non_dispo" }),
+      mkScrutinPers("s2", { le_pen: "abstention", chatelain: "absent"   }),
+      mkScrutinPers("s3", { le_pen: "contre",     chatelain: "pour"     }),
     ];
     const votes: SessionVote[] = [
       { scrutin_id: "s1", choice: "pour", voted_at: 1 },
@@ -140,10 +140,10 @@ describe("computeAlignmentPersonnalites (full session)", () => {
     expect(r.le_pen.perfect).toBe(1);
     expect(r.le_pen.partial).toBe(1);
     expect(r.le_pen.conflict).toBe(1);
-    // Bardella: s1=non_dispo, s2=absent, s3=+1 → 1/1 = 100%
-    expect(r.bardella.pct).toBe(100);
-    expect(r.bardella.counted).toBe(1);
-    expect(r.bardella.non_dispo_excluded).toBe(1);
-    expect(r.bardella.absent_excluded).toBe(1);
+    // Chatelain: s1=non_dispo, s2=absent, s3=+1 → 1/1 = 100%
+    expect(r.chatelain.pct).toBe(100);
+    expect(r.chatelain.counted).toBe(1);
+    expect(r.chatelain.non_dispo_excluded).toBe(1);
+    expect(r.chatelain.absent_excluded).toBe(1);
   });
 });
