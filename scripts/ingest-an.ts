@@ -496,13 +496,27 @@ function extractSummaryFromMessage(message: AnthropicResponse): Summary {
   // formats long text. Sanitize: replace literal control chars INSIDE string
   // values with their escaped form so JSON.parse accepts them.
   const safe = sanitizeJsonControlChars(m[0]);
-  const parsed = JSON.parse(safe) as Summary;
-  if (parsed.analyse_loi) {
-    parsed.analyse_loi = normalizeAnalyse(parsed.analyse_loi);
+  const raw = JSON.parse(safe) as Record<string, unknown>;
+
+  // Whitelist the expected fields. Without this, a model that hallucinates
+  // an extra key like "erreur" leaks it into the upsert payload and Postgres
+  // rejects the whole chunk. Throw if essential fields are missing — the
+  // orchestrator catches and substitutes a fallback summary.
+  const chapeau = typeof raw.chapeau === "string" ? raw.chapeau.trim() : "";
+  const titre_pedago = typeof raw.titre_pedago === "string" ? raw.titre_pedago.trim() : "";
+  const contexte = typeof raw.contexte === "string" ? raw.contexte.trim() : "";
+  if (!chapeau || !titre_pedago) {
+    const stray = Object.keys(raw).filter((k) => !["chapeau","titre_pedago","contexte","analyse_loi","points_cles","theme"].includes(k));
+    throw new Error(`Missing required fields (chapeau or titre_pedago). Stray keys: [${stray.join(",")}]`);
   }
-  parsed.points_cles = normalizePointsCles(parsed.points_cles);
-  parsed.theme = normalizeTheme(parsed.theme);
-  return parsed;
+  return {
+    chapeau,
+    titre_pedago,
+    contexte,
+    analyse_loi: raw.analyse_loi ? normalizeAnalyse(raw.analyse_loi as Partial<ScrutinAnalyse>) : undefined,
+    points_cles: normalizePointsCles(raw.points_cles),
+    theme: normalizeTheme(raw.theme),
+  };
 }
 
 // Validate against the THEMES enum; anything off-list collapses to "autre" so
