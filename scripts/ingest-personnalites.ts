@@ -130,17 +130,38 @@ async function main(): Promise<void> {
   }
   console.log(`◯ ${updates.length} payloads votes_personnalites construits`);
 
-  // Patch en base, par chunks.
-  const CHUNK = 100;
-  for (let i = 0; i < updates.length; i += CHUNK) {
-    const chunk = updates.slice(i, i + CHUNK);
-    const { error } = await sb.from("scrutins").upsert(chunk);
-    if (error) {
-      console.error(`✕ Chunk ${i}-${i + chunk.length} failed:`, error);
-      process.exit(1);
+  // Patch en base avec UPDATE par id (et NON `.upsert()`).
+  //
+  // Pourquoi pas upsert : PostgREST .upsert() traduit en
+  // `INSERT ... ON CONFLICT DO UPDATE`, et Postgres valide les contraintes
+  // NOT NULL du tuple INSÉRÉ avant d'aplanir le conflit. Comme on n'envoie
+  // que { id, votes_personnalites }, le `numero NOT NULL` est violé et la
+  // requête est rejetée — même quand l'id existe déjà.
+  //
+  // Le UPDATE explicite n'a pas ce problème : il ne touche que la colonne
+  // patché, les autres restent ce qu'elles sont en base.
+  console.log(`↑ Patching ${updates.length} rows via UPDATE …`);
+  const BATCH = 20;
+  let patched = 0;
+  for (let i = 0; i < updates.length; i += BATCH) {
+    const batch = updates.slice(i, i + BATCH);
+    const results = await Promise.all(
+      batch.map((u) =>
+        sb.from("scrutins")
+          .update({ votes_personnalites: u.votes_personnalites })
+          .eq("id", u.id),
+      ),
+    );
+    for (const r of results) {
+      if (r.error) {
+        console.error(`✕ UPDATE failed:`, r.error);
+        process.exit(1);
+      }
     }
-    console.log(`  ✓ chunk ${i}-${i + chunk.length}`);
+    patched += batch.length;
+    process.stdout.write(`  ✓ ${patched}/${updates.length}\r`);
   }
+  console.log(`\n  ✓ ${patched} rows patched`);
 
   // Stats finales : par personnalité, combien de votés vs absent vs non_dispo.
   console.log(`\n── Couverture par personnalité :`);
