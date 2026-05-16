@@ -59,7 +59,7 @@ export default function Cover() {
   function restart() {
     const ok = window.confirm(
       votesCount === 1
-        ? "Recommencer à zéro ? Ton 1 vote en cours sera perdu."
+        ? "Recommencer à zéro ? Ton vote en cours sera perdu."
         : `Recommencer à zéro ? Tes ${votesCount} votes en cours seront perdus.`,
     );
     if (!ok) return;
@@ -202,7 +202,7 @@ export default function Cover() {
                 ? `${votesCount}/${TARGET} terminés`
                 : hasInProgress
                   ? `${votesCount}/${TARGET} · ${remainingVotes} restant${remainingVotes !== 1 ? "s" : ""}`
-                  : "≈ 5 min · 20 votes"}
+                  : `≈ 5 min · ${TARGET} votes`}
               <span aria-hidden="true"> →</span>
             </span>
           </button>

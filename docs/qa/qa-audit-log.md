@@ -969,3 +969,25 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Mock fetchFreshness avec `last_sync_at = today`, `next_sync_eta = today` → banner doit dire "MAJ aujourd'hui · sync imminente"
 - [ ] Sur Result avec 0 skips → "20 scrutins · 20 comptés · 0 skips" (pluriel)
 - [ ] Sur Cover avec 1 vote en cours, cliquer "Recommencer à zéro" → confirm dit "Ton 1 vote en cours sera perdu" (pas "Tes 1 votes")
+
+---
+
+## Session 43 — 2026-05-16
+
+### Vérification session 42
+
+- [VERIFIED] FreshnessBanner phrases naturelles pour past=0 / next=0
+- [VERIFIED] Plural rule `!== 1` dans Cover sub-text + Result skip
+- [VERIFIED] Cover restart confirm branche singular/plural
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés (DRY drift + wording)
+
+- [FIXED] DRY drift · `Cover.tsx:205` hardcodait `"≈ 5 min · 20 votes"` alors que TARGET = 20 est centralisé dans types/index.ts (session 38). Si TARGET change, Cover affiche encore "20 votes" → drift. Template literal avec `${TARGET}`. · `src/routes/Cover.tsx`
+- [FIXED] DRY drift · `Methode.tsx:114` hardcodait "Pour chaque session, on en tire **20**...". Même drift. Le commentaire dans `types/index.ts:5` le flag déjà ("Methode page copy '20 votes'"). Import TARGET + `{TARGET}` interpolation. · `src/routes/Methode.tsx`
+- [FIXED] Wording · `Cover.tsx restart()` confirm singular branche disait "Ton 1 vote en cours sera perdu" — le "1" est redondant en français singulier ("Ton vote" suffit). Plus naturel. · `src/routes/Cover.tsx`
+
+### Vérifications à faire en session 44
+
+- [ ] Modifier `TARGET = 21` dans types/index.ts temporairement → Cover sub-text default doit dire "≈ 5 min · 21 votes" ET Methode §02 doit dire "Pour chaque session, on en tire 21"
+- [ ] Cover restart sur 1 vote → confirm doit dire "Ton vote en cours sera perdu" (sans le "1")

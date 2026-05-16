@@ -5,7 +5,7 @@ import { Wordmark } from "../components/Wordmark";
 import { FreshnessBanner } from "../components/FreshnessBanner";
 import { fetchFreshness } from "../lib/scrutins";
 import { track } from "../lib/analytics";
-import type { FreshnessInfo } from "../types";
+import { TARGET, type FreshnessInfo } from "../types";
 
 export default function Methode() {
   const [info, setInfo] = useState<FreshnessInfo | null>(null);
@@ -111,7 +111,7 @@ export default function Methode() {
 
       <Section n="02" title="Quels scrutins on garde">
         <p>On garde les <strong>scrutins solennels</strong> (SPS), les <strong>votes finaux sur l'ensemble d'une loi</strong> (SOR), les <strong>motions de censure</strong> et les <strong>propositions de résolution</strong>. On exclut les amendements, les votes en commission et les motions procédurales (rejet préalable, renvoi).</p>
-        <p>Pour chaque session, on en tire <strong>20</strong> en équilibrant les thèmes (santé, immigration, fiscalité…) plutôt qu'au hasard pur, avec deux garde-fous : <strong>jamais plus de 2 scrutins du même dossier législatif</strong> et <strong>jamais plus de 2 scrutins du même sujet</strong> (pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée).</p>
+        <p>Pour chaque session, on en tire <strong>{TARGET}</strong> en équilibrant les thèmes (santé, immigration, fiscalité…) plutôt qu'au hasard pur, avec deux garde-fous : <strong>jamais plus de 2 scrutins du même dossier législatif</strong> et <strong>jamais plus de 2 scrutins du même sujet</strong> (pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée).</p>
       </Section>
 
       <Section n="03" title="Comment on définit la position d'un groupe">
