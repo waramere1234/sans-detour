@@ -40,6 +40,39 @@ export default function Methode() {
 
       {info && <div style={{ marginTop: 18 }}><FreshnessBanner info={info} /></div>}
 
+      {/* Sommaire — la page fait 7 sections, sans nav rapide l'user doit
+        scroller pour trouver une partie précise. Les ancres `#methode-NN`
+        existent déjà (cf. Section component) ; on les expose ici. */}
+      <nav
+        aria-label="Sommaire de la méthode"
+        style={{
+          marginTop: 24, padding: "12px 14px",
+          border: "1px solid var(--line)", borderRadius: 6,
+          background: "var(--bg-2)",
+          display: "flex", flexWrap: "wrap", gap: "6px 14px",
+          fontFamily: "var(--font-mono)", fontSize: 11.5,
+          letterSpacing: "0.04em",
+        }}
+      >
+        {[
+          ["01", "Données"],
+          ["02", "Scrutins"],
+          ["03", "Position groupe"],
+          ["04", "Calcul"],
+          ["05", "Tes données"],
+          ["06", "Indépendance"],
+          ["07", "IA Claude"],
+        ].map(([n, label]) => (
+          <a key={n} href={`#methode-${n}`} style={{
+            color: "var(--ink-2)", textDecoration: "none",
+            display: "inline-flex", alignItems: "baseline", gap: 4,
+          }}>
+            <span style={{ color: "var(--accent)" }}>{n}</span>
+            {label}
+          </a>
+        ))}
+      </nav>
+
       <Section n="01" title="D'où viennent les données">
         <p>Les votes proviennent de <b>l'open data officiel de l'Assemblée Nationale</b>, exposé sur <code>data.assemblee-nationale.fr</code>. Ce sont les mêmes fichiers que ceux utilisés par les médias de référence et le service interne de l'AN. Aucune retranscription manuelle, aucune source secondaire.</p>
         <p>Mise à jour automatisée toutes les semaines.</p>

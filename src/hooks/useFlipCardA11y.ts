@@ -48,7 +48,10 @@ export function useFlipCardA11y({
   return {
     rootProps: {
       role: "article",
-      "aria-roledescription": "carte de scrutin, glissez pour voter",
+      // Mention both interaction modes so keyboard users learn the
+      // shortcuts. Without "ou flèches" the role description suggests
+      // touch-only and keyboard users would Tab past without trying.
+      "aria-roledescription": "carte de scrutin — glissez ou utilisez les flèches pour voter",
       "aria-label": `Scrutin n°${scrutin.numero} : ${scrutin.titre_pedago}`,
       tabIndex: topMost ? 0 : -1,
       onKeyDown,

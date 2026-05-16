@@ -207,6 +207,7 @@ export default function Cover() {
               {canSeePartialResult && (
                 <Link
                   to="/result"
+                  onClick={() => track("cover_partial_result")}
                   style={{ color: "var(--ink-2)", textDecoration: "none" }}
                 >
                   Voir mon résultat partiel
