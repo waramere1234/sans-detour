@@ -110,7 +110,16 @@ function Section({ n, title, children }: { n: string; title: string; children: R
     // in §04 intro) can use `<a href="#methode-07">` to deep-link. Without an
     // anchor target the text reads as if it were a link but does nothing on
     // click — broken affordance on a transparency-focused page.
-    <div id={`methode-${n}`} style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid var(--line)", scrollMarginTop: 16 }}>
+    <div
+      id={`methode-${n}`}
+      // tabIndex=-1 makes the div programmatically focusable so browsers
+      // move focus to it after an in-page anchor jump (`<a href="#methode-07">`).
+      // Without it, focus stays on the link and keyboard Tab continues from
+      // the §04 paragraph instead of the §07 heading — scroll moves but
+      // focus doesn't follow.
+      tabIndex={-1}
+      style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid var(--line)", scrollMarginTop: 16, outline: "none" }}
+    >
       <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
         <span style={{
           fontFamily: "var(--font-mono)", fontSize: 11,

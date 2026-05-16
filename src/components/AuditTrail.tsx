@@ -84,11 +84,15 @@ export function AuditTrail({ alignment, scrutins, votes }: AuditTrailProps) {
             </div>
 
             {r.sc.url_an_officielle ? (
-              <a href={r.sc.url_an_officielle} target="_blank" rel="noopener noreferrer"
+              <a
+                href={r.sc.url_an_officielle}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Voir le scrutin n°${r.sc.numero} sur le site de l'Assemblée Nationale (nouvel onglet)`}
                 style={{
                   fontFamily: "var(--font-mono)", fontSize: 10,
                   color: "var(--ink-3)", letterSpacing: "0.04em", textDecoration: "none",
-                }}>AN ↗</a>
+                }}><span aria-hidden="true">AN ↗</span></a>
             ) : (
               <span title="Donnée de démonstration — sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production"
                 style={{

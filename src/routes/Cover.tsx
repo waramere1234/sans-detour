@@ -58,8 +58,11 @@ export default function Cover() {
       `Recommencer à zéro ? Tes ${votesCount} votes en cours seront perdus.`,
     );
     if (!ok) return;
+    // resetSession only clears the session key — the cover-seen flag is
+    // already "true" since the user is interacting with the in-progress UI
+    // (which only renders for hasInProgress = users who've seen Cover).
+    // No need to re-mark.
     resetSession();
-    markCoverSeen();
     track("cover_restarted");
     setSessionTick((t) => t + 1);
     navigate("/play");
