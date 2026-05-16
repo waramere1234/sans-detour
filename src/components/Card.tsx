@@ -300,7 +300,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             display: "flex", justifyContent: "space-between", alignItems: "center",
             fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.04em",
           }}>
-            <span style={{ color: "var(--ink-3)" }}><span aria-hidden="true">‹ </span>tap pour revenir</span>
+            <span style={{ color: "var(--ink-3)" }}>tap pour revenir<span aria-hidden="true"> ‹</span></span>
             {scrutin.url_an_officielle
               ? <a
                   href={scrutin.url_an_officielle}
