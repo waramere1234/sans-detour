@@ -74,7 +74,10 @@ export default function Play() {
   }, [navigate, params, loadTick]);
 
   useEffect(() => {
-    if (params.get("affinement") === "1") setRefinementMode(true);
+    // Sync both ways: dropping ?affinement=1 must also flip the mode off,
+    // otherwise the refinement flag sticks across navigations and the
+    // header drops the " / TARGET" suffix even in normal play.
+    setRefinementMode(params.get("affinement") === "1");
   }, [params]);
 
   const session = loadSession();
@@ -183,7 +186,7 @@ export default function Play() {
     return (
       <div style={{ padding: 24 }}>
         Pool épuisé.{" "}
-        <button onClick={() => navigate("/result")}>Voir mon résultat</button>
+        <button type="button" onClick={() => navigate("/result")}>Voir mon résultat</button>
       </div>
     );
   }
@@ -257,6 +260,7 @@ export default function Play() {
         </span>
         {showLiveScore && (
           <button
+            type="button"
             onClick={() => navigate("/result")}
             style={{
               fontFamily: "var(--font-mono)",
