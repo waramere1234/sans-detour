@@ -188,10 +188,11 @@ export default function Cover() {
             <span>{hasCompleted ? "Voir mon résultat" : hasInProgress ? "Reprendre" : "Commencer"}</span>
             <span style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}>
               {hasCompleted
-                ? `${votesCount}/${TARGET} terminés →`
+                ? `${votesCount}/${TARGET} terminés`
                 : hasInProgress
-                  ? `${votesCount}/${TARGET} · ${remainingVotes} restant${remainingVotes > 1 ? "s" : ""} →`
-                  : "≈ 5 min · 20 votes →"}
+                  ? `${votesCount}/${TARGET} · ${remainingVotes} restant${remainingVotes > 1 ? "s" : ""}`
+                  : "≈ 5 min · 20 votes"}
+              <span aria-hidden="true"> →</span>
             </span>
           </button>
 

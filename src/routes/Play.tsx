@@ -314,7 +314,7 @@ export default function Play() {
               cursor: "pointer",
             }}
           >
-            Mon résultat →
+            Mon résultat<span aria-hidden="true"> →</span>
           </button>
         )}
       </div>

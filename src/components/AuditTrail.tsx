@@ -23,11 +23,12 @@ export function AuditTrail({ alignment, scrutins, votes }: AuditTrailProps) {
       const score = alignmentScore(v.choice, groupPos);
       let icon = "—";
       let color = "var(--ink-3)";
-      if (score === null) { icon = "÷"; color = "var(--ink-4)"; }
-      else if (score === 1) { icon = "✓"; color = "var(--pour)"; }
-      else if (score === 0.5) { icon = "≈"; color = "var(--warn)"; }
-      else if (score === 0) { icon = "✕"; color = "var(--contre)"; }
-      return { v, sc, groupPos, score, icon, color };
+      let label = "Non noté";
+      if (score === null) { icon = "÷"; color = "var(--ink-4)"; label = "Groupe divisé, non compté"; }
+      else if (score === 1) { icon = "✓"; color = "var(--pour)"; label = "Aligné"; }
+      else if (score === 0.5) { icon = "≈"; color = "var(--warn)"; label = "Partiel"; }
+      else if (score === 0) { icon = "✕"; color = "var(--contre)"; label = "Opposé"; }
+      return { v, sc, groupPos, score, icon, color, label };
     })
     .filter((x): x is NonNullable<typeof x> => x !== null);
 
@@ -73,7 +74,10 @@ export function AuditTrail({ alignment, scrutins, votes }: AuditTrailProps) {
             alignItems: "baseline", columnGap: 8, rowGap: 4,
             padding: "10px 0", borderTop: "1px dashed var(--line)",
           }}>
-            <span style={{ color: r.color, fontWeight: 600 }}>{r.icon}</span>
+            <span
+              aria-label={r.label}
+              style={{ color: r.color, fontWeight: 600 }}
+            ><span aria-hidden="true">{r.icon}</span></span>
 
             {/* Title + optional concrete bullet */}
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>

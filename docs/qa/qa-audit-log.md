@@ -463,3 +463,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Sur /play, activer SR, tap une carte (front) puis lire le footer → SR doit lire "tap pour détails" sans "right-pointing angle quote"
 - [ ] Sur le verso, focus le lien "Voir sur AN" → SR doit lire "Voir le scrutin n°X sur le site de l'Assemblée Nationale, nouvel onglet"
 - [ ] Hover sur la carte recto avec souris : le `›` est visible visuellement, `‹` au verso aussi
+
+---
+
+## Session 21 — 2026-05-16
+
+### Vérification session 20
+
+- [VERIFIED] `Card.tsx:224` "tap pour détails" + aria-hidden span
+- [VERIFIED] `Card.tsx:303` "tap pour revenir" + aria-hidden span
+- [VERIFIED] `Card.tsx:309` AN link aria-label + aria-hidden inner span
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés (suite a11y caractères décoratifs + AuditTrail icons)
+
+- [FIXED] A11y · `Play.tsx:317` "Mon résultat →" — `→` décoratif lu "right-pointing arrow" par SR. Wrap dans `<span aria-hidden="true">`. · `src/routes/Play.tsx`
+- [FIXED] A11y · `Cover.tsx CTA sub-text` — 3 instances de `→` dans le template literal du span secondaire (`/${TARGET} terminés →`, hasInProgress, default). Sortie du template en JSX + `<span aria-hidden="true"> →</span>` séparé. · `src/routes/Cover.tsx`
+- [FIXED] A11y/sémantique · `AuditTrail.tsx` icônes ✓/≈/✕/÷ par-row n'avaient aucun label sémantique. SR lisait "check mark titre-pedago" sans savoir que c'était un alignement. Ajout d'un champ `label` dans le rows mapping (Aligné/Partiel/Opposé/Groupe divisé) + `aria-label` sur le span icône + icône visuelle dans aria-hidden child. · `src/components/AuditTrail.tsx`
+
+### Vérifications à faire en session 22
+
+- [ ] Sur /play header avec >=5 votes, focus "Mon résultat →" → SR lit "Mon résultat" sans flèche
+- [ ] Sur /, focus bouton CTA → SR lit "Commencer ≈ 5 min · 20 votes" (sans flèche) selon état
+- [ ] Sur /result, expand un PartyRow, focus une icône d'alignement → SR doit annoncer "Aligné" / "Partiel" / "Opposé" / "Groupe divisé, non compté" selon le score
