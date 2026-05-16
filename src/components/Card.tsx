@@ -1,7 +1,8 @@
 // src/components/Card.tsx
 import { useEffect, useState } from "react";
-import { motion, type PanInfo } from "framer-motion";
+import { motion, useReducedMotion, type PanInfo } from "framer-motion";
 import type { Scrutin } from "../types";
+import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
 
 export interface CardProps {
   scrutin: Scrutin;
@@ -35,6 +36,20 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
   // triggered by tapping the card body) or the structured analyse (triggered
   // by the "+ analyse" button on the front).
   const [backVariant, setBackVariant] = useState<BackVariant>("explanation");
+
+  const reducedMotion = useReducedMotion();
+  const a11y = useFlipCardA11y({
+    flipped,
+    topMost,
+    scrutin,
+    onFlip: () => {
+      setFlipped((f) => {
+        if (!f) setBackVariant("explanation");
+        return !f;
+      });
+    },
+    onSwipe,
+  });
 
   // Tap (no drag movement) toggles flip. Tap on the card body → flip to
   // explanation. Tap on an <a>/<button> child is ignored so links and the
@@ -78,9 +93,11 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
 
   return (
     <motion.div
+      {...a11y.rootProps}
       drag={topMost && !flipped}
       dragSnapToOrigin
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+      dragElastic={reducedMotion ? 0 : 0.18}
       onTap={handleTap}
       onDragEnd={handleDragEnd}
       style={{
@@ -91,11 +108,12 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
         touchAction: topMost && !flipped ? "none" : "auto",
         perspective: 1500,
         height: "100%",
+        outline: "none",
       }}
     >
       <motion.div
         animate={{ rotateY: flipped ? 180 : 0 }}
-        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         style={{
           position: "relative",
           transformStyle: "preserve-3d",
@@ -103,7 +121,7 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
         }}
       >
         {/* FRONT — the question. Chapeau + "+ analyse" button + title + footer. */}
-        <div style={{ ...FACE_STYLE, gap: 22, justifyContent: "space-between", height: "100%" }}>
+        <div {...a11y.frontProps} style={{ ...FACE_STYLE, gap: 22, justifyContent: "space-between", height: "100%" }}>
           <div style={{
             display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12,
           }}>
@@ -181,6 +199,7 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
             analyse (tap "+ analyse"). Both share the same header and footer
             so the flip lands on a consistent visual shell. */}
         <div
+          {...a11y.backProps}
           style={{
             ...FACE_STYLE,
             position: "absolute",
