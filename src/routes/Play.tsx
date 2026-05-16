@@ -268,6 +268,20 @@ export default function Play() {
         margin: "0 auto",
       }}
     >
+      {/* Visually-hidden h1 so the Play page has a navigable landmark in
+        the SR heading rotor — the visible UI is interactive (deck) with
+        no on-screen title, but SR users need a way to identify the page. */}
+      <h1 style={{
+        position: "absolute",
+        width: 1, height: 1,
+        padding: 0, margin: -1,
+        overflow: "hidden",
+        clip: "rect(0, 0, 0, 0)",
+        whiteSpace: "nowrap",
+        border: 0,
+      }}>
+        Voter sur les scrutins
+      </h1>
       <div
         style={{
           display: "flex",

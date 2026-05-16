@@ -182,6 +182,20 @@ export default function Result() {
       </header>
 
       <div>
+        {/* Visually-hidden h2 so SR users navigating by headings find the
+          parties list (otherwise h1 → h2 personnalités jumps over the
+          main content of the page). */}
+        <h2 style={{
+          position: "absolute",
+          width: 1, height: 1,
+          padding: 0, margin: -1,
+          overflow: "hidden",
+          clip: "rect(0, 0, 0, 0)",
+          whiteSpace: "nowrap",
+          border: 0,
+        }}>
+          Alignement par groupe parlementaire
+        </h2>
         {ranked.map(a => (
           <div key={a.group}>
             <PartyRow

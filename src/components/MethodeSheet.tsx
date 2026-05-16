@@ -181,11 +181,15 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
 function Block({ emoji, title, children }: { emoji: string; title: string; children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <div style={{
+      {/* h3 (under MethodeSheet's h2 "Comment c'est fait ?"). Emoji wrapped
+        in aria-hidden span so SR doesn't read "outbox tray AN officiel" /
+        "sparkles Mis en forme par IA Claude" — emojis are decorative. */}
+      <h3 style={{
         fontFamily: "var(--font-mono)", fontSize: 10.5,
         letterSpacing: "0.12em", textTransform: "uppercase",
         color: "var(--accent)", fontWeight: 600,
-      }}>{emoji} {title}</div>
+        margin: 0,
+      }}><span aria-hidden="true">{emoji} </span>{title}</h3>
       <div style={{
         fontFamily: "var(--font-sans)", fontSize: 13.5, lineHeight: 1.55,
         color: "var(--ink-2)", textWrap: "pretty" as const,
