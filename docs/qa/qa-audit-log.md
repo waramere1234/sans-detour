@@ -946,3 +946,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `og:image` dans index.html → TODO production-blocker comment au-dessus
 - [ ] Sur /result, expand un PartyRow → SR doit pouvoir naviguer par "image" pour trouver les icônes d'alignement avec leur label
 - [ ] Tester `/methode#methode-05` direct URL → scroll doit être instantané (pas smooth) vers la Section 05
+
+---
+
+## Session 42 — 2026-05-16
+
+### Vérification session 41
+
+- [VERIFIED] index.html og:image avec TODO production-blocker comment
+- [VERIFIED] `AuditTrail:94` `role="img"` sur span icône
+- [VERIFIED] `Methode.tsx:27` `behavior: "instant"`
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés (wording + pluralization)
+
+- [FIXED] Wording · `FreshnessBanner` "MAJ il y a 0 j" / "prochaine sync dans 0 j" awkward (synchronisé aujourd'hui). Promote en langage naturel : "MAJ aujourd'hui" si past=0, "sync imminente" si next=0. Plus pluriel correct sur "jour"/"jours". · `src/components/FreshnessBanner.tsx`
+- [FIXED] French plural rule · `> 1 ? "s" : ""` était utilisé dans 2 endroits (Cover sub-text restants, Result skip). En français, le pluriel s'applique pour 0 aussi ("0 votes restants", "0 skips"). Règle correcte : `!== 1 ? "s" : ""`. · `src/routes/Cover.tsx`, `src/routes/Result.tsx`
+- [FIXED] Confirm dialog grammar · `Cover.tsx restart()` confirm text disait "Tes ${votesCount} votes en cours seront perdus" qui ne s'accorde pas pour votesCount=1 ("Tes 1 votes"). Branche explicite : "Ton 1 vote en cours sera perdu" vs "Tes N votes en cours seront perdus". · `src/routes/Cover.tsx`
+
+### Vérifications à faire en session 43
+
+- [ ] Mock fetchFreshness avec `last_sync_at = today`, `next_sync_eta = today` → banner doit dire "MAJ aujourd'hui · sync imminente"
+- [ ] Sur Result avec 0 skips → "20 scrutins · 20 comptés · 0 skips" (pluriel)
+- [ ] Sur Cover avec 1 vote en cours, cliquer "Recommencer à zéro" → confirm dit "Ton 1 vote en cours sera perdu" (pas "Tes 1 votes")

@@ -58,7 +58,9 @@ export default function Cover() {
 
   function restart() {
     const ok = window.confirm(
-      `Recommencer à zéro ? Tes ${votesCount} votes en cours seront perdus.`,
+      votesCount === 1
+        ? "Recommencer à zéro ? Ton 1 vote en cours sera perdu."
+        : `Recommencer à zéro ? Tes ${votesCount} votes en cours seront perdus.`,
     );
     if (!ok) return;
     // resetSession only clears the session key — the cover-seen flag is
@@ -199,7 +201,7 @@ export default function Cover() {
               {hasCompleted
                 ? `${votesCount}/${TARGET} terminés`
                 : hasInProgress
-                  ? `${votesCount}/${TARGET} · ${remainingVotes} restant${remainingVotes > 1 ? "s" : ""}`
+                  ? `${votesCount}/${TARGET} · ${remainingVotes} restant${remainingVotes !== 1 ? "s" : ""}`
                   : "≈ 5 min · 20 votes"}
               <span aria-hidden="true"> →</span>
             </span>

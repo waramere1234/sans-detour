@@ -36,6 +36,10 @@ export function FreshnessBanner({ info }: { info: FreshnessInfo }) {
     dot: "var(--accent)",
     title: "Données à jour",
   };
+  // "0 j" reads awkwardly — promote to natural-language phrasing for the
+  // two boundary cases (today + imminent). Same for the past/next plural.
+  const pastPhrase = past === 0 ? "MAJ aujourd'hui" : `MAJ il y a ${past} jour${past !== 1 ? "s" : ""}`;
+  const nextPhrase = next === 0 ? "sync imminente" : `prochaine sync dans ${next} jour${next !== 1 ? "s" : ""}`;
   return (
     <div
       role="status"
@@ -61,7 +65,7 @@ export function FreshnessBanner({ info }: { info: FreshnessInfo }) {
           fontFamily: "var(--font-mono)", fontSize: 11,
           color: "var(--ink-2)", letterSpacing: "0.04em", marginTop: 3,
         }}>
-          {info.total_scrutins} scrutins · MAJ il y a {past} j · prochaine sync dans {next} j
+          {info.total_scrutins} scrutins · {pastPhrase} · {nextPhrase}
         </div>
       </div>
     </div>
