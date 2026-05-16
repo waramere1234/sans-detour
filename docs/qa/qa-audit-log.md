@@ -1425,3 +1425,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `optionnel pour le ship initial` dans `SHIP-V1.md` → 0 résultat
 - [ ] Sur iPhone X+ Simulator (PWA), `/` → CTA Commencer visible sans scroll ; `/play` → 3 boutons (Contre/Je passe/Pour) visibles sans scroll
 - [ ] `npm run test:run` → 123 tests verts (stable)
+
+---
+
+## Session 63 — 2026-05-17
+
+### Vérification session 62
+
+- [VERIFIED] `src/lib/supabase.ts` : 0 cast `as string | undefined` (juste un commentaire historique)
+- [VERIFIED] `SHIP-V1.md` : 0 mention "optionnel pour le ship initial"
+- [VERIFIED] `src/App.tsx:22` + `src/routes/Cover.tsx:98` utilisent `calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))`
+- 123/123 tests verts, typecheck clean
+
+### Bugs fixés (3 follow-ups iOS PWA safe-area — gaps post sessions 57+61+62)
+
+- [FIXED] Play.tsx overflow · `playSectionStyle.minHeight: calc(100dvh - 60px)` ne soustrayait pas les safe-areas. Sur iPhone 13 PWA (47+34=81px safe), la section overflowait son parent (App outer = 100dvh - 81) de 21px → button row Contre/Je passe/Pour glissait sous le fold. Aligné sur le pattern App+Cover de session 62 : `calc(100dvh - 60px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))`. · `src/routes/Play.tsx`
+- [FIXED] Methode anchor jump iPhone PWA · `Section scrollMarginTop: 64` (= TopBar 52 + 12 breathing) suffisait sur non-notched. Mais session 61 a fait TopBar sticky à `top: env(safe-area-inset-top)`, donc post-scroll le TopBar pinote à viewport y=47 (notch) + height 53 = y=100 sur iPhone 13. scrollMarginTop=64 lande le heading à y=64, masqué sous TopBar. Fix : `calc(64px + env(safe-area-inset-top, 0px))` → y=64+47=111, juste en-dessous du TopBar à y=100. · `src/routes/Methode.tsx`
+- [FIXED] Bottom-sheets sous home indicator · `RankingOverlay` et `MethodeSheet` ont tous deux `position: fixed; bottom: 0` — le bord inférieur du sheet est à viewport y=100dvh, ce qui chevauche le home indicator iPhone X+ (~34px). Le dernier élément (PartyRow / bouton CTA) passe sous l'indicator, semi-masqué et difficile à tapper. Fix : `padding-bottom: calc(<existing>px + env(safe-area-inset-bottom, 0px))` sur les deux sheets — le contenu interne respecte l'indicator, le fond du sheet continue à border edge-to-edge. · `src/components/RankingOverlay.tsx`, `src/components/MethodeSheet.tsx`
+
+### Vérifications à faire en session 64
+
+- [ ] grep `minHeight.*100dvh - 60px"$` dans src/ → 0 résultat (le `"$` exclu la version avec env())
+- [ ] grep `scrollMarginTop: 64\b` dans src/ → 0 résultat
+- [ ] iPhone X+ Simulator (PWA) : ouvrir RankingOverlay sur /play (chip Top1 → 5+ votes), vérifier que la dernière PartyRow + le close button ne sont pas masqués par le home indicator

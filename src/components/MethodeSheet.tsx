@@ -107,7 +107,10 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
               borderTop: "1px solid var(--line)",
               borderRadius: "14px 14px 0 0",
               zIndex: 41,
-              padding: "22px var(--gutter) 28px",
+              // Bottom padding includes safe-area-inset-bottom so the
+              // primary/secondary buttons stay above the iOS home indicator
+              // on PWA (same fix as RankingOverlay).
+              padding: "22px var(--gutter) calc(28px + env(safe-area-inset-bottom, 0px))",
               display: "flex", flexDirection: "column", gap: 16,
             }}
           >

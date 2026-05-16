@@ -20,14 +20,16 @@ const CAP_PER_CHAPEAU_PREFIX = 2;
 
 // Shared layout for the Play page section — used by both the loading-skeleton
 // return and the real deck return so they don't drift. minHeight uses 100dvh
-// minus the 60-px TopBar so the page fills the viewport without the bottom
-// buttons shifting between skeleton and content.
+// minus the 60-px TopBar AND the iOS safe-area insets (notch top + home
+// indicator bottom), otherwise the Contre/Je passe/Pour row slid below the
+// fold on iPhone 13 PWA — same pattern as App.tsx + Cover.tsx (session 62).
 const playSectionStyle: CSSProperties = {
   padding: "18px var(--gutter) 16px",
   display: "flex",
   flexDirection: "column",
   gap: 18,
-  minHeight: "calc(100dvh - 60px)",
+  minHeight:
+    "calc(100dvh - 60px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))",
   maxWidth: "var(--max-content)",
   margin: "0 auto",
 };

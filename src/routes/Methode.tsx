@@ -197,14 +197,21 @@ function Section({ n, title, children }: { n: string; title: string; children: R
       // focus doesn't follow.
       tabIndex={-1}
       className="methode-section"
-      // scrollMarginTop=64 ≈ TopBar height (~52px sticky) + 12px breathing
-      // room. Without it, anchor jumps land the heading visually under the
-      // sticky TopBar — user scrolls to §07 but the heading is hidden.
+      // scrollMarginTop = TopBar height (~52px sticky) + 12px breathing,
+      // PLUS env(safe-area-inset-top) because the TopBar sits below the
+      // notch on iOS PWA (cf. session 61 fix in TopBar.tsx). Without the
+      // env() term, anchor jumps on iPhone X+ PWA land the heading visually
+      // under the TopBar (heading lost behind the bar).
       // (outline:none + focus-visible ring live in index.css under
       // .methode-section so the suppression and the keyboard ring stay
       // in sync — pure inline outline:none would also hide the keyboard
       // focus indicator.)
-      style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid var(--line)", scrollMarginTop: 64 }}
+      style={{
+        marginTop: 32,
+        paddingTop: 24,
+        borderTop: "1px solid var(--line)",
+        scrollMarginTop: "calc(64px + env(safe-area-inset-top, 0px))",
+      }}
     >
       <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
         <span style={{

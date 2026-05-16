@@ -99,7 +99,11 @@ export function RankingOverlay({ open, alignments, countedTotal, onClose }: Rank
               background: "var(--bg)",
               borderTop: "1px solid var(--line)",
               borderRadius: "20px 20px 0 0",
-              padding: "20px 22px 32px",
+              // The sheet's visible bottom edge is at viewport y = 100dvh on
+              // iOS PWA, which lands on/under the home indicator (~34px tall).
+              // Add the safe-area inset to the bottom padding so the last
+              // PartyRow stays above the indicator.
+              padding: "20px 22px calc(32px + env(safe-area-inset-bottom, 0px))",
               zIndex: 101,
             }}
           >
