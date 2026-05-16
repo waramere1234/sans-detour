@@ -13,8 +13,6 @@ export interface CardProps {
 
 const SWIPE_THRESHOLD = 120;
 
-type BackVariant = "explanation" | "analyse";
-
 // Shared card-face style so front and back have identical visual dimensions.
 const FACE_STYLE: React.CSSProperties = {
   background: "var(--bg-2)",
@@ -33,49 +31,28 @@ const FACE_STYLE: React.CSSProperties = {
 
 export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
   const [flipped, setFlipped] = useState(false);
-  // Which content shows on the back when flipped: the explanation (default,
-  // triggered by tapping the card body) or the structured analyse (triggered
-  // by the "+ analyse" button on the front).
-  const [backVariant, setBackVariant] = useState<BackVariant>("explanation");
 
   const reducedMotion = useReducedMotion();
   const a11y = useFlipCardA11y({
     flipped,
     topMost,
     scrutin,
-    onFlip: () => {
-      setFlipped((f) => {
-        if (!f) setBackVariant("explanation");
-        return !f;
-      });
-    },
+    onFlip: () => setFlipped((f) => !f),
     onSwipe,
   });
 
-  // Tap (no drag movement) toggles flip. Tap on the card body → flip to
-  // explanation. Tap on an <a>/<button> child is ignored so links and the
-  // "+ analyse" button still fire their own onClick handlers.
+  // Tap on the card body toggles flip. Tap on an <a>/<button> child is ignored
+  // so links and the chip IA still fire their own onClick handlers.
   function handleTap(e: MouseEvent | TouchEvent | PointerEvent) {
     if (!topMost) return;
     const target = e.target as HTMLElement | null;
     if (target && target.closest("a, button")) return;
-    setFlipped((f) => {
-      if (!f) {
-        // Front → back: body taps always go to the explanation variant.
-        setBackVariant("explanation");
-      }
-      return !f;
-    });
+    setFlipped((f) => !f);
   }
 
-  function showAnalyse() {
-    setBackVariant("analyse");
-    setFlipped(true);
-  }
-
-  // Keyboard-only users can reach the back via Tab → Enter on "+ analyse"
-  // but there's no pointer-free way back: framer-motion onTap doesn't fire
-  // on keyboard events. ESC mirrors the modal-close convention.
+  // Keyboard-only users can reach the back via Tab → Enter on the chip but
+  // framer-motion onTap doesn't fire on keyboard events. ESC mirrors the
+  // modal-close convention.
   useEffect(() => {
     if (!topMost || !flipped) return;
     const onKey = (e: KeyboardEvent) => {
@@ -92,8 +69,6 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
 
   function handleDragEnd(_: unknown, info: PanInfo) {
     if (!topMost || !onSwipe) return;
-    // Swipe is only intended on the front face — when flipped, dragging is
-    // disabled below, so this branch only runs for the front.
     if (info.offset.x < -SWIPE_THRESHOLD) onSwipe("left");
     else if (info.offset.x > SWIPE_THRESHOLD) onSwipe("right");
     else if (info.offset.y > SWIPE_THRESHOLD) onSwipe("down");
@@ -111,13 +86,9 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
       style={{
         cursor: topMost ? (flipped ? "pointer" : "grab") : "default",
         userSelect: "none",
-        // Allow vertical scroll inside the back face when flipped; lock to
-        // gestures on the front so swipe-down works as expected.
         touchAction: topMost && !flipped ? "none" : "auto",
         perspective: 1500,
         height: "100%",
-        // outline:none moved to index.css under [role="article"]:focus:not(:focus-visible)
-        // so the focus-visible ring (keyboard) still wins over the inline style.
       }}
     >
       <motion.div
@@ -129,67 +100,39 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
           height: "100%",
         }}
       >
-        {/* FRONT — the question. Chapeau + "+ analyse" button + title + footer. */}
+        {/* FRONT — chapeau + chip IA, title, 3 bullets, footer (date + n°). */}
         <div {...a11y.frontProps} style={{ ...FACE_STYLE, gap: 22, justifyContent: "space-between", height: "100%" }}>
           <div style={{
-            display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12,
+            fontFamily: "var(--font-mono)", fontSize: 11,
+            letterSpacing: "0.12em", textTransform: "uppercase",
+            color: "var(--accent)", fontWeight: 500,
           }}>
-            <div style={{
-              fontFamily: "var(--font-mono)", fontSize: 11,
-              letterSpacing: "0.12em", textTransform: "uppercase",
-              color: "var(--accent)", fontWeight: 500,
-              flex: 1,
-            }}>
-              {scrutin.chapeau}
-              {topMost && onOpenMethode && (
-                <>
-                  {" · "}
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); onOpenMethode(); }}
-                    onPointerDown={(e) => e.stopPropagation()}
-                    aria-label="Comment ce contenu a été préparé"
-                    style={{
-                      background: "transparent",
-                      border: "none",
-                      color: "inherit",
-                      opacity: 0.7,
-                      cursor: "pointer",
-                      padding: "4px 2px",
-                      fontFamily: "inherit",
-                      fontSize: "inherit",
-                      letterSpacing: "inherit",
-                      textTransform: "inherit",
-                      textDecoration: "underline",
-                      textUnderlineOffset: 3,
-                      textDecorationStyle: "dotted",
-                    }}
-                  >✨IA</button>
-                </>
-              )}
-            </div>
-            {topMost && scrutin.analyse_loi && (
-              // Only render the "+ analyse" button when there's actual
-              // analyse data. Previously it stayed visible (muted ink-3)
-              // and clicking it showed a "pas encore disponible" fallback
-              // — a button that "looks disabled but isn't" is confusing.
-              // No data = no entry point.
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); showAnalyse(); }}
-                onPointerDown={(e) => e.stopPropagation()}
-                aria-label="Voir l'analyse détaillée du scrutin"
-                style={{
-                  background: "transparent",
-                  border: "1px solid var(--line)",
-                  color: "var(--accent)",
-                  fontFamily: "var(--font-mono)", fontSize: 10,
-                  padding: "6px 10px", borderRadius: 3,
-                  cursor: "pointer", letterSpacing: "0.08em",
-                  whiteSpace: "nowrap",
-                  textTransform: "uppercase",
-                }}
-              >+ analyse</button>
+            {scrutin.chapeau}
+            {topMost && onOpenMethode && (
+              <>
+                {" · "}
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); onOpenMethode(); }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  aria-label="Comment ce contenu a été préparé"
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "inherit",
+                    opacity: 0.7,
+                    cursor: "pointer",
+                    padding: "4px 2px",
+                    fontFamily: "inherit",
+                    fontSize: "inherit",
+                    letterSpacing: "inherit",
+                    textTransform: "inherit",
+                    textDecoration: "underline",
+                    textUnderlineOffset: 3,
+                    textDecorationStyle: "dotted",
+                  }}
+                >✨IA</button>
+              </>
             )}
           </div>
 
@@ -229,17 +172,16 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             paddingTop: 14,
           }}>
             <span>{new Date(scrutin.date).toLocaleDateString("fr-FR")}</span>
-            <span style={{ color: "var(--ink-2)" }}>tap pour détails<span aria-hidden="true"> ›</span></span>
             {scrutin.url_an_officielle
               ? <span>n° {scrutin.numero}</span>
               : <span style={{ color: "var(--accent)" }}>démo</span>}
           </div>
         </div>
 
-        {/* BACK — same bounding box as front, rotated 180° so it shows after flip.
-            Content switches based on backVariant: explanation (tap card) or
-            analyse (tap "+ analyse"). Both share the same header and footer
-            so the flip lands on a consistent visual shell. */}
+        {/* BACK — single unified scrollable verso : header → contexte LLM →
+         *  sections analyse_loi (si présent) → separator → intitulé officiel AN →
+         *  footer. Le titre_pedago n'est PAS répété (le user vient de le voir
+         *  200ms avant en flipant). */}
         <div
           {...a11y.backProps}
           style={{
@@ -251,7 +193,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             gap: 16,
           }}
         >
-          {/* Shared header */}
+          {/* Shared header — chapeau + n° + date */}
           <div style={{
             display: "flex", justifyContent: "space-between", alignItems: "baseline",
             fontFamily: "var(--font-mono)", fontSize: 10,
@@ -259,49 +201,62 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             color: "var(--ink-3)",
             paddingBottom: 8, borderBottom: "1px solid var(--line)",
           }}>
-            <span style={{ color: "var(--accent)" }}>
-              {backVariant === "analyse" ? "Analyse · " : ""}{scrutin.chapeau}
-            </span>
+            <span style={{ color: "var(--accent)" }}>{scrutin.chapeau}</span>
             <span>n° {scrutin.numero} · {new Date(scrutin.date).toLocaleDateString("fr-FR")}</span>
           </div>
 
-          {/* The explanation variant keeps the big titre as anchor; the
-              analyse variant goes lighter (the titre is already on the front
-              the user just flipped from). */}
-          {backVariant === "explanation" ? (
-            <>
-              <div style={{
-                fontFamily: "var(--font-sans)", fontWeight: 600,
-                fontSize: 18, lineHeight: 1.3, letterSpacing: "-0.012em",
-                color: "var(--ink)",
-              }}>{scrutin.titre_pedago}</div>
-              <ExplanationBody scrutin={scrutin} />
-            </>
-          ) : (
-            <>
-              <div style={{
-                fontFamily: "var(--font-sans)", fontWeight: 500,
-                fontSize: 13, lineHeight: 1.35,
-                color: "var(--ink-3)", textWrap: "pretty" as const,
-              }}>{scrutin.titre_pedago}</div>
-              <AnalyseBody scrutin={scrutin} />
-              {/* IA attribution footer — only on the analyse variant since this face
-               *  is 100% LLM-generated content (mesures, concernés, calendrier,
-               *  exceptions all come from analyse_loi). */}
-              <div style={{
-                marginTop: 8, paddingTop: 8,
-                borderTop: "1px dashed var(--line)",
-                fontFamily: "var(--font-mono)", fontSize: 9.5,
-                letterSpacing: "0.08em",
-                color: "var(--ink-3)", textAlign: "center",
-                lineHeight: 1.5,
-              }}>
-                Synthèse mise en forme par Claude,<br/>basée sur le libellé officiel AN.
-              </div>
-            </>
+          {/* Contexte LLM (or friendly fallback if absent) */}
+          <div style={{
+            fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.6,
+            color: "var(--ink-2)", textWrap: "pretty" as const,
+          }}>
+            {scrutin.contexte ? (
+              renderWithBold(scrutin.contexte)
+            ) : (
+              <em style={{ color: "var(--ink-3)" }}>
+                Aucune explication détaillée disponible pour ce scrutin. Le texte officiel ci-dessous donne le sujet général.
+              </em>
+            )}
+          </div>
+
+          {/* Analyse détaillée — rendue uniquement si analyse_loi présent */}
+          {scrutin.analyse_loi && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <ColoredSection accent="var(--accent)" title="Mesures" bullets={scrutin.analyse_loi.mesures_principales} />
+              <ColoredImpact
+                positifs={scrutin.analyse_loi.concernes_positifs}
+                negatifs={scrutin.analyse_loi.concernes_negatifs}
+                neutres={scrutin.analyse_loi.concernes_neutres}
+              />
+              <ColoredSection accent="var(--warn)" title="Calendrier" bullets={scrutin.analyse_loi.calendrier} />
+              <ColoredSection accent="var(--ink-3)" title="Exceptions" bullets={scrutin.analyse_loi.exceptions} />
+            </div>
           )}
 
-          {/* Shared footer */}
+          {/* Separator: explicitly marks the boundary between LLM-rendered
+           *  content (above) and the raw AN libellé (below). Désamorce le
+           *  réflexe « biais IA » en plaçant les deux côte à côte. */}
+          <div style={{
+            paddingTop: 10, marginTop: 4,
+            borderTop: "1px solid var(--line)",
+            fontFamily: "var(--font-mono)", fontSize: 9.5,
+            letterSpacing: "0.1em", textTransform: "uppercase",
+            color: "var(--ink-3)", textAlign: "center",
+          }}>
+            ↑ Synthèse IA  ·  ↓ texte officiel AN
+          </div>
+
+          {/* Intitulé brut AN */}
+          <div style={{
+            fontFamily: "var(--font-mono)", fontSize: 10,
+            color: "var(--ink-3)", letterSpacing: "0.04em",
+            lineHeight: 1.5,
+          }}>
+            <span style={{ textTransform: "uppercase", letterSpacing: "0.12em" }}>Intitulé officiel AN · </span>
+            <span style={{ fontFamily: "var(--font-sans)", fontSize: 11.5 }}>{scrutin.titre_brut}</span>
+          </div>
+
+          {/* Shared footer — tap pour revenir + lien AN */}
           <div style={{
             marginTop: "auto",
             paddingTop: 12, borderTop: "1px solid var(--line)",
@@ -327,83 +282,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
   );
 }
 
-// ─────────────────────────────────────────────────── BACK VARIANTS
-
-function ExplanationBody({ scrutin }: { scrutin: Scrutin }) {
-  return (
-    <>
-      <div style={{
-        fontFamily: "var(--font-sans)", fontSize: 14, lineHeight: 1.6,
-        color: "var(--ink-2)", textWrap: "pretty" as const,
-      }}>
-        {scrutin.contexte ? (
-          renderWithBold(scrutin.contexte)
-        ) : (
-          <em style={{ color: "var(--ink-3)" }}>
-            Aucune explication détaillée disponible pour ce scrutin. Le titre officiel ci-dessous donne le sujet général.
-          </em>
-        )}
-      </div>
-
-      {/* Separation line between LLM-rendered summary and the raw AN libellé.
-       *  Replaces the previous dashed top-border so the boundary is verbalised
-       *  rather than just visual — désamorce le réflexe "biais IA". */}
-      <div style={{
-        paddingTop: 10, marginTop: 4,
-        borderTop: "1px solid var(--line)",
-        fontFamily: "var(--font-mono)", fontSize: 9.5,
-        letterSpacing: "0.1em", textTransform: "uppercase",
-        color: "var(--ink-3)", textAlign: "center",
-      }}>
-        ↑ Résumé IA  ·  ↓ libellé officiel AN
-      </div>
-
-      <div style={{
-        fontFamily: "var(--font-mono)", fontSize: 10,
-        color: "var(--ink-3)", letterSpacing: "0.04em",
-        lineHeight: 1.5,
-      }}>
-        <span style={{ textTransform: "uppercase", letterSpacing: "0.12em" }}>Intitulé officiel AN · </span>
-        <span style={{ fontFamily: "var(--font-sans)", fontSize: 11.5 }}>{scrutin.titre_brut}</span>
-      </div>
-    </>
-  );
-}
-
-function AnalyseBody({ scrutin }: { scrutin: Scrutin }) {
-  const a = scrutin.analyse_loi;
-  if (!a) {
-    return (
-      <div style={{
-        border: "1px dashed var(--line)",
-        borderRadius: 6,
-        padding: "16px 18px",
-        fontFamily: "var(--font-sans)", fontSize: 12.5, lineHeight: 1.55,
-        color: "var(--ink-2)", textAlign: "center",
-      }}>
-        Analyse détaillée pas encore disponible pour ce scrutin.<br/>
-        <span style={{ color: "var(--ink-3)", fontSize: 11 }}>
-          Sera générée au prochain run du pipeline d'ingestion.
-        </span>
-      </div>
-    );
-  }
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <ColoredSection accent="var(--accent)" title="Mesures principales" bullets={a.mesures_principales} />
-
-      <ColoredImpact
-        positifs={a.concernes_positifs}
-        negatifs={a.concernes_negatifs}
-        neutres={a.concernes_neutres}
-      />
-
-      <ColoredSection accent="var(--warn)" title="Calendrier" bullets={a.calendrier} />
-
-      <ColoredSection accent="var(--ink-3)" title="Exceptions et cas particuliers" bullets={a.exceptions} />
-    </div>
-  );
-}
+// ─────────────────────────────────────────────────── ANALYSE SECTIONS
 
 /** Section title in the accent color, with a thin colored left border on the
  *  bullet list. Bullets themselves stay in --ink-2 for readability — the color

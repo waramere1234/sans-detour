@@ -117,14 +117,47 @@ describe("Card a11y", () => {
     expect(onOpenMethode).toHaveBeenCalled();
   });
 
-  it("renders verso explanation with separation line between context and AN libellé", () => {
+  it("verso shows contexte, separator and intitulé AN in a single unified face", () => {
     render(<Card scrutin={mkScrutin()} topMost={true} />);
     fireEvent.keyDown(screen.getByRole("article"), { key: "Enter" });
-    expect(screen.getByText(/Résumé IA/i)).toBeInTheDocument();
-    expect(screen.getByText(/libellé officiel AN/i)).toBeInTheDocument();
+    // Contexte LLM (renderWithBold strips the ** markers; matching the inner word "renforcée")
+    expect(screen.getByText(/renforc/i)).toBeInTheDocument();
+    // Separator line marking the IA / AN boundary
+    expect(screen.getByText(/Synthèse IA/i)).toBeInTheDocument();
+    // Raw AN libellé below the separator
+    expect(screen.getByText(/Intitulé officiel AN/i)).toBeInTheDocument();
   });
 
-  it("renders verso analyse with Claude attribution footer", () => {
+  it("verso shows analyse sections when analyse_loi is present", () => {
+    const scrutin = mkScrutin();
+    scrutin.analyse_loi = {
+      mesures_principales: ["Mesure A"],
+      concernes_positifs: ["Bénéficiaire X"],
+      concernes_negatifs: [], concernes_neutres: [],
+      calendrier: ["Date Y"],
+      exceptions: [],
+    };
+    render(<Card scrutin={scrutin} topMost={true} />);
+    fireEvent.keyDown(screen.getByRole("article"), { key: "Enter" });
+    // All sections render at once on the unified verso — no toggle, no +analyse click
+    expect(screen.getByText(/Mesure A/)).toBeInTheDocument();
+    expect(screen.getByText(/Bénéficiaire X/)).toBeInTheDocument();
+    expect(screen.getByText(/Date Y/)).toBeInTheDocument();
+  });
+
+  it("verso skips analyse sections when analyse_loi is null", () => {
+    const scrutin = mkScrutin();
+    delete scrutin.analyse_loi;
+    render(<Card scrutin={scrutin} topMost={true} />);
+    fireEvent.keyDown(screen.getByRole("article"), { key: "Enter" });
+    // Contexte and AN libellé still present
+    expect(screen.getByText(/Synthèse IA/i)).toBeInTheDocument();
+    expect(screen.getByText(/Intitulé officiel AN/i)).toBeInTheDocument();
+    // No "Mesures" section header (exact-match uppercase mono label)
+    expect(screen.queryByText(/^Mesures$/)).not.toBeInTheDocument();
+  });
+
+  it("recto does not render a + analyse button (merged into unified verso)", () => {
     const scrutin = mkScrutin();
     scrutin.analyse_loi = {
       mesures_principales: ["Mesure A"],
@@ -132,7 +165,6 @@ describe("Card a11y", () => {
       calendrier: [], exceptions: [],
     };
     render(<Card scrutin={scrutin} topMost={true} />);
-    fireEvent.click(screen.getByRole("button", { name: /voir l'analyse/i }));
-    expect(screen.getByText(/synthèse mise en forme par claude/i)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /voir l'analyse/i })).not.toBeInTheDocument();
   });
 });
