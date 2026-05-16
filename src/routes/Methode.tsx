@@ -34,7 +34,7 @@ export default function Methode() {
           lineHeight: 1.15, letterSpacing: "-0.022em", margin: "10px 0 0",
         }}>Comment on calcule, et avec quelles données<span style={{ color: "var(--accent)" }}>.</span></h1>
         <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.55, marginTop: 12 }}>
-          Aucune opinion, aucun panel, aucune IA pour calculer ton alignement. Juste les votes officiels de l'Assemblée Nationale, et une formule de comparaison qu'on pose ici noir sur blanc.
+          Aucune opinion, aucun panel. <b>Le calcul d'alignement est une formule mathématique pure — l'IA n'y intervient pas.</b> En revanche, les résumés, les points clés et les synthèses des scrutins sont mis en forme par Claude (voir section 07).
         </p>
       </header>
 
