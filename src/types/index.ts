@@ -77,7 +77,7 @@ export interface Scrutin {
   theme?: Theme;                 // thematic bucket used by the deck composer
                                  // to enforce diversity (migration 0005).
   votes_personnalites?: Partial<Record<PersonnaliteCode, PersonnaliteVote>>;
-                                 // individual votes of the 10 indexed
+                                 // individual votes of the 8 indexed
                                  // personalities (migration 0006). Partial
                                  // because some personalities may not be
                                  // députés at a given date (non_dispo).

@@ -123,11 +123,26 @@ export default function Play() {
         navigate("/result");
         return;
       }
+      // The memoised counts above are stale at this point — `recordVote`
+      // just ran but the memo deps haven't recomputed yet. Build a fresh
+      // copy that includes the scrutin we just voted on so drawNext can't
+      // pick another card from the same dossier/sujet and bust the caps.
+      const justVoted = pool.find((s) => s.id === scrutinId);
+      const fresherDossiers = new Map(seenDossierCounts);
+      const fresherPrefixes = new Map(seenPrefixCounts);
+      if (justVoted) {
+        fresherDossiers.set(
+          justVoted.dossier_id,
+          (fresherDossiers.get(justVoted.dossier_id) ?? 0) + 1,
+        );
+        const pref = chapeauPrefix(justVoted);
+        fresherPrefixes.set(pref, (fresherPrefixes.get(pref) ?? 0) + 1);
+      }
       const next = drawNext(pool, new Set([...cardsSeenSet, scrutinId]), {
         capPerDossier: CAP_PER_DOSSIER,
         capPerChapeauPrefix: CAP_PER_CHAPEAU_PREFIX,
-        seenDossierCounts,
-        seenChapeauPrefixCounts: seenPrefixCounts,
+        seenDossierCounts: fresherDossiers,
+        seenChapeauPrefixCounts: fresherPrefixes,
       });
       setDeck(next ? [next] : []);
       if (!next) navigate("/result");

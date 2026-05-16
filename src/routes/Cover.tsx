@@ -1,5 +1,5 @@
 // src/routes/Cover.tsx
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Wordmark } from "../components/Wordmark";
 import { FreshnessBanner } from "../components/FreshnessBanner";
@@ -12,10 +12,16 @@ const TARGET = 20;
 
 export default function Cover() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [info, setInfo] = useState<FreshnessInfo | null>(null);
 
   useEffect(() => {
-    if (hasSeenCover()) {
+    // Explicit nav from the TopBar wordmark passes { fromLogo: true } so
+    // the user lands on the home screen instead of being bounced back to
+    // their in-progress deck. Fresh app opens have no state and keep the
+    // auto-resume behavior.
+    const fromLogo = (location.state as { fromLogo?: boolean } | null)?.fromLogo === true;
+    if (!fromLogo && hasSeenCover()) {
       const s = loadSession();
       const votes = s?.votes.length ?? 0;
       if (votes >= TARGET) navigate("/result", { replace: true });
@@ -23,7 +29,7 @@ export default function Cover() {
       return;
     }
     fetchFreshness().then(setInfo).catch(() => {});
-  }, [navigate]);
+  }, [navigate, location.state]);
 
   function start() {
     markCoverSeen();
@@ -33,11 +39,11 @@ export default function Cover() {
 
   return (
     <section style={{
-      padding: "32px 22px",
+      padding: "32px var(--gutter)",
       display: "flex",
       flexDirection: "column",
       gap: 24,
-      maxWidth: 480,
+      maxWidth: "var(--max-content)",
       margin: "0 auto",
       minHeight: "100dvh",
     }}>
@@ -48,7 +54,12 @@ export default function Cover() {
         paddingBottom: 18,
         borderBottom: "1px solid var(--line)",
       }}>
-        <Link to="/" aria-label="Accueil" style={{ textDecoration: "none", color: "inherit" }}>
+        <Link
+          to="/"
+          state={{ fromLogo: true }}
+          aria-label="Accueil"
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
           <Wordmark size={14} />
         </Link>
         <span style={{
