@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Wordmark } from "../components/Wordmark";
 import { FreshnessBanner } from "../components/FreshnessBanner";
 import { fetchFreshness } from "../lib/scrutins";
@@ -9,7 +9,19 @@ import type { FreshnessInfo } from "../types";
 
 export default function Methode() {
   const [info, setInfo] = useState<FreshnessInfo | null>(null);
+  const location = useLocation();
   useEffect(() => { fetchFreshness().then(setInfo).catch(() => {}); }, []);
+
+  // SPA hash scroll : when user lands on `/methode#methode-07` directly,
+  // the browser's native anchor jump happens BEFORE React mounts the
+  // Section elements — so the target id doesn't exist yet and the scroll
+  // is a no-op. Run our own scrollIntoView after mount as a fallback.
+  useEffect(() => {
+    if (!location.hash) return;
+    const id = location.hash.slice(1);
+    const el = document.getElementById(id);
+    el?.scrollIntoView({ behavior: "auto", block: "start" });
+  }, [location.hash]);
 
   return (
     <section style={{ maxWidth: 720, margin: "0 auto", padding: "24px var(--gutter) 48px" }}>
@@ -63,9 +75,9 @@ export default function Methode() {
         {[
           ["01", "Données"],
           ["02", "Scrutins"],
-          ["03", "Position groupe"],
+          ["03", "Position d'un groupe"],
           ["04", "Calcul"],
-          ["05", "Tes données"],
+          ["05", "Confidentialité"],
           ["06", "Indépendance"],
           ["07", "IA Claude"],
         ].map(([n, label]) => (
