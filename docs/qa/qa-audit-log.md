@@ -1130,3 +1130,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `resvg` dans `.gitignore` → 0 résultat
 - [ ] grep `VITE_PLAUSIBLE_DOMAIN` dans repo (hors docs/qa et MEMORY) → 0 résultat (ou seulement la note explicative dans .env.local.example)
 - [ ] `curl -I https://sansdetour.fr/api/share-card.png` → 404 (ou rewrite vers /index.html selon le catch-all), plus de SVG-as-PNG ; `.svg` doit toujours marcher
+
+---
+
+## Session 50 — 2026-05-16
+
+### Vérification session 49
+
+- [VERIFIED] `.gitignore` ne contient plus `public/resvg.wasm`
+- [VERIFIED] `.env.local.example` ne déclare plus `VITE_PLAUSIBLE_DOMAIN=` ; remplacé par une note explicite pointant vers `index.html`
+- [VERIFIED] `vercel.json` ne référence plus `/api/share-card.png` (rewrite supprimée)
+- 93/93 tests verts, typecheck clean
+
+### Bugs fixés (stale docs + DRY drift sur types)
+
+- [FIXED] Stale docs · `SHIP-V1.md` annonçait "33/33 tests" (en réalité 93), "PNG share-card" (l'endpoint sert SVG only depuis l'abandon de resvg-wasm pré-V1, cf `api/share-card.ts:5`) et listait `SUPABASE_SERVICE_ROLE_KEY` + `ANTHROPIC_API_KEY` comme env vars Vercel "pour l'edge function share-card" — faux : `api/share-card.ts` ne tape pas Supabase (juste Satori + font), et Anthropic ne tourne pas en prod. Cleanup en 3 endroits : compte de tests, instructions Vercel env (réduit de 4 à 2 vars), smoke test mentionne `.svg`. · `SHIP-V1.md`
+- [FIXED] DRY drift · `ScrutinAnalyse` était re-déclaré localement dans `scripts/ingest-an.ts:435` ET `scripts/resume-ingest.ts:158`, en parallèle de la définition canonique dans `src/types/index.ts:127`. 3 copies du même type → drift garanti si on ajoute un champ (ex: `sources` pour citations). Les 2 scripts importent maintenant `ScrutinAnalyse` depuis `../src/types` (tsx résout fine vers la source). · `scripts/ingest-an.ts`, `scripts/resume-ingest.ts`
+- [FIXED] Stale JSDoc · `src/types/index.ts:124` JSDoc de `ScrutinAnalyse` décrivait "exposed via the '+ analyse' bottom-sheet on the card". Le refactor `9cb7e6c` (refactor card) a supprimé à la fois le bouton + analyse et le bottom-sheet d'analyse — tout est maintenant rendu inline dans le verso unifié. JSDoc réécrit pour pointer Card.tsx et le commit de réf. · `src/types/index.ts`
+
+### Vérifications à faire en session 51
+
+- [ ] grep `33/33 tests\|PNG share-card\|share-card.png` dans SHIP-V1.md → 0 résultat
+- [ ] grep `interface ScrutinAnalyse` dans repo (hors src/types et docs/qa) → 0 résultat
+- [ ] grep `+ analyse.*bottom-sheet` dans src/ → 0 résultat

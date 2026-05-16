@@ -21,7 +21,9 @@ import path from "node:path";
 import { execSync } from "node:child_process";
 import { computeGroupPosition } from "../src/lib/compute-positions";
 import { THEMES } from "../src/types";
-import type { GroupCode, GroupPosition, GroupVoteBreakdown, Theme } from "../src/types";
+import type {
+  GroupCode, GroupPosition, GroupVoteBreakdown, Theme, ScrutinAnalyse,
+} from "../src/types";
 
 // ───────────────────────────────────────────────────────────────── config
 
@@ -430,15 +432,6 @@ interface Summary {
   analyse_loi?: ScrutinAnalyse;
   points_cles?: string[];
   theme?: Theme;
-}
-
-interface ScrutinAnalyse {
-  mesures_principales: string[];
-  concernes_positifs: string[];
-  concernes_negatifs: string[];
-  concernes_neutres: string[];
-  calendrier: string[];
-  exceptions: string[];
 }
 
 interface AnthropicResponse {

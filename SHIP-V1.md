@@ -1,6 +1,6 @@
 # SHIP V1 — checklist de mise en prod
 
-Cette checklist couvre tout ce qui reste à faire **côté utilisateur** pour mettre Sans Détour V1 en production. Le code est prêt (build clean, 33/33 tests, branche `feat/v1-implementation`).
+Cette checklist couvre tout ce qui reste à faire **côté utilisateur** pour mettre Sans Détour V1 en production. Le code est prêt (build clean, suite Vitest verte sur la branche `feat/v1-implementation`).
 
 ---
 
@@ -58,18 +58,18 @@ git push -u origin feat/v1-implementation
 1. Va sur [vercel.com/new](https://vercel.com/new)
 2. **Import** ton repo GitHub
 3. Framework auto-détecté : **Vite**
-4. **Settings → Environment Variables**, ajoute les 4 variables (cf `.env.local.example`) :
+4. **Settings → Environment Variables**, ajoute les 2 variables côté client (cf `.env.local.example`) :
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY` *(pour l'edge function share-card)*
-   - `ANTHROPIC_API_KEY` *(pas utilisé en prod runtime, mais peut servir si tu ajoutes une edge function plus tard)*
+
+   Pas besoin de `SUPABASE_SERVICE_ROLE_KEY` ni de `ANTHROPIC_API_KEY` côté Vercel runtime : `api/share-card.ts` ne tape pas Supabase (juste Satori + une font), et l'ingestion Anthropic tourne localement / sur GitHub Actions (cf §6), pas en prod.
 5. **Deploy**
 
 **Vérification** : ouvre `https://TON-PROJET.vercel.app/` → la cover doit charger les vraies données Supabase. Test rapide :
 - Faire 5 votes → voir le chip Top1 apparaître
 - Tap sur une carte → voir le flip 3D
 - Aller jusqu'à 20 votes → voir le ranking final
-- Test de l'edge share-card : `https://TON-PROJET.vercel.app/api/share-card.png?t=EPR:42,RN:35,LFI:28&fmt=square` → doit renvoyer un PNG
+- Test de l'edge share-card : `https://TON-PROJET.vercel.app/api/share-card.svg?t=EPR:42,RN:35,LFI:28&fmt=square` → doit renvoyer un SVG (le path `.png` n'existe plus, V1 abandon resvg-wasm pour SVG pur)
 
 ---
 
@@ -128,7 +128,7 @@ Une fois en prod, fais une session complète sur ton téléphone (vrai mobile, p
 - 20 swipes (mélange gauche/droite/bas)
 - Result → tester le flip 3D sur une carte (sur la page Result il n'y a pas de cartes, c'est sur Play)
 - Test "Continuer à affiner" → revenir sur Play
-- Test "Partager" → vérifier que le PNG share-card s'ouvre
+- Test "Partager" → vérifier que le SVG share-card s'ouvre (l'endpoint `/api/share-card` retourne `image/svg+xml`)
 - Test "Refaire" → retour à la cover
 - Test footer : Méthode, Mentions légales, Mon résultat
 

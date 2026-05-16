@@ -21,7 +21,9 @@ import { createClient } from "@supabase/supabase-js";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { computeGroupPosition } from "../src/lib/compute-positions";
-import type { GroupCode, GroupPosition, GroupVoteBreakdown } from "../src/types";
+import type {
+  GroupCode, GroupPosition, GroupVoteBreakdown, ScrutinAnalyse,
+} from "../src/types";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -151,15 +153,6 @@ interface BatchResultLine {
     | { type: "errored"; error?: unknown }
     | { type: "canceled" }
     | { type: "expired" };
-}
-
-interface ScrutinAnalyse {
-  mesures_principales: string[];
-  concernes_positifs: string[];
-  concernes_negatifs: string[];
-  concernes_neutres: string[];
-  calendrier: string[];
-  exceptions: string[];
 }
 
 const THEMES = [
