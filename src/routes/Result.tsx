@@ -196,13 +196,12 @@ export default function Result() {
                 onClick={() => setExpandedGroup(expandedGroup === a.group ? null : a.group)}
               />
               {expandedGroup === a.group && (
-                <div id={panelId}>
-                  <AuditTrail
-                    alignment={a}
-                    scrutins={pool}
-                    votes={session?.votes ?? []}
-                  />
-                </div>
+                <AuditTrail
+                  id={panelId}
+                  alignment={a}
+                  scrutins={pool}
+                  votes={session?.votes ?? []}
+                />
               )}
             </div>
           );

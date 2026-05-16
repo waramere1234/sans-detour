@@ -15,14 +15,20 @@ const Legal = lazy(() => import("./routes/Legal"));
 
 // Minimal route-loading placeholder — same gutter/max-width as the real
 // reading pages so the layout doesn't snap when the lazy chunk arrives.
+// role="status" + aria-live="polite" so SR users know it's a transitory
+// loading state, not the destination page.
 function RouteLoader() {
   return (
-    <section style={{
-      maxWidth: 720, margin: "0 auto",
-      padding: "48px var(--gutter)",
-      color: "var(--ink-3)", fontFamily: "var(--font-mono)", fontSize: 11,
-      letterSpacing: "0.08em", textTransform: "uppercase",
-    }}>
+    <section
+      role="status"
+      aria-live="polite"
+      style={{
+        maxWidth: 720, margin: "0 auto",
+        padding: "48px var(--gutter)",
+        color: "var(--ink-3)", fontFamily: "var(--font-mono)", fontSize: 11,
+        letterSpacing: "0.08em", textTransform: "uppercase",
+      }}
+    >
       Chargement…
     </section>
   );

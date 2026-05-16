@@ -7,9 +7,12 @@ export interface AuditTrailProps {
   alignment: GroupAlignment;
   scrutins: Scrutin[];
   votes: SessionVote[];
+  /** Optional DOM id for the wrapping section — used by callers (Result.tsx)
+   *  that need aria-controls pairing with the toggle that opens this panel. */
+  id?: string;
 }
 
-export function AuditTrail({ alignment, scrutins, votes }: AuditTrailProps) {
+export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) {
   const byId = new Map(scrutins.map(s => [s.id, s]));
   const partyName = getParty(alignment.group).name;
 
@@ -39,6 +42,7 @@ export function AuditTrail({ alignment, scrutins, votes }: AuditTrailProps) {
     // a11y landmark — SR users tabbing/jumping in hear "Détail des votes
     // pour [groupe], region" instead of an unlabeled div.
     <section
+      id={id}
       role="region"
       aria-labelledby={`audit-heading-${alignment.group}`}
       style={{

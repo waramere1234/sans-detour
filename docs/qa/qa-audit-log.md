@@ -831,3 +831,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Inspect `<html>` tag : `lang="fr-FR"` (matche manifest)
 - [ ] Re-run `tests/matching-edge-cases.test.ts` : 1er test description et assertion alignées
 - [ ] DevTools Application > Local Storage : cliquer CTA sur Cover revisitée (avec sd_seen_cover déjà "true") → pas de write event localStorage
+
+---
+
+## Session 37 — 2026-05-16
+
+### Vérification session 36
+
+- [VERIFIED] `<html lang="fr-FR">` matche manifest
+- [VERIFIED] `tests/matching-edge-cases.test.ts:24` description et assertion alignées
+- [VERIFIED] `Cover.tsx:51` guard `if (!hasSeenCover()) markCoverSeen()`
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés
+
+- [FIXED] DRY/cleanup · `AuditTrail` wrapping double — Result.tsx enveloppait `<div id={panelId}>` autour de `<AuditTrail>` qui rend déjà `<section role="region" aria-labelledby>`. Deux levels de wrapping pour 1 logical container. Ajout d'une prop `id?` à AuditTrail qui place l'id sur la section directement. Result.tsx simplifié, plus un seul élément a11y wrapper. · `src/components/AuditTrail.tsx`, `src/routes/Result.tsx`
+- [FIXED] A11y · `RouteLoader` (Suspense fallback ajouté session 35) affichait "Chargement…" sans `role="status"` ni `aria-live`. SR users ne savaient pas que c'était un loading transitoire vs la destination. Ajout `role="status"` + `aria-live="polite"`. · `src/main.tsx`
+- [FIXED] CSS redondance · `@media (prefers-reduced-motion: reduce) { .skeleton-shimmer { animation: none } }` redondant — la règle wildcard `*, *::before, *::after { animation-duration: 0.01ms !important }` plus haut neutralisait déjà l'animation. Suppression de la règle dupliquée + commentaire pour justifier. · `src/index.css`
+
+### Vérifications à faire en session 38
+
+- [ ] Inspect DOM sur /result avec un PartyRow expanded : un seul `<section role="region" id="audit-trail-X">`, plus de div wrapper supplémentaire
+- [ ] Slow 3G + nav vers /methode : VoiceOver doit annoncer "status, Chargement…" pendant le chunk load (pas juste lire silencieusement)
+- [ ] Activer prefers-reduced-motion dans DevTools : CardSkeleton/ResultSkeleton shimmer doit être instantané ou statique (pas en boucle)
