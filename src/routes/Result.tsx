@@ -24,6 +24,10 @@ export default function Result() {
   const [loadTick, setLoadTick] = useState(0);
   const [showPersonnalites, setShowPersonnalites] = useState(false);
   const reportedRef = useRef(false);
+  // Mirror reportedRef's once-per-mount pattern for the personalities reveal
+  // event. Without it, a user toggling the disclosure 5× counted as 5 reveals
+  // — inflated the metric and was inconsistent with `result_reached`.
+  const personnalitesReportedRef = useRef(false);
 
   useEffect(() => {
     setLoadError(false);
@@ -229,7 +233,10 @@ export default function Result() {
             onClick={() => {
               const next = !showPersonnalites;
               setShowPersonnalites(next);
-              if (next) track("personnalites_revealed");
+              if (next && !personnalitesReportedRef.current) {
+                personnalitesReportedRef.current = true;
+                track("personnalites_revealed");
+              }
             }}
             style={togglePersonnalitesBtn(showPersonnalites)}
             aria-expanded={showPersonnalites}

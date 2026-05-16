@@ -5,7 +5,7 @@ import { Wordmark } from "../components/Wordmark";
 import { FreshnessBanner } from "../components/FreshnessBanner";
 import { fetchFreshness } from "../lib/scrutins";
 import { track } from "../lib/analytics";
-import { TARGET, type FreshnessInfo } from "../types";
+import { TARGET, MIN_FOR_RANKING, type FreshnessInfo } from "../types";
 
 export default function Methode() {
   const [info, setInfo] = useState<FreshnessInfo | null>(null);
@@ -134,7 +134,7 @@ export default function Methode() {
           <br/>
           Somme des scores ÷ nombre de scrutins comptés × 100 = % affiché
         </Formula>
-        <p>Le ranking apparaît à partir du <strong>5e scrutin compté</strong> — en dessous, les pourcentages bougent trop pour signifier quoi que ce soit.</p>
+        <p>Le ranking apparaît à partir du <strong>{MIN_FOR_RANKING}<sup>e</sup> scrutin compté</strong> — en dessous, les pourcentages bougent trop pour signifier quoi que ce soit.</p>
       </Section>
 
       <Section n="05" title="Ce qu'on ne fait pas avec tes données">

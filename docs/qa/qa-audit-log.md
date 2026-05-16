@@ -1061,3 +1061,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] DevTools console : `localStorage.setItem('sd_session_v1', '"null"')` → idem, pas de crash
 - [ ] grep `seenChapeauPrefixCounts\?\.` dans `src/lib/deck.ts` → 0 résultat (plus de optional chaining sur la Map)
 - [ ] Mocker `supabase.from('scrutins').select(...count: 'exact'...)` pour retourner `{ error: { message: 'forbidden' } }` → fetchFreshness throw, banner pas rendu
+
+---
+
+## Session 47 — 2026-05-16
+
+### Vérification session 46
+
+- [VERIFIED] `loadSession` valide `Array.isArray(cards_seen) && Array.isArray(votes)` après JSON.parse (`session.ts:39-40`)
+- [VERIFIED] `drawNext` n'utilise plus de optional chaining sur `seenChapeauPrefixCounts` — default à `new Map()` localement quand le cap est set (`deck.ts:132-134`)
+- [VERIFIED] `fetchFreshness` throw sur `countRes.error` (`scrutins.ts:49`)
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés (DRY drift + UX retry + analytics inflation)
+
+- [FIXED] DRY drift · `Methode.tsx §04` hardcodait `<strong>5e scrutin compté</strong>` alors que `MIN_FOR_RANKING = 5` est centralisé dans `types/index.ts` et déjà importé par Cover/Play/TopBar. Même drift que session 43 avec TARGET. Import + interpolation `{MIN_FOR_RANKING}<sup>e</sup>` pour préserver l'exposant typographique. · `src/routes/Methode.tsx`
+- [FIXED] UX silent failure · `Cover.tsx` posait `fetchedRef.current = true` AVANT d'await `fetchFreshness()`. Si la fetch échoue (blip Supabase, offline tick), le ref reste `true` et le banner ne réessaie jamais pour le reste de la session, même si l'user clique sur le wordmark pour revenir sur `/`. Fix : set le ref dans `.then` (only on success) — un échec laisse le ref `false` donc le prochain run de l'effect (state mutation via wordmark click) retente. · `src/routes/Cover.tsx`
+- [FIXED] Analytics inflation · `Result.tsx personnalites_revealed` firait sur CHAQUE toggle open du disclosure (un user qui ouvre/ferme/ouvre = 2 events). Incohérent avec `result_reached` qui utilise `reportedRef.current` pour fire 1× par mount. Ajout `personnalitesReportedRef` symétrique → 1 event max par session. · `src/routes/Result.tsx`
+
+### Vérifications à faire en session 48
+
+- [ ] grep `5e scrutin\|5 scrutins compt` dans `src/` → 0 résultat (plus de littéral hardcodé)
+- [ ] DevTools Network : block `*supabase*` puis charger `/` → après échec, cliquer wordmark dans le TopBar d'une autre page pour re-fire Cover → debrancher block → la banner doit apparaître au second retour (retry effectif)
+- [ ] Plausible dashboard : sur une session avec toggle personnalités 3× ouvert/fermé → `personnalites_revealed` count = 1, pas 3

@@ -30,8 +30,18 @@ export default function Cover() {
       return;
     }
     if (fetchedRef.current) return;
-    fetchedRef.current = true;
-    fetchFreshness().then(setInfo).catch(() => {});
+    // Mark fetched only on success: if the call fails (transient Supabase
+    // blip, offline tick), leaving the ref false lets a subsequent effect
+    // run (e.g., user clicks the wordmark to come back to /, which mutates
+    // location.state and re-fires the effect) try again. Previous code set
+    // the flag unconditionally before awaiting, so one early failure killed
+    // the banner for the rest of the session.
+    fetchFreshness()
+      .then((freshness) => {
+        fetchedRef.current = true;
+        setInfo(freshness);
+      })
+      .catch(() => {});
   }, [navigate, location.state]);
 
   const session = loadSession();
