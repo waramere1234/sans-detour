@@ -20,7 +20,12 @@ export default function Methode() {
     if (!location.hash) return;
     const id = location.hash.slice(1);
     const el = document.getElementById(id);
-    el?.scrollIntoView({ behavior: "auto", block: "start" });
+    if (!el) return;
+    el.scrollIntoView({ behavior: "auto", block: "start" });
+    // Also move focus so keyboard Tab continues from the section heading,
+    // not from the TOC link that was clicked. Sections have tabIndex=-1
+    // which makes them programmatically focusable.
+    el.focus({ preventScroll: true });
   }, [location.hash]);
 
   return (

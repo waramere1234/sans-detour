@@ -18,9 +18,6 @@ export interface PersonnaliteMeta {
    *  AMO20/AMO30 bulk download (the URL has been moving on the AN side and
    *  returned 404 on the original attempt). Verified May 2026. */
   acteur_ref: string;
-  /** True if the personality is a declared or strongly-pressed 2027
-   *  presidential candidate. Currently informational. */
-  presidentiable: boolean;
 }
 
 export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
@@ -32,7 +29,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     nom: "Le Pen",
     departement: "Pas-de-Calais",
     acteur_ref: "PA720614",
-    presidentiable: true,
   },
   faure: {
     display_name: "Olivier Faure",
@@ -42,7 +38,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     nom: "Faure",
     departement: "Seine-et-Marne",
     acteur_ref: "PA609332",
-    presidentiable: true,
   },
   chatelain: {
     display_name: "Cyrielle Chatelain",
@@ -52,7 +47,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     nom: "Chatelain",
     departement: "Isère",
     acteur_ref: "PA794008",
-    presidentiable: false,
   },
   wauquiez: {
     display_name: "Laurent Wauquiez",
@@ -62,7 +56,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     nom: "Wauquiez",
     departement: "Haute-Loire",
     acteur_ref: "PA267285",
-    presidentiable: true,
   },
   attal: {
     display_name: "Gabriel Attal",
@@ -72,7 +65,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     nom: "Attal",
     departement: "Hauts-de-Seine",
     acteur_ref: "PA722190",
-    presidentiable: true,
   },
   ciotti: {
     display_name: "Éric Ciotti",
@@ -82,7 +74,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     nom: "Ciotti",
     departement: "Alpes-Maritimes",
     acteur_ref: "PA330240",
-    presidentiable: true,
   },
   bompard: {
     display_name: "Manuel Bompard",
@@ -92,7 +83,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     nom: "Bompard",
     departement: "Bouches-du-Rhône",
     acteur_ref: "PA793444",
-    presidentiable: false,
   },
   panot: {
     display_name: "Mathilde Panot",
@@ -102,7 +92,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     nom: "Panot",
     departement: "Val-de-Marne",
     acteur_ref: "PA720892",
-    presidentiable: false,
   },
 };
 

@@ -761,3 +761,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Sur /play, Tab vers une Card → focus ring accent visible autour du contour (pas avec souris)
 - [ ] Reload page, regarder browser tab title → doit dire "Sans Détour — Pas les programmes, les vrais votes"
 - [ ] GET https://sansdetour.fr/robots.txt → 200 OK avec contenu
+
+---
+
+## Session 34 — 2026-05-16
+
+### Vérification session 33
+
+- [VERIFIED] `index.css:67` règle focus-visible sur `[role="article"]`
+- [VERIFIED] `<title>` inclut la tagline
+- [VERIFIED] `public/robots.txt` créé
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés (a11y focus + perf bundle + dead code)
+
+- [FIXED] A11y · `Methode.tsx useEffect` hash scroll faisait `scrollIntoView` mais ne `focus()` pas l'élément cible. Keyboard user qui clique TOC link reste avec focus sur le LINK, pas sur la section atteinte. Tab continue depuis le link au lieu de la heading. Ajout `el.focus({ preventScroll: true })` après le scroll. · `src/routes/Methode.tsx`
+- [FIXED] Perf · main bundle = 642 KB (warning Vite > 500 KB). `Methode` + `Legal` sont des reading pages rarement visitées. Lazy load via `React.lazy()` + `Suspense fallback={null}` dans main.tsx → split en chunks séparés. Mesure : main passé à 579 KB + Methode 10 KB + Wordmark 50 KB en chunks séparés. ~63 KB économisés au premier paint critical path. · `src/main.tsx`
+- [FIXED] Dead data · `PersonnaliteMeta.presidentiable` field — commenté "Currently informational" depuis le départ, jamais consommé en frontend ni en scripts. Idem `code` (session 30). Suppression de l'interface field et des 8 valeurs `presidentiable: true/false` dans les entries. · `src/lib/personnalites.ts`
+
+### Vérifications à faire en session 35
+
+- [ ] Sur /methode, cliquer un TOC link → vérifier (Tab après) que focus est sur la section heading, pas sur le link cliqué
+- [ ] Network tab DevTools : naviguer Cover → Méthode doit déclencher un chunk JS séparé ("Methode-*.js")
+- [ ] Inspecter PERSONNALITES : entries n'ont plus `presidentiable`
