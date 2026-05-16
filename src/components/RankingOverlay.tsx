@@ -1,5 +1,5 @@
 // src/components/RankingOverlay.tsx
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { GroupAlignment } from "../types";
 import { PartyRow } from "./PartyRow";
@@ -15,6 +15,9 @@ export interface RankingOverlayProps {
 
 export function RankingOverlay({ open, alignments, countedTotal, onClose }: RankingOverlayProps) {
   const ranked = rankByAlignment(alignments);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
 
   // Esc to dismiss the modal (a11y) + lock body scroll while open so the
   // backdrop doesn't pass through to the underlying /play deck.
@@ -32,6 +35,45 @@ export function RankingOverlay({ open, alignments, countedTotal, onClose }: Rank
     };
   }, [open, onClose]);
 
+  // Save opener + focus close button on open, restore on close. Pairs with
+  // aria-modal="true" so the modal actually behaves like a modal for
+  // keyboard users (otherwise the aria attribute lies about behavior).
+  useEffect(() => {
+    if (open) {
+      openerRef.current = document.activeElement as HTMLElement | null;
+      const id = requestAnimationFrame(() => closeBtnRef.current?.focus());
+      return () => cancelAnimationFrame(id);
+    } else {
+      openerRef.current?.focus();
+    }
+  }, [open]);
+
+  // Focus trap: cycle Tab within the dialog so users can't tab into the
+  // underlying /play deck while the modal is open.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      const dialog = dialogRef.current;
+      if (!dialog) return;
+      const focusables = dialog.querySelectorAll<HTMLElement>(
+        'a, button, [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   return (
     <AnimatePresence>
       {open && (
@@ -47,6 +89,7 @@ export function RankingOverlay({ open, alignments, countedTotal, onClose }: Rank
             }}
           />
           <motion.div
+            ref={dialogRef}
             role="dialog" aria-modal="true" aria-label="Classement partiel"
             initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 280 }}
@@ -65,7 +108,10 @@ export function RankingOverlay({ open, alignments, countedTotal, onClose }: Rank
                 fontFamily: "var(--font-mono)", fontSize: 11,
                 color: "var(--ink-3)", letterSpacing: "0.12em", textTransform: "uppercase",
               }}>Classement partiel · {countedTotal} comptés</span>
-              <button type="button" onClick={onClose}
+              <button
+                ref={closeBtnRef}
+                type="button"
+                onClick={onClose}
                 style={{
                   background: "transparent", border: "1px solid var(--line)",
                   color: "var(--ink-2)", fontFamily: "var(--font-mono)",

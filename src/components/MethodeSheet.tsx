@@ -167,6 +167,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
               >→ Méthode complète</Link>
               <a
                 href="mailto:contact@sansdetour.fr?subject=Sans%20D%C3%A9tour%20%E2%80%94%20Signalement%20d%27une%20erreur%20factuelle"
+                onClick={onClose}
                 style={btnSecondary()}
               >✉ Signaler une erreur factuelle</a>
             </div>

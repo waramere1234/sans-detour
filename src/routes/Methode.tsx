@@ -34,7 +34,7 @@ export default function Methode() {
           lineHeight: 1.15, letterSpacing: "-0.022em", margin: "10px 0 0",
         }}>Comment on calcule, et avec quelles données<span style={{ color: "var(--accent)" }}>.</span></h1>
         <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.55, marginTop: 12 }}>
-          Aucune opinion, aucun panel. <b>Le calcul d'alignement est une formule mathématique pure — l'IA n'y intervient pas.</b> En revanche, les résumés, les points clés et les synthèses des scrutins sont mis en forme par Claude (voir section 07).
+          Aucune opinion, aucun panel. <b>Le calcul d'alignement est une formule mathématique pure — l'IA n'y intervient pas.</b> En revanche, les résumés, les points clés et les synthèses des scrutins sont mis en forme par Claude (voir <a href="#methode-07" style={{ color: "var(--accent)" }}>section 07</a>).
         </p>
       </header>
 
@@ -106,7 +106,11 @@ export default function Methode() {
 
 function Section({ n, title, children }: { n: string; title: string; children: ReactNode }) {
   return (
-    <div style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid var(--line)" }}>
+    // id is `methode-NN` so cross-section references (e.g. "voir section 07"
+    // in §04 intro) can use `<a href="#methode-07">` to deep-link. Without an
+    // anchor target the text reads as if it were a link but does nothing on
+    // click — broken affordance on a transparency-focused page.
+    <div id={`methode-${n}`} style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid var(--line)", scrollMarginTop: 16 }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
         <span style={{
           fontFamily: "var(--font-mono)", fontSize: 11,
