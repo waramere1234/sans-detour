@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { DeckStack } from "../components/DeckStack";
 import { ChipTop1 } from "../components/ChipTop1";
 import { RankingOverlay } from "../components/RankingOverlay";
+import { MethodeSheet } from "../components/MethodeSheet";
 import { fetchScrutins } from "../lib/scrutins";
 import { composeDeck, drawNext, chapeauPrefix } from "../lib/deck";
 import { computeAlignment, rankByAlignment } from "../lib/matching";
@@ -28,6 +29,7 @@ export default function Play() {
   const [loadError, setLoadError] = useState(false);
   const [loadTick, setLoadTick] = useState(0);
   const [lastVoteLabel, setLastVoteLabel] = useState("");
+  const [methodeSheetOpen, setMethodeSheetOpen] = useState(false);
 
   // Initial deck composition
   useEffect(() => {
@@ -316,7 +318,7 @@ export default function Play() {
         {lastVoteLabel}
       </div>
 
-      <DeckStack scrutins={deck} onVote={handleVote} />
+      <DeckStack scrutins={deck} onVote={handleVote} onOpenMethode={() => setMethodeSheetOpen(true)} />
 
       <div
         style={{
@@ -357,6 +359,11 @@ export default function Play() {
         alignments={alignments}
         countedTotal={countedTotal}
         onClose={() => setRankingOpen(false)}
+      />
+
+      <MethodeSheet
+        open={methodeSheetOpen}
+        onClose={() => setMethodeSheetOpen(false)}
       />
     </section>
   );
