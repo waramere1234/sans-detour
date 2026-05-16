@@ -235,7 +235,16 @@ export default function Cover() {
                 <Link
                   to="/result"
                   onClick={() => track("cover_partial_result")}
-                  style={{ color: "var(--ink-2)", textDecoration: "none" }}
+                  // textDecoration:underline so the link isn't identified by
+                  // color alone (WCAG 1.4.1) — color-blind / high-contrast
+                  // users get the underline as a non-color cue. Pattern
+                  // mirrors the sibling "Recommencer à zéro" button below.
+                  style={{
+                    color: "var(--ink-2)",
+                    textDecoration: "underline",
+                    textDecorationColor: "var(--ink-4)",
+                    textUnderlineOffset: 3,
+                  }}
                 >
                   Voir mon résultat partiel
                 </Link>

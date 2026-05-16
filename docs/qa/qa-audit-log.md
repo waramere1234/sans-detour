@@ -1471,3 +1471,25 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] DevTools → `prefers-reduced-motion: reduce` (Emulate Vision Deficiencies), ouvrir le menu TopBar `•••` → animation pratiquement instantanée
 - [ ] Idem pour RankingOverlay (chip Top1 sur /play après 5 votes)
 - [ ] VO rotor sur /methode → 7 entrées "region" labelées avec titre de section (ex: "D'où viennent les données", "Quels scrutins on garde", etc.)
+
+---
+
+## Session 65 — 2026-05-17
+
+### Vérification session 64
+
+- [VERIFIED] `useReducedMotion` importé+utilisé dans Card, MethodeSheet, RankingOverlay, TopBar (4 sites)
+- [VERIFIED] `Methode.tsx Section` a `role="region"` + `aria-labelledby={headingId}` pointant vers le h2 (nouveau `id="methode-heading-NN"`)
+- 123/123 tests verts, typecheck clean
+
+### Bugs fixés (WCAG 1.4.1 + favicon + user memory stale)
+
+- [FIXED] WCAG 1.4.1 "Use of Color" · `Cover.tsx` lien "Voir mon résultat partiel" était stylé `color: var(--ink-2); textDecoration: "none"` sur un parent `var(--ink-3)` — la couleur est l'UNIQUE indicateur que c'est un lien. Pour les color-blind / high-contrast / low-vision users, indistinguable d'un text. Pattern miroir du sibling "Recommencer à zéro" appliqué : underline + textUnderlineOffset 3 + textDecorationColor var(--ink-4). Cohérent visuellement avec l'autre lien discret du footer. · `src/routes/Cover.tsx`
+- [FIXED] Favicon manquant · `index.html` n'avait pas de `<link rel="icon">` et `public/favicon.ico` n'existe pas → browser fait 404 sur `/favicon.ico`, fallback à l'icône générique. Ajout `<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">` (réutilise l'asset PWA, pas besoin d'un fichier séparé) + TODO production-blocker étendu pour couvrir favicon avec les autres icons. · `index.html`
+- [FIXED] User memory stale · `~/.claude/projects/.../memory/project_sans-detour-v1-shipped.md` était figé à l'état post-2026-05-11 V1 (46 scrutins, "Plausible à installer", "Legal à étoffer", PNG share-card en V1.1). Depuis : V2 P1+P2 shippés, ~100 scrutins, 8 personnalités, Plausible installé+gated, Legal écrit, 123 tests, 65 sessions QA, iOS PWA safe-area chain, security headers, etc. Future sessions Claude lisant ce fichier avaient une mauvaise base de raisonnement. Réécrit avec l'état réel + liste des 4 production-blockers + roadmap V2 P3. Index MEMORY.md mis à jour. · `~/.claude/projects/-Users-boz-Documents-GitHub-sans-detour/memory/project_sans-detour-v1-shipped.md`, `MEMORY.md`
+
+### Vérifications à faire en session 66
+
+- [ ] DevTools Vision Deficiencies → "Achromatopsie" sur Cover hasInProgress → "Voir mon résultat partiel" reste identifiable comme lien (underline)
+- [ ] curl https://sansdetour.fr/favicon.ico → réponse (404 maintenant tant que les icons ne sont pas créés, mais le `<link rel="icon">` indique au browser de fetcher icon-192.png à la place — quand le fichier existera, le browser le trouvera)
+- [ ] Nouveau Claude session sur ce repo lisant la memory → comprend l'état V2 actuel, pas V1 figé

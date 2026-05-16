@@ -28,12 +28,18 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <!-- TODO production-blocker · /icons/*.png references below (apple-
-         touch-icon, og:image, twitter:image — and the matching entries in
-         public/manifest.webmanifest) all 404 today: no public/icons/
-         directory exists. SHIP-V1.md §2 "Icônes PWA" tracks the work.
-         Symptoms before fix: blank icon on iOS Add-to-Home-Screen, blank
-         social previews on Slack / WhatsApp / Telegram, default-icon PWA
-         install. Drop this comment when the icons exist in public/icons/. -->
+         touch-icon, favicon, og:image, twitter:image — and the matching
+         entries in public/manifest.webmanifest) all 404 today: no
+         public/icons/ directory exists and no /favicon.{ico,svg} either.
+         SHIP-V1.md §2 "Icônes PWA" tracks the work. Symptoms before fix:
+         blank icon on browser tab + iOS Add-to-Home-Screen, blank social
+         previews on Slack / WhatsApp / Telegram, default-icon PWA install.
+         Drop this comment when the icons + favicon exist. -->
+    <!-- The favicon link tells browsers WHERE to fetch the tab icon
+         (otherwise they hit /favicon.ico blindly and fall back to a
+         default on 404). icon-192 doubles as the favicon source so we
+         don't have to ship a separate file. -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
     <!-- Open Graph + Twitter card so shared URLs render with a preview
          on social platforms / Slack / WhatsApp instead of a bare link. -->
     <meta property="og:title" content="Sans Détour" />
