@@ -136,13 +136,20 @@ export default function Cover() {
 
         {info && <FreshnessBanner info={info} />}
 
-        <div style={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: 8,
-          borderTop: "1px solid var(--line)",
-          paddingTop: 16,
-        }}>
+        {/* Swipe-gesture legend — purely visual for touch/mouse users.
+          aria-hidden because SR users will use the labelled button fallback
+          on /play, not gestures. Reading "leftwards arrow Contre / downwards
+          arrow Je passe / rightwards arrow Pour" adds noise without value. */}
+        <div
+          aria-hidden="true"
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 8,
+            borderTop: "1px solid var(--line)",
+            paddingTop: 16,
+          }}
+        >
           {[
             { lbl: "Contre", arr: "←", color: "var(--contre)" },
             { lbl: "Je passe", arr: "↓", color: "var(--ink-2)" },
@@ -241,9 +248,9 @@ export default function Cover() {
           letterSpacing: "0.06em",
           color: "var(--ink-3)",
         }}>
-          <Link to="/methode" style={{ color: "inherit", textDecoration: "none" }}>Méthode &amp; sources</Link>
-          <Link to="/legal" style={{ color: "inherit", textDecoration: "none" }}>Mentions légales</Link>
-          <a href="mailto:contact@sansdetour.fr" style={{ color: "inherit", textDecoration: "none" }}>Contact</a>
+          <Link to="/methode" onClick={() => track("cover_footer_nav", { target: "methode" })} style={{ color: "inherit", textDecoration: "none" }}>Méthode &amp; sources</Link>
+          <Link to="/legal" onClick={() => track("cover_footer_nav", { target: "legal" })} style={{ color: "inherit", textDecoration: "none" }}>Mentions légales</Link>
+          <a href="mailto:contact@sansdetour.fr" onClick={() => track("cover_footer_nav", { target: "contact" })} style={{ color: "inherit", textDecoration: "none" }}>Contact</a>
         </nav>
       </div>
     </section>

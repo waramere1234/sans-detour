@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Wordmark } from "./Wordmark";
 import { loadSession } from "../lib/session";
+import { track } from "../lib/analytics";
 
 const MIN_FOR_RESULT_LINK = 5;
 
@@ -190,16 +191,16 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
                   label="Mon résultat"
                   badge={String(votes)}
                   accent
-                  onNavigate={onClose}
+                  onNavigate={() => { track("topbar_nav", { target: "result" }); onClose(); }}
                 />
               )}
-              <MenuLink to="/methode" label="Méthode & sources" onNavigate={onClose} />
-              <MenuLink to="/legal" label="Mentions légales" onNavigate={onClose} />
+              <MenuLink to="/methode" label="Méthode & sources" onNavigate={() => { track("topbar_nav", { target: "methode" }); onClose(); }} />
+              <MenuLink to="/legal" label="Mentions légales" onNavigate={() => { track("topbar_nav", { target: "legal" }); onClose(); }} />
               <MenuLink
                 href="mailto:contact@sansdetour.fr"
                 label="Contact"
                 external
-                onNavigate={onClose}
+                onNavigate={() => { track("topbar_nav", { target: "contact" }); onClose(); }}
               />
             </nav>
 

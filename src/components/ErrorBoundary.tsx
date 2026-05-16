@@ -30,6 +30,10 @@ function ErrorFallback() {
       padding: "48px var(--gutter)", textAlign: "center",
       display: "flex", flexDirection: "column", gap: 16,
     }}>
+      {/* Visually-hidden h1 so the fallback page has a landmark in the SR
+        heading rotor — without it, SR users hit the boundary with no
+        indication that they're on an error screen. */}
+      <h1 className="sr-only">Erreur</h1>
       <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.5 }}>
         Quelque chose s'est cassé de notre côté.
       </p>
