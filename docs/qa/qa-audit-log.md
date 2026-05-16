@@ -1107,3 +1107,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] curl `https://sansdetour.fr/robots.txt` → ne contient plus de ligne `Sitemap:` active (commentée)
 - [ ] grep `@resvg\|resvg-wasm\|prebuild` dans package.json + ls `public/resvg.wasm` → tout absent
 - [ ] curl `https://sansdetour.fr/api/share-card?t=RN:57,EPR:48,LFI:42,DR:30,SOC:25` → SVG retourné avec `<text fill="#ed9846">` (ou équivalent dans le rendu satori) pas `#7eb6ff`
+
+---
+
+## Session 49 — 2026-05-16
+
+### Vérification session 48
+
+- [VERIFIED] `public/robots.txt:11` `Sitemap:` commenté avec TODO production-blocker
+- [VERIFIED] `package.json` zéro mention de `resvg-wasm` ou `prebuild` ; `public/resvg.wasm` absent du disque ; lockfile resynced
+- [VERIFIED] `api/share-card.ts:27` `ACCENT = "#ed9846"` avec commentaire pointant `oklch(0.76 0.16 55)`
+- 93/93 tests verts, typecheck clean (2 nouveaux tests apparus entre sessions, sans rapport avec mes fix)
+
+### Bugs fixés (dead config dans la zone session 48)
+
+- [FIXED] Dead config · `.gitignore` ligne `public/resvg.wasm` ignorait un fichier qui n'est plus généré (session 48 a retiré le `prebuild` step + le wasm). Le `.gitignore` parlait d'un cas impossible. Suppression. · `.gitignore`
+- [FIXED] Documentation drift · `.env.local.example` déclarait `VITE_PLAUSIBLE_DOMAIN=sansdetour.fr` mais aucun code ne lit cette variable — `index.html:34` hardcode `data-domain="sansdetour.fr"` directement sur la balise `<script>` Plausible. Un dev qui mettait la variable à `staging.sansdetour.fr` aurait pensé re-router ses events, alors qu'ils continuaient à polluer prod. Remplacé la déclaration par une note explicite qui dit où le domaine vit vraiment. · `.env.local.example`
+- [FIXED] Content-Type mismatch · `vercel.json` rewrite `/api/share-card.png → /api/share-card` était un leftover du path PNG abandonné (cf. comment `api/share-card.ts:5`). L'endpoint sert exclusivement `Content-Type: image/svg+xml` ; un GET sur `.png` renvoyait du SVG avec une extension PNG — certains scrapers OG (WhatsApp, Slack) refusent l'image quand le Content-Type ne matche pas l'extension annoncée. Drop la rewrite, garder uniquement `.svg`. · `vercel.json`
+
+### Vérifications à faire en session 50
+
+- [ ] grep `resvg` dans `.gitignore` → 0 résultat
+- [ ] grep `VITE_PLAUSIBLE_DOMAIN` dans repo (hors docs/qa et MEMORY) → 0 résultat (ou seulement la note explicative dans .env.local.example)
+- [ ] `curl -I https://sansdetour.fr/api/share-card.png` → 404 (ou rewrite vers /index.html selon le catch-all), plus de SVG-as-PNG ; `.svg` doit toujours marcher
