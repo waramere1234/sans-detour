@@ -30,7 +30,18 @@ export function loadSession(): SessionState | null {
 }
 
 export function saveSession(s: SessionState): void {
-  localStorage.setItem(KEY, JSON.stringify(s));
+  // localStorage.setItem can throw in two real scenarios:
+  // - Safari private mode (pre-iOS 17): quota is 0 and any write rejects.
+  // - Quota exceeded after many sessions on a low-storage device.
+  // Without a guard, the throw bubbles into recordVote / markCoverSeen
+  // and the page handler dies silently — the "Commencer" button stops
+  // working and votes stop being recorded with no UI feedback.
+  try {
+    localStorage.setItem(KEY, JSON.stringify(s));
+  } catch {
+    // Best effort: the session stays in memory for the current run but
+    // won't survive a reload. We swallow rather than crash the UI.
+  }
 }
 
 export function recordVote(scrutinId: string, choice: UserVote): void {
@@ -62,5 +73,10 @@ export function hasSeenCover(): boolean {
 }
 
 export function markCoverSeen(): void {
-  localStorage.setItem("sd_seen_cover", "true");
+  try {
+    localStorage.setItem("sd_seen_cover", "true");
+  } catch {
+    // Same Safari-private-mode / quota guard as saveSession — keep the
+    // user moving rather than throwing out of `start()`.
+  }
 }

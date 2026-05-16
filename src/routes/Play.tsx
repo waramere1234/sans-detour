@@ -184,9 +184,22 @@ export default function Play() {
   }
   if (deck.length === 0 && pool.length > 0) {
     return (
-      <div style={{ padding: 24 }}>
-        Pool épuisé.{" "}
-        <button type="button" onClick={() => navigate("/result")}>Voir mon résultat</button>
+      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: 480, margin: "0 auto" }}>
+        <p style={{ color: "var(--ink)", fontSize: 15, lineHeight: 1.5 }}>
+          Plus de scrutins disponibles à voter dans ton deck.
+        </p>
+        <button
+          type="button"
+          onClick={() => navigate("/result")}
+          style={{
+            alignSelf: "flex-start",
+            background: "var(--accent)", color: "var(--bg)", border: "none",
+            padding: "10px 16px", borderRadius: 6,
+            fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 14, cursor: "pointer",
+          }}
+        >
+          Voir mon résultat
+        </button>
       </div>
     );
   }

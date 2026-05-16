@@ -1,5 +1,5 @@
 // src/components/Card.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, type PanInfo } from "framer-motion";
 import type { Scrutin } from "../types";
 
@@ -56,6 +56,16 @@ export function Card({ scrutin, topMost, onSwipe }: CardProps) {
     setBackVariant("analyse");
     setFlipped(true);
   }
+
+  // Keyboard-only users can reach the back via Tab → Enter on "+ analyse"
+  // but there's no pointer-free way back: framer-motion onTap doesn't fire
+  // on keyboard events. ESC mirrors the modal-close convention.
+  useEffect(() => {
+    if (!topMost || !flipped) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setFlipped(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [topMost, flipped]);
 
   function handleDragEnd(_: unknown, info: PanInfo) {
     if (!topMost || !onSwipe) return;
