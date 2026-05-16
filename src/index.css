@@ -29,6 +29,12 @@
   --contre: oklch(0.66 0.18 25);
   --warn:   oklch(0.82 0.16 75);
 
+  /* Layout — shared by TopBar, Cover, Play, Result so the wordmark/menu
+   * row aligns with the content column. Reading pages (Methode, Legal)
+   * keep their own wider max-width but inherit the gutter. */
+  --max-content: 480px;
+  --gutter: 18px;
+
   /* Party colors — 17e légis (validés WCAG ≥3:1 vs --bg) */
   --p-lfi:  oklch(0.62 0.18 25);
   --p-gdr:  oklch(0.55 0.20 12);
@@ -52,6 +58,18 @@ html, body {
 }
 
 * { box-sizing: border-box; }
+
+/* TopBar dropdown menu items — hover/focus visible on desktop, ignored
+ * on touch. Keeps the popover items quiet at rest but responsive to a
+ * pointer hover, which inline styles can't express. */
+.sd-menu-item {
+  transition: background 140ms ease, color 140ms ease;
+}
+.sd-menu-item:hover,
+.sd-menu-item:focus-visible {
+  background: var(--bg-3);
+  outline: none;
+}
 
 /* Wordmark — see design board 03 */
 .sd-wordmark {
