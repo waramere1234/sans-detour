@@ -272,6 +272,19 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
                 color: "var(--ink-3)", textWrap: "pretty" as const,
               }}>{scrutin.titre_pedago}</div>
               <AnalyseBody scrutin={scrutin} />
+              {/* IA attribution footer — only on the analyse variant since this face
+               *  is 100% LLM-generated content (mesures, concernés, calendrier,
+               *  exceptions all come from analyse_loi). */}
+              <div style={{
+                marginTop: 8, paddingTop: 8,
+                borderTop: "1px dashed var(--line)",
+                fontFamily: "var(--font-mono)", fontSize: 9.5,
+                letterSpacing: "0.08em",
+                color: "var(--ink-3)", textAlign: "center",
+                lineHeight: 1.5,
+              }}>
+                Synthèse mise en forme par Claude,<br/>basée sur le libellé officiel AN.
+              </div>
             </>
           )}
 
@@ -315,10 +328,22 @@ function ExplanationBody({ scrutin }: { scrutin: Scrutin }) {
         )}
       </div>
 
+      {/* Separation line between LLM-rendered summary and the raw AN libellé.
+       *  Replaces the previous dashed top-border so the boundary is verbalised
+       *  rather than just visual — désamorce le réflexe "biais IA". */}
+      <div style={{
+        paddingTop: 10, marginTop: 4,
+        borderTop: "1px solid var(--line)",
+        fontFamily: "var(--font-mono)", fontSize: 9.5,
+        letterSpacing: "0.1em", textTransform: "uppercase",
+        color: "var(--ink-3)", textAlign: "center",
+      }}>
+        ↑ Résumé IA  ·  ↓ libellé officiel AN
+      </div>
+
       <div style={{
         fontFamily: "var(--font-mono)", fontSize: 10,
         color: "var(--ink-3)", letterSpacing: "0.04em",
-        paddingTop: 8, borderTop: "1px dashed var(--line)",
         lineHeight: 1.5,
       }}>
         <span style={{ textTransform: "uppercase", letterSpacing: "0.12em" }}>Intitulé officiel AN · </span>

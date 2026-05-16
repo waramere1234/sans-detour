@@ -116,4 +116,23 @@ describe("Card a11y", () => {
     fireEvent.click(screen.getByRole("button", { name: /comment ce contenu a été préparé/i }));
     expect(onOpenMethode).toHaveBeenCalled();
   });
+
+  it("renders verso explanation with separation line between context and AN libellé", () => {
+    render(<Card scrutin={mkScrutin()} topMost={true} />);
+    fireEvent.keyDown(screen.getByRole("article"), { key: "Enter" });
+    expect(screen.getByText(/Résumé IA/i)).toBeInTheDocument();
+    expect(screen.getByText(/libellé officiel AN/i)).toBeInTheDocument();
+  });
+
+  it("renders verso analyse with Claude attribution footer", () => {
+    const scrutin = mkScrutin();
+    scrutin.analyse_loi = {
+      mesures_principales: ["Mesure A"],
+      concernes_positifs: [], concernes_negatifs: [], concernes_neutres: [],
+      calendrier: [], exceptions: [],
+    };
+    render(<Card scrutin={scrutin} topMost={true} />);
+    fireEvent.click(screen.getByRole("button", { name: /voir l'analyse/i }));
+    expect(screen.getByText(/synthèse mise en forme par claude/i)).toBeInTheDocument();
+  });
 });
