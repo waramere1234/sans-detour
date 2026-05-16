@@ -738,3 +738,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Tester URL directe sur Twitter Card Validator (cards-dev.twitter.com) — preview doit afficher titre + description + image
 - [ ] Désactiver JS dans DevTools, reload `/` — message "JavaScript requis" doit s'afficher (pas page blanche)
 - [ ] iOS Safari 17+ : tester "Add to Home Screen" — l'app doit toujours fonctionner en standalone mode (les 2 meta tags doivent être respectés)
+
+---
+
+## Session 33 — 2026-05-16
+
+### Vérification session 32
+
+- [VERIFIED] index.html : `mobile-web-app-capable` + `apple-mobile-web-app-capable`
+- [VERIFIED] Open Graph + Twitter card meta tags présents
+- [VERIFIED] `<noscript>` fallback avec message JS requis
+- 91/91 tests verts, typecheck clean, build OK
+
+### Bugs fixés (a11y + SEO + branding)
+
+- [FIXED] A11y · `Card.tsx style outline: "none"` supprimait le focus indicator browser default (qui était moche sur un card full-height) mais sans remplacement → keyboard user qui Tab sur Card n'a aucun feedback visuel. Ajout règle CSS `[role="article"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }` dans index.css. focus-visible ne fire qu'au clavier, pas au pointer (donc pas de ring sur drag/tap). · `src/index.css`
+- [FIXED] SEO + branding · `index.html <title>` était juste "Sans Détour". Browser tab + résultats Google manquaient la tagline. Updated à "Sans Détour — Pas les programmes, les vrais votes" (53 chars, sous la limite SEO de 60). · `index.html`
+- [FIXED] SEO best practice · pas de `public/robots.txt`. Search engines crawl OK par défaut mais c'est best practice de spécifier explicitement + référencer le sitemap (futur). Ajout `User-agent: * / Allow: /` + Sitemap URL. · `public/robots.txt`
+
+### Vérifications à faire en session 34
+
+- [ ] Sur /play, Tab vers une Card → focus ring accent visible autour du contour (pas avec souris)
+- [ ] Reload page, regarder browser tab title → doit dire "Sans Détour — Pas les programmes, les vrais votes"
+- [ ] GET https://sansdetour.fr/robots.txt → 200 OK avec contenu

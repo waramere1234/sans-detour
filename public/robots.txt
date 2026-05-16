@@ -1,0 +1,8 @@
+# Sans Détour — robots policy
+# The app's public-facing pages (Cover, Méthode, Légal) are crawlable.
+# Future API endpoints under /api/ would not be — none today.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://sansdetour.fr/sitemap.xml
