@@ -51,6 +51,13 @@ export default function Legal() {
 
         <p><strong>Sources des données</strong> — Open data officiel de l'Assemblée Nationale (<a href="https://data.assemblee-nationale.fr/" target="_blank" rel="noopener noreferrer" aria-label="data.assemblee-nationale.fr (nouvel onglet)">data.assemblee-nationale.fr</a>), licence Etalab 2.0.</p>
 
+        {/* TODO production-blocker · same broken github.com/sansdetour
+            link as Methode §06 + §07 (real repo is private at
+            waramere1234/sans-detour per CLAUDE.md). AND no LICENSE.md
+            exists in the repo despite the "MIT" claim — once the repo
+            is published, also add LICENSE.md before exposing this link
+            (RGPD/legal cleanliness). Drop this <p> entirely if the open-
+            source path is deferred. */}
         <p><strong>Code source</strong> — Open source sous licence MIT, disponible sur <a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label="github.com/sansdetour (nouvel onglet)">github.com/sansdetour</a>.</p>
       </div>
     </section>

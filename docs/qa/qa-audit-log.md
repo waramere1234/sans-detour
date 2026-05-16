@@ -1357,3 +1357,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `45 tests\|45.tests aujourd'hui` dans `CLAUDE.md` → 0 résultat
 - [ ] grep `\$1.50` dans `CLAUDE.md` → 0 résultat (le coût aligné avec SHIP-V1)
 - [ ] grep `Refonte menu (TopBar + bottom-sheet)` dans `CLAUDE.md` → 0 résultat (popover ancré explicite)
+
+---
+
+## Session 60 — 2026-05-17
+
+### Vérification session 59
+
+- [VERIFIED] `CLAUDE.md` : 0 mention "45 tests", "$1.50", ou "Refonte menu (TopBar + bottom-sheet)"
+- 115/115 tests verts, typecheck clean
+
+### Bugs fixés (open-source claims + tagline punctuation + corpus count)
+
+- [FIXED] User-facing 404 + missing LICENSE · 3 endroits (Methode §06 ligne 153, Methode §07 ligne 168, Legal "Code source" ligne 54) liaient vers `https://github.com/sansdetour` — repo qui n'existe pas (le vrai repo est privé à `waramere1234/sans-detour` per CLAUDE.md). AND aucun `LICENSE` file dans la repo malgré la claim "code source MIT" → potentielle non-compliance légale. Flag les 3 endroits avec TODO production-blocker (cohérent avec le pattern Legal placeholders + index.html icons + robots.txt sitemap). Décision à faire avant ship : publier sous l'org sansdetour + ajouter LICENSE.md, ou drop ces bullets. · `src/routes/Methode.tsx`, `src/routes/Legal.tsx`
+- [FIXED] Tagline punctuation drift · `<title>` disait "Sans Détour — Pas les programmes, les vrais votes" (virgule, sans point final) — divergeait de la forme canonique "Pas les programmes. Les vrais votes." utilisée partout ailleurs : Cover hero, meta description, og:description, twitter:description, manifest description. Le title est ce qui s'affiche dans l'onglet navigateur ET dans le snippet Google — devait matcher. Aligné. · `index.html`
+- [FIXED] Stale corpus count · `SHIP-V1.md §1` ligne 9 disait "seed avec 46 scrutins" et ligne 20 "46 cartes rafraîchies" — chiffres V1 baseline. Le corpus actuel est ~100 scrutins (92 votables, 8 fallback) per CLAUDE.md. Aligné sur 100 + mention du filtre fallback + note que l'upsert est idempotent. · `SHIP-V1.md`
+
+### Vérifications à faire en session 61
+
+- [ ] grep `github.com/sansdetour` dans `src/` → toujours présent (TODO production-blocker à côté) ; vérifier que chaque occurrence a un commentaire TODO juste au-dessus
+- [ ] grep `Pas les programmes, les vrais votes` dans `index.html` → 0 résultat (la version comma-no-period n'existe plus)
+- [ ] grep `46 scrutins\|46 cartes` dans `SHIP-V1.md` → 0 résultat

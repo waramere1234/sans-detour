@@ -150,6 +150,12 @@ export default function Methode() {
         <p>Hébergement sur fonds personnels. Pas d'annonceur, pas de sponsor, pas de don accepté pendant les 6 mois précédant un scrutin national.</p>
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)" }}>
           <li><a href="https://data.assemblee-nationale.fr/" target="_blank" rel="noopener noreferrer" aria-label="data.assemblee-nationale.fr (nouvel onglet)">data.assemblee-nationale.fr</a> — open data officiel</li>
+          {/* TODO production-blocker · github.com/sansdetour is a 404 today
+              (real repo is private at waramere1234/sans-detour per CLAUDE.md)
+              AND no LICENSE file exists despite the "MIT" claim. Either
+              publish under the sansdetour org with a LICENSE.md, or drop
+              this bullet until the repo is public. Same TODO in §07 below
+              and in Legal.tsx — keep them in sync. */}
           <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label="github.com/sansdetour (nouvel onglet)">github.com/sansdetour</a> — code source MIT</li>
           <li><a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a> — signaler une erreur</li>
         </ul>
@@ -165,6 +171,9 @@ export default function Methode() {
         <p><strong>Limites & signalement.</strong> Claude peut se tromper sur les nuances : un mot mal choisi, une mesure oubliée, un thème mal taggué. Pour l'instant, aucune relecture humaine systématique (V3 prévue). Si tu repères une erreur factuelle : <a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a> — on corrige.</p>
 
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)", marginTop: 12 }}>
+          {/* TODO production-blocker · same broken github.com/sansdetour
+              link as §06 above. The "prompt et code source publics" claim
+              is aspirational until the repo is published. */}
           <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label="github.com/sansdetour (nouvel onglet)">github.com/sansdetour</a> — prompt et code source publics</li>
           <li>Modèle : Claude Haiku 4.5 d'Anthropic, via Batches API + web_search</li>
         </ul>

@@ -6,7 +6,7 @@ Cette checklist couvre tout ce qui reste à faire **côté utilisateur** pour me
 
 ## 1. Données réelles dans Supabase (15 min)
 
-Tu as déjà la table `scrutins` créée et seed avec 46 scrutins (certains en fallback). Pour avoir des cartes lisibles avec contextes pédagos, relance l'ingestion avec le nouveau code (Haiku 4.5 + Batches API + prompt voix-lycéen).
+Tu as déjà la table `scrutins` créée et seed avec ~100 scrutins (92 votables, 8 fallback exclus par filtre front — cf. CLAUDE.md). Pour avoir des cartes lisibles avec contextes pédagos, relance l'ingestion avec le nouveau code (Haiku 4.5 + Batches API + prompt voix-lycéen).
 
 ```bash
 # Charger les variables d'env dans ton shell (si pas encore en mémoire)
@@ -17,7 +17,7 @@ export ANTHROPIC_API_KEY="sk-ant-api03-..."
 npm run ingest:an
 ```
 
-**Attendu** : ~2-10 min de batch, ~$0.20-0.30 de coût Anthropic, 46 cartes rafraîchies.
+**Attendu** : ~2-10 min de batch, ~$0.20-0.30 de coût Anthropic, ~100 cartes rafraîchies (upsert idempotent, ne recharge pas les rows déjà à jour).
 
 **Vérification** : `npm run dev`, ouvre `/play`, tap sur une carte pour voir le flip 3D et les détails. Le contexte doit être concret (chiffres / dates / mécanismes), pas de "définit les règles" / "événement majeur".
 
