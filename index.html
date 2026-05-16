@@ -9,14 +9,37 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#1d1f24">
+    <!-- mobile-web-app-capable is the W3C standard (iOS 17+, Chrome).
+         apple- prefix kept for iOS < 17 back-compat. -->
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <!-- Open Graph + Twitter card so shared URLs render with a preview
+         on social platforms / Slack / WhatsApp instead of a bare link. -->
+    <meta property="og:title" content="Sans Détour" />
+    <meta property="og:description" content="Pas les programmes. Les vrais votes. Mesure ton alignement réel avec les groupes parlementaires de la 17e législature." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sansdetour.fr/" />
+    <meta property="og:image" content="https://sansdetour.fr/icons/icon-512.png" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Sans Détour" />
+    <meta name="twitter:description" content="Pas les programmes. Les vrais votes." />
+    <meta name="twitter:image" content="https://sansdetour.fr/icons/icon-512.png" />
     <script defer data-domain="sansdetour.fr" src="https://plausible.io/js/script.js"></script>
     <title>Sans Détour</title>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <div style="max-width: 480px; margin: 48px auto; padding: 24px; font-family: system-ui, sans-serif; color: #d6d8de; background: #1d1f24; text-align: center;">
+        <h1 style="font-size: 18px; margin: 0 0 12px;">JavaScript requis</h1>
+        <p style="font-size: 14px; line-height: 1.5; margin: 0; color: #a6a8ae;">
+          Sans Détour calcule ton alignement politique localement dans le navigateur — il faut activer JavaScript pour que l'app fonctionne. Aucune donnée n'est envoyée à un serveur.
+        </p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
