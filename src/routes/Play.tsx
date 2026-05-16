@@ -271,17 +271,7 @@ export default function Play() {
       {/* Visually-hidden h1 so the Play page has a navigable landmark in
         the SR heading rotor — the visible UI is interactive (deck) with
         no on-screen title, but SR users need a way to identify the page. */}
-      <h1 style={{
-        position: "absolute",
-        width: 1, height: 1,
-        padding: 0, margin: -1,
-        overflow: "hidden",
-        clip: "rect(0, 0, 0, 0)",
-        whiteSpace: "nowrap",
-        border: 0,
-      }}>
-        Voter sur les scrutins
-      </h1>
+      <h1 className="sr-only">Voter sur les scrutins</h1>
       <div
         style={{
           display: "flex",
@@ -333,15 +323,7 @@ export default function Play() {
         role="status"
         aria-live="polite"
         aria-atomic="true"
-        style={{
-          position: "absolute",
-          width: 1, height: 1,
-          padding: 0, margin: -1,
-          overflow: "hidden",
-          clip: "rect(0, 0, 0, 0)",
-          whiteSpace: "nowrap",
-          border: 0,
-        }}
+        className="sr-only"
       >
         {lastVoteLabel}
       </div>

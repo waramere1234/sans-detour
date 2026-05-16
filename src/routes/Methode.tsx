@@ -34,7 +34,7 @@ export default function Methode() {
           lineHeight: 1.15, letterSpacing: "-0.022em", margin: "10px 0 0",
         }}>Comment on calcule, et avec quelles données<span style={{ color: "var(--accent)" }}>.</span></h1>
         <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.55, marginTop: 12 }}>
-          Aucune opinion, aucun panel. <b>Le calcul d'alignement est une formule mathématique pure — l'IA n'y intervient pas.</b> En revanche, les résumés, les points clés et les synthèses des scrutins sont mis en forme par Claude (voir <a href="#methode-07" style={{ color: "var(--accent)" }}>section 07</a>).
+          Aucune opinion, aucun panel. <strong>Le calcul d'alignement est une formule mathématique pure — l'IA n'y intervient pas.</strong> En revanche, les résumés, les points clés et les synthèses des scrutins sont mis en forme par Claude (voir <a href="#methode-07" style={{ color: "var(--accent)" }}>section 07</a>).
         </p>
       </header>
 
@@ -74,13 +74,13 @@ export default function Methode() {
       </nav>
 
       <Section n="01" title="D'où viennent les données">
-        <p>Les votes proviennent de <b>l'open data officiel de l'Assemblée Nationale</b>, exposé sur <code>data.assemblee-nationale.fr</code>. Ce sont les mêmes fichiers que ceux utilisés par les médias de référence et le service interne de l'AN. Aucune retranscription manuelle, aucune source secondaire.</p>
+        <p>Les votes proviennent de <strong>l'open data officiel de l'Assemblée Nationale</strong>, exposé sur <code>data.assemblee-nationale.fr</code>. Ce sont les mêmes fichiers que ceux utilisés par les médias de référence et le service interne de l'AN. Aucune retranscription manuelle, aucune source secondaire.</p>
         <p>Mise à jour automatisée toutes les semaines.</p>
       </Section>
 
       <Section n="02" title="Quels scrutins on garde">
-        <p>On garde les <b>scrutins solennels</b> (SPS), les <b>votes finaux sur l'ensemble d'une loi</b> (SOR), les <b>motions de censure</b> et les <b>propositions de résolution</b>. On exclut les amendements, les votes en commission et les motions procédurales (rejet préalable, renvoi).</p>
-        <p>Pour chaque session, on en tire <b>20</b> en équilibrant les thèmes (santé, immigration, fiscalité…) plutôt qu'au hasard pur, avec deux garde-fous : <b>jamais plus de 2 scrutins du même dossier législatif</b> et <b>jamais plus de 2 scrutins du même sujet</b> (pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée).</p>
+        <p>On garde les <strong>scrutins solennels</strong> (SPS), les <strong>votes finaux sur l'ensemble d'une loi</strong> (SOR), les <strong>motions de censure</strong> et les <strong>propositions de résolution</strong>. On exclut les amendements, les votes en commission et les motions procédurales (rejet préalable, renvoi).</p>
+        <p>Pour chaque session, on en tire <strong>20</strong> en équilibrant les thèmes (santé, immigration, fiscalité…) plutôt qu'au hasard pur, avec deux garde-fous : <strong>jamais plus de 2 scrutins du même dossier législatif</strong> et <strong>jamais plus de 2 scrutins du même sujet</strong> (pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée).</p>
       </Section>
 
       <Section n="03" title="Comment on définit la position d'un groupe">
@@ -90,7 +90,7 @@ export default function Methode() {
           sinon → groupe divisé<br/>
           (absents et non-votants exclus du calcul)
         </Formula>
-        <p>Un scrutin sur lequel un groupe est <b>divisé</b> ne compte pas pour ce groupe — pas pour toi non plus, dans cette comparaison.</p>
+        <p>Un scrutin sur lequel un groupe est <strong>divisé</strong> ne compte pas pour ce groupe — pas pour toi non plus, dans cette comparaison.</p>
       </Section>
 
       <Section n="04" title="Comment on calcule ton alignement">
@@ -101,7 +101,7 @@ export default function Methode() {
           0 si désaccord net (pour vs contre)<br/>
           Somme ÷ nombre de scrutins comptés × 100 = % affiché
         </Formula>
-        <p>Le ranking apparaît à partir du <b>5e scrutin compté</b> — en dessous, les pourcentages bougent trop pour signifier quoi que ce soit.</p>
+        <p>Le ranking apparaît à partir du <strong>5e scrutin compté</strong> — en dessous, les pourcentages bougent trop pour signifier quoi que ce soit.</p>
       </Section>
 
       <Section n="05" title="Ce qu'on ne fait pas avec tes données">
@@ -110,7 +110,7 @@ export default function Methode() {
       </Section>
 
       <Section n="06" title="Indépendance & financement">
-        <p>Sans Détour est un projet <b>indépendant</b>. Aucune affiliation parti / média / institution.</p>
+        <p>Sans Détour est un projet <strong>indépendant</strong>. Aucune affiliation parti / média / institution.</p>
         <p>Hébergement sur fonds personnels. Pas d'annonceur, pas de sponsor, pas de don accepté pendant les 6 mois précédant un scrutin national.</p>
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)" }}>
           <li><a href="https://data.assemblee-nationale.fr/" target="_blank" rel="noopener noreferrer">data.assemblee-nationale.fr</a> — open data officiel</li>
@@ -120,13 +120,13 @@ export default function Methode() {
       </Section>
 
       <Section n="07" title="Le rôle de l'IA Claude">
-        <p><b>Ce que fait Claude.</b> Reformuler le titre brut du scrutin en 12 mots, condenser le projet de loi en 3 points clés, rédiger un résumé contextuel de 30 à 50 mots, structurer une synthèse détaillée (mesures, concernés, calendrier, exceptions), et taguer le scrutin par thème. <b>Mise en forme, pas commentaire.</b></p>
+        <p><strong>Ce que fait Claude.</strong> Reformuler le titre brut du scrutin en 12 mots, condenser le projet de loi en 3 points clés, rédiger un résumé contextuel de 30 à 50 mots, structurer une synthèse détaillée (mesures, concernés, calendrier, exceptions), et taguer le scrutin par thème. <strong>Mise en forme, pas commentaire.</strong></p>
 
-        <p><b>Ce qu'il ne fait pas.</b> Le calcul d'alignement (formule mathématique pure), la composition du deck (round-robin algorithmique par thème), l'extraction des votes individuels (parsing des XML officiels AN). Sur ces trois plans, Claude n'intervient à aucun moment.</p>
+        <p><strong>Ce qu'il ne fait pas.</strong> Le calcul d'alignement (formule mathématique pure), la composition du deck (round-robin algorithmique par thème), l'extraction des votes individuels (parsing des XML officiels AN). Sur ces trois plans, Claude n'intervient à aucun moment.</p>
 
-        <p><b>Comment on cadre les biais.</b> Le prompt envoyé à Claude est neutre par construction. Sa source : le libellé brut AN + des résultats de recherche web pour le contexte. <b>Le libellé officiel brut est affiché sur la face Résumé du verso de chaque carte</b> (et la page AN complète est toujours accessible via « Voir sur AN ↗ ») — tu peux comparer directement.</p>
+        <p><strong>Comment on cadre les biais.</strong> Le prompt envoyé à Claude est neutre par construction. Sa source : le libellé brut AN + des résultats de recherche web pour le contexte. <strong>Le libellé officiel brut est affiché sur la face Résumé du verso de chaque carte</strong> (et la page AN complète est toujours accessible via « Voir sur AN ↗ ») — tu peux comparer directement.</p>
 
-        <p><b>Limites & signalement.</b> Claude peut se tromper sur les nuances : un mot mal choisi, une mesure oubliée, un thème mal taggué. Pour l'instant, aucune relecture humaine systématique (V3 prévue). Si tu repères une erreur factuelle : <a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a> — on corrige.</p>
+        <p><strong>Limites & signalement.</strong> Claude peut se tromper sur les nuances : un mot mal choisi, une mesure oubliée, un thème mal taggué. Pour l'instant, aucune relecture humaine systématique (V3 prévue). Si tu repères une erreur factuelle : <a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a> — on corrige.</p>
 
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)", marginTop: 12 }}>
           <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer">github.com/sansdetour</a> — prompt et code source publics</li>

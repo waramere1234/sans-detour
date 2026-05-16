@@ -150,8 +150,8 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
               <p style={{ margin: "0 0 10px" }}>
                 Claude reçoit le libellé brut de l'AN + des résultats de
                 recherche web. Pas d'opinion humaine ni d'orientation
-                politique dans son prompt. <b>Sa mission : rendre lisible,
-                pas commenter.</b>
+                politique dans son prompt. <strong>Sa mission : rendre lisible,
+                pas commenter.</strong>
               </p>
               <p style={{ margin: 0 }}>
                 Le calcul d'alignement, lui, est une formule mathématique

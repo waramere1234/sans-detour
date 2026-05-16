@@ -59,6 +59,23 @@ html, body {
 
 * { box-sizing: border-box; }
 
+/* Visually-hidden utility for SR-only content (headings, aria-live regions).
+ * WCAG-recommended pattern — content is in the DOM (screen readers find it)
+ * but visually clipped to 1×1px out of flow. Used by Play h1, Result h2,
+ * and Play vote announcer to avoid inlining the same 7-line style at every
+ * call site. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* TopBar dropdown menu items — hover/focus visible on desktop, ignored
  * on touch. Keeps the popover items quiet at rest but responsive to a
  * pointer hover, which inline styles can't express. */

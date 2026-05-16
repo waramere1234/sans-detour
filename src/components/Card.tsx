@@ -160,7 +160,12 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
                 </>
               )}
             </div>
-            {topMost && (
+            {topMost && scrutin.analyse_loi && (
+              // Only render the "+ analyse" button when there's actual
+              // analyse data. Previously it stayed visible (muted ink-3)
+              // and clicking it showed a "pas encore disponible" fallback
+              // — a button that "looks disabled but isn't" is confusing.
+              // No data = no entry point.
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); showAnalyse(); }}
@@ -169,7 +174,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
                 style={{
                   background: "transparent",
                   border: "1px solid var(--line)",
-                  color: scrutin.analyse_loi ? "var(--accent)" : "var(--ink-3)",
+                  color: "var(--accent)",
                   fontFamily: "var(--font-mono)", fontSize: 10,
                   padding: "6px 10px", borderRadius: 3,
                   cursor: "pointer", letterSpacing: "0.08em",
