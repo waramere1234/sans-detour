@@ -142,19 +142,25 @@ fait la même chose pour les 8 personnalités.
 ### Navigation
 
 - **TopBar** sticky (`src/components/TopBar.tsx`) sur Play/Result/Methode/Legal :
-  wordmark à gauche (clickable → home), bouton `•••` à droite qui ouvre
-  un bottom-sheet (framer-motion spring, close sur backdrop/escape/✕) avec :
-  Mon résultat (N), Méthode & sources, Mentions légales, Contact, version.
+  wordmark à gauche (clickable → home), bouton `•••` à droite qui ouvre un
+  popover ancré (avec petite flèche pointant vers le trigger, close sur
+  backdrop/escape) listant : Mon résultat (N), Méthode & sources, Mentions
+  légales, Contact, version.
 - **Cover** garde son propre header riche (wordmark + data source) ; pas de
   TopBar dessus. Liens méthode/légal/contact accessibles via une nav row
   discrète sous « Commencer ».
+- **MethodeSheet** (déclenché par la chip « ✨IA » sur la carte) reste un
+  vrai bottom-sheet (slide-up, focus trap, aria-modal) — à ne pas confondre
+  avec le popover du TopBar.
 
 ### Card (`src/components/Card.tsx`)
 
-- Recto : chapeau + titre_pedago + 3 points_cles + footer date/numéro
-- Verso (variant `explanation`) : contexte + intitulé officiel AN + lien
-- Verso (variant `analyse`) : sections colorées Mesures / Qui est concerné
-  / Calendrier / Exceptions (analyse_loi)
+- Recto : chapeau + chip ✨IA (ouvre MethodeSheet) + titre_pedago + 3
+  points_cles + footer date/numéro.
+- Verso unifié (commit `9cb7e6c` a fusionné les anciennes variantes
+  explanation/analyse) : contexte + sections analyse_loi (mesures, concernés,
+  calendrier, exceptions) si présentes + séparateur "Synthèse IA / texte
+  officiel AN" + intitulé brut AN + footer (tap pour revenir + lien AN).
 - `stripVoteResult` ne matche que `:` (pas `.`) pour ne pas tronquer le
   contexte sur « ...sans vote. Une motion... »
 

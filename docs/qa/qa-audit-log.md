@@ -1153,3 +1153,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `33/33 tests\|PNG share-card\|share-card.png` dans SHIP-V1.md → 0 résultat
 - [ ] grep `interface ScrutinAnalyse` dans repo (hors src/types et docs/qa) → 0 résultat
 - [ ] grep `+ analyse.*bottom-sheet` dans src/ → 0 résultat
+
+---
+
+## Session 51 — 2026-05-16
+
+### Vérification session 50
+
+- [VERIFIED] `SHIP-V1.md` ne mentionne plus "33/33 tests", "PNG share-card" ni "share-card.png"
+- [VERIFIED] `interface ScrutinAnalyse` n'existe que dans `src/types/index.ts:129` (canonical) — scripts importent depuis types
+- [VERIFIED] `src/types/index.ts` JSDoc de `ScrutinAnalyse` ne référence plus le "+ analyse bottom-sheet" supprimé
+- 93/93 tests verts, typecheck clean
+
+### Bugs fixés (stale doc refs post-refactors)
+
+- [FIXED] Broken doc ref · `Legal.tsx:30` TODO comment pointait vers `SHIP-V1.md §4 "Mentions légales (10 min)"` — cette section n'a jamais existé : `SHIP-V1.md §4` est "Déploiement Vercel". Comment ré-écrit pour être intrinsèque au fichier (plus de risque de drift externe) + note historique explicite. · `src/routes/Legal.tsx`
+- [FIXED] Incomplete prod-blocker flag · Session 41 avait flagué `og:image` + `twitter:image` avec TODO production-blocker mais pas `<link rel="apple-touch-icon">` (index.html:17) ni les 3 entrées `icons[]` de `manifest.webmanifest` — tous référencent `/icons/*.png` qui 404 aujourd'hui (pas de dossier `public/icons/`). Symptômes invisibles dans le code mais : icône blanc sur iOS "Ajouter à l'écran d'accueil", preview vide WhatsApp/Slack/Telegram, install PWA avec icône par défaut. TODO étendu en index.html + ajouté dans manifest (via clé `_comment` non-standard mais valide JSON). · `index.html`, `public/manifest.webmanifest`
+- [FIXED] CLAUDE.md stale post-refactor · La section UI décrivait (a) le menu TopBar comme un "bottom-sheet" alors que c'est un popover ancré (avec petite flèche), et (b) la Card avec 2 verso variants `explanation` / `analyse` — fusionnés en verso unifié par commit `9cb7e6c`. La doc mentait sur 2 patterns d'UI dont les contributeurs futurs (humains ou Claude) auraient suivi le mauvais modèle mental. Réécriture pour refléter l'état réel + mention du commit de référence. · `CLAUDE.md`
+
+### Vérifications à faire en session 52
+
+- [ ] grep `SHIP-V1.md §4 .Mentions légales` dans `src/` → 0 résultat
+- [ ] grep `apple-touch-icon` + lire le bloc TODO juste au-dessus dans `index.html` → mentionne explicitement apple-touch-icon (pas juste og/twitter)
+- [ ] grep `variant.*explanation\|backVariant\|bottom-sheet` dans `CLAUDE.md` → 0 résultat (sauf la mention explicite de MethodeSheet comme vrai bottom-sheet)

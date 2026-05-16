@@ -15,12 +15,15 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <!-- TODO production-blocker · /icons/*.png references below (apple-
+         touch-icon, og:image, twitter:image — and the matching entries in
+         public/manifest.webmanifest) all 404 today: no public/icons/
+         directory exists. SHIP-V1.md §2 "Icônes PWA" tracks the work.
+         Symptoms before fix: blank icon on iOS Add-to-Home-Screen, blank
+         social previews on Slack / WhatsApp / Telegram, default-icon PWA
+         install. Drop this comment when the icons exist in public/icons/. -->
     <!-- Open Graph + Twitter card so shared URLs render with a preview
-         on social platforms / Slack / WhatsApp instead of a bare link.
-         TODO production-blocker · /icons/icon-512.png doesn't exist yet
-         (SHIP-V1.md §2 "Icônes PWA"). Until the icons land, og:image
-         and twitter:image 404 → social previews show no image. Drop
-         this comment when the icons exist in public/icons/. -->
+         on social platforms / Slack / WhatsApp instead of a bare link. -->
     <meta property="og:title" content="Sans Détour" />
     <meta property="og:description" content="Pas les programmes. Les vrais votes. Mesure ton alignement réel avec les groupes parlementaires de la 17e législature." />
     <meta property="og:type" content="website" />

@@ -26,11 +26,13 @@ export default function Legal() {
 
       <div style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.6 }}>
         {/* TODO production-blocker · "[à compléter]" placeholders must be
-          replaced with real legal identity before ship. Tracked in
-          SHIP-V1.md §4 "Mentions légales (10 min)". Visible to users
-          today — deploying as-is means RGPD non-compliance on the
-          editor identity line. Do NOT remove this comment until the
-          two square-bracket placeholders below are real values. */}
+          replaced with real legal identity before ship. Visible to users
+          today — deploying as-is means RGPD non-compliance on the editor
+          identity line. Do NOT remove this comment until both square-
+          bracket placeholders below are real values. (Previously referenced
+          SHIP-V1.md §4 "Mentions légales" — that section never existed:
+          §4 is "Déploiement Vercel". The reference is now intrinsic to
+          this file so it can't drift again.) */}
         <p><strong>Éditeur</strong> — [Nom complet · à compléter]<br/>
         Adresse : [adresse postale]<br/>
         Email : <a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a></p>
