@@ -16,14 +16,20 @@ export interface RankingOverlayProps {
 export function RankingOverlay({ open, alignments, countedTotal, onClose }: RankingOverlayProps) {
   const ranked = rankByAlignment(alignments);
 
-  // Esc to dismiss the modal (a11y)
+  // Esc to dismiss the modal (a11y) + lock body scroll while open so the
+  // backdrop doesn't pass through to the underlying /play deck.
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
     }
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
   }, [open, onClose]);
 
   return (

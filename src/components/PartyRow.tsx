@@ -18,7 +18,12 @@ export function PartyRow({ alignment, expanded, onClick }: PartyRowProps) {
       role={interactive ? "button" : undefined}
       tabIndex={interactive ? 0 : undefined}
       onClick={onClick}
-      onKeyDown={interactive ? (e) => { if (e.key === "Enter" || e.key === " ") onClick!(); } : undefined}
+      onKeyDown={interactive ? (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick!();
+        }
+      } : undefined}
       aria-expanded={interactive ? expanded : undefined}
       style={{
         display: "grid",

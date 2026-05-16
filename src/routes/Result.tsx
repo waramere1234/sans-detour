@@ -17,8 +17,15 @@ export default function Result() {
   const navigate = useNavigate();
   const [pool, setPool] = useState<Scrutin[]>([]);
   const [expandedGroup, setExpandedGroup] = useState<GroupCode | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [loadTick, setLoadTick] = useState(0);
 
-  useEffect(() => { fetchScrutins().then(setPool); }, []);
+  useEffect(() => {
+    setLoadError(false);
+    fetchScrutins()
+      .then(setPool)
+      .catch(() => setLoadError(true));
+  }, [loadTick]);
 
   const session = loadSession();
   const alignments = useMemo(
@@ -53,6 +60,27 @@ export default function Result() {
     }
   }, [top]);
 
+  if (loadError) {
+    return (
+      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: 480, margin: "0 auto" }}>
+        <p style={{ color: "var(--ink)", fontSize: 15, lineHeight: 1.5 }}>
+          Impossible de charger les scrutins. Vérifie ta connexion puis réessaie.
+        </p>
+        <button
+          type="button"
+          onClick={() => setLoadTick((t) => t + 1)}
+          style={{
+            alignSelf: "flex-start",
+            background: "var(--accent)", color: "var(--bg)", border: "none",
+            padding: "10px 16px", borderRadius: 6,
+            fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 14, cursor: "pointer",
+          }}
+        >
+          Réessayer
+        </button>
+      </div>
+    );
+  }
   if (!top || pool.length === 0) {
     return <div style={{ padding: 24 }}>Chargement…</div>;
   }
@@ -89,8 +117,8 @@ export default function Result() {
 
   return (
     <section style={{
-      padding: "24px 22px 32px",
-      maxWidth: 480, margin: "0 auto",
+      padding: "24px var(--gutter) 32px",
+      maxWidth: "var(--max-content)", margin: "0 auto",
       display: "flex", flexDirection: "column", gap: 18,
     }}>
       <header>

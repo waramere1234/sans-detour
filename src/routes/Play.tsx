@@ -24,6 +24,8 @@ export default function Play() {
   const [refinementMode, setRefinementMode] = useState(false);
   const [rankingOpen, setRankingOpen] = useState(false);
   const [tick, setTick] = useState(0); // force re-render after recordVote
+  const [loadError, setLoadError] = useState(false);
+  const [loadTick, setLoadTick] = useState(0);
 
   // Initial deck composition
   useEffect(() => {
@@ -35,6 +37,7 @@ export default function Play() {
       navigate("/result", { replace: true });
       return;
     }
+    setLoadError(false);
     fetchScrutins().then((p) => {
       setPool(p);
       getOrCreateSession();
@@ -64,8 +67,8 @@ export default function Play() {
           seenChapeauPrefixCounts: seenPrefixCounts,
         }),
       );
-    });
-  }, [navigate, params]);
+    }).catch(() => setLoadError(true));
+  }, [navigate, params, loadTick]);
 
   useEffect(() => {
     if (params.get("affinement") === "1") setRefinementMode(true);
@@ -137,6 +140,27 @@ export default function Play() {
     }
   }
 
+  if (loadError) {
+    return (
+      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: 480, margin: "0 auto" }}>
+        <p style={{ color: "var(--ink)", fontSize: 15, lineHeight: 1.5 }}>
+          Impossible de charger les scrutins. Vérifie ta connexion puis réessaie.
+        </p>
+        <button
+          type="button"
+          onClick={() => setLoadTick((t) => t + 1)}
+          style={{
+            alignSelf: "flex-start",
+            background: "var(--accent)", color: "var(--bg)", border: "none",
+            padding: "10px 16px", borderRadius: 6,
+            fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 14, cursor: "pointer",
+          }}
+        >
+          Réessayer
+        </button>
+      </div>
+    );
+  }
   if (deck.length === 0 && pool.length > 0) {
     return (
       <div style={{ padding: 24 }}>
@@ -152,12 +176,12 @@ export default function Play() {
   return (
     <section
       style={{
-        padding: "18px 16px 16px",
+        padding: "18px var(--gutter) 16px",
         display: "flex",
         flexDirection: "column",
         gap: 18,
         minHeight: "calc(100dvh - 60px)",
-        maxWidth: 480,
+        maxWidth: "var(--max-content)",
         margin: "0 auto",
       }}
     >
