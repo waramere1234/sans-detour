@@ -11,7 +11,7 @@ export default function Methode() {
   useEffect(() => { fetchFreshness().then(setInfo).catch(() => {}); }, []);
 
   return (
-    <section style={{ maxWidth: 720, margin: "0 auto", padding: "24px 22px 48px" }}>
+    <section style={{ maxWidth: 720, margin: "0 auto", padding: "24px var(--gutter) 48px" }}>
       <nav style={{
         display: "flex", justifyContent: "space-between", alignItems: "baseline",
         paddingBottom: 14, borderBottom: "1px solid var(--line)",
@@ -44,8 +44,8 @@ export default function Methode() {
       </Section>
 
       <Section n="02" title="Quels scrutins on garde">
-        <p>On filtre uniquement les <b>scrutins solennels</b> — ceux où chaque député doit afficher son vote nominalement. On exclut les scrutins ordinaires et les votes en commission.</p>
-        <p>Pour chaque session, on en tire <b>20 au hasard</b> avec une seule contrainte : <b>jamais plus de 2 scrutins du même dossier législatif</b> (pour ne pas avoir 8 votes retraite de suite).</p>
+        <p>On garde les <b>scrutins solennels</b> (SPS), les <b>votes finaux sur l'ensemble d'une loi</b> (SOR), les <b>motions de censure</b> et les <b>propositions de résolution</b>. On exclut les amendements, les votes en commission et les motions procédurales (rejet préalable, renvoi).</p>
+        <p>Pour chaque session, on en tire <b>20</b> en équilibrant les thèmes (santé, immigration, fiscalité…) plutôt qu'au hasard pur, avec deux garde-fous : <b>jamais plus de 2 scrutins du même dossier législatif</b> et <b>jamais plus de 2 scrutins du même sujet</b> (pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée).</p>
       </Section>
 
       <Section n="03" title="Comment on définit la position d'un groupe">

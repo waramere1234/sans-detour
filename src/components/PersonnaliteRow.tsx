@@ -39,7 +39,7 @@ export function PersonnaliteRow({ alignment }: PersonnaliteRowProps) {
       }}>
         <span style={{
           display: "block", height: "100%",
-          width: `${alignment.pct}%`, background: color,
+          width: `${tooLittleData ? 0 : alignment.pct}%`, background: color,
         }} />
       </span>
       <span style={{

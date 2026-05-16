@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import App from "./App";
 import Cover from "./routes/Cover";
 import Play from "./routes/Play";
@@ -19,6 +19,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/result" element={<Result />} />
           <Route path="/methode" element={<Methode />} />
           <Route path="/legal" element={<Legal />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </App>
     </BrowserRouter>
