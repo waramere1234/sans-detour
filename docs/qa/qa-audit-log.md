@@ -1334,3 +1334,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `## Feature 3` dans `docs/v2-roadmap.md` → 1 seul résultat
 - [ ] grep `footer.*Mentions légales\|tester le flip 3D sur une carte` dans `SHIP-V1.md` → 0 résultat
 - [ ] grep `pré-vote sur dossiers à venir est documentée` dans `SHIP-V1.md` → 0 résultat (la section parle des 4 chantiers V2 maintenant, pas du parking)
+
+---
+
+## Session 59 — 2026-05-17
+
+### Vérification session 58
+
+- [VERIFIED] `docs/v2-roadmap.md` : 1 seul `## Feature 3` (dedupé)
+- [VERIFIED] `SHIP-V1.md` : 0 mention "footer" pour secondary nav ou "tester le flip 3D sur une carte" (item-by-item smoke test reformulé)
+- [VERIFIED] `SHIP-V1.md` : 0 mention "pré-vote sur dossiers à venir est documentée" ; § Roadmap V2 récapitule P1/P2/P3 + parking
+- 115/115 tests verts, typecheck clean
+
+### Bugs fixés (CLAUDE.md drift au fil des sessions)
+
+- [FIXED] Stale test count · `CLAUDE.md` ligne 190 disait "Vitest, 45 tests aujourd'hui" — un dev qui regardait CLAUDE.md voyait 45, la suite en a en réalité 115 (sessions 53-57 ont ajouté +22 tests : matching low-data, session shape-validation, drawNext prefix cap, personnalites registry, analytics hostname gate). Réécrit avec ~115 + breakdown des domaines couverts. · `CLAUDE.md`
+- [FIXED] Stale cost claim · `CLAUDE.md` ligne 198 annonçait `npm run ingest:an` à "~$1.50, 10min" — figure pré-V2 (probablement Sonnet 3.x sans Batches). Pipeline actuel = Haiku 4.5 + Batches API → ~$0.20-0.30 (cf. SHIP-V1 §1) selon les ~250K tokens utiles, 5-7x moins cher. Aligné sur la valeur SHIP-V1 + ajout du modèle pour traçabilité. · `CLAUDE.md`
+- [FIXED] Stale UI ref · `CLAUDE.md` ligne 208 Roadmap disait "V2 UX — Refonte menu (TopBar + bottom-sheet)". Session 51 avait corrigé "bottom-sheet → popover" dans la section UI principale mais avait raté la mention dans la Roadmap section. Réécrit pour distinguer le popover ancré du TopBar du vrai bottom-sheet MethodeSheet (déclenché par chip ✨IA). · `CLAUDE.md`
+
+### Vérifications à faire en session 60
+
+- [ ] grep `45 tests\|45.tests aujourd'hui` dans `CLAUDE.md` → 0 résultat
+- [ ] grep `\$1.50` dans `CLAUDE.md` → 0 résultat (le coût aligné avec SHIP-V1)
+- [ ] grep `Refonte menu (TopBar + bottom-sheet)` dans `CLAUDE.md` → 0 résultat (popover ancré explicite)

@@ -187,7 +187,7 @@ Pas de mention du modèle dans les commits/PR (Claude Code 1M context, etc.).
 
 ### Tests
 
-`npm run test:run` (Vitest, 45 tests aujourd'hui, doivent rester verts).
+`npm run test:run` (Vitest, ~115 tests aujourd'hui couvrant matching / deck / session / personnalites / analytics / Card / Cover / MethodeSheet / ErrorBoundary, doivent rester verts à chaque commit).
 
 ### Commandes utiles
 
@@ -195,7 +195,7 @@ Pas de mention du modèle dans les commits/PR (Claude Code 1M context, etc.).
 npm run dev                       # dev local, port 5173
 npm run build                     # build de prod
 npm run test:run                  # tests Vitest
-npm run ingest:an                 # ingestion AN (Anthropic batch ~$1.50, 10min)
+npm run ingest:an                 # ingestion AN (Haiku 4.5 + Batches API, ~$0.20-0.30, 2-10min)
 npx tsx scripts/resume-ingest.ts  # récupération d'un batch failed
 npx tsx scripts/ingest-personnalites.ts  # injection votes personnalités
 ```
@@ -205,7 +205,7 @@ npx tsx scripts/ingest-personnalites.ts  # injection votes personnalités
 - ✅ V1 (livré)
 - ✅ V2 P1 — Corpus élargi + thématisation (~100 scrutins)
 - ✅ V2 P2 — Personnalités présidentielles (8 figures)
-- ✅ V2 UX — Refonte menu (TopBar + bottom-sheet)
+- ✅ V2 UX — Refonte menu (TopBar wordmark + bouton `•••` ouvrant un popover ancré ; MethodeSheet bottom-sheet reste séparé, déclenché par la chip ✨IA des cartes)
 - ⏳ **V2 P3 — Ton député** : code postal optionnel sur Cover → ligne
   d'alignement avec son député local. Quick win (~2 jours) qui exploite
   l'infra `votes_personnalites` déjà en place mais pour TOUS les députés
