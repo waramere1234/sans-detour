@@ -124,8 +124,8 @@ export default function Methode() {
         <p>Sans Détour est un projet <strong>indépendant</strong>. Aucune affiliation parti / média / institution.</p>
         <p>Hébergement sur fonds personnels. Pas d'annonceur, pas de sponsor, pas de don accepté pendant les 6 mois précédant un scrutin national.</p>
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)" }}>
-          <li><a href="https://data.assemblee-nationale.fr/" target="_blank" rel="noopener noreferrer">data.assemblee-nationale.fr</a> — open data officiel</li>
-          <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer">github.com/sansdetour</a> — code source MIT</li>
+          <li><a href="https://data.assemblee-nationale.fr/" target="_blank" rel="noopener noreferrer" aria-label="data.assemblee-nationale.fr (nouvel onglet)">data.assemblee-nationale.fr</a> — open data officiel</li>
+          <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label="github.com/sansdetour (nouvel onglet)">github.com/sansdetour</a> — code source MIT</li>
           <li><a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a> — signaler une erreur</li>
         </ul>
       </Section>
@@ -140,7 +140,7 @@ export default function Methode() {
         <p><strong>Limites & signalement.</strong> Claude peut se tromper sur les nuances : un mot mal choisi, une mesure oubliée, un thème mal taggué. Pour l'instant, aucune relecture humaine systématique (V3 prévue). Si tu repères une erreur factuelle : <a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a> — on corrige.</p>
 
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)", marginTop: 12 }}>
-          <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer">github.com/sansdetour</a> — prompt et code source publics</li>
+          <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label="github.com/sansdetour (nouvel onglet)">github.com/sansdetour</a> — prompt et code source publics</li>
           <li>Modèle : Claude Haiku 4.5 d'Anthropic, via Batches API + web_search</li>
         </ul>
       </Section>

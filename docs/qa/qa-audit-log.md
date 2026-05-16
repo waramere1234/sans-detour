@@ -624,3 +624,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Sur Cover, activer SR → swipe legend doit être silencieuse (aria-hidden)
 - [ ] Forcer un throw render dans Play.tsx → page d'erreur s'affiche, SR doit lire "Erreur" en heading h1
 - [ ] Cliquer chaque menu TopBar + footer Cover → vérifier `topbar_nav` / `cover_footer_nav` events dans Plausible avec `target` prop
+
+---
+
+## Session 28 — 2026-05-16
+
+### Vérification session 27
+
+- [VERIFIED] `Cover.tsx:144` `aria-hidden="true"` sur la swipe legend
+- [VERIFIED] `ErrorBoundary` h1 sr-only "Erreur"
+- [VERIFIED] TopBar MenuLinks + Cover footer links ont track avec `target` prop
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés
+
+- [FIXED] Dead data · `PartyMeta` avait 2 champs jamais utilisés en frontend ni tests : `code` (redondant avec la clé du record) et `orderHint` (suggéré pour le tri tie-break mais jamais consommé). 11 entrées × 2 champs = 22 valeurs mortes. Suppression de l'interface et des 11 entries. · `src/lib/parties.ts`
+- [FIXED] Comment stale · `matching.ts:72` "Stable on ties via orderHint" — Faux : la stabilité vient de JS Array.sort (stable depuis ES2019), pas d'orderHint (qui n'est jamais utilisé). Réécriture du commentaire pour expliquer la vraie source de stabilité + le fait que GROUP_CODES est déjà en ordre gauche-droite. · `src/lib/matching.ts`
+- [FIXED] A11y · `Methode.tsx` external links (data.assemblee-nationale.fr × 2, github.com/sansdetour × 2) sans aria-label indiquant "nouvel onglet". Même pattern que `AuditTrail` link (session 12) + `Card` AN link (session 20). Ajout aria-label pour cohérence. · `src/routes/Methode.tsx`
+
+### Vérifications à faire en session 29
+
+- [ ] Inspecter PARTIES dans DevTools React : les entries doivent avoir 3 fields (name, short, colorVar), plus 4 (sans code ni orderHint)
+- [ ] Sur /methode Section 06+07, focus un external link → SR doit annoncer "(nouvel onglet)"
+- [ ] Vérifier que le ranking sur /result garde l'ordre LFI→RN pour des partis avec même pct (e.g. tous à 0% si pool vide)

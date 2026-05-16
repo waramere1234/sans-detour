@@ -69,7 +69,9 @@ export function computeAlignment(
   return result;
 }
 
-/** Sort group codes by alignment %, highest first. Stable on ties via orderHint. */
+/** Sort group codes by alignment %, highest first. On ties, JS Array.sort
+ *  is stable (spec since 2018) so groups keep their GROUP_CODES order,
+ *  which is left-to-right political order. */
 export function rankByAlignment(
   alignments: Record<GroupCode, GroupAlignment>,
 ): GroupAlignment[] {
