@@ -35,23 +35,33 @@ export function AuditTrail({ alignment, scrutins, votes }: AuditTrailProps) {
     .filter((x): x is NonNullable<typeof x> => x !== null);
 
   return (
-    <div style={{
-      background: "var(--bg-2)",
-      border: "1px solid var(--line)",
-      borderRadius: 6,
-      padding: "12px 14px",
-      margin: "4px 0 12px",
-      fontSize: 12,
-      lineHeight: 1.5,
-    }}>
+    // role=region + aria-labelledby so the audit trail becomes a proper
+    // a11y landmark — SR users tabbing/jumping in hear "Détail des votes
+    // pour [groupe], region" instead of an unlabeled div.
+    <section
+      role="region"
+      aria-labelledby={`audit-heading-${alignment.group}`}
+      style={{
+        background: "var(--bg-2)",
+        border: "1px solid var(--line)",
+        borderRadius: 6,
+        padding: "12px 14px",
+        margin: "4px 0 12px",
+        fontSize: 12,
+        lineHeight: 1.5,
+      }}
+    >
       {/* Party full name header. h3 because the AuditTrail panel is a
         deep-detail section under Result.tsx's h1 + future h2 grouping —
         nesting keeps the heading rotor navigable for SR users. */}
-      <h3 style={{
-        fontFamily: "var(--font-sans)", fontWeight: 600,
-        fontSize: 14, color: "var(--ink)",
-        margin: "0 0 4px",
-      }}>
+      <h3
+        id={`audit-heading-${alignment.group}`}
+        style={{
+          fontFamily: "var(--font-sans)", fontWeight: 600,
+          fontSize: 14, color: "var(--ink)",
+          margin: "0 0 4px",
+        }}
+      >
         {alignment.group} <span style={{ color: "var(--ink-3)", fontWeight: 400 }}>· {partyName}</span>
       </h3>
 
@@ -113,7 +123,7 @@ export function AuditTrail({ alignment, scrutins, votes }: AuditTrailProps) {
           </div>
         );
       })}
-    </div>
+    </section>
   );
 }
 

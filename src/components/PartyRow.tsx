@@ -16,6 +16,9 @@ export function PartyRow({ alignment, expanded, onClick, controlsId }: PartyRowP
   const meta = getParty(alignment.group);
   const color = getPartyColorVar(alignment.group);
   const interactive = !!onClick;
+  // Compose a single readable label so SR users don't hear three
+  // disconnected fragments ("LFI · 25 % · 8") — they hear one sentence.
+  const rowLabel = `${meta.name}, ${alignment.pct} % d'alignement sur ${alignment.counted} scrutin${alignment.counted === 1 ? "" : "s"} compté${alignment.counted === 1 ? "" : "s"}`;
 
   return (
     <div
@@ -30,6 +33,7 @@ export function PartyRow({ alignment, expanded, onClick, controlsId }: PartyRowP
       } : undefined}
       aria-expanded={interactive ? expanded : undefined}
       aria-controls={interactive ? controlsId : undefined}
+      aria-label={rowLabel}
       style={{
         display: "grid",
         gridTemplateColumns: "60px 1fr 44px",

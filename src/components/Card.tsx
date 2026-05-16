@@ -311,7 +311,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
                 >
                   <span aria-hidden="true">Voir sur AN ↗</span>
                 </a>
-              : <span style={{ color: "var(--accent)" }}>donnée démo</span>}
+              : <span aria-label="Donnée de démonstration (pas une vraie source AN)" style={{ color: "var(--accent)" }}>donnée démo</span>}
           </div>
         </div>
       </motion.div>
