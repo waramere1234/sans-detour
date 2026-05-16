@@ -28,19 +28,23 @@ export async function fetchFreshness(): Promise<FreshnessInfo> {
       next_sync_eta: new Date(Date.now() + 7 * 86400_000).toISOString(),
     };
   }
-  const { data, error } = await supabase
-    .from("scrutins")
-    .select("ingere_le")
-    .order("ingere_le", { ascending: false })
-    .limit(1);
-  if (error) throw error;
-  const lastSync = data?.[0]?.ingere_le ?? new Date().toISOString();
-  const { count } = await supabase
-    .from("scrutins")
-    .select("*", { count: "exact", head: true })
-    .not("points_cles", "is", null);
+  // The two queries are independent — parallelise so the banner shows
+  // sooner on cold loads. Halves the round-trip latency.
+  const [lastSyncRes, countRes] = await Promise.all([
+    supabase
+      .from("scrutins")
+      .select("ingere_le")
+      .order("ingere_le", { ascending: false })
+      .limit(1),
+    supabase
+      .from("scrutins")
+      .select("*", { count: "exact", head: true })
+      .not("points_cles", "is", null),
+  ]);
+  if (lastSyncRes.error) throw lastSyncRes.error;
+  const lastSync = lastSyncRes.data?.[0]?.ingere_le ?? new Date().toISOString();
   return {
-    total_scrutins: count ?? 0,
+    total_scrutins: countRes.count ?? 0,
     last_sync_at: lastSync,
     next_sync_eta: new Date(new Date(lastSync).getTime() + 7 * 86400_000).toISOString(),
   };

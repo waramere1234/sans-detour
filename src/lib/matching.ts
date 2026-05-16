@@ -147,11 +147,22 @@ export function computeAlignmentPersonnalites(
   return result;
 }
 
-/** Sort personalities by alignment %, highest first. */
+/** Sort personalities by alignment %, highest first. Personalities with
+ *  fewer than 3 counted votes (tooLittleData in PersonnaliteRow) are
+ *  pushed to the bottom regardless of pct — a 100 %-on-1-vote score
+ *  would otherwise float above a meaningful 85 %-on-20-votes and rank
+ *  misleadingly. */
+const LOW_DATA_THRESHOLD = 3;
+
 export function rankPersonnalitesByAlignment(
   alignments: Record<PersonnaliteCode, PersonnaliteAlignment>,
 ): PersonnaliteAlignment[] {
   return PERSONNALITE_CODES
     .map(c => alignments[c])
-    .sort((a, b) => b.pct - a.pct);
+    .sort((a, b) => {
+      const aLow = a.counted < LOW_DATA_THRESHOLD ? 1 : 0;
+      const bLow = b.counted < LOW_DATA_THRESHOLD ? 1 : 0;
+      if (aLow !== bLow) return aLow - bLow;
+      return b.pct - a.pct;
+    });
 }

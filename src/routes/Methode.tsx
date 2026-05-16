@@ -184,10 +184,15 @@ function Section({ n, title, children }: { n: string; title: string; children: R
       // the §04 paragraph instead of the §07 heading — scroll moves but
       // focus doesn't follow.
       tabIndex={-1}
+      className="methode-section"
       // scrollMarginTop=64 ≈ TopBar height (~52px sticky) + 12px breathing
       // room. Without it, anchor jumps land the heading visually under the
       // sticky TopBar — user scrolls to §07 but the heading is hidden.
-      style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid var(--line)", scrollMarginTop: 64, outline: "none" }}
+      // (outline:none + focus-visible ring live in index.css under
+      // .methode-section so the suppression and the keyboard ring stay
+      // in sync — pure inline outline:none would also hide the keyboard
+      // focus indicator.)
+      style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid var(--line)", scrollMarginTop: 64 }}
     >
       <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
         <span style={{

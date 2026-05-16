@@ -991,3 +991,26 @@ Format : `[STATUT] type · description · fix commit/file`
 
 - [ ] Modifier `TARGET = 21` dans types/index.ts temporairement → Cover sub-text default doit dire "≈ 5 min · 21 votes" ET Methode §02 doit dire "Pour chaque session, on en tire 21"
 - [ ] Cover restart sur 1 vote → confirm doit dire "Ton vote en cours sera perdu" (sans le "1")
+
+---
+
+## Session 44 — 2026-05-16
+
+### Vérification session 43
+
+- [VERIFIED] Cover sub-text `${TARGET} votes`
+- [VERIFIED] Methode §02 `<strong>{TARGET}</strong>`
+- [VERIFIED] Cover restart singular branche sans "1" redondant
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés (perf + ranking edge case + a11y)
+
+- [FIXED] Perf · `fetchFreshness` faisait 2 round-trips Supabase séquentiels (lastSync puis count). Indépendants. `Promise.all` divise le temps par 2 sur cold load (banner Cover/Methode apparaît plus vite). · `src/lib/scrutins.ts`
+- [FIXED] Ranking edge case · `rankPersonnalitesByAlignment` ne dépriorisait pas tooLittleData. Une personnalité avec 100 % sur 1 vote rank au-dessus d'une avec 85 % sur 20 votes — visuellement #1 mais peu significatif. Sort en deux passes : d'abord par `counted < 3 ? 1 : 0` (low-data au bottom), puis par pct. · `src/lib/matching.ts`
+- [FIXED] A11y · `Methode.tsx Section` avait `outline: "none"` inline supprimant le focus indicator inconditionnellement. Keyboard user qui Tab depuis TOC vers section n'avait aucun feedback. Pattern Card (sessions 33+35) reproduit : suppression inline → class `.methode-section` + règle CSS `:focus:not(:focus-visible)` + `:focus-visible { outline: 2px solid accent }`. · `src/routes/Methode.tsx`, `src/index.css`
+
+### Vérifications à faire en session 45
+
+- [ ] Slow 3G + load /cover → FreshnessBanner apparaît plus vite qu'avant (Promise.all)
+- [ ] Mock une personnalité avec counted=1 pct=100 + une autre counted=20 pct=80 → ranking doit avoir la deuxième en premier
+- [ ] Sur /methode, Tab sur lien TOC, Enter → section atteinte doit avoir focus ring accent visible

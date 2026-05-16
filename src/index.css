@@ -74,6 +74,17 @@ html, body {
   outline-offset: 2px;
 }
 
+/* Methode page sections — same pattern as Card. Focus only shows when
+ * user lands via keyboard (anchor-jump fallback in Methode.tsx
+ * useEffect), not during silent programmatic focus on hash navigation. */
+.methode-section:focus:not(:focus-visible) {
+  outline: none;
+}
+.methode-section:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
 /* Visually-hidden utility for SR-only content (headings, aria-live regions).
  * WCAG-recommended pattern — content is in the DOM (screen readers find it)
  * but visually clipped to 1×1px out of flow. Used by Play h1, Result h2,
