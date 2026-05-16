@@ -1,5 +1,16 @@
 // src/types/index.ts
 
+/** Number of scrutins drawn per normal session. Refinement mode lets the
+ *  deck grow past this. Single source of truth — referenced by Cover,
+ *  Play, Result, and the Methode page copy ("20 votes"). */
+export const TARGET = 20;
+
+/** Minimum scrutins counted before showing a live ranking (chip on /play,
+ *  "Mon résultat" link in TopBar menu, "Voir mon résultat partiel" on
+ *  Cover). Below this, percentages bounce too much to mean anything. */
+export const MIN_FOR_RANKING = 5;
+
+
 /** All parliamentary group codes for the 17e legislature. */
 export const GROUP_CODES = [
   "LFI", "GDR", "ECO", "SOC", "LIOT",

@@ -11,10 +11,8 @@ import { computeAlignment, rankByAlignment } from "../lib/matching";
 import { getOrCreateSession, recordVote, loadSession } from "../lib/session";
 import { track } from "../lib/analytics";
 import type { Scrutin, UserVote, GroupCode, GroupAlignment } from "../types";
-import { GROUP_CODES } from "../types";
+import { GROUP_CODES, TARGET, MIN_FOR_RANKING } from "../types";
 
-const TARGET = 20;
-const MIN_FOR_LIVE = 5;
 const CAP_PER_DOSSIER = 2;
 const CAP_PER_CHAPEAU_PREFIX = 2;
 
@@ -111,7 +109,7 @@ export default function Play() {
 
   const alignments: Record<GroupCode, GroupAlignment> = computeAlignment(pool, session?.votes ?? []);
   const countedTotal = Math.max(...GROUP_CODES.map((c) => alignments[c].counted), 0);
-  const showLiveScore = countedTotal >= MIN_FOR_LIVE;
+  const showLiveScore = countedTotal >= MIN_FOR_RANKING;
   const ranked = rankByAlignment(alignments);
   const top1 = ranked[0];
 

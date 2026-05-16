@@ -13,6 +13,7 @@ import { AuditTrail } from "../components/AuditTrail";
 import { getParty, getPartyColorVar } from "../lib/parties";
 import { track } from "../lib/analytics";
 import type { Scrutin, GroupCode } from "../types";
+import { TARGET } from "../types";
 
 export default function Result() {
   const navigate = useNavigate();
@@ -34,6 +35,15 @@ export default function Result() {
   }, [loadTick]);
 
   const session = loadSession();
+
+  // Guard against URL-typed `/result` with no votes recorded — without
+  // this, the page would render "Tu es surtout aligné avec LFI (0%)"
+  // (first group in GROUP_CODES order, all pcts at 0). Misleading.
+  // Bounce back to Cover where the user can start.
+  useEffect(() => {
+    if (session && session.votes.length === 0) navigate("/", { replace: true });
+  }, [navigate, session]);
+
   // No useMemo here — `session` is a fresh object reference every render
   // (loadSession reads from localStorage), so memoising on [pool, session]
   // would recompute every render anyway. Computing inline is the same
@@ -51,7 +61,6 @@ export default function Result() {
   const [showPersonnalites, setShowPersonnalites] = useState(false);
   const skips = (session?.votes.filter(v => v.choice === "skip").length) ?? 0;
   const total = session?.votes.length ?? 0;
-  const TARGET = 20;
   const isPartial = total < TARGET;
   const remaining = Math.max(0, TARGET - total);
 

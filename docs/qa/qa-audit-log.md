@@ -854,3 +854,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Inspect DOM sur /result avec un PartyRow expanded : un seul `<section role="region" id="audit-trail-X">`, plus de div wrapper supplémentaire
 - [ ] Slow 3G + nav vers /methode : VoiceOver doit annoncer "status, Chargement…" pendant le chunk load (pas juste lire silencieusement)
 - [ ] Activer prefers-reduced-motion dans DevTools : CardSkeleton/ResultSkeleton shimmer doit être instantané ou statique (pas en boucle)
+
+---
+
+## Session 38 — 2026-05-16
+
+### Vérification session 37
+
+- [VERIFIED] `AuditTrail` accepte prop `id?` + placé sur le `<section>`, Result.tsx ne wrap plus
+- [VERIFIED] `RouteLoader` a `role="status"` + `aria-live="polite"`
+- [VERIFIED] `.skeleton-shimmer` @media reduced-motion supprimé
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés (refactor DRY + edge case 0-votes)
+
+- [FIXED] DRY · `TARGET = 20` dupliqué dans Cover.tsx, Play.tsx, Result.tsx. Centralisation dans `types/index.ts` comme export `TARGET`. Tous les call sites updated. · `src/types/index.ts`, `src/routes/Cover.tsx`, `src/routes/Play.tsx`, `src/routes/Result.tsx`
+- [FIXED] DRY · 3 magic numbers identiques pour le seuil "ranking utile" (5 votes) : `MIN_FOR_LIVE` (Play), `MIN_FOR_RESULT_LINK` (TopBar), littéral `5` dans canSeePartialResult (Cover). Centralisation comme export `MIN_FOR_RANKING` dans types/index.ts. · `src/types/index.ts`, `src/components/TopBar.tsx`, `src/routes/Cover.tsx`, `src/routes/Play.tsx`
+- [FIXED] Edge case · `Result.tsx` URL directe `/result` sans session affichait "Tu es surtout aligné avec La France Insoumise (0%)" (premier groupe par GROUP_CODES order, tous pct=0). Misleading. Ajout useEffect guard : si session && votes.length === 0, navigate("/") replace. · `src/routes/Result.tsx`
+
+### Vérifications à faire en session 39
+
+- [ ] Modifier `TARGET = 20` → `21` dans types/index.ts → vérifier que Cover/Play/Result affichent tous "/21" (et pas un mix)
+- [ ] Vider la session (DevTools → localStorage clear), naviguer directement à `/result` → doit rediriger vers `/`
+- [ ] Aucune référence à `MIN_FOR_LIVE` ou `MIN_FOR_RESULT_LINK` dans le code (replacés par `MIN_FOR_RANKING`)

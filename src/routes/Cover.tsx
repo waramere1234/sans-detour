@@ -6,9 +6,8 @@ import { FreshnessBanner } from "../components/FreshnessBanner";
 import { fetchFreshness } from "../lib/scrutins";
 import { hasSeenCover, loadSession, markCoverSeen, resetSession } from "../lib/session";
 import { track } from "../lib/analytics";
+import { TARGET, MIN_FOR_RANKING } from "../types";
 import type { FreshnessInfo } from "../types";
-
-const TARGET = 20;
 
 export default function Cover() {
   const navigate = useNavigate();
@@ -41,7 +40,7 @@ export default function Cover() {
   const hasInProgress = votesCount > 0 && votesCount < TARGET;
   const hasCompleted = votesCount >= TARGET;
   const remainingVotes = TARGET - votesCount;
-  const canSeePartialResult = votesCount >= 5;
+  const canSeePartialResult = votesCount >= MIN_FOR_RANKING;
 
   function start() {
     // Only flip the cover-seen flag the first time — subsequent revisits

@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Wordmark } from "./Wordmark";
 import { loadSession } from "../lib/session";
 import { track } from "../lib/analytics";
+import { MIN_FOR_RANKING } from "../types";
 
-const MIN_FOR_RESULT_LINK = 5;
 
 /** Top bar shown on every page except the Cover. Wordmark on the left
  *  links to home; "•••" on the right toggles an anchored popover menu
@@ -114,7 +114,7 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
   const location = useLocation();
   const session = loadSession();
   const votes = session?.votes.length ?? 0;
-  const showResultLink = votes >= MIN_FOR_RESULT_LINK && location.pathname !== "/result";
+  const showResultLink = votes >= MIN_FOR_RANKING && location.pathname !== "/result";
 
   useEffect(() => {
     if (!open) return;
