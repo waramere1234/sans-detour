@@ -41,14 +41,16 @@ export function AuditTrail({ alignment, scrutins, votes }: AuditTrailProps) {
       fontSize: 12,
       lineHeight: 1.5,
     }}>
-      {/* Party full name header */}
-      <div style={{
+      {/* Party full name header. h3 because the AuditTrail panel is a
+        deep-detail section under Result.tsx's h1 + future h2 grouping —
+        nesting keeps the heading rotor navigable for SR users. */}
+      <h3 style={{
         fontFamily: "var(--font-sans)", fontWeight: 600,
         fontSize: 14, color: "var(--ink)",
-        marginBottom: 4,
+        margin: "0 0 4px",
       }}>
         {alignment.group} <span style={{ color: "var(--ink-3)", fontWeight: 400 }}>· {partyName}</span>
-      </div>
+      </h3>
 
       {/* Breakdown chips */}
       <div style={{

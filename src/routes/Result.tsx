@@ -211,8 +211,9 @@ export default function Result() {
             }}
             style={togglePersonnalitesBtn(showPersonnalites)}
             aria-expanded={showPersonnalites}
+            aria-controls="personnalites-panel"
           >
-            <span>{showPersonnalites ? "▾" : "▸"} Voir les personnalités</span>
+            <span><span aria-hidden="true">{showPersonnalites ? "▾" : "▸"} </span>Voir les personnalités</span>
             <span style={{
               fontFamily: "var(--font-mono)", fontSize: 10.5,
               color: "var(--ink-3)", letterSpacing: "0.04em",
@@ -220,15 +221,16 @@ export default function Result() {
           </button>
 
           {showPersonnalites && (
-            <div>
-              <p style={{
+            <div id="personnalites-panel">
+              <h2 style={{
                 margin: "0 0 6px",
                 fontFamily: "var(--font-mono)", fontSize: 10.5,
                 color: "var(--ink-3)", letterSpacing: "0.08em",
                 textTransform: "uppercase",
+                fontWeight: 500,
               }}>
                 Alignement avec figures du mandat
-              </p>
+              </h2>
               {personnalitesWithData.map((p) => (
                 <PersonnaliteRow key={p.personnalite} alignment={p} />
               ))}
