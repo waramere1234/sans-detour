@@ -21,8 +21,8 @@ function mkScrutin(id: string, positions: Partial<Record<string, "pour" | "contr
 }
 
 describe("alignmentScore — full matrix completion", () => {
-  it("returns 1 when user abstention matches group abstention", () => {
-    expect(alignmentScore("pour" as any, "abstention")).toBe(0.5);
+  it("returns 0.5 when user votes pour and group abstains (partial alignment)", () => {
+    expect(alignmentScore("pour", "abstention")).toBe(0.5);
   });
 
   it("returns null for skip on any group position", () => {

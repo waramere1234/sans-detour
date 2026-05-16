@@ -807,3 +807,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Sur /play, Tab vers Card → focus ring accent visible (avec souris pas de ring)
 - [ ] Slow 3G simulation sur Network tab, naviguer vers /methode → "Chargement…" affiché avant la page (pas blank)
 - [ ] Inspecter manifest.webmanifest : a `id: "/"`
+
+---
+
+## Session 36 — 2026-05-16
+
+### Vérification session 35
+
+- [VERIFIED] `Card.tsx` plus d'inline `outline: "none"`, règle CSS dans index.css gère les 2 états (focus / focus-visible)
+- [VERIFIED] `main.tsx` Suspense fallback = `<RouteLoader />` (plus null)
+- [VERIFIED] `manifest.webmanifest:2` a `"id": "/"`
+- Note : user a changé `--accent` de bleu république (D2) à orange signal (D3) — design board 04. Mes session 35 changes préservés.
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés
+
+- [FIXED] BCP-47 lang inconsistency · `manifest.webmanifest` disait `"lang": "fr-FR"`, `index.html` disait `<html lang="fr">`. fr-FR (France) plus précis que fr (générique). Aligné sur fr-FR dans HTML. · `index.html`
+- [FIXED] Test correctness · `tests/matching-edge-cases.test.ts:24` description "returns 1 when user abstention matches group abstention" ne matchait pas l'assertion `alignmentScore("pour" as any, "abstention") === 0.5`. Le `as any` était dead code (`"pour"` est valid UserVote). Description corrigée + cast retiré. · `tests/matching-edge-cases.test.ts`
+- [FIXED] Perf micro · `Cover.tsx start()` appelait `markCoverSeen()` unconditionnel à chaque clic CTA, même quand user revisite (hasSeenCover déjà true). Inutile localStorage.setItem. Guard `if (!hasSeenCover()) markCoverSeen()`. Important sur Safari private mode où setItem peut throw (caught par session 7 try/catch, mais skip est plus propre). · `src/routes/Cover.tsx`
+
+### Vérifications à faire en session 37
+
+- [ ] Inspect `<html>` tag : `lang="fr-FR"` (matche manifest)
+- [ ] Re-run `tests/matching-edge-cases.test.ts` : 1er test description et assertion alignées
+- [ ] DevTools Application > Local Storage : cliquer CTA sur Cover revisitée (avec sd_seen_cover déjà "true") → pas de write event localStorage

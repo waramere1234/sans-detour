@@ -44,7 +44,11 @@ export default function Cover() {
   const canSeePartialResult = votesCount >= 5;
 
   function start() {
-    markCoverSeen();
+    // Only flip the cover-seen flag the first time — subsequent revisits
+    // (TopBar wordmark) don't need to re-write localStorage. Important on
+    // Safari private mode where setItem can throw (caught by saveSession
+    // try/catch, but skipping the call is cleaner).
+    if (!hasSeenCover()) markCoverSeen();
     if (hasCompleted) {
       track("cover_result_revisit");
       navigate("/result");
