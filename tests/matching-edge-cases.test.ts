@@ -1,12 +1,12 @@
 // tests/matching-edge-cases.test.ts
 import { describe, it, expect } from "vitest";
 import {
-  alignmentScore, alignmentScorePersonnalite,
+  alignmentScore,
   computeAlignment, computeAlignmentPersonnalites,
   rankByAlignment, rankPersonnalitesByAlignment,
 } from "../src/lib/matching";
 import { GROUP_CODES, PERSONNALITE_CODES } from "../src/types";
-import type { Scrutin, SessionVote, GroupAlignment, PersonnaliteAlignment } from "../src/types";
+import type { Scrutin, SessionVote } from "../src/types";
 
 function mkScrutin(id: string, positions: Partial<Record<string, "pour" | "contre" | "abstention" | "divisé">>): Scrutin {
   return {
