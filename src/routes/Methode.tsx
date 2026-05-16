@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Wordmark } from "../components/Wordmark";
 import { FreshnessBanner } from "../components/FreshnessBanner";
 import { fetchFreshness } from "../lib/scrutins";
+import { track } from "../lib/analytics";
 import type { FreshnessInfo } from "../types";
 
 export default function Methode() {
@@ -68,10 +69,15 @@ export default function Methode() {
           ["06", "Indépendance"],
           ["07", "IA Claude"],
         ].map(([n, label]) => (
-          <a key={n} href={`#methode-${n}`} style={{
-            color: "var(--ink-2)", textDecoration: "none",
-            display: "inline-flex", alignItems: "baseline", gap: 4,
-          }}>
+          <a
+            key={n}
+            href={`#methode-${n}`}
+            onClick={() => track("methode_toc_click", { section: n })}
+            style={{
+              color: "var(--ink-2)", textDecoration: "none",
+              display: "inline-flex", alignItems: "baseline", gap: 4,
+            }}
+          >
             <span style={{ color: "var(--accent)" }}>{n}</span>
             {label}
           </a>

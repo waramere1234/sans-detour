@@ -20,14 +20,16 @@ export function AuditTrail({ alignment, scrutins, votes }: AuditTrailProps) {
       if (!sc) return null;
       const groupPos = sc.position_par_groupe[alignment.group];
       if (!groupPos) return null;
+      // alignmentScore returns exactly one of {null, 0, 0.5, 1} — every
+      // case mapped below, so no fallback needed.
       const score = alignmentScore(v.choice, groupPos);
-      let icon = "—";
-      let color = "var(--ink-3)";
-      let label = "Non noté";
+      let icon: string;
+      let color: string;
+      let label: string;
       if (score === null) { icon = "÷"; color = "var(--ink-4)"; label = "Groupe divisé, non compté"; }
       else if (score === 1) { icon = "✓"; color = "var(--pour)"; label = "Aligné"; }
       else if (score === 0.5) { icon = "≈"; color = "var(--warn)"; label = "Partiel"; }
-      else if (score === 0) { icon = "✕"; color = "var(--contre)"; label = "Opposé"; }
+      else { icon = "✕"; color = "var(--contre)"; label = "Opposé"; }
       return { v, sc, groupPos, score, icon, color, label };
     })
     .filter((x): x is NonNullable<typeof x> => x !== null);

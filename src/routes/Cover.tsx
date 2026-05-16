@@ -14,9 +14,6 @@ export default function Cover() {
   const navigate = useNavigate();
   const location = useLocation();
   const [info, setInfo] = useState<FreshnessInfo | null>(null);
-  // Bump to force a re-render after restart() resets the session so the
-  // CTA label/state recompute without a full page reload.
-  const [sessionTick, setSessionTick] = useState(0);
 
   useEffect(() => {
     // Explicit nav from the TopBar wordmark passes { fromLogo: true } so
@@ -35,7 +32,6 @@ export default function Cover() {
   }, [navigate, location.state]);
 
   const session = loadSession();
-  void sessionTick; // dep for the read above so restart() forces recompute
   const votesCount = session?.votes.length ?? 0;
   const hasInProgress = votesCount > 0 && votesCount < TARGET;
   const hasCompleted = votesCount >= TARGET;
@@ -64,7 +60,6 @@ export default function Cover() {
     // No need to re-mark.
     resetSession();
     track("cover_restarted");
-    setSessionTick((t) => t + 1);
     navigate("/play");
   }
 
