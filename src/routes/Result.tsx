@@ -252,17 +252,17 @@ export default function Result() {
         {isPartial && (
           <button type="button"
             onClick={() => navigate("/play")}
-            style={btnPrimary()}>→ Continuer le test ({remaining} {remaining === 1 ? "vote restant" : "votes restants"})</button>
+            style={btnPrimary()}><span aria-hidden="true">→ </span>Continuer le test ({remaining} {remaining === 1 ? "vote restant" : "votes restants"})</button>
         )}
         <button type="button"
           onClick={share}
-          style={isPartial ? btnSecondary() : btnPrimary()}>📤 Partager mon résultat</button>
+          style={isPartial ? btnSecondary() : btnPrimary()}><span aria-hidden="true">📤 </span>Partager mon résultat</button>
         {!isPartial && (
           <button type="button"
             onClick={() => { track("affinement_clicked"); navigate("/play?affinement=1"); }}
-            style={btnSecondary()}>↻ Continuer à affiner</button>
+            style={btnSecondary()}><span aria-hidden="true">↻ </span>Continuer à affiner</button>
         )}
-        <button type="button" onClick={refaire} style={btnTertiary()}>↻ Refaire depuis le début</button>
+        <button type="button" onClick={refaire} style={btnTertiary()}><span aria-hidden="true">↻ </span>Refaire depuis le début</button>
       </div>
     </section>
   );

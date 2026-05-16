@@ -66,7 +66,7 @@ export default function Methode() {
           +1 si ton vote = position du groupe<br/>
           +0,5 si l'un des deux s'abstient et l'autre vote<br/>
           0 si désaccord net (pour vs contre)<br/>
-          ÷ nombre de scrutins comptés × 100 = % affiché
+          Somme ÷ nombre de scrutins comptés × 100 = % affiché
         </Formula>
         <p>Le ranking apparaît à partir du <b>5e scrutin compté</b> — en dessous, les pourcentages bougent trop pour signifier quoi que ce soit.</p>
       </Section>
@@ -118,7 +118,10 @@ function Section({ n, title, children }: { n: string; title: string; children: R
       // the §04 paragraph instead of the §07 heading — scroll moves but
       // focus doesn't follow.
       tabIndex={-1}
-      style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid var(--line)", scrollMarginTop: 16, outline: "none" }}
+      // scrollMarginTop=64 ≈ TopBar height (~52px sticky) + 12px breathing
+      // room. Without it, anchor jumps land the heading visually under the
+      // sticky TopBar — user scrolls to §07 but the heading is hidden.
+      style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid var(--line)", scrollMarginTop: 64, outline: "none" }}
     >
       <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
         <span style={{
