@@ -1267,3 +1267,25 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] DevTools localStorage clear puis URL directe `/play?affinement=1` → doit rediriger vers `/play` (sans flag), header montre "1 / 20" pas "1" tout seul
 - [ ] VoiceOver / NVDA sur /methode + landmarks rotor → 3 nav labelés distincts : "En-tête de la page", "Sommaire de la méthode", "Menu principal" (quand popover TopBar ouvert)
 - [ ] Inspect Card recto → bouton chip avec aria-label="IA — …" et `<span aria-hidden="true">✨</span>` autour de l'emoji
+
+---
+
+## Session 56 — 2026-05-16
+
+### Vérification session 55
+
+- [VERIFIED] `Play.tsx:74` guard `isAffinement && (!existing || existing.votes.length < TARGET)` en place
+- [VERIFIED] `aria-label="En-tête de la page"` dans Methode + Legal ; `aria-label="Liens secondaires"` dans Cover ; chacune des 3 routes a 1 match
+- [VERIFIED] `Card.tsx:118` `aria-label="IA — comment ce contenu a été préparé"`
+
+### Bugs fixés (typed env + regex defense + analytics gate)
+
+- [FIXED] Type-safety · `src/vite-env.d.ts` ne contenait que la `reference vite/client` mais ne déclarait pas `ImportMetaEnv`. Un typo sur `import.meta.env.VITE_SUPABBASE_URL` résolverait silencieusement à `undefined` → `supabase.ts` fallback aux fixtures dev en prod. Augmentation typée ajoutée pour les 2 clés client (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`). Server-only secrets explicitement absents pour éviter qu'on les lise depuis le bundle client (Vite les inlinerait, fuite). · `src/vite-env.d.ts`
+- [FIXED] Regex defense · `AuditTrail.extractConcrete` matchait `(?:Concrètement|Par exemple)\s*:?\s*` — colon optionnel mais zéro fallback comma. Le SYSTEM_PROMPT impose le colon, mais une drift LLM ("Concrètement, la loi...") faisait surfacer un bullet "*, Mme Le Pen vote..." avec virgule en tête (trim+strip trailing dot ne récupère pas un leading comma). Pattern étendu en `\s*[:,]?\s*`. · `src/components/AuditTrail.tsx`
+- [FIXED] Analytics pollution · `analytics.ts track()` appelait `window.plausible?.(...)` sans gate sur hostname. Le script Plausible est servi pour TOUS les origins (dev localhost, *.vercel.app previews, prod) avec `data-domain="sansdetour.fr"` hardcoded dans index.html — chaque dev session ou preview deploy pollut le dashboard prod. Gate ajouté sur `ANALYTICS_HOSTS = Set(["sansdetour.fr", "www.sansdetour.fr"])` : non-prod hostnames no-op proprement. Les tests qui spyent `track` ne sont pas affectés (le gate est en aval du spy). · `src/lib/analytics.ts`
+
+### Vérifications à faire en session 57
+
+- [ ] DevTools console sur localhost → essayer `import.meta.env.VITE_SUPABBASE_URL` (typo) ; si VITE_TYPED → tsc devrait flag en build, sinon `undefined` à runtime (validation manuelle)
+- [ ] Mocker un contexte "Concrètement, la loi fait X. Cette mesure…" puis ouvrir Result → AuditTrail bullet doit dire "la loi fait X" (pas ", la loi fait X")
+- [ ] DevTools sur `localhost:5173` → faire un vote → DevTools Network → aucun event `event=vote` envoyé à `plausible.io` (le script peut se charger, mais `track()` no-op)

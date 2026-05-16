@@ -143,9 +143,13 @@ function extractConcrete(contexte?: string): string | null {
   const cleaned = contexte
     .replace(/<cite[^>]*>([\s\S]*?)<\/cite>/g, "$1")
     .replace(/<\/?cite[^>]*>/g, "");
-  // Match "Concrètement :" or "Par exemple :" followed by content up to the
-  // next sentence boundary (period followed by space + capital, or end of string).
-  const m = cleaned.match(/(?:Concrètement|Par exemple)\s*:?\s*([^]+?)(?=\.\s+[A-Z]|\.?$)/i);
+  // Match "Concrètement :" or "Par exemple :" (or rarely a comma instead of
+  // colon if the LLM drifts from its spec — see ingest-an.ts SYSTEM_PROMPT)
+  // followed by content up to the next sentence boundary (period followed by
+  // space + capital, or end of string). Without the comma fallback, a drifted
+  // contexte "Concrètement, la loi…" would surface in the bullet with a
+  // leading ", " — the trim/punctuation pass can't recover that.
+  const m = cleaned.match(/(?:Concrètement|Par exemple)\s*[:,]?\s*([^]+?)(?=\.\s+[A-Z]|\.?$)/i);
   if (!m) return null;
   const sentence = m[1].trim().replace(/\.$/, "");
   // Strip **bold** markers — the AuditTrail row is dense, no need for emphasis
