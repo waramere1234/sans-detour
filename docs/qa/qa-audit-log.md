@@ -1176,3 +1176,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `SHIP-V1.md §4 .Mentions légales` dans `src/` → 0 résultat
 - [ ] grep `apple-touch-icon` + lire le bloc TODO juste au-dessus dans `index.html` → mentionne explicitement apple-touch-icon (pas juste og/twitter)
 - [ ] grep `variant.*explanation\|backVariant\|bottom-sheet` dans `CLAUDE.md` → 0 résultat (sauf la mention explicite de MethodeSheet comme vrai bottom-sheet)
+
+---
+
+## Session 52 — 2026-05-16
+
+### Vérification session 51
+
+- [VERIFIED] `Legal.tsx:33` comment historique mentionne explicitement que SHIP-V1 §4 ≠ "Mentions légales" (commentaire intrinsèque, plus de drift externe possible)
+- [VERIFIED] `index.html` bloc TODO production-blocker liste explicitement apple-touch-icon + og:image + twitter:image + manifest icons[]
+- [VERIFIED] `CLAUDE.md` UI section : zéro mention de "variant explanation/analyse" ; TopBar décrit comme popover, MethodeSheet identifié comme vrai bottom-sheet
+- 93/93 tests verts, typecheck clean
+
+### Bugs fixés (3 migrations SQL avec docs périmées)
+
+- [FIXED] Migration 0002 stale spec · `0002_add_contexte.sql` documentait le contexte comme "One sentence, ≤ 25 words" — réalité (ingest-an.ts SYSTEM_PROMPT ligne 249) : 30-50 mots en 2 phrases courtes, dont une "Concrètement : …" / "Par exemple : …" obligatoire, avec un chiffre + un nom propre, et **bold** markdown pour 2-3 fragments-clés. Spec widened pre-V1, jamais répercutée dans la migration. Comment ré-écrit avec le spec actuel + pointeur vers `extractConcrete` qui consomme la 2e phrase dans AuditTrail. · `supabase/migrations/0002_add_contexte.sql`
+- [FIXED] Migration 0003 stale UI ref · `0003_add_analyse.sql` disait "Powers the '+ analyse' card overlay". Le refactor `9cb7e6c` a supprimé le bouton "+ analyse" et l'overlay associé : `analyse_loi` est rendu inline dans le verso unifié de la Card. Comment corrigé, ref au commit de fusion ajoutée pour l'archéologie. · `supabase/migrations/0003_add_analyse.sql`
+- [FIXED] Migration 0006 shape example faux · `0006_add_votes_personnalites.sql` montrait un shape `{ "le_pen": "pour", "bardella": "contre", ..., "tondelier": "absent", "wauquiez": "non_dispo", ... }` — bardella + tondelier sont **exclus structurellement** de PERSONNALITE_CODES (cf. JSDoc src/types/index.ts:50), Wauquiez est président du groupe DR et n'a jamais été ministre donc jamais "non_dispo". L'exemple aurait induit en erreur tout dev essayant de comprendre les valeurs valides. Réécrit avec les 8 vraies clés + bloc explicite listant les exclus structurels. · `supabase/migrations/0006_add_votes_personnalites.sql`
+
+### Vérifications à faire en session 53
+
+- [ ] grep `One sentence, ≤ 25 words` dans `supabase/migrations/` → 0 résultat
+- [ ] grep `+ analyse.*overlay\|+ analyse.*card overlay` dans `supabase/migrations/` → 0 résultat
+- [ ] grep `bardella\|tondelier\|wauquiez.*non_dispo` dans `supabase/migrations/0006_add_votes_personnalites.sql` → seulement dans la note d'exclusion explicite, pas dans l'exemple Shape
