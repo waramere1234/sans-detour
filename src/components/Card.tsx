@@ -131,7 +131,35 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
               letterSpacing: "0.12em", textTransform: "uppercase",
               color: "var(--accent)", fontWeight: 500,
               flex: 1,
-            }}>{scrutin.chapeau}</div>
+            }}>
+              {scrutin.chapeau}
+              {topMost && onOpenMethode && (
+                <>
+                  {" · "}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); onOpenMethode(); }}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    aria-label="Comment ce contenu a été préparé"
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: "inherit",
+                      opacity: 0.7,
+                      cursor: "pointer",
+                      padding: "4px 2px",
+                      fontFamily: "inherit",
+                      fontSize: "inherit",
+                      letterSpacing: "inherit",
+                      textTransform: "inherit",
+                      textDecoration: "underline",
+                      textUnderlineOffset: 3,
+                      textDecorationStyle: "dotted",
+                    }}
+                  >✨IA</button>
+                </>
+              )}
+            </div>
             {topMost && (
               <button
                 type="button"
@@ -143,7 +171,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
                   border: "1px solid var(--line)",
                   color: scrutin.analyse_loi ? "var(--accent)" : "var(--ink-3)",
                   fontFamily: "var(--font-mono)", fontSize: 10,
-                  padding: "3px 8px", borderRadius: 3,
+                  padding: "6px 10px", borderRadius: 3,
                   cursor: "pointer", letterSpacing: "0.08em",
                   whiteSpace: "nowrap",
                   textTransform: "uppercase",

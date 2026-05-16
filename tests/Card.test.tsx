@@ -99,4 +99,21 @@ describe("Card a11y", () => {
     fireEvent.keyDown(screen.getByRole("article"), { key: "ArrowRight" });
     expect(onSwipe).not.toHaveBeenCalled();
   });
+
+  it("renders the IA chip when topMost and onOpenMethode provided", () => {
+    render(<Card scrutin={mkScrutin()} topMost={true} onOpenMethode={vi.fn()} />);
+    expect(screen.getByRole("button", { name: /comment ce contenu a été préparé/i })).toBeInTheDocument();
+  });
+
+  it("does not render IA chip when not topMost", () => {
+    render(<Card scrutin={mkScrutin()} topMost={false} onOpenMethode={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: /comment ce contenu a été préparé/i })).not.toBeInTheDocument();
+  });
+
+  it("calls onOpenMethode when IA chip is clicked", () => {
+    const onOpenMethode = vi.fn();
+    render(<Card scrutin={mkScrutin()} topMost={true} onOpenMethode={onOpenMethode} />);
+    fireEvent.click(screen.getByRole("button", { name: /comment ce contenu a été préparé/i }));
+    expect(onOpenMethode).toHaveBeenCalled();
+  });
 });
