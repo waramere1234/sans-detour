@@ -1,6 +1,6 @@
 // src/components/RankingOverlay.tsx
 import { useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import type { GroupAlignment } from "../types";
 import { PartyRow } from "./PartyRow";
 import { rankByAlignment } from "../lib/matching";
@@ -18,6 +18,7 @@ export function RankingOverlay({ open, alignments, countedTotal, onClose }: Rank
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
+  const reducedMotion = useReducedMotion();
 
   // Esc to dismiss the modal (a11y) + lock body scroll while open so the
   // backdrop doesn't pass through to the underlying /play deck.
@@ -80,6 +81,7 @@ export function RankingOverlay({ open, alignments, countedTotal, onClose }: Rank
         <>
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: reducedMotion ? 0 : 0.16 }}
             onClick={onClose}
             style={{
               position: "fixed", inset: 0,
@@ -92,7 +94,9 @@ export function RankingOverlay({ open, alignments, countedTotal, onClose }: Rank
             ref={dialogRef}
             role="dialog" aria-modal="true" aria-label="Classement partiel"
             initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 30, stiffness: 280 }}
+            transition={reducedMotion
+              ? { duration: 0 }
+              : { type: "spring", damping: 30, stiffness: 280 }}
             style={{
               position: "fixed", left: 0, right: 0, bottom: 0,
               maxHeight: "82dvh", overflow: "auto",

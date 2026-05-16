@@ -1448,3 +1448,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `minHeight.*100dvh - 60px"$` dans src/ → 0 résultat (le `"$` exclu la version avec env())
 - [ ] grep `scrollMarginTop: 64\b` dans src/ → 0 résultat
 - [ ] iPhone X+ Simulator (PWA) : ouvrir RankingOverlay sur /play (chip Top1 → 5+ votes), vérifier que la dernière PartyRow + le close button ne sont pas masqués par le home indicator
+
+---
+
+## Session 64 — 2026-05-17
+
+### Vérification session 63
+
+- [VERIFIED] `Play.tsx playSectionStyle.minHeight` utilise `env(safe-area-inset-*)`
+- [VERIFIED] `Methode.tsx Section scrollMarginTop` est en calc avec `env(safe-area-inset-top)`
+- [VERIFIED] `RankingOverlay` + `MethodeSheet` ont `calc(<n>px + env(safe-area-inset-bottom, 0px))` sur padding-bottom
+- 123/123 tests verts, typecheck clean
+
+### Bugs fixés (3 a11y — useReducedMotion + role=region)
+
+- [FIXED] `TopBar MenuPopover` n'utilisait pas `useReducedMotion`. Les transitions `duration: 0.12` (backdrop) + `0.16 + ease` (popover slide) jouaient toujours, même avec `prefers-reduced-motion: reduce`. Card.tsx + MethodeSheet.tsx l'utilisaient déjà — gap d'inconstance. Hook ajouté + transitions gated. Le wildcard CSS `*` dans index.css ne catch pas les animations JS Framer Motion, donc le hook est nécessaire. · `src/components/TopBar.tsx`
+- [FIXED] `RankingOverlay` même bug · `transition={{ type: "spring", damping: 30, stiffness: 280 }}` sur le sheet slide-up + backdrop fade non-gated. Hook ajouté, spring → `duration: 0` sous reduced-motion, backdrop → `duration: 0.16 ? 0`. · `src/components/RankingOverlay.tsx`
+- [FIXED] Methode `Section` sans role+labelledby · La page Methode contient 7 sections (§01..§07). Le composant Section les rendait comme `<div tabIndex=-1>` — anonyme dans les SR landmarks. VoiceOver rotor / NVDA Insert+R listait des landmarks sans étiquette. Ajout `role="region"` + `aria-labelledby` pointant vers le h2 (nouveau id `methode-heading-NN`). Les 7 sections sont maintenant identifiables individuellement dans le rotor. · `src/routes/Methode.tsx`
+
+### Vérifications à faire en session 65
+
+- [ ] DevTools → `prefers-reduced-motion: reduce` (Emulate Vision Deficiencies), ouvrir le menu TopBar `•••` → animation pratiquement instantanée
+- [ ] Idem pour RankingOverlay (chip Top1 sur /play après 5 votes)
+- [ ] VO rotor sur /methode → 7 entrées "region" labelées avec titre de section (ex: "D'où viennent les données", "Quels scrutins on garde", etc.)

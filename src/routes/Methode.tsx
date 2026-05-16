@@ -183,13 +183,21 @@ export default function Methode() {
 }
 
 function Section({ n, title, children }: { n: string; title: string; children: ReactNode }) {
+  const headingId = `methode-heading-${n}`;
   return (
     // id is `methode-NN` so cross-section references (e.g. "voir section 07"
     // in §04 intro) can use `<a href="#methode-07">` to deep-link. Without an
     // anchor target the text reads as if it were a link but does nothing on
     // click — broken affordance on a transparency-focused page.
+    //
+    // role="region" + aria-labelledby promotes the section to a proper SR
+    // landmark — VoiceOver rotor / NVDA Insert+R now lists the 7 sections
+    // with their titles (else they were anonymous divs in the landmark
+    // tree, indistinguishable from each other).
     <div
       id={`methode-${n}`}
+      role="region"
+      aria-labelledby={headingId}
       // tabIndex=-1 makes the div programmatically focusable so browsers
       // move focus to it after an in-page anchor jump (`<a href="#methode-07">`).
       // Without it, focus stays on the link and keyboard Tab continues from
@@ -218,10 +226,13 @@ function Section({ n, title, children }: { n: string; title: string; children: R
           fontFamily: "var(--font-mono)", fontSize: 11,
           letterSpacing: "0.12em", color: "var(--accent)", fontWeight: 500,
         }}>{n}</span>
-        <h2 style={{
-          fontFamily: "var(--font-sans)", fontWeight: 600,
-          fontSize: 18, letterSpacing: "-0.012em", margin: 0,
-        }}>{title}</h2>
+        <h2
+          id={headingId}
+          style={{
+            fontFamily: "var(--font-sans)", fontWeight: 600,
+            fontSize: 18, letterSpacing: "-0.012em", margin: 0,
+          }}
+        >{title}</h2>
       </div>
       <div style={{ marginTop: 8, color: "var(--ink-2)", fontSize: 13.5, lineHeight: 1.6 }}>{children}</div>
     </div>

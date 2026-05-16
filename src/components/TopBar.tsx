@@ -1,7 +1,7 @@
 // src/components/TopBar.tsx
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Wordmark } from "./Wordmark";
 import { loadSession } from "../lib/session";
 import { track } from "../lib/analytics";
@@ -119,6 +119,7 @@ function MenuTrigger({
 
 function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) {
   const location = useLocation();
+  const reducedMotion = useReducedMotion();
   const session = loadSession();
   const votes = session?.votes.length ?? 0;
   const showResultLink = votes >= MIN_FOR_RANKING && location.pathname !== "/result";
@@ -140,7 +141,7 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.12 }}
+            transition={{ duration: reducedMotion ? 0 : 0.12 }}
             onClick={onClose}
             aria-hidden="true"
             style={{
@@ -155,7 +156,9 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
             initial={{ opacity: 0, y: -4, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.97 }}
-            transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+            transition={reducedMotion
+              ? { duration: 0 }
+              : { duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
             style={{
               position: "absolute",
               top: "calc(100% + 8px)",
