@@ -900,3 +900,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Tester URL `/result` sans aucune session (localStorage clear) → doit rediriger immédiatement vers `/` sans flash de page misleading
 - [ ] Sur /result avec 3 skips → header affiche "20 scrutins · 17 comptés · 3 skips" (pluriel)
 - [ ] Inspecter top de Cover/Play/Result : un seul `import` line depuis `../types`
+
+---
+
+## Session 40 — 2026-05-16
+
+### Vérification session 39
+
+- [VERIFIED] `Result.tsx:71` `<Navigate to="/" replace />` early return
+- [VERIFIED] `Result.tsx:187` skip pluralization `{skips > 1 ? "s" : ""}`
+- [VERIFIED] Imports consolidés Cover/Play/Result depuis `../types`
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés
+
+- [FIXED] Analytics pollution · `Result.tsx result_reached` track firait même quand `<Navigate>` redirige (useEffect schedule s'exécute après render mais avant que Navigate prenne effet). Pollue analytics avec sessions vides. Guard ajouté `hasVotes` check + deps stable `[top?.group, session?.votes.length]` au lieu de `[top]` (qui change de ref chaque render). · `src/routes/Result.tsx`
+- [FIXED] Hook ordering · `Result.tsx` avait `useState(showPersonnalites)` et `useRef(reportedRef)` entre des computations (style non-conventionnel). Tous les hooks regroupés en haut maintenant, suivis des computations, puis des guards. Plus lisible. · `src/routes/Result.tsx`
+- [FIXED] Ship blocker flagged · `Legal.tsx` lignes 28-29 contiennent `[Nom complet · à compléter]` + `[adresse postale]` visibles en production. SHIP-V1.md §4 le flag mais aucun commentaire dans le code. Ajout d'un commentaire TODO production-blocker explicite au-dessus pour qu'un futur dev ne déploie pas par mégarde. · `src/routes/Legal.tsx`
+
+### Vérifications à faire en session 41
+
+- [ ] Visiter `/result` sans session → vérifier Plausible : pas d'event "result_reached" envoyé
+- [ ] Inspect `src/routes/Result.tsx` : tous les hooks (useState, useRef, useEffect) sont avant `const session = loadSession()`
+- [ ] grep `[Nom complet` dans src/ → fichier flag avec TODO production-blocker comment au-dessus

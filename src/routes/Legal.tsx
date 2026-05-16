@@ -25,6 +25,12 @@ export default function Legal() {
       }}>Mentions légales</h1>
 
       <div style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.6 }}>
+        {/* TODO production-blocker · "[à compléter]" placeholders must be
+          replaced with real legal identity before ship. Tracked in
+          SHIP-V1.md §4 "Mentions légales (10 min)". Visible to users
+          today — deploying as-is means RGPD non-compliance on the
+          editor identity line. Do NOT remove this comment until the
+          two square-bracket placeholders below are real values. */}
         <p><strong>Éditeur</strong> — [Nom complet · à compléter]<br/>
         Adresse : [adresse postale]<br/>
         Email : <a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a></p>

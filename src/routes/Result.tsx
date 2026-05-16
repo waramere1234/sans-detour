@@ -15,12 +15,15 @@ import { track } from "../lib/analytics";
 import { TARGET, type Scrutin, type GroupCode } from "../types";
 
 export default function Result() {
+  // All hooks at the top so the call order is uniform and easy to scan.
   const navigate = useNavigate();
   const [pool, setPool] = useState<Scrutin[]>([]);
   const [poolLoaded, setPoolLoaded] = useState(false);
   const [expandedGroup, setExpandedGroup] = useState<GroupCode | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [loadTick, setLoadTick] = useState(0);
+  const [showPersonnalites, setShowPersonnalites] = useState(false);
+  const reportedRef = useRef(false);
 
   useEffect(() => {
     setLoadError(false);
@@ -38,8 +41,7 @@ export default function Result() {
   // No useMemo here — `session` is a fresh object reference every render
   // (loadSession reads from localStorage), so memoising on [pool, session]
   // would recompute every render anyway. Computing inline is the same
-  // cost without the false-promise wrapper that ESLint had to be silenced
-  // around. Each call is 20 votes × 11 groups ≈ 220 ops — negligible.
+  // cost without the false-promise wrapper. ~220 ops per call — negligible.
   const alignments = computeAlignment(pool, session?.votes ?? []);
   const ranked = rankByAlignment(alignments);
   const top = ranked[0];
@@ -49,19 +51,22 @@ export default function Result() {
   // Hide personalities the user has zero comparable data on (e.g. when the
   // session's 20 scrutins all predate Bardella's mandate).
   const personnalitesWithData = rankedPersonnalites.filter((p) => p.counted > 0);
-  const [showPersonnalites, setShowPersonnalites] = useState(false);
   const skips = (session?.votes.filter(v => v.choice === "skip").length) ?? 0;
   const total = session?.votes.length ?? 0;
   const isPartial = total < TARGET;
   const remaining = Math.max(0, TARGET - total);
 
-  const reportedRef = useRef(false);
   useEffect(() => {
-    if (top && !reportedRef.current) {
+    // Don't fire the analytics ping when the 0-votes guard below is about
+    // to <Navigate /> away — would pollute "result_reached" with empty
+    // sessions. Stable dep `top?.group` so the effect doesn't re-run on
+    // every render (top is recomputed each cycle as a fresh object).
+    const hasVotes = (session?.votes.length ?? 0) > 0;
+    if (top && hasVotes && !reportedRef.current) {
       reportedRef.current = true;
       track("result_reached", { counted: top.counted, top: top.group });
     }
-  }, [top]);
+  }, [top?.group, session?.votes.length]);
 
   // Guard against URL-typed `/result` with no session or no votes — without
   // this, the page renders "Tu es surtout aligné avec LFI (0%)" (first
