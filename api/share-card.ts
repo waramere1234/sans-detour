@@ -20,7 +20,11 @@ function parseTopParam(t: string | null): Bar[] {
 }
 
 const BG = "#1d1f24";
-const ACCENT = "#7eb6ff";
+// Orange signal — sRGB approximation of `oklch(0.76 0.16 55)` (index.css
+// `--accent`, board 04 direction D3). Server-side rendering can't read CSS
+// vars, so the hex is duplicated. Previously held `#7eb6ff` (D2 république
+// blue, archived) — share images visibly diverged from the app's identity.
+const ACCENT = "#ed9846";
 const INK = "#f0f1f3";
 const INK_2 = "#a7adb8";
 

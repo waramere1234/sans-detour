@@ -5,4 +5,7 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sansdetour.fr/sitemap.xml
+# TODO production-blocker: re-enable when public/sitemap.xml is generated
+# at build time. Previously declared but the file never existed, so every
+# crawler that parsed this hit a 404 on the sitemap fetch.
+# Sitemap: https://sansdetour.fr/sitemap.xml

@@ -1084,3 +1084,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `5e scrutin\|5 scrutins compt` dans `src/` → 0 résultat (plus de littéral hardcodé)
 - [ ] DevTools Network : block `*supabase*` puis charger `/` → après échec, cliquer wordmark dans le TopBar d'une autre page pour re-fire Cover → debrancher block → la banner doit apparaître au second retour (retry effectif)
 - [ ] Plausible dashboard : sur une session avec toggle personnalités 3× ouvert/fermé → `personnalites_revealed` count = 1, pas 3
+
+---
+
+## Session 48 — 2026-05-16
+
+### Vérification session 47
+
+- [VERIFIED] `Methode.tsx:8` import `MIN_FOR_RANKING`, ligne 137 utilise `{MIN_FOR_RANKING}<sup>e</sup>`, 0 littéral "5e scrutin" restant
+- [VERIFIED] `Cover.tsx:41` `fetchedRef.current = true` à l'intérieur du `.then` (post-succès)
+- [VERIFIED] `Result.tsx:30,236,237` `personnalitesReportedRef` symétrique à `reportedRef`
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés (false promise + dead deps + identity drift)
+
+- [FIXED] False promise · `public/robots.txt` annonçait `Sitemap: https://sansdetour.fr/sitemap.xml` mais aucun fichier sitemap.xml n'existait (et aucun build step ne le génère). Chaque crawler qui parsait robots.txt récupérait un 404 sur l'URL annoncée. Comment-out avec TODO production-blocker (cohérent avec `index.html og:image` + `Legal.tsx` placeholders) jusqu'à ce que la génération soit réellement câblée. · `public/robots.txt`
+- [FIXED] Dead deps · `@resvg/resvg-wasm` est listé dans `dependencies` (^2.6.2) mais zéro import en runtime — la seule trace est le commentaire de `api/share-card.ts:5` qui explique qu'on a abandonné resvg pour shipper du SVG pur. Le script `prebuild` copiait `index_bg.wasm` dans `public/resvg.wasm` (≈1 MB) servi à chaque client pour rien. Drop la dep, le prebuild, et le fichier wasm physique. Lockfile resynchronisé via `npm install`. · `package.json`, `public/resvg.wasm`
+- [FIXED] Identity drift · `api/share-card.ts:23 ACCENT = "#7eb6ff"` était le bleu D2 (république) archivé. L'app est passée orange D3 (`oklch(0.76 0.16 55)`) session 36, mais le serveur de share images est resté bleu : chaque user qui partage son alignement diffuse une image avec un accent qui ne correspond pas à l'app. Remplacé par `#ed9846` (sRGB approx du D3) + commentaire pointant le CSS var de référence. · `api/share-card.ts`
+
+### Vérifications à faire en session 49
+
+- [ ] curl `https://sansdetour.fr/robots.txt` → ne contient plus de ligne `Sitemap:` active (commentée)
+- [ ] grep `@resvg\|resvg-wasm\|prebuild` dans package.json + ls `public/resvg.wasm` → tout absent
+- [ ] curl `https://sansdetour.fr/api/share-card?t=RN:57,EPR:48,LFI:42,DR:30,SOC:25` → SVG retourné avec `<text fill="#ed9846">` (ou équivalent dans le rendu satori) pas `#7eb6ff`
