@@ -1,5 +1,5 @@
 // src/components/TopBar.tsx
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Wordmark } from "./Wordmark";
@@ -15,6 +15,16 @@ const MIN_FOR_RESULT_LINK = 5;
 export function TopBar() {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const prevOpenRef = useRef(menuOpen);
+
+  // Restore focus to trigger when menu closes (ESC, backdrop, route nav)
+  useEffect(() => {
+    if (prevOpenRef.current && !menuOpen) {
+      triggerRef.current?.focus();
+    }
+    prevOpenRef.current = menuOpen;
+  }, [menuOpen]);
 
   // Auto-close on route change so a navigation from a menu link can
   // never leave a stale-open popover behind.
@@ -50,6 +60,7 @@ export function TopBar() {
         </Link>
 
         <MenuTrigger
+          triggerRef={triggerRef}
           open={menuOpen}
           onToggle={() => setMenuOpen((o) => !o)}
         />
@@ -63,9 +74,16 @@ export function TopBar() {
   );
 }
 
-function MenuTrigger({ open, onToggle }: { open: boolean; onToggle: () => void }) {
+function MenuTrigger({
+  triggerRef, open, onToggle,
+}: {
+  triggerRef: React.RefObject<HTMLButtonElement | null>;
+  open: boolean;
+  onToggle: () => void;
+}) {
   return (
     <button
+      ref={triggerRef}
       type="button"
       onClick={onToggle}
       aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
