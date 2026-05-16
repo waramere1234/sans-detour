@@ -90,7 +90,12 @@ export default function Cover() {
       gap: 24,
       maxWidth: "var(--max-content)",
       margin: "0 auto",
-      minHeight: "100dvh",
+      // Same dvh minus safe-area pattern as App.tsx — body padding takes
+      // the notch + home indicator, the section fills the remaining
+      // visible area so the "Commencer" CTA stays above the fold on
+      // iPhone X+ PWA. fallback 0px = identical to "100dvh" on non-notched.
+      minHeight:
+        "calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))",
     }}>
       <header style={{
         display: "flex",

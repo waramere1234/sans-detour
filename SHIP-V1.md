@@ -23,9 +23,9 @@ npm run ingest:an
 
 ---
 
-## 2. Icônes PWA (10 min) — optionnel pour le ship initial
+## 2. Icônes PWA (10 min) — production-blocker
 
-3 fichiers à placer dans `public/icons/` (le manifest les référence déjà) :
+3 fichiers à placer dans `public/icons/` (le manifest les référence déjà, et `index.html` aussi pour og:image / twitter:image / apple-touch-icon — TODO production-blocker en commentaire dans les deux fichiers) :
 
 - `icon-192.png` (192×192)
 - `icon-512.png` (512×512)
@@ -35,7 +35,7 @@ npm run ingest:an
 **Couleur de fond** : `#1d1f24` (cohérent avec le theme color du manifest)
 **Base** : le wordmark "sans/détour" — soit recréé dans l'outil, soit screenshot du composant `Wordmark.tsx`.
 
-Sans icônes, l'app marche mais les utilisateurs qui font "Ajouter à l'écran d'accueil" verront un icône par défaut.
+Sans ces 3 fichiers : icône blanc à l'install PWA (iOS + Chrome), preview vide sur Slack / WhatsApp / Telegram (og:image 404), apple-touch-icon 404 à l'Ajout à l'écran d'accueil. Visible en prod — pas optionnel.
 
 ---
 

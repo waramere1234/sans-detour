@@ -1401,3 +1401,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] curl -I https://sansdetour.fr/ | grep -i "x-frame-options\|referrer-policy" → présents
 - [ ] Sur iPhone X+ Simulator (PWA standalone), scroller dans `/play` → TopBar reste en-dessous du notch, jamais masqué par lui
 - [ ] `npm run test:run` → 123 tests verts (était 115)
+
+---
+
+## Session 62 — 2026-05-17
+
+### Vérification session 61
+
+- [VERIFIED] `vercel.json` `headers[]` contient X-Frame-Options DENY + Permissions-Policy
+- [VERIFIED] `src/components/TopBar.tsx:46` `top: "env(safe-area-inset-top, 0px)"` sur sticky
+- [VERIFIED] `tests/FreshnessBanner.test.tsx` existe (72 lignes, 8 tests)
+- 123/123 tests verts, typecheck clean
+
+### Bugs fixés (dead casts + contradictory docs + iOS PWA overflow)
+
+- [FIXED] Dead casts · `src/lib/supabase.ts:4-5` utilisait `as string | undefined` sur `import.meta.env.VITE_SUPABASE_*`. Depuis l'augmentation typed `ImportMetaEnv` session 56, ces deux clés sont déjà typées `string | undefined` au niveau du module. Les casts étaient des no-ops déclaratifs. Drop + commentaire pointant vers `src/vite-env.d.ts`. · `src/lib/supabase.ts`
+- [FIXED] Contradiction docs · `SHIP-V1.md §2` ligne 26 disait "Icônes PWA (10 min) — **optionnel pour le ship initial**", mais index.html + manifest.webmanifest flaggent les 3 entrées `/icons/*.png` comme TODO production-blocker (sessions 41+51+57). Optionnel + production-blocker s'excluent. Aligné sur prod-blocker + énuméré les symptômes visibles (icône blanc PWA install, preview vide WhatsApp/Slack/Telegram, apple-touch-icon 404). · `SHIP-V1.md`
+- [FIXED] iOS PWA layout overflow · Session 57 a ajouté `body { padding: env(safe-area-inset-*) }` (notch + home indicator zones). Session 61 a fixé `TopBar { top: env(safe-area-inset-top) }`. Mais `App.tsx` outer + `Cover.tsx` section gardent `minHeight: 100dvh` — `100dvh` couvre toute la viewport (notch zones incluses), donc l'élément demande la taille totale dans un body dont le contenu est déjà rétréci par les paddings → ~81px d'overflow sur iPhone 13 PWA, CTA Commencer / boutons Play sous le fold. Fix : `calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))` sur les deux. Fallback `0px` = identique à `100dvh` sur non-notched. · `src/App.tsx`, `src/routes/Cover.tsx`
+
+### Vérifications à faire en session 63
+
+- [ ] grep `as string | undefined` dans src/ → 0 résultat
+- [ ] grep `optionnel pour le ship initial` dans `SHIP-V1.md` → 0 résultat
+- [ ] Sur iPhone X+ Simulator (PWA), `/` → CTA Commencer visible sans scroll ; `/play` → 3 boutons (Contre/Je passe/Pour) visibles sans scroll
+- [ ] `npm run test:run` → 123 tests verts (stable)

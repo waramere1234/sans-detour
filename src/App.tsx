@@ -12,7 +12,14 @@ export default function App({ children }: { children: ReactNode }) {
   const location = useLocation();
   return (
     <div style={{
-      minHeight: "100dvh",
+      // 100dvh covers the full visual viewport, but body has safe-area
+      // padding (index.css :body { padding: env(safe-area-inset-*) })
+      // so the outer wrapper needs to subtract those insets to avoid
+      // overflowing body by ~81px on iPhone 13 PWA (pushing the Cover
+      // CTA / Play bottom buttons below the visible fold). The fallback
+      // `0px` keeps non-notched devices at exactly 100dvh.
+      minHeight:
+        "calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))",
       display: "flex",
       flexDirection: "column",
       background: "var(--bg)",
