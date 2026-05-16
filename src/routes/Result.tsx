@@ -16,14 +16,19 @@ import type { Scrutin, GroupCode } from "../types";
 export default function Result() {
   const navigate = useNavigate();
   const [pool, setPool] = useState<Scrutin[]>([]);
+  const [poolLoaded, setPoolLoaded] = useState(false);
   const [expandedGroup, setExpandedGroup] = useState<GroupCode | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [loadTick, setLoadTick] = useState(0);
 
   useEffect(() => {
     setLoadError(false);
+    setPoolLoaded(false);
     fetchScrutins()
-      .then(setPool)
+      .then((p) => {
+        setPool(p);
+        setPoolLoaded(true);
+      })
       .catch(() => setLoadError(true));
   }, [loadTick]);
 
@@ -65,6 +70,30 @@ export default function Result() {
       <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: 480, margin: "0 auto" }}>
         <p style={{ color: "var(--ink)", fontSize: 15, lineHeight: 1.5 }}>
           Impossible de charger les scrutins. Vérifie ta connexion puis réessaie.
+        </p>
+        <button
+          type="button"
+          onClick={() => setLoadTick((t) => t + 1)}
+          style={{
+            alignSelf: "flex-start",
+            background: "var(--accent)", color: "var(--bg)", border: "none",
+            padding: "10px 16px", borderRadius: 6,
+            fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 14, cursor: "pointer",
+          }}
+        >
+          Réessayer
+        </button>
+      </div>
+    );
+  }
+  // Loaded but empty: Supabase returned zero rows (or every row was
+  // filtered out). The "Chargement…" fallback below would otherwise show
+  // forever, leaving the user stuck. Surface the same retry UI as Play.tsx.
+  if (poolLoaded && pool.length === 0) {
+    return (
+      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: 480, margin: "0 auto" }}>
+        <p style={{ color: "var(--ink)", fontSize: 15, lineHeight: 1.5 }}>
+          Impossible de calculer ton alignement : aucun scrutin disponible. Réessaie dans quelques minutes.
         </p>
         <button
           type="button"

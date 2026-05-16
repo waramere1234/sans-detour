@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Wordmark } from "../components/Wordmark";
 import { FreshnessBanner } from "../components/FreshnessBanner";
 import { fetchFreshness } from "../lib/scrutins";
-import { hasSeenCover, loadSession, markCoverSeen } from "../lib/session";
+import { hasSeenCover, loadSession, markCoverSeen, resetSession } from "../lib/session";
 import { track } from "../lib/analytics";
 import type { FreshnessInfo } from "../types";
 
@@ -14,6 +14,9 @@ export default function Cover() {
   const navigate = useNavigate();
   const location = useLocation();
   const [info, setInfo] = useState<FreshnessInfo | null>(null);
+  // Bump to force a re-render after restart() resets the session so the
+  // CTA label/state recompute without a full page reload.
+  const [sessionTick, setSessionTick] = useState(0);
 
   useEffect(() => {
     // Explicit nav from the TopBar wordmark passes { fromLogo: true } so
@@ -31,9 +34,34 @@ export default function Cover() {
     fetchFreshness().then(setInfo).catch(() => {});
   }, [navigate, location.state]);
 
+  const session = loadSession();
+  void sessionTick; // dep for the read above so restart() forces recompute
+  const votesCount = session?.votes.length ?? 0;
+  const hasInProgress = votesCount > 0 && votesCount < TARGET;
+  const hasCompleted = votesCount >= TARGET;
+  const remainingVotes = TARGET - votesCount;
+  const canSeePartialResult = votesCount >= 5;
+
   function start() {
     markCoverSeen();
-    track("cover_started");
+    if (hasCompleted) {
+      track("cover_result_revisit");
+      navigate("/result");
+      return;
+    }
+    track(hasInProgress ? "cover_resumed" : "cover_started");
+    navigate("/play");
+  }
+
+  function restart() {
+    const ok = window.confirm(
+      `Recommencer à zéro ? Tes ${votesCount} votes en cours seront perdus.`,
+    );
+    if (!ok) return;
+    resetSession();
+    markCoverSeen();
+    track("cover_restarted");
+    setSessionTick((t) => t + 1);
     navigate("/play");
   }
 
@@ -133,29 +161,71 @@ export default function Cover() {
           ))}
         </div>
 
-        <button
-          type="button"
-          onClick={start}
-          style={{
-            background: "var(--accent)",
-            color: "var(--bg)",
-            fontFamily: "var(--font-sans)",
-            fontWeight: 600,
-            fontSize: 16,
-            letterSpacing: "-0.01em",
-            padding: "18px",
-            border: "none",
-            borderRadius: 6,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 8,
-          }}
-        >
-          <span>Commencer</span>
-          <span style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}>≈ 5 min · 20 votes →</span>
-        </button>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <button
+            type="button"
+            onClick={start}
+            style={{
+              background: "var(--accent)",
+              color: "var(--bg)",
+              fontFamily: "var(--font-sans)",
+              fontWeight: 600,
+              fontSize: 16,
+              letterSpacing: "-0.01em",
+              padding: "18px",
+              border: "none",
+              borderRadius: 6,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 8,
+            }}
+          >
+            <span>{hasCompleted ? "Voir mon résultat" : hasInProgress ? "Reprendre" : "Commencer"}</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}>
+              {hasCompleted
+                ? `${votesCount}/${TARGET} terminés →`
+                : hasInProgress
+                  ? `${votesCount}/${TARGET} · ${remainingVotes} restant${remainingVotes > 1 ? "s" : ""} →`
+                  : "≈ 5 min · 20 votes →"}
+            </span>
+          </button>
+
+          {hasInProgress && (
+            <div style={{
+              display: "flex", flexWrap: "wrap",
+              justifyContent: "center", gap: 18,
+              paddingTop: 4,
+              fontFamily: "var(--font-mono)", fontSize: 11,
+              letterSpacing: "0.04em",
+              color: "var(--ink-3)",
+            }}>
+              {canSeePartialResult && (
+                <Link
+                  to="/result"
+                  style={{ color: "var(--ink-2)", textDecoration: "none" }}
+                >
+                  Voir mon résultat partiel
+                </Link>
+              )}
+              <button
+                type="button"
+                onClick={restart}
+                style={{
+                  background: "transparent", border: "none",
+                  padding: 0, cursor: "pointer",
+                  font: "inherit", color: "inherit", letterSpacing: "inherit",
+                  textDecoration: "underline",
+                  textDecorationColor: "var(--ink-4)",
+                  textUnderlineOffset: 3,
+                }}
+              >
+                Recommencer à zéro
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Discreet secondary nav for the Cover only — the TopBar (and its
             menu sheet) is hidden on this route because the Cover already
