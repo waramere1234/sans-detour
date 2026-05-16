@@ -1,0 +1,56 @@
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import { MethodeSheet } from "../src/components/MethodeSheet";
+
+function renderSheet(open: boolean, onClose = vi.fn()) {
+  return render(
+    <MemoryRouter>
+      <MethodeSheet open={open} onClose={onClose} />
+    </MemoryRouter>
+  );
+}
+
+describe("MethodeSheet", () => {
+  it("renders nothing when open=false", () => {
+    renderSheet(false);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("renders dialog with aria-modal and aria-labelledby when open=true", () => {
+    renderSheet(true);
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveAttribute("aria-modal", "true");
+    expect(dialog).toHaveAttribute("aria-labelledby");
+    const titleId = dialog.getAttribute("aria-labelledby")!;
+    expect(document.getElementById(titleId)).toBeInTheDocument();
+  });
+
+  it("focuses the close button on mount", async () => {
+    renderSheet(true);
+    const closeBtn = screen.getByRole("button", { name: /fermer/i });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(closeBtn).toHaveFocus();
+  });
+
+  it("calls onClose when Escape is pressed", () => {
+    const onClose = vi.fn();
+    renderSheet(true, onClose);
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it("calls onClose when backdrop is clicked", () => {
+    const onClose = vi.fn();
+    renderSheet(true, onClose);
+    fireEvent.click(screen.getByTestId("methode-sheet-backdrop"));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it("includes mailto and methode link", () => {
+    renderSheet(true);
+    const mailLink = screen.getByRole("link", { name: /signaler/i });
+    expect(mailLink).toHaveAttribute("href", expect.stringContaining("mailto:"));
+    expect(screen.getByRole("link", { name: /méthode complète/i })).toBeInTheDocument();
+  });
+});
