@@ -99,7 +99,7 @@ export default function Cover() {
           textAlign: "right",
           lineHeight: 1.5,
         }}>
-          Données :<br /><b style={{ color: "var(--ink-2)", fontWeight: 500 }}>data.assemblee-nationale.fr</b>
+          Données AN officielles<br /><b style={{ color: "var(--ink-2)", fontWeight: 500 }}>résumés Claude (IA)</b>
         </span>
       </header>
 
