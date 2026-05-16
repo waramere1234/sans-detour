@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DeckStack } from "../components/DeckStack";
 import { CardSkeleton } from "../components/CardSkeleton";
@@ -85,21 +85,20 @@ export default function Play() {
   }, [params]);
 
   const session = loadSession();
-  const cardsSeenSet = useMemo(
-    () => new Set(session?.cards_seen ?? []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [session, tick],
-  );
-  const seenDossierCounts = useMemo(() => {
+  // No useMemo here — `session` (and `tick`) are referentially unstable
+  // each render, so the [session, pool, tick] deps invalidate every cycle
+  // and the wrapper was a no-op behind eslint-disable comments. Inline
+  // these computations: cheap and clearer.
+  const cardsSeenSet = new Set(session?.cards_seen ?? []);
+  const seenDossierCounts = (() => {
     const m = new Map<string, number>();
     for (const id of session?.cards_seen ?? []) {
       const sc = pool.find((s) => s.id === id);
       if (sc) m.set(sc.dossier_id, (m.get(sc.dossier_id) ?? 0) + 1);
     }
     return m;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session, pool, tick]);
-  const seenPrefixCounts = useMemo(() => {
+  })();
+  const seenPrefixCounts = (() => {
     const m = new Map<string, number>();
     for (const id of session?.cards_seen ?? []) {
       const sc = pool.find((s) => s.id === id);
@@ -109,14 +108,9 @@ export default function Play() {
       }
     }
     return m;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session, pool, tick]);
+  })();
 
-  const alignments: Record<GroupCode, GroupAlignment> = useMemo(
-    () => computeAlignment(pool, session?.votes ?? []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pool, session, tick],
-  );
+  const alignments: Record<GroupCode, GroupAlignment> = computeAlignment(pool, session?.votes ?? []);
   const countedTotal = Math.max(...GROUP_CODES.map((c) => alignments[c].counted), 0);
   const showLiveScore = countedTotal >= MIN_FOR_LIVE;
   const ranked = rankByAlignment(alignments);

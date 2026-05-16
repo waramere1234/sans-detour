@@ -31,6 +31,12 @@ export function DeckStack({ scrutins, onVote, onOpenMethode }: DeckStackProps) {
         return (
           <div
             key={s.id}
+            // Non-top cards are visual decoration (stacked-deck effect)
+            // — already non-interactive via pointer-events:none + tabIndex
+            // on the Card root, but SR still announces them as "article"
+            // 3 times. aria-hidden removes them from the a11y tree so the
+            // user only hears the top card.
+            aria-hidden={!isTop}
             style={{
               position: "absolute",
               left: 8, right: 8, top: offset, bottom: offset,

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchScrutins } from "../lib/scrutins";
 import {
@@ -34,19 +34,16 @@ export default function Result() {
   }, [loadTick]);
 
   const session = loadSession();
-  const alignments = useMemo(
-    () => computeAlignment(pool, session?.votes ?? []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pool, session],
-  );
+  // No useMemo here — `session` is a fresh object reference every render
+  // (loadSession reads from localStorage), so memoising on [pool, session]
+  // would recompute every render anyway. Computing inline is the same
+  // cost without the false-promise wrapper that ESLint had to be silenced
+  // around. Each call is 20 votes × 11 groups ≈ 220 ops — negligible.
+  const alignments = computeAlignment(pool, session?.votes ?? []);
   const ranked = rankByAlignment(alignments);
   const top = ranked[0];
 
-  const personnaliteAlignments = useMemo(
-    () => computeAlignmentPersonnalites(pool, session?.votes ?? []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pool, session],
-  );
+  const personnaliteAlignments = computeAlignmentPersonnalites(pool, session?.votes ?? []);
   const rankedPersonnalites = rankPersonnalitesByAlignment(personnaliteAlignments);
   // Hide personalities the user has zero comparable data on (e.g. when the
   // session's 20 scrutins all predate Bardella's mandate).
@@ -188,22 +185,28 @@ export default function Result() {
         <h2 className="sr-only">
           Alignement par groupe parlementaire
         </h2>
-        {ranked.map(a => (
-          <div key={a.group}>
-            <PartyRow
-              alignment={a}
-              expanded={expandedGroup === a.group}
-              onClick={() => setExpandedGroup(expandedGroup === a.group ? null : a.group)}
-            />
-            {expandedGroup === a.group && (
-              <AuditTrail
+        {ranked.map(a => {
+          const panelId = `audit-trail-${a.group}`;
+          return (
+            <div key={a.group}>
+              <PartyRow
                 alignment={a}
-                scrutins={pool}
-                votes={session?.votes ?? []}
+                expanded={expandedGroup === a.group}
+                controlsId={panelId}
+                onClick={() => setExpandedGroup(expandedGroup === a.group ? null : a.group)}
               />
-            )}
-          </div>
-        ))}
+              {expandedGroup === a.group && (
+                <div id={panelId}>
+                  <AuditTrail
+                    alignment={a}
+                    scrutins={pool}
+                    votes={session?.votes ?? []}
+                  />
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {personnalitesWithData.length > 0 && (

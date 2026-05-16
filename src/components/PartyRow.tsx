@@ -6,9 +6,13 @@ export interface PartyRowProps {
   alignment: GroupAlignment;
   expanded?: boolean;
   onClick?: () => void;
+  /** When interactive and expanded, the id of the AuditTrail panel this
+   *  row controls — wired into aria-controls so SR users learn which
+   *  region the toggle opens/closes. */
+  controlsId?: string;
 }
 
-export function PartyRow({ alignment, expanded, onClick }: PartyRowProps) {
+export function PartyRow({ alignment, expanded, onClick, controlsId }: PartyRowProps) {
   const meta = getParty(alignment.group);
   const color = getPartyColorVar(alignment.group);
   const interactive = !!onClick;
@@ -25,6 +29,7 @@ export function PartyRow({ alignment, expanded, onClick }: PartyRowProps) {
         }
       } : undefined}
       aria-expanded={interactive ? expanded : undefined}
+      aria-controls={interactive ? controlsId : undefined}
       style={{
         display: "grid",
         gridTemplateColumns: "60px 1fr 44px",
