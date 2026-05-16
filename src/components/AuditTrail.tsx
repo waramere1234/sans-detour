@@ -91,6 +91,7 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
             padding: "10px 0", borderTop: "1px dashed var(--line)",
           }}>
             <span
+              role="img"
               aria-label={r.label}
               style={{ color: r.color, fontWeight: 600 }}
             ><span aria-hidden="true">{r.icon}</span></span>

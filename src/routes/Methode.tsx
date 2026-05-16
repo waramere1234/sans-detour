@@ -21,7 +21,10 @@ export default function Methode() {
     const id = location.hash.slice(1);
     const el = document.getElementById(id);
     if (!el) return;
-    el.scrollIntoView({ behavior: "auto", block: "start" });
+    // "instant" is explicit (vs "auto" which inherits from CSS
+    // scroll-behavior and could be smooth or instant depending on the
+    // page). Deep-link jumps should land predictably.
+    el.scrollIntoView({ behavior: "instant", block: "start" });
     // Also move focus so keyboard Tab continues from the section heading,
     // not from the TOC link that was clicked. Sections have tabIndex=-1
     // which makes them programmatically focusable.

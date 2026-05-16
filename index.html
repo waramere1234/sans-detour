@@ -16,7 +16,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <!-- Open Graph + Twitter card so shared URLs render with a preview
-         on social platforms / Slack / WhatsApp instead of a bare link. -->
+         on social platforms / Slack / WhatsApp instead of a bare link.
+         TODO production-blocker · /icons/icon-512.png doesn't exist yet
+         (SHIP-V1.md §2 "Icônes PWA"). Until the icons land, og:image
+         and twitter:image 404 → social previews show no image. Drop
+         this comment when the icons exist in public/icons/. -->
     <meta property="og:title" content="Sans Détour" />
     <meta property="og:description" content="Pas les programmes. Les vrais votes. Mesure ton alignement réel avec les groupes parlementaires de la 17e législature." />
     <meta property="og:type" content="website" />

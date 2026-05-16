@@ -923,3 +923,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Visiter `/result` sans session → vérifier Plausible : pas d'event "result_reached" envoyé
 - [ ] Inspect `src/routes/Result.tsx` : tous les hooks (useState, useRef, useEffect) sont avant `const session = loadSession()`
 - [ ] grep `[Nom complet` dans src/ → fichier flag avec TODO production-blocker comment au-dessus
+
+---
+
+## Session 41 — 2026-05-16
+
+### Vérification session 40
+
+- [VERIFIED] `Result.tsx:64` `hasVotes` guard dans le track useEffect
+- [VERIFIED] hooks regroupés en haut de Result.tsx
+- [VERIFIED] `Legal.tsx:28` TODO production-blocker comment au-dessus des placeholders
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés
+
+- [FIXED] Ship blocker flagged · `index.html og:image` + `twitter:image` pointent vers `/icons/icon-512.png` qui n'existe pas (SHIP-V1.md §2 "Icônes PWA" TODO). Partage social = preview cassée actuellement. Flag avec TODO production-blocker comment, cohérent avec Legal session 40. Visible en code review. · `index.html`
+- [FIXED] A11y · `AuditTrail` row icon span avait `aria-label` mais pas `role="img"`. SR users qui naviguent par "images" (rotor JAWS/VoiceOver) ne trouvaient pas l'icône d'alignement. Ajout `role="img"` pour la rendre indexable. · `src/components/AuditTrail.tsx`
+- [FIXED] API explicite · `Methode.tsx useEffect scrollIntoView` utilisait `behavior: "auto"` — auto hérite du CSS `scroll-behavior` (smooth ou instant selon contexte). Pour un deep-link, comportement prévisible attendu. Changé à `behavior: "instant"` (API moderne, Chrome 105+, Safari 16+, Firefox 121+). · `src/routes/Methode.tsx`
+
+### Vérifications à faire en session 42
+
+- [ ] grep `og:image` dans index.html → TODO production-blocker comment au-dessus
+- [ ] Sur /result, expand un PartyRow → SR doit pouvoir naviguer par "image" pour trouver les icônes d'alignement avec leur label
+- [ ] Tester `/methode#methode-05` direct URL → scroll doit être instantané (pas smooth) vers la Section 05
