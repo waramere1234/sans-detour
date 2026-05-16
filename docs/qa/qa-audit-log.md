@@ -1037,3 +1037,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `LOW_DATA_THRESHOLD` dans src/ → 3 occurrences (1 def dans types, 1 import dans matching, 1 import dans PersonnaliteRow), zéro littéral `< 3` lié à counted
 - [ ] grep `padding: "18px var(--gutter)` dans `src/routes/Play.tsx` → 0 résultat (extrait en const)
 - [ ] Slow 3G + load /play → la chip de progression placeholder est visible pendant le skeleton, et au moment où le deck render, ni CardSkeleton ni la button row ne sautent verticalement
+
+---
+
+## Session 46 — 2026-05-16
+
+### Vérification session 45
+
+- [VERIFIED] `LOW_DATA_THRESHOLD` centralisé dans `types/index.ts`, 0 littéral `< 3` restant, 2 imports propres (matching + PersonnaliteRow)
+- [VERIFIED] `Play.tsx` `playSectionStyle` const, utilisée par skeleton path + main path, aucun style inline `padding: "18px var(--gutter)`
+- [VERIFIED] `Play.tsx` skeleton path a un placeholder header `aria-hidden` + section `aria-busy="true"`
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés (defensive + silent failures)
+
+- [FIXED] Edge-case · `loadSession` cast `JSON.parse(raw) as SessionState` sans valider la shape. Si localStorage contient un JSON valide mais pas une session (`{}`, `"null"`, payload d'un vieux schéma, ou édition manuelle de localStorage), le cast ment et les appelants crashent à `session.votes.length` / `session.cards_seen.includes()`. Ajout d'une validation minimale : `Array.isArray(cards_seen)` ET `Array.isArray(votes)` sinon return null (= "corrupt session, treat as no session"). · `src/lib/session.ts`
+- [FIXED] Type-safety · `drawNext` (mode affinement) acceptait `capPerChapeauPrefix?: number` et `seenChapeauPrefixCounts?: Map` comme deux optionnels indépendants. Si caller passe le cap mais oublie la Map (silent contract drift), `undefined?.get() ?? 0` retourne toujours 0, donc `0 >= cap` ne déclenche jamais → cap silencieusement bypassed. Pattern de composeDeck copié : default à `new Map()` localement quand le cap est défini, ce qui rend la fonction self-healing. · `src/lib/deck.ts`
+- [FIXED] Silent failure · `fetchFreshness` vérifie `lastSyncRes.error` mais pas `countRes.error`. Si la count query échoue (permissions Supabase, network glitch, RLS), countRes.count est null, et le banner rend silencieusement "0 scrutins · MAJ aujourd'hui · sync imminente" — ment sur l'état de la base. Throw sur `countRes.error` comme on le fait pour lastSync. Le banner disparaîtra (`info` reste null) au lieu de mentir. · `src/lib/scrutins.ts`
+
+### Vérifications à faire en session 47
+
+- [ ] DevTools console : `localStorage.setItem('sd_session_v1', '{}')` puis recharger `/play` → ne doit pas crasher, comportement = pas de session (Cover redirect)
+- [ ] DevTools console : `localStorage.setItem('sd_session_v1', '"null"')` → idem, pas de crash
+- [ ] grep `seenChapeauPrefixCounts\?\.` dans `src/lib/deck.ts` → 0 résultat (plus de optional chaining sur la Map)
+- [ ] Mocker `supabase.from('scrutins').select(...count: 'exact'...)` pour retourner `{ error: { message: 'forbidden' } }` → fetchFreshness throw, banner pas rendu

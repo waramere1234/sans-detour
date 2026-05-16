@@ -23,11 +23,25 @@ export function newSession(): SessionState {
 export function loadSession(): SessionState | null {
   const raw = localStorage.getItem(KEY);
   if (!raw) return null;
+  let parsed: unknown;
   try {
-    return JSON.parse(raw) as SessionState;
+    parsed = JSON.parse(raw);
   } catch {
     return null;
   }
+  // Shape-validate before casting. JSON.parse succeeds on any valid JSON
+  // ("null", "[]", "{}", a half-rewritten payload from a older schema, or
+  // a user who manually edited localStorage), but callers assume
+  // `cards_seen` and `votes` are arrays — `session.votes.length` would
+  // throw on a junk payload. Bad shape ≡ corrupt: treat as no session.
+  if (
+    !parsed || typeof parsed !== "object" ||
+    !Array.isArray((parsed as SessionState).cards_seen) ||
+    !Array.isArray((parsed as SessionState).votes)
+  ) {
+    return null;
+  }
+  return parsed as SessionState;
 }
 
 export function saveSession(s: SessionState): void {

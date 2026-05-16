@@ -42,6 +42,11 @@ export async function fetchFreshness(): Promise<FreshnessInfo> {
       .not("points_cles", "is", null),
   ]);
   if (lastSyncRes.error) throw lastSyncRes.error;
+  // Without this, a permissions/network error on the count query would
+  // silently surface as `total_scrutins: 0` and the banner would render
+  // "0 scrutins · MAJ aujourd'hui · sync imminente" — lying about state
+  // while the lastSync query happened to succeed.
+  if (countRes.error) throw countRes.error;
   const lastSync = lastSyncRes.data?.[0]?.ingere_le ?? new Date().toISOString();
   return {
     total_scrutins: countRes.count ?? 0,

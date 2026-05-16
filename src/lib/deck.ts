@@ -129,14 +129,24 @@ export function drawNext(
   const seed = opts.seed ?? Math.floor(Math.random() * 2 ** 31);
   const rng = mulberry32(seed);
   const shuffled = shuffle(pool, rng);
+  // Resolve the prefix-counts map once, with the same default-empty pattern
+  // composeDeck uses (line 69). Without this, a caller that sets
+  // `capPerChapeauPrefix: 2` but forgets `seenChapeauPrefixCounts` would
+  // silently get the cap skipped: `undefined?.get() ?? 0` is always 0,
+  // so `0 >= 2` never triggers. Defaulting to an empty Map preserves the
+  // cap behavior (cap of N still triggers once the Map is grown — useful
+  // for composability if the caller threads the map through later draws).
+  const prefixCounts = opts.capPerChapeauPrefix !== undefined
+    ? (opts.seenChapeauPrefixCounts ?? new Map<string, number>())
+    : null;
   for (const s of shuffled) {
     if (seenIds.has(s.id)) continue;
     const c = opts.seenDossierCounts.get(s.dossier_id) ?? 0;
     if (c >= opts.capPerDossier) continue;
-    if (opts.capPerChapeauPrefix !== undefined) {
+    if (prefixCounts) {
       const prefix = chapeauPrefix(s);
-      const pc = opts.seenChapeauPrefixCounts?.get(prefix) ?? 0;
-      if (pc >= opts.capPerChapeauPrefix) continue;
+      const pc = prefixCounts.get(prefix) ?? 0;
+      if (pc >= opts.capPerChapeauPrefix!) continue;
     }
     return s;
   }
