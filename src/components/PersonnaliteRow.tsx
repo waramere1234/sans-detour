@@ -11,9 +11,17 @@ export function PersonnaliteRow({ alignment }: PersonnaliteRowProps) {
   const meta = getPersonnalite(alignment.personnalite);
   const color = getPartyColorVar(meta.group_code);
   const tooLittleData = alignment.counted < 3;
+  // Same SR-friendly composition as PartyRow (session 25) — SR reads one
+  // sentence instead of three disconnected fragments ("Le Pen 57 % 12").
+  // The low-data path drops the percent to avoid implying a real score
+  // on a 1-2 vote sample.
+  const rowLabel = tooLittleData
+    ? `${meta.display_name}, trop peu de données : ${alignment.counted} vote${alignment.counted === 1 ? "" : "s"} comparable${alignment.counted === 1 ? "" : "s"}`
+    : `${meta.display_name}, ${alignment.pct} % d'alignement sur ${alignment.counted} votes`;
 
   return (
     <div
+      aria-label={rowLabel}
       style={{
         display: "grid",
         gridTemplateColumns: "auto 1fr auto",

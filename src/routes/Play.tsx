@@ -26,7 +26,6 @@ export default function Play() {
   const [deck, setDeck] = useState<Scrutin[]>([]);
   const [refinementMode, setRefinementMode] = useState(false);
   const [rankingOpen, setRankingOpen] = useState(false);
-  const [tick, setTick] = useState(0); // force re-render after recordVote
   const [loadError, setLoadError] = useState(false);
   const [loadTick, setLoadTick] = useState(0);
   const [lastVoteLabel, setLastVoteLabel] = useState("");
@@ -119,14 +118,17 @@ export default function Play() {
   function handleVote(scrutinId: string, choice: UserVote) {
     recordVote(scrutinId, choice);
     track("vote", { choice });
-    setTick((t) => t + 1);
 
+    // Append a zero-width space so identical consecutive votes (e.g. two
+    // "Pour" in a row) still mutate the string — aria-live polite only
+    // re-announces when content changes. Without it, the second vote
+    // would be silent for SR users.
     const labels: Record<UserVote, string> = {
       pour: "Voté pour. Carte suivante.",
       contre: "Voté contre. Carte suivante.",
       skip: "Passé. Carte suivante.",
     };
-    setLastVoteLabel(labels[choice]);
+    setLastVoteLabel((prev) => labels[choice] + (prev.endsWith("​") ? "" : "​"));
 
     const remaining = deck.slice(1);
     if (remaining.length === 0) {
@@ -134,10 +136,10 @@ export default function Play() {
         navigate("/result");
         return;
       }
-      // The memoised counts above are stale at this point — `recordVote`
-      // just ran but the memo deps haven't recomputed yet. Build a fresh
-      // copy that includes the scrutin we just voted on so drawNext can't
-      // pick another card from the same dossier/sujet and bust the caps.
+      // The counts above were captured at render time, BEFORE recordVote
+      // updated localStorage. Build a fresh copy that includes the scrutin
+      // we just voted on so drawNext can't pick another card from the same
+      // dossier/sujet and bust the caps.
       const justVoted = pool.find((s) => s.id === scrutinId);
       const fresherDossiers = new Map(seenDossierCounts);
       const fresherPrefixes = new Map(seenPrefixCounts);
