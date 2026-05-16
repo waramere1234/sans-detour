@@ -27,6 +27,7 @@ export default function Play() {
   const [tick, setTick] = useState(0); // force re-render after recordVote
   const [loadError, setLoadError] = useState(false);
   const [loadTick, setLoadTick] = useState(0);
+  const [lastVoteLabel, setLastVoteLabel] = useState("");
 
   // Initial deck composition
   useEffect(() => {
@@ -123,6 +124,13 @@ export default function Play() {
     track("vote", { choice });
     setTick((t) => t + 1);
 
+    const labels: Record<UserVote, string> = {
+      pour: "Voté pour. Carte suivante.",
+      contre: "Voté contre. Carte suivante.",
+      skip: "Passé. Carte suivante.",
+    };
+    setLastVoteLabel(labels[choice]);
+
     const remaining = deck.slice(1);
     if (remaining.length === 0) {
       if ((session?.votes.length ?? 0) + 1 >= TARGET) {
@@ -163,7 +171,7 @@ export default function Play() {
 
   if (loadError) {
     return (
-      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: 480, margin: "0 auto" }}>
+      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: "var(--max-content)", margin: "0 auto" }}>
         <p style={{ color: "var(--ink)", fontSize: 15, lineHeight: 1.5 }}>
           Impossible de charger les scrutins. Vérifie ta connexion puis réessaie.
         </p>
@@ -184,7 +192,7 @@ export default function Play() {
   }
   if (deck.length === 0 && pool.length > 0) {
     return (
-      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: 480, margin: "0 auto" }}>
+      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: "var(--max-content)", margin: "0 auto" }}>
         <p style={{ color: "var(--ink)", fontSize: 15, lineHeight: 1.5 }}>
           Plus de scrutins disponibles à voter dans ton deck.
         </p>
@@ -209,7 +217,7 @@ export default function Play() {
   // recourse — so we surface a real message and let them retry.
   if (deck.length === 0 && poolLoaded) {
     return (
-      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: 480, margin: "0 auto" }}>
+      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: "var(--max-content)", margin: "0 auto" }}>
         <p style={{ color: "var(--ink)", fontSize: 15, lineHeight: 1.5 }}>
           Aucun scrutin disponible pour le moment. Réessaie dans quelques minutes.
         </p>
@@ -289,6 +297,23 @@ export default function Play() {
             Mon résultat →
           </button>
         )}
+      </div>
+
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        style={{
+          position: "absolute",
+          width: 1, height: 1,
+          padding: 0, margin: -1,
+          overflow: "hidden",
+          clip: "rect(0, 0, 0, 0)",
+          whiteSpace: "nowrap",
+          border: 0,
+        }}
+      >
+        {lastVoteLabel}
       </div>
 
       <DeckStack scrutins={deck} onVote={handleVote} />
