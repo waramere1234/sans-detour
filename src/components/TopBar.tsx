@@ -23,7 +23,11 @@ export function TopBar() {
   return (
     <>
       <header className="sd-topbar" style={{
-        position: "sticky", top: 0, zIndex: 10,
+        position: "sticky", top: 0,
+        // Above the deck cards (z-index 10 in DeckStack) and the framer-motion
+        // transforms they sit under. The menu sheet itself uses 20+ for its
+        // own backdrop and panel.
+        zIndex: 30,
         background: "var(--bg)",
         borderBottom: "1px solid var(--line)",
         padding: "10px 22px",

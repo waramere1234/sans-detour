@@ -48,7 +48,9 @@ export default function Cover() {
         paddingBottom: 18,
         borderBottom: "1px solid var(--line)",
       }}>
-        <Wordmark size={14} />
+        <Link to="/" aria-label="Accueil" style={{ textDecoration: "none", color: "inherit" }}>
+          <Wordmark size={14} />
+        </Link>
         <span style={{
           fontFamily: "var(--font-mono)",
           fontSize: 9.5,
