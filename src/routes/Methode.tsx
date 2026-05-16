@@ -36,11 +36,14 @@ export default function Methode() {
       {/* 3-column grid keeps the wordmark centered without needing an
         invisible placeholder span. Left col = back link (justify start),
         center = wordmark (justify center), right col = empty (1fr) so
-        the geometry is balanced. */}
-      <nav style={{
-        display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "baseline",
-        paddingBottom: 14, borderBottom: "1px solid var(--line)",
-      }}>
+        the geometry is balanced. aria-label distinguishes this landmark
+        from the Sommaire <nav> below for SR users navigating by landmarks. */}
+      <nav
+        aria-label="En-tête de la page"
+        style={{
+          display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "baseline",
+          paddingBottom: 14, borderBottom: "1px solid var(--line)",
+        }}>
         <Link to="/" style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none", justifySelf: "start" }}>
           <span aria-hidden="true">‹ </span>Retour
         </Link>

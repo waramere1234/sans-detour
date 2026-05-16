@@ -66,6 +66,15 @@ export default function Play() {
       navigate("/result", { replace: true });
       return;
     }
+    // Affinement only makes sense after a completed session — it's the
+    // "draw 20 more" action on /result. If the user lands on /play with
+    // ?affinement=1 but no completed session (typing the URL, stale link,
+    // localStorage cleared), strip the flag so they get a normal "0 / 20"
+    // run instead of a refinement-mode header without a target count.
+    if (isAffinement && (!existing || existing.votes.length < TARGET)) {
+      navigate("/play", { replace: true });
+      return;
+    }
     setLoadError(false);
     setPoolLoaded(false);
     fetchScrutins().then((p) => {

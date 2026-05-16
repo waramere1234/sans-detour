@@ -6,11 +6,14 @@ export default function Legal() {
   return (
     <section style={{ maxWidth: 640, margin: "0 auto", padding: "24px var(--gutter) 48px" }}>
       {/* 3-column grid centers the wordmark without needing an invisible
-        spacer. Same pattern as Methode.tsx. */}
-      <nav style={{
-        display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "baseline",
-        paddingBottom: 14, borderBottom: "1px solid var(--line)",
-      }}>
+        spacer. Same pattern as Methode.tsx. aria-label distinguishes this
+        landmark from the TopBar header for SR users navigating by landmarks. */}
+      <nav
+        aria-label="En-tête de la page"
+        style={{
+          display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "baseline",
+          paddingBottom: 14, borderBottom: "1px solid var(--line)",
+        }}>
         <Link to="/" style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none", justifySelf: "start" }}>
           <span aria-hidden="true">‹ </span>Retour
         </Link>

@@ -1245,3 +1245,25 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `aria-label="Voter (contre\|pour)\|aria-label="Passer ce scrutin` dans src/routes/Play.tsx → 0 résultat (tous remplacés par le pattern "TEXTE — verbose")
 - [ ] `npm run test:run` → 108 tests verts (était 102), `tests/personnalites.test.ts` présent
 - [ ] curl https://sansdetour.fr/ | grep canonical → `<link rel="canonical" href="https://sansdetour.fr/" />`
+
+---
+
+## Session 55 — 2026-05-16
+
+### Vérification session 54
+
+- [VERIFIED] `src/routes/Play.tsx` : 3 aria-labels pattern "TEXTE — verbose" (Contre / Je passe / Pour)
+- [VERIFIED] `tests/personnalites.test.ts` existe et tourne (6 cas, parmi les 108)
+- [VERIFIED] `index.html:12` `<link rel="canonical" href="https://sansdetour.fr/" />` présent avec commentaire SPA-limit
+
+### Bugs fixés (UX edge case + a11y landmarks + WCAG label-in-name)
+
+- [FIXED] UX edge case · `/play?affinement=1` sans session précédente complète gardait quand même `refinementMode=true`, donc le header dropait le " / TARGET" suffix → user débarquait sur une session vide avec "1" sans target visible. Affinement n'a de sens qu'après 20 votes terminés. Garde ajouté : `isAffinement && (!existing || existing.votes.length < TARGET)` → strip le flag, redirect `/play` propre. · `src/routes/Play.tsx`
+- [FIXED] A11y multiple unlabeled `<nav>` landmarks · `Methode.tsx:40`, `Legal.tsx:10`, `Cover.tsx:260` rendaient tous des `<nav>` sans aria-label. SR users naviguant par landmarks (VO rotor, NVDA Insert+F7) voyaient plusieurs entrées "navigation" indistinguables (en plus de la nav "Sommaire de la méthode" qui, elle, était labelée). aria-label ajoutés : "En-tête de la page" sur Methode + Legal, "Liens secondaires" sur Cover. · `src/routes/Methode.tsx`, `src/routes/Legal.tsx`, `src/routes/Cover.tsx`
+- [FIXED] WCAG 2.5.3 "Label in Name" · La chip "✨IA" sur le recto Card avait `aria-label="Comment ce contenu a été préparé"` — l'accessible name ne contenait pas le texte visible "IA". Voice control "Click IA" ratait la cible. Aligné avec le pattern session 54 : `"IA — comment ce contenu a été préparé"` + emoji ✨ wrappée dans `<span aria-hidden="true">` pour que SR ne lisent pas "sparkles IA" → "comment ce contenu…". · `src/components/Card.tsx`
+
+### Vérifications à faire en session 56
+
+- [ ] DevTools localStorage clear puis URL directe `/play?affinement=1` → doit rediriger vers `/play` (sans flag), header montre "1 / 20" pas "1" tout seul
+- [ ] VoiceOver / NVDA sur /methode + landmarks rotor → 3 nav labelés distincts : "En-tête de la page", "Sommaire de la méthode", "Menu principal" (quand popover TopBar ouvert)
+- [ ] Inspect Card recto → bouton chip avec aria-label="IA — …" et `<span aria-hidden="true">✨</span>` autour de l'emoji

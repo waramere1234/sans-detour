@@ -115,7 +115,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
                   type="button"
                   onClick={(e) => { e.stopPropagation(); onOpenMethode(); }}
                   onPointerDown={(e) => e.stopPropagation()}
-                  aria-label="Comment ce contenu a été préparé"
+                  aria-label="IA — comment ce contenu a été préparé"
                   style={{
                     background: "transparent",
                     border: "none",
@@ -131,7 +131,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
                     textUnderlineOffset: 3,
                     textDecorationStyle: "dotted",
                   }}
-                >✨IA</button>
+                ><span aria-hidden="true">✨</span>IA</button>
               </>
             )}
           </div>

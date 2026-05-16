@@ -256,17 +256,20 @@ export default function Cover() {
         {/* Discreet secondary nav for the Cover only — the TopBar (and its
             menu sheet) is hidden on this route because the Cover already
             shows a wordmark in its header, so we surface the same links
-            inline here. */}
-        <nav style={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: 18,
-          fontFamily: "var(--font-mono)",
-          fontSize: 10.5,
-          letterSpacing: "0.06em",
-          color: "var(--ink-3)",
-        }}>
+            inline here. aria-label avoids an unlabeled "navigation"
+            landmark in SR rotors alongside the Cover header. */}
+        <nav
+          aria-label="Liens secondaires"
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: 18,
+            fontFamily: "var(--font-mono)",
+            fontSize: 10.5,
+            letterSpacing: "0.06em",
+            color: "var(--ink-3)",
+          }}>
           <Link to="/methode" onClick={() => track("cover_footer_nav", { target: "methode" })} style={{ color: "inherit", textDecoration: "none" }}>Méthode &amp; sources</Link>
           <Link to="/legal" onClick={() => track("cover_footer_nav", { target: "legal" })} style={{ color: "inherit", textDecoration: "none" }}>Mentions légales</Link>
           <a href="mailto:contact@sansdetour.fr" onClick={() => track("cover_footer_nav", { target: "contact" })} style={{ color: "inherit", textDecoration: "none" }}>Contact</a>
