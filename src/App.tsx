@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { TopBar } from "./components/TopBar";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 export default function App({ children }: { children: ReactNode }) {
   return (
@@ -11,7 +12,9 @@ export default function App({ children }: { children: ReactNode }) {
       color: "var(--ink)",
     }}>
       <TopBar />
-      <main style={{ flex: 1 }}>{children}</main>
+      <main style={{ flex: 1 }}>
+        <ErrorBoundary>{children}</ErrorBoundary>
+      </main>
     </div>
   );
 }

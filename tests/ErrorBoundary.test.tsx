@@ -1,0 +1,54 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { ErrorBoundary } from "../src/components/ErrorBoundary";
+import * as analytics from "../src/lib/analytics";
+
+function ChildThatThrows(): never {
+  throw new Error("kaboom");
+}
+
+describe("ErrorBoundary", () => {
+  let trackSpy: ReturnType<typeof vi.spyOn>;
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    trackSpy = vi.spyOn(analytics, "track").mockImplementation(() => {});
+    consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    trackSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
+  });
+
+  it("renders children when no error", () => {
+    render(
+      <ErrorBoundary>
+        <p>Hello</p>
+      </ErrorBoundary>
+    );
+    expect(screen.getByText("Hello")).toBeInTheDocument();
+  });
+
+  it("renders fallback UI when a child throws", () => {
+    render(
+      <ErrorBoundary>
+        <ChildThatThrows />
+      </ErrorBoundary>
+    );
+    expect(screen.getByText(/quelque chose s'est cassé/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /recharger/i })).toBeInTheDocument();
+  });
+
+  it("calls track('error', ...) when a child throws", () => {
+    render(
+      <ErrorBoundary>
+        <ChildThatThrows />
+      </ErrorBoundary>
+    );
+    expect(trackSpy).toHaveBeenCalledWith(
+      "error",
+      expect.objectContaining({ msg: "kaboom" }),
+    );
+  });
+});
