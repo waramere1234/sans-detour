@@ -102,7 +102,7 @@ export default function Cover() {
           textAlign: "right",
           lineHeight: 1.5,
         }}>
-          Données AN officielles<br /><b style={{ color: "var(--ink-2)", fontWeight: 500 }}>résumés Claude (IA)</b>
+          Données AN officielles<br /><span style={{ color: "var(--ink-2)", fontWeight: 500 }}>résumés Claude (IA)</span>
         </span>
       </header>
 

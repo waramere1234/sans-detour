@@ -296,7 +296,7 @@ export default function Play() {
             borderRadius: 3,
           }}
         >
-          <b style={{ color: "var(--ink)", fontWeight: 500 }}>{progress}</b>
+          <span style={{ color: "var(--ink)", fontWeight: 500 }}>{progress}</span>
           {!refinementMode && ` / ${TARGET}`}
         </span>
         {showLiveScore && (

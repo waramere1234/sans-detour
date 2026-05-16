@@ -22,22 +22,22 @@ export default function Legal() {
       }}>Mentions légales</h1>
 
       <div style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.6 }}>
-        <p><b>Éditeur</b> — [Nom complet · à compléter]<br/>
+        <p><strong>Éditeur</strong> — [Nom complet · à compléter]<br/>
         Adresse : [adresse postale]<br/>
         Email : <a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a></p>
 
-        <p><b>Hébergeur</b> — Vercel Inc.<br/>
+        <p><strong>Hébergeur</strong> — Vercel Inc.<br/>
         340 S Lemon Ave #4133, Walnut, CA 91789, USA</p>
 
-        <p><b>Données personnelles</b> — Sans Détour ne collecte aucune donnée personnelle. Aucune inscription, aucun cookie de tracking. Toutes les interactions sont stockées localement dans le navigateur (localStorage). Aucune donnée n'est transmise à un serveur Sans Détour.</p>
+        <p><strong>Données personnelles</strong> — Sans Détour ne collecte aucune donnée personnelle. Aucune inscription, aucun cookie de tracking. Toutes les interactions sont stockées localement dans le navigateur (localStorage). Aucune donnée n'est transmise à un serveur Sans Détour.</p>
 
-        <p><b>Analytics</b> — Plausible (analytics anonymisés sans cookies, conformes RGPD).</p>
+        <p><strong>Analytics</strong> — Plausible (analytics anonymisés sans cookies, conformes RGPD).</p>
 
-        <p><b>Indépendance</b> — Sans Détour est un projet indépendant. Aucune affiliation politique, médiatique ou institutionnelle.</p>
+        <p><strong>Indépendance</strong> — Sans Détour est un projet indépendant. Aucune affiliation politique, médiatique ou institutionnelle.</p>
 
-        <p><b>Sources des données</b> — Open data officiel de l'Assemblée Nationale (<a href="https://data.assemblee-nationale.fr/" target="_blank" rel="noopener noreferrer">data.assemblee-nationale.fr</a>), licence Etalab 2.0.</p>
+        <p><strong>Sources des données</strong> — Open data officiel de l'Assemblée Nationale (<a href="https://data.assemblee-nationale.fr/" target="_blank" rel="noopener noreferrer">data.assemblee-nationale.fr</a>), licence Etalab 2.0.</p>
 
-        <p><b>Code source</b> — Open source sous licence MIT, disponible sur <a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer">github.com/sansdetour</a>.</p>
+        <p><strong>Code source</strong> — Open source sous licence MIT, disponible sur <a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer">github.com/sansdetour</a>.</p>
       </div>
     </section>
   );
