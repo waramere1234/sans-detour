@@ -17,7 +17,9 @@ export default function Methode() {
         paddingBottom: 14, borderBottom: "1px solid var(--line)",
       }}>
         <Link to="/" style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none" }}>‹ Retour</Link>
-        <Wordmark size={14} />
+        <Link to="/" state={{ fromLogo: true }} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit" }}>
+          <Wordmark size={14} />
+        </Link>
         <span style={{ visibility: "hidden" }}>‹</span>
       </nav>
 

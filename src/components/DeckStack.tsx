@@ -1,5 +1,4 @@
 // src/components/DeckStack.tsx
-import { AnimatePresence } from "framer-motion";
 import type { Scrutin, UserVote } from "../types";
 import { Card } from "./Card";
 
@@ -23,29 +22,27 @@ export function DeckStack({ scrutins, onVote }: DeckStackProps) {
       display: "flex", alignItems: "center", justifyContent: "center",
       padding: "6px 0",
     }}>
-      <AnimatePresence>
-        {visible.map((s, i) => {
-          const isTop = i === 0;
-          const offset = i * 8;
-          const scale = 1 - i * 0.035;
-          const opacity = i === 0 ? 1 : i === 1 ? 0.75 : 0.45;
-          return (
-            <div
-              key={s.id}
-              style={{
-                position: "absolute",
-                left: 8, right: 8, top: offset, bottom: offset,
-                transform: `scale(${scale}) translateY(${offset / 2}px)`,
-                opacity,
-                zIndex: 10 - i,
-                pointerEvents: isTop ? "auto" : "none",
-              }}
-            >
-              <Card scrutin={s} topMost={isTop} onSwipe={(dir) => handleSwipe(s, dir)} />
-            </div>
-          );
-        })}
-      </AnimatePresence>
+      {visible.map((s, i) => {
+        const isTop = i === 0;
+        const offset = i * 8;
+        const scale = 1 - i * 0.035;
+        const opacity = i === 0 ? 1 : i === 1 ? 0.75 : 0.45;
+        return (
+          <div
+            key={s.id}
+            style={{
+              position: "absolute",
+              left: 8, right: 8, top: offset, bottom: offset,
+              transform: `scale(${scale}) translateY(${offset / 2}px)`,
+              opacity,
+              zIndex: 10 - i,
+              pointerEvents: isTop ? "auto" : "none",
+            }}
+          >
+            <Card scrutin={s} topMost={isTop} onSwipe={(dir) => handleSwipe(s, dir)} />
+          </div>
+        );
+      })}
     </div>
   );
 }

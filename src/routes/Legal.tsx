@@ -4,13 +4,15 @@ import { Wordmark } from "../components/Wordmark";
 
 export default function Legal() {
   return (
-    <section style={{ maxWidth: 640, margin: "0 auto", padding: "24px 22px 48px" }}>
+    <section style={{ maxWidth: 640, margin: "0 auto", padding: "24px var(--gutter) 48px" }}>
       <nav style={{
         display: "flex", justifyContent: "space-between", alignItems: "baseline",
         paddingBottom: 14, borderBottom: "1px solid var(--line)",
       }}>
         <Link to="/" style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none" }}>‹ Retour</Link>
-        <Wordmark size={14} />
+        <Link to="/" state={{ fromLogo: true }} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit" }}>
+          <Wordmark size={14} />
+        </Link>
         <span style={{ visibility: "hidden" }}>‹</span>
       </nav>
 

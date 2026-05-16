@@ -97,7 +97,10 @@ export default function Result() {
     const summary = top6
       .map((a, i) => `${i + 1}. ${getParty(a.group).short} ${a.pct}%`)
       .join(" · ");
-    const text = `Mes affinités politiques réelles, basées sur les vrais votes de l'AN : ${summary}`;
+    const lead = isPartial
+      ? `Mes affinités politiques réelles (résultat partiel ${total}/${TARGET}), basées sur les vrais votes de l'AN`
+      : `Mes affinités politiques réelles, basées sur les vrais votes de l'AN`;
+    const text = `${lead} : ${summary}`;
     const shareUrl = location.origin;
 
     if (navigator.share) {
