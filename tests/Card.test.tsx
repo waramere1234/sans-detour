@@ -72,11 +72,11 @@ describe("Card a11y", () => {
     render(<Card scrutin={mkScrutin()} topMost={true} />);
     const card = screen.getByRole("article");
     // Before flip: front face aria-hidden=false, back aria-hidden=true.
-    const [front] = card.querySelectorAll<HTMLElement>("[aria-hidden]");
+    const [front] = card.querySelectorAll<HTMLElement>("div[aria-hidden]");
     expect(front).toHaveAttribute("aria-hidden", "false");
     fireEvent.keyDown(card, { key: "Enter" });
     // After flip: front aria-hidden=true, back aria-hidden=false.
-    const faces = card.querySelectorAll<HTMLElement>("[aria-hidden]");
+    const faces = card.querySelectorAll<HTMLElement>("div[aria-hidden]");
     expect(faces[0]).toHaveAttribute("aria-hidden", "true");
     expect(faces[1]).toHaveAttribute("aria-hidden", "false");
   });
@@ -84,10 +84,10 @@ describe("Card a11y", () => {
   it("flips on Space key when topMost", () => {
     render(<Card scrutin={mkScrutin()} topMost={true} />);
     const card = screen.getByRole("article");
-    const [front] = card.querySelectorAll<HTMLElement>("[aria-hidden]");
+    const [front] = card.querySelectorAll<HTMLElement>("div[aria-hidden]");
     expect(front).toHaveAttribute("aria-hidden", "false");
     fireEvent.keyDown(card, { key: " " });
-    const faces = card.querySelectorAll<HTMLElement>("[aria-hidden]");
+    const faces = card.querySelectorAll<HTMLElement>("div[aria-hidden]");
     expect(faces[0]).toHaveAttribute("aria-hidden", "true");
     expect(faces[1]).toHaveAttribute("aria-hidden", "false");
   });

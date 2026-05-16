@@ -221,7 +221,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             paddingTop: 14,
           }}>
             <span>{new Date(scrutin.date).toLocaleDateString("fr-FR")}</span>
-            <span style={{ color: "var(--ink-2)" }}>tap pour détails ›</span>
+            <span style={{ color: "var(--ink-2)" }}>tap pour détails<span aria-hidden="true"> ›</span></span>
             {scrutin.url_an_officielle
               ? <span>n° {scrutin.numero}</span>
               : <span style={{ color: "var(--accent)" }}>démo</span>}
@@ -300,12 +300,16 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             display: "flex", justifyContent: "space-between", alignItems: "center",
             fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.04em",
           }}>
-            <span style={{ color: "var(--ink-3)" }}>tap pour revenir ‹</span>
+            <span style={{ color: "var(--ink-3)" }}><span aria-hidden="true">‹ </span>tap pour revenir</span>
             {scrutin.url_an_officielle
-              ? <a href={scrutin.url_an_officielle}
-                  target="_blank" rel="noopener noreferrer"
-                  style={{ color: "var(--accent)", textDecoration: "none" }}>
-                  Voir sur AN ↗
+              ? <a
+                  href={scrutin.url_an_officielle}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Voir le scrutin n°${scrutin.numero} sur le site de l'Assemblée Nationale (nouvel onglet)`}
+                  style={{ color: "var(--accent)", textDecoration: "none" }}
+                >
+                  <span aria-hidden="true">Voir sur AN ↗</span>
                 </a>
               : <span style={{ color: "var(--accent)" }}>donnée démo</span>}
           </div>
