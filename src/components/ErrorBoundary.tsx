@@ -26,7 +26,7 @@ export class ErrorBoundary extends React.Component<{ children: ReactNode }, Stat
 function ErrorFallback() {
   return (
     <section style={{
-      maxWidth: 480, margin: "0 auto",
+      maxWidth: "var(--max-content)", margin: "0 auto",
       padding: "48px var(--gutter)", textAlign: "center",
       display: "flex", flexDirection: "column", gap: 16,
     }}>

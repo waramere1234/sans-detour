@@ -5,7 +5,7 @@ import {
   computeAlignment, rankByAlignment,
   computeAlignmentPersonnalites, rankPersonnalitesByAlignment,
 } from "../lib/matching";
-import { loadSession, resetSession } from "../lib/session";
+import { loadSession, resetSession, forgetCover } from "../lib/session";
 import { PartyRow } from "../components/PartyRow";
 import { PersonnaliteRow } from "../components/PersonnaliteRow";
 import { AuditTrail } from "../components/AuditTrail";
@@ -67,7 +67,7 @@ export default function Result() {
 
   if (loadError) {
     return (
-      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: 480, margin: "0 auto" }}>
+      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: "var(--max-content)", margin: "0 auto" }}>
         <p style={{ color: "var(--ink)", fontSize: 15, lineHeight: 1.5 }}>
           Impossible de charger les scrutins. Vérifie ta connexion puis réessaie.
         </p>
@@ -91,7 +91,7 @@ export default function Result() {
   // forever, leaving the user stuck. Surface the same retry UI as Play.tsx.
   if (poolLoaded && pool.length === 0) {
     return (
-      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: 480, margin: "0 auto" }}>
+      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: "var(--max-content)", margin: "0 auto" }}>
         <p style={{ color: "var(--ink)", fontSize: 15, lineHeight: 1.5 }}>
           Impossible de calculer ton alignement : aucun scrutin disponible. Réessaie dans quelques minutes.
         </p>
@@ -116,7 +116,7 @@ export default function Result() {
 
   function refaire() {
     resetSession();
-    localStorage.removeItem("sd_seen_cover");  // re-show cover
+    forgetCover();
     navigate("/");
   }
 

@@ -2,6 +2,7 @@
 import type { SessionState, UserVote } from "../types";
 
 const KEY = "sd_session_v1";
+const COVER_KEY = "sd_seen_cover";
 
 function makeId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -69,14 +70,25 @@ export function getOrCreateSession(): SessionState {
 }
 
 export function hasSeenCover(): boolean {
-  return localStorage.getItem("sd_seen_cover") === "true";
+  return localStorage.getItem(COVER_KEY) === "true";
 }
 
 export function markCoverSeen(): void {
   try {
-    localStorage.setItem("sd_seen_cover", "true");
+    localStorage.setItem(COVER_KEY, "true");
   } catch {
     // Same Safari-private-mode / quota guard as saveSession — keep the
     // user moving rather than throwing out of `start()`.
+  }
+}
+
+export function forgetCover(): void {
+  // Symmetric counterpart to markCoverSeen — re-show the Cover next time
+  // the user lands on "/". Localises the storage key so callers don't
+  // hardcode the string and drift when it's renamed.
+  try {
+    localStorage.removeItem(COVER_KEY);
+  } catch {
+    // removeItem rarely throws but stay symmetric with the setItem guards.
   }
 }
