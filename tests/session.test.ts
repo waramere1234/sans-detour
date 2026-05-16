@@ -27,6 +27,16 @@ describe("session (localStorage state)", () => {
     expect(loaded.cards_seen).toEqual(["s1"]);
   });
 
+  it("recordVote ignores a duplicate vote on the same scrutin", () => {
+    saveSession(newSession());
+    recordVote("s1", "pour");
+    recordVote("s1", "contre"); // fast double-click / swipe+click race
+    const loaded = loadSession()!;
+    expect(loaded.votes).toHaveLength(1);
+    expect(loaded.votes[0].choice).toBe("pour"); // first vote wins
+    expect(loaded.cards_seen).toEqual(["s1"]);
+  });
+
   it("resetSession clears storage", () => {
     saveSession(newSession());
     resetSession();

@@ -35,9 +35,12 @@ export function saveSession(s: SessionState): void {
 
 export function recordVote(scrutinId: string, choice: UserVote): void {
   const s = loadSession() ?? newSession();
-  if (!s.cards_seen.includes(scrutinId)) {
-    s.cards_seen.push(scrutinId);
-  }
+  // Guard against fast double-clicks / swipe+click races: if this scrutin
+  // is already recorded, ignore the new event. Without this, `votes` would
+  // accumulate duplicate entries and computeAlignment would count the
+  // same scrutin multiple times, inflating the score.
+  if (s.cards_seen.includes(scrutinId)) return;
+  s.cards_seen.push(scrutinId);
   s.votes.push({ scrutin_id: scrutinId, choice, voted_at: Date.now() });
   saveSession(s);
 }

@@ -20,6 +20,7 @@ export default function Play() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [pool, setPool] = useState<Scrutin[]>([]);
+  const [poolLoaded, setPoolLoaded] = useState(false);
   const [deck, setDeck] = useState<Scrutin[]>([]);
   const [refinementMode, setRefinementMode] = useState(false);
   const [rankingOpen, setRankingOpen] = useState(false);
@@ -38,8 +39,10 @@ export default function Play() {
       return;
     }
     setLoadError(false);
+    setPoolLoaded(false);
     fetchScrutins().then((p) => {
       setPool(p);
+      setPoolLoaded(true);
       getOrCreateSession();
       // Resume-aware composition: skip already-seen scrutins so they
       // never reappear, and only request the number of cards still needed.
@@ -181,6 +184,31 @@ export default function Play() {
       <div style={{ padding: 24 }}>
         Pool épuisé.{" "}
         <button onClick={() => navigate("/result")}>Voir mon résultat</button>
+      </div>
+    );
+  }
+  // `loaded === true` here means fetchScrutins resolved with an empty array
+  // (Supabase has zero matching rows, or every row was filtered out). Without
+  // this branch the user would sit on "Chargement…" indefinitely with no
+  // recourse — so we surface a real message and let them retry.
+  if (deck.length === 0 && poolLoaded) {
+    return (
+      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: 480, margin: "0 auto" }}>
+        <p style={{ color: "var(--ink)", fontSize: 15, lineHeight: 1.5 }}>
+          Aucun scrutin disponible pour le moment. Réessaie dans quelques minutes.
+        </p>
+        <button
+          type="button"
+          onClick={() => setLoadTick((t) => t + 1)}
+          style={{
+            alignSelf: "flex-start",
+            background: "var(--accent)", color: "var(--bg)", border: "none",
+            padding: "10px 16px", borderRadius: 6,
+            fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 14, cursor: "pointer",
+          }}
+        >
+          Réessayer
+        </button>
       </div>
     );
   }
