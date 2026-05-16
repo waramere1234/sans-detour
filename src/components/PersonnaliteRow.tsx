@@ -1,7 +1,7 @@
 // src/components/PersonnaliteRow.tsx
 import { getPersonnalite } from "../lib/personnalites";
 import { getPartyColorVar } from "../lib/parties";
-import type { PersonnaliteAlignment } from "../types";
+import { LOW_DATA_THRESHOLD, type PersonnaliteAlignment } from "../types";
 
 export interface PersonnaliteRowProps {
   alignment: PersonnaliteAlignment;
@@ -10,7 +10,7 @@ export interface PersonnaliteRowProps {
 export function PersonnaliteRow({ alignment }: PersonnaliteRowProps) {
   const meta = getPersonnalite(alignment.personnalite);
   const color = getPartyColorVar(meta.group_code);
-  const tooLittleData = alignment.counted < 3;
+  const tooLittleData = alignment.counted < LOW_DATA_THRESHOLD;
   // Same SR-friendly composition as PartyRow (session 25) — SR reads one
   // sentence instead of three disconnected fragments ("Le Pen 57 % 12").
   // The low-data path drops the percent to avoid implying a real score

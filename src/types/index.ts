@@ -10,6 +10,12 @@ export const TARGET = 20;
  *  Cover). Below this, percentages bounce too much to mean anything. */
 export const MIN_FOR_RANKING = 5;
 
+/** Below this counted-votes threshold, PersonnaliteRow shows a "trop peu
+ *  de données" state (faded, no bar) and the ranking pushes the entry to
+ *  the bottom. Same value used both for display and for sort to keep the
+ *  two in sync. */
+export const LOW_DATA_THRESHOLD = 3;
+
 
 /** All parliamentary group codes for the 17e legislature. */
 export const GROUP_CODES = [

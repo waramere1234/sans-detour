@@ -1014,3 +1014,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Slow 3G + load /cover → FreshnessBanner apparaît plus vite qu'avant (Promise.all)
 - [ ] Mock une personnalité avec counted=1 pct=100 + une autre counted=20 pct=80 → ranking doit avoir la deuxième en premier
 - [ ] Sur /methode, Tab sur lien TOC, Enter → section atteinte doit avoir focus ring accent visible
+
+---
+
+## Session 45 — 2026-05-16
+
+### Vérification session 44
+
+- [VERIFIED] `scrutins.ts fetchFreshness` utilise `Promise.all([lastSyncQuery, countQuery])`
+- [VERIFIED] `matching.ts rankPersonnalitesByAlignment` two-pass sort low-data → bottom
+- [VERIFIED] `Methode.tsx Section` utilise `className="methode-section"` + règles CSS `index.css`
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés (DRY drift + layout + a11y)
+
+- [FIXED] DRY drift · `LOW_DATA_THRESHOLD = 3` dupliqué : ajouté session 44 dans `matching.ts` (const local) ET déjà littéral `counted < 3` dans `PersonnaliteRow.tsx:13`. Centralisé dans `types/index.ts` avec JSDoc rappelant que la valeur sert à la fois au tri et à l'affichage (doivent rester en sync). Imports dans les deux call sites. · `src/types/index.ts`, `src/lib/matching.ts`, `src/components/PersonnaliteRow.tsx`
+- [FIXED] DRY drift · `Play.tsx` `<section>` style dupliqué entre skeleton path (deck.length===0) et main path (rendering deck). Même 6 propriétés : padding, flex, gap, minHeight, maxWidth, margin. Si on tweak la layout, on doit penser à modifier les 2 endroits. Extrait en const `playSectionStyle` module-level. · `src/routes/Play.tsx`
+- [FIXED] Layout shift · `Play.tsx` skeleton path rendait `<CardSkeleton />` seul, sans header. Au load, quand la real route render, la chip de progression `(1 / 20)` apparaît d'un coup, poussant CardSkeleton + bouton row vers le bas de ~32 px (border + padding). Visible sur cold load lent. Ajout d'un placeholder header `aria-hidden` qui mime le footprint de la vraie chip pour préserver l'espace + `aria-busy="true"` sur la section pour signaler le loading aux SR. · `src/routes/Play.tsx`
+
+### Vérifications à faire en session 46
+
+- [ ] grep `LOW_DATA_THRESHOLD` dans src/ → 3 occurrences (1 def dans types, 1 import dans matching, 1 import dans PersonnaliteRow), zéro littéral `< 3` lié à counted
+- [ ] grep `padding: "18px var(--gutter)` dans `src/routes/Play.tsx` → 0 résultat (extrait en const)
+- [ ] Slow 3G + load /play → la chip de progression placeholder est visible pendant le skeleton, et au moment où le deck render, ni CardSkeleton ni la button row ne sautent verticalement

@@ -18,6 +18,31 @@ import {
 const CAP_PER_DOSSIER = 2;
 const CAP_PER_CHAPEAU_PREFIX = 2;
 
+// Shared layout for the Play page section — used by both the loading-skeleton
+// return and the real deck return so they don't drift. minHeight uses 100dvh
+// minus the 60-px TopBar so the page fills the viewport without the bottom
+// buttons shifting between skeleton and content.
+const playSectionStyle: CSSProperties = {
+  padding: "18px var(--gutter) 16px",
+  display: "flex",
+  flexDirection: "column",
+  gap: 18,
+  minHeight: "calc(100dvh - 60px)",
+  maxWidth: "var(--max-content)",
+  margin: "0 auto",
+};
+
+// Placeholder for the skeleton path that mirrors the progress chip's footprint
+// (border + padding + same vertical rhythm). Without it, the bottom buttons
+// and CardSkeleton jump 30+ px up at load when the real header renders.
+const skeletonHeaderStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  gap: 10,
+  height: 32,
+};
+
 export default function Play() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -237,12 +262,22 @@ export default function Play() {
   }
   if (deck.length === 0) {
     return (
-      <section style={{
-        padding: "18px var(--gutter) 16px",
-        display: "flex", flexDirection: "column", gap: 18,
-        minHeight: "calc(100dvh - 60px)",
-        maxWidth: "var(--max-content)", margin: "0 auto",
-      }}>
+      <section style={playSectionStyle} aria-busy="true">
+        <div aria-hidden="true" style={skeletonHeaderStyle}>
+          <span
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 12,
+              color: "var(--ink-3)",
+              letterSpacing: "0.04em",
+              border: "1px solid var(--line)",
+              padding: "7px 11px",
+              borderRadius: 3,
+            }}
+          >
+            … / {TARGET}
+          </span>
+        </div>
         <div style={{ flex: 1, padding: "6px 0" }}>
           <CardSkeleton />
         </div>
@@ -253,17 +288,7 @@ export default function Play() {
   const progress = (session?.cards_seen.length ?? 0) + 1;
 
   return (
-    <section
-      style={{
-        padding: "18px var(--gutter) 16px",
-        display: "flex",
-        flexDirection: "column",
-        gap: 18,
-        minHeight: "calc(100dvh - 60px)",
-        maxWidth: "var(--max-content)",
-        margin: "0 auto",
-      }}
-    >
+    <section style={playSectionStyle}>
       {/* Visually-hidden h1 so the Play page has a navigable landmark in
         the SR heading rotor — the visible UI is interactive (deck) with
         no on-screen title, but SR users need a way to identify the page. */}

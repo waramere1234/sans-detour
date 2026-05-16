@@ -3,7 +3,7 @@ import type {
   GroupCode, GroupPosition, UserVote, Scrutin, SessionVote, GroupAlignment,
   PersonnaliteCode, PersonnaliteVote, PersonnaliteAlignment,
 } from "../types";
-import { GROUP_CODES, PERSONNALITE_CODES } from "../types";
+import { GROUP_CODES, PERSONNALITE_CODES, LOW_DATA_THRESHOLD } from "../types";
 
 const SCALE: Record<"pour" | "contre" | "abstention", number> = {
   pour: 1,
@@ -147,13 +147,11 @@ export function computeAlignmentPersonnalites(
   return result;
 }
 
-/** Sort personalities by alignment %, highest first. Personalities with
- *  fewer than 3 counted votes (tooLittleData in PersonnaliteRow) are
- *  pushed to the bottom regardless of pct — a 100 %-on-1-vote score
+/** Sort personalities by alignment %, highest first. Personalities below
+ *  LOW_DATA_THRESHOLD counted votes (tooLittleData in PersonnaliteRow)
+ *  are pushed to the bottom regardless of pct — a 100 %-on-1-vote score
  *  would otherwise float above a meaningful 85 %-on-20-votes and rank
  *  misleadingly. */
-const LOW_DATA_THRESHOLD = 3;
-
 export function rankPersonnalitesByAlignment(
   alignments: Record<PersonnaliteCode, PersonnaliteAlignment>,
 ): PersonnaliteAlignment[] {
