@@ -110,3 +110,27 @@ html, body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Shimmer animation for loading skeletons (CardSkeleton, ResultSkeleton).
+ * Disabled when the user prefers reduced motion — the skeleton stays
+ * static grey rather than animating. */
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg,
+    var(--bg-2) 0%,
+    var(--line) 50%,
+    var(--bg-2) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer {
+    animation: none;
+  }
+}

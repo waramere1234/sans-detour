@@ -7,6 +7,7 @@ import {
 } from "../lib/matching";
 import { loadSession, resetSession, forgetCover } from "../lib/session";
 import { PartyRow } from "../components/PartyRow";
+import { ResultSkeleton } from "../components/ResultSkeleton";
 import { PersonnaliteRow } from "../components/PersonnaliteRow";
 import { AuditTrail } from "../components/AuditTrail";
 import { getParty, getPartyColorVar } from "../lib/parties";
@@ -111,7 +112,7 @@ export default function Result() {
     );
   }
   if (!top || pool.length === 0) {
-    return <div style={{ padding: 24 }}>Chargement…</div>;
+    return <ResultSkeleton />;
   }
 
   function refaire() {
@@ -136,8 +137,13 @@ export default function Result() {
       try {
         await navigator.share({ text, url: shareUrl });
         return;
-      } catch {
-        // user cancelled or share unavailable — fall through to clipboard
+      } catch (err) {
+        // AbortError = user dismissed the share sheet intentionally.
+        // Respecting that requires we DON'T silently fall through to
+        // clipboard — otherwise their result gets copied without consent.
+        // Other errors (NotAllowedError, etc.) = share API unavailable,
+        // safe to try clipboard as a backup path.
+        if ((err as { name?: string }).name === "AbortError") return;
       }
     }
     try {

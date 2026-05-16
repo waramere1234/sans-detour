@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DeckStack } from "../components/DeckStack";
+import { CardSkeleton } from "../components/CardSkeleton";
 import { ChipTop1 } from "../components/ChipTop1";
 import { RankingOverlay } from "../components/RankingOverlay";
 import { MethodeSheet } from "../components/MethodeSheet";
@@ -238,7 +239,20 @@ export default function Play() {
       </div>
     );
   }
-  if (deck.length === 0) return <div style={{ padding: 24 }}>Chargement…</div>;
+  if (deck.length === 0) {
+    return (
+      <section style={{
+        padding: "18px var(--gutter) 16px",
+        display: "flex", flexDirection: "column", gap: 18,
+        minHeight: "calc(100dvh - 60px)",
+        maxWidth: "var(--max-content)", margin: "0 auto",
+      }}>
+        <div style={{ flex: 1, padding: "6px 0" }}>
+          <CardSkeleton />
+        </div>
+      </section>
+    );
+  }
 
   const progress = (session?.cards_seen.length ?? 0) + 1;
 
