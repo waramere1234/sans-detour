@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { fetchScrutins } from "../lib/scrutins";
 import {
   computeAlignment, rankByAlignment,
@@ -12,8 +12,7 @@ import { PersonnaliteRow } from "../components/PersonnaliteRow";
 import { AuditTrail } from "../components/AuditTrail";
 import { getParty, getPartyColorVar } from "../lib/parties";
 import { track } from "../lib/analytics";
-import type { Scrutin, GroupCode } from "../types";
-import { TARGET } from "../types";
+import { TARGET, type Scrutin, type GroupCode } from "../types";
 
 export default function Result() {
   const navigate = useNavigate();
@@ -35,14 +34,6 @@ export default function Result() {
   }, [loadTick]);
 
   const session = loadSession();
-
-  // Guard against URL-typed `/result` with no votes recorded — without
-  // this, the page would render "Tu es surtout aligné avec LFI (0%)"
-  // (first group in GROUP_CODES order, all pcts at 0). Misleading.
-  // Bounce back to Cover where the user can start.
-  useEffect(() => {
-    if (session && session.votes.length === 0) navigate("/", { replace: true });
-  }, [navigate, session]);
 
   // No useMemo here — `session` is a fresh object reference every render
   // (loadSession reads from localStorage), so memoising on [pool, session]
@@ -71,6 +62,15 @@ export default function Result() {
       track("result_reached", { counted: top.counted, top: top.group });
     }
   }, [top]);
+
+  // Guard against URL-typed `/result` with no session or no votes — without
+  // this, the page renders "Tu es surtout aligné avec LFI (0%)" (first
+  // group in GROUP_CODES order, all pcts at 0). Misleading. Using
+  // <Navigate> here (instead of useEffect+navigate) prevents the
+  // misleading content from flashing before the redirect.
+  if (!session || session.votes.length === 0) {
+    return <Navigate to="/" replace />;
+  }
 
   if (loadError) {
     return (
@@ -184,7 +184,7 @@ export default function Result() {
         <p style={{
           fontSize: 13, color: "var(--ink-2)",
           margin: "10px 0 0", letterSpacing: "-0.005em",
-        }}>{total} scrutins · {top.counted} comptés · {skips} skip</p>
+        }}>{total} scrutins · {top.counted} comptés · {skips} skip{skips > 1 ? "s" : ""}</p>
       </header>
 
       <div>

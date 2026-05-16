@@ -10,8 +10,10 @@ import { composeDeck, drawNext, chapeauPrefix } from "../lib/deck";
 import { computeAlignment, rankByAlignment } from "../lib/matching";
 import { getOrCreateSession, recordVote, loadSession } from "../lib/session";
 import { track } from "../lib/analytics";
-import type { Scrutin, UserVote, GroupCode, GroupAlignment } from "../types";
-import { GROUP_CODES, TARGET, MIN_FOR_RANKING } from "../types";
+import {
+  GROUP_CODES, TARGET, MIN_FOR_RANKING,
+  type Scrutin, type UserVote, type GroupCode, type GroupAlignment,
+} from "../types";
 
 const CAP_PER_DOSSIER = 2;
 const CAP_PER_CHAPEAU_PREFIX = 2;

@@ -6,8 +6,7 @@ import { FreshnessBanner } from "../components/FreshnessBanner";
 import { fetchFreshness } from "../lib/scrutins";
 import { hasSeenCover, loadSession, markCoverSeen, resetSession } from "../lib/session";
 import { track } from "../lib/analytics";
-import { TARGET, MIN_FOR_RANKING } from "../types";
-import type { FreshnessInfo } from "../types";
+import { TARGET, MIN_FOR_RANKING, type FreshnessInfo } from "../types";
 
 export default function Cover() {
   const navigate = useNavigate();

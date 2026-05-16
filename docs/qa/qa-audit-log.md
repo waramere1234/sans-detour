@@ -877,3 +877,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Modifier `TARGET = 20` → `21` dans types/index.ts → vérifier que Cover/Play/Result affichent tous "/21" (et pas un mix)
 - [ ] Vider la session (DevTools → localStorage clear), naviguer directement à `/result` → doit rediriger vers `/`
 - [ ] Aucune référence à `MIN_FOR_LIVE` ou `MIN_FOR_RESULT_LINK` dans le code (replacés par `MIN_FOR_RANKING`)
+
+---
+
+## Session 39 — 2026-05-16
+
+### Vérification session 38
+
+- [VERIFIED] `TARGET` + `MIN_FOR_RANKING` exportés depuis `types/index.ts`
+- [VERIFIED] `MIN_FOR_LIVE` / `MIN_FOR_RESULT_LINK` éliminés
+- [VERIFIED] `Result.tsx:44` 0-votes guard (mais incomplet — fixé en session 39)
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés
+
+- [FIXED] Edge case complet · `Result.tsx` mon useEffect session 38 vérifiait `session && session.votes.length === 0` mais oubliait le cas `session === null` (URL `/result` direct sans session du tout). Plus, useEffect → flash de la page misleading avant navigate. Remplacé par early-return `<Navigate to="/" replace />` qui couvre les 2 cas et empêche le flash. · `src/routes/Result.tsx`
+- [FIXED] Pluralization · `Result.tsx:188` `{skips} skip` toujours au singulier. Pour `skips > 1` should be "skips". Cohérence avec les autres pluriels du codebase (`restant${... > 1 ? "s" : ""}` dans Cover). Ajout `{skips > 1 ? "s" : ""}`. · `src/routes/Result.tsx`
+- [FIXED] Import consolidation · `Cover.tsx`, `Play.tsx`, `Result.tsx` avaient 2 imports séparés depuis `../types` (un `import { value }` + un `import type { Type }`). TypeScript supporte `import { value, type Type }` mixé. Consolidation pour réduire la duplication d'import lines. · `src/routes/Cover.tsx`, `src/routes/Play.tsx`, `src/routes/Result.tsx`
+
+### Vérifications à faire en session 40
+
+- [ ] Tester URL `/result` sans aucune session (localStorage clear) → doit rediriger immédiatement vers `/` sans flash de page misleading
+- [ ] Sur /result avec 3 skips → header affiche "20 scrutins · 17 comptés · 3 skips" (pluriel)
+- [ ] Inspecter top de Cover/Play/Result : un seul `import` line depuis `../types`
