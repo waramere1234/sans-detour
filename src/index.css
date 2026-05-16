@@ -59,11 +59,14 @@ html, body {
 
 * { box-sizing: border-box; }
 
-/* Focus ring for the flippable Card root — outline:none was set inline to
- * suppress the browser default (which looked weird around the full-deck
- * tall card), but keyboard users still need a visible focus indicator.
- * Use focus-visible so the ring only appears on keyboard nav, not on
- * pointer drag/tap. */
+/* Focus ring for the flippable Card root. The Card needed an inline
+ * outline:none to suppress the browser default on pointer (drag/tap),
+ * but inline > class specificity so a plain class wouldn't override.
+ * Solution: move BOTH the suppression (pointer focus) and the keyboard
+ * ring to CSS classes here so the cascade is consistent. */
+[role="article"]:focus:not(:focus-visible) {
+  outline: none;
+}
 [role="article"]:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;

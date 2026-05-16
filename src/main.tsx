@@ -13,11 +13,26 @@ import "./index.css";
 const Methode = lazy(() => import("./routes/Methode"));
 const Legal = lazy(() => import("./routes/Legal"));
 
+// Minimal route-loading placeholder — same gutter/max-width as the real
+// reading pages so the layout doesn't snap when the lazy chunk arrives.
+function RouteLoader() {
+  return (
+    <section style={{
+      maxWidth: 720, margin: "0 auto",
+      padding: "48px var(--gutter)",
+      color: "var(--ink-3)", fontFamily: "var(--font-mono)", fontSize: 11,
+      letterSpacing: "0.08em", textTransform: "uppercase",
+    }}>
+      Chargement…
+    </section>
+  );
+}
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <App>
-        <Suspense fallback={null}>
+        <Suspense fallback={<RouteLoader />}>
           <Routes>
             <Route path="/" element={<Cover />} />
             <Route path="/play" element={<Play />} />

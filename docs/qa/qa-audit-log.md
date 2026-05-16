@@ -784,3 +784,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Sur /methode, cliquer un TOC link → vérifier (Tab après) que focus est sur la section heading, pas sur le link cliqué
 - [ ] Network tab DevTools : naviguer Cover → Méthode doit déclencher un chunk JS séparé ("Methode-*.js")
 - [ ] Inspecter PERSONNALITES : entries n'ont plus `presidentiable`
+
+---
+
+## Session 35 — 2026-05-16
+
+### Vérification session 34
+
+- [VERIFIED] `Methode.tsx:28` `el.focus({ preventScroll: true })` après scroll
+- [VERIFIED] `main.tsx` Methode + Legal en lazy() (chunks séparés)
+- [VERIFIED] PersonnaliteMeta sans `presidentiable`
+- 91/91 tests verts, typecheck clean
+
+### Bugs fixés
+
+- [FIXED] CSS specificity · `Card.tsx` avait `outline: "none"` inline qui trumpait la règle CSS `[role="article"]:focus-visible { outline: 2px... }` ajoutée en session 33. Le focus indicator ne s'affichait jamais (inline > class). Solution : supprimer l'inline, déplacer la suppression dans une règle CSS `:focus:not(:focus-visible)` qui ne touche pas le ring keyboard. Cascade cohérente. · `src/components/Card.tsx`, `src/index.css`
+- [FIXED] UX/loading · `main.tsx Suspense fallback={null}` affichait page blanche pendant le chunk lazy Methode/Legal load (~50-100ms sur connexion rapide, plusieurs secondes sur 3G). Ajout d'un `<RouteLoader>` minimal qui réserve l'espace de layout avec un "Chargement…" discret. · `src/main.tsx`
+- [FIXED] PWA · `manifest.webmanifest` n'avait pas de field `id`. Sans id explicite, certains browsers traitent l'app comme une nouvelle instance si l'URL change (e.g. www. vs apex). Ajout `id: "/"` pour fixer l'identité PWA. · `public/manifest.webmanifest`
+
+### Vérifications à faire en session 36
+
+- [ ] Sur /play, Tab vers Card → focus ring accent visible (avec souris pas de ring)
+- [ ] Slow 3G simulation sur Network tab, naviguer vers /methode → "Chargement…" affiché avant la page (pas blank)
+- [ ] Inspecter manifest.webmanifest : a `id: "/"`

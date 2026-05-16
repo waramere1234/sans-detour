@@ -116,7 +116,8 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
         touchAction: topMost && !flipped ? "none" : "auto",
         perspective: 1500,
         height: "100%",
-        outline: "none",
+        // outline:none moved to index.css under [role="article"]:focus:not(:focus-visible)
+        // so the focus-visible ring (keyboard) still wins over the inline style.
       }}
     >
       <motion.div
