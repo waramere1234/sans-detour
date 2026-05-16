@@ -38,9 +38,9 @@ export default function Legal() {
 
         <p><strong>Indépendance</strong> — Sans Détour est un projet indépendant. Aucune affiliation politique, médiatique ou institutionnelle.</p>
 
-        <p><strong>Sources des données</strong> — Open data officiel de l'Assemblée Nationale (<a href="https://data.assemblee-nationale.fr/" target="_blank" rel="noopener noreferrer">data.assemblee-nationale.fr</a>), licence Etalab 2.0.</p>
+        <p><strong>Sources des données</strong> — Open data officiel de l'Assemblée Nationale (<a href="https://data.assemblee-nationale.fr/" target="_blank" rel="noopener noreferrer" aria-label="data.assemblee-nationale.fr (nouvel onglet)">data.assemblee-nationale.fr</a>), licence Etalab 2.0.</p>
 
-        <p><strong>Code source</strong> — Open source sous licence MIT, disponible sur <a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer">github.com/sansdetour</a>.</p>
+        <p><strong>Code source</strong> — Open source sous licence MIT, disponible sur <a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label="github.com/sansdetour (nouvel onglet)">github.com/sansdetour</a>.</p>
       </div>
     </section>
   );

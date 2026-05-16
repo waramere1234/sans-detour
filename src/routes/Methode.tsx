@@ -107,10 +107,12 @@ export default function Methode() {
       <Section n="04" title="Comment on calcule ton alignement">
         <p>Pour chaque groupe, on compare ce que tu as voté à ce que ce groupe a voté, scrutin par scrutin :</p>
         <Formula>
-          +1 si ton vote = position du groupe<br/>
-          +0,5 si l'un des deux s'abstient et l'autre vote<br/>
-          0 si désaccord net (pour vs contre)<br/>
-          Somme ÷ nombre de scrutins comptés × 100 = % affiché
+          Score par scrutin :<br/>
+          &nbsp;&nbsp;+1 si ton vote = position du groupe<br/>
+          &nbsp;&nbsp;+0,5 si l'un des deux s'abstient et l'autre vote<br/>
+          &nbsp;&nbsp;0 si désaccord net (pour vs contre)<br/>
+          <br/>
+          Somme des scores ÷ nombre de scrutins comptés × 100 = % affiché
         </Formula>
         <p>Le ranking apparaît à partir du <strong>5e scrutin compté</strong> — en dessous, les pourcentages bougent trop pour signifier quoi que ce soit.</p>
       </Section>

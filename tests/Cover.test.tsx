@@ -44,6 +44,10 @@ describe("Cover", () => {
     localStorage.setItem("sd_seen_cover", "true");
     recordVote("s1", "pour");
     renderCover([{ pathname: "/", state: { fromLogo: true } }]);
-    expect(screen.getByRole("button", { name: /commencer/i })).toBeInTheDocument();
+    // votes=1, hasInProgress=true → primary CTA reads "Reprendre", not
+    // "Commencer". Match on /reprendre/i so the assertion can't be
+    // accidentally satisfied by the secondary "Recommencer à zéro"
+    // button (which contains "commencer" as a substring).
+    expect(screen.getByRole("button", { name: /reprendre/i })).toBeInTheDocument();
   });
 });
