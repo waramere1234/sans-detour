@@ -85,6 +85,21 @@ export default function Methode() {
           <li><a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a> — signaler une erreur</li>
         </ul>
       </Section>
+
+      <Section n="07" title="Le rôle de l'IA Claude">
+        <p><b>Ce que fait Claude.</b> Reformuler le titre brut du scrutin en 12 mots, condenser le projet de loi en 3 points clés, rédiger un résumé contextuel de 30 à 50 mots, structurer une synthèse détaillée (mesures, concernés, calendrier, exceptions), et taguer le scrutin par thème. <b>Mise en forme, pas commentaire.</b></p>
+
+        <p><b>Ce qu'il ne fait pas.</b> Le calcul d'alignement (formule mathématique pure), la composition du deck (round-robin algorithmique par thème), l'extraction des votes individuels (parsing des XML officiels AN). Sur ces trois plans, Claude n'intervient à aucun moment.</p>
+
+        <p><b>Comment on cadre les biais.</b> Le prompt envoyé à Claude est neutre par construction. Sa source : le libellé brut AN + des résultats de recherche web pour le contexte. <b>Le libellé officiel brut est affiché sur la face Résumé du verso de chaque carte</b> (et la page AN complète est toujours accessible via « Voir sur AN ↗ ») — tu peux comparer directement.</p>
+
+        <p><b>Limites & signalement.</b> Claude peut se tromper sur les nuances : un mot mal choisi, une mesure oubliée, un thème mal taggué. Pour l'instant, aucune relecture humaine systématique (V3 prévue). Si tu repères une erreur factuelle : <a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a> — on corrige.</p>
+
+        <ul style={{ paddingLeft: 18, color: "var(--ink-2)", marginTop: 12 }}>
+          <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer">github.com/sansdetour</a> — prompt et code source publics</li>
+          <li>Modèle : Claude Haiku 4.5 d'Anthropic, via Batches API + web_search</li>
+        </ul>
+      </Section>
     </section>
   );
 }
