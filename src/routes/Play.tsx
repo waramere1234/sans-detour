@@ -362,7 +362,7 @@ export default function Play() {
         <button
           type="button"
           onClick={() => handleVote(deck[0].id, "contre")}
-          aria-label="Voter contre ce scrutin"
+          aria-label="Contre — voter contre ce scrutin"
           style={btnFallback("var(--contre)")}
         >
           <span aria-hidden="true">← </span>Contre
@@ -370,7 +370,7 @@ export default function Play() {
         <button
           type="button"
           onClick={() => handleVote(deck[0].id, "skip")}
-          aria-label="Passer ce scrutin sans voter"
+          aria-label="Je passe — passer ce scrutin sans voter"
           style={btnFallback("var(--ink-2)")}
         >
           <span aria-hidden="true">↓ </span>Je passe
@@ -378,7 +378,7 @@ export default function Play() {
         <button
           type="button"
           onClick={() => handleVote(deck[0].id, "pour")}
-          aria-label="Voter pour ce scrutin"
+          aria-label="Pour — voter pour ce scrutin"
           style={btnFallback("var(--pour)")}
         >
           Pour<span aria-hidden="true"> →</span>

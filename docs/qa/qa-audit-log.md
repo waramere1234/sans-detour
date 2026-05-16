@@ -1222,3 +1222,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] `npm run test:run` → 102 tests verts (était 93)
 - [ ] Modifier temporairement `LOW_DATA_THRESHOLD` à 0 dans types/index.ts → le test "pushes low-data personnalités to the bottom" doit échouer (preuve que le test détecte la régression)
 - [ ] Modifier temporairement `loadSession` pour skipper le `Array.isArray` check → 5 tests session 53 doivent échouer
+
+---
+
+## Session 54 — 2026-05-16
+
+### Vérification session 53
+
+- [VERIFIED] 102 tests verts (avant l'ajout de cette session) — 9 tests session-53 ajoutés bien présents
+- [VERIFIED] `tests/matching-edge-cases.test.ts` contient "pushes low-data personnalités to the bottom"
+- [VERIFIED] `tests/session.test.ts` contient "cards_seen is missing" + 4 autres shape-validation
+- [VERIFIED] `tests/deck.test.ts` contient "seenChapeauPrefixCounts saturates"
+
+### Bugs fixés (a11y WCAG + coverage + SEO)
+
+- [FIXED] A11y WCAG 2.5.3 "Label in Name" · Sur `/play`, le bouton "Je passe" avait `aria-label="Passer ce scrutin sans voter"` — la chaîne ne contient pas le texte visible "Je passe". Voice control (macOS / Windows) qui matche par accessible name ne trouvait pas la cible quand l'user dit "Click Je passe". Aligné avec le pattern `"TEXTE — verbose"` pour les 3 boutons (Contre / Je passe / Pour) — l'accessible name commence maintenant par le texte visible, le verbose suit pour les SR users qui ont besoin de contexte. · `src/routes/Play.tsx`
+- [FIXED] Coverage gap · Le registre `PERSONNALITES` (src/lib/personnalites.ts) n'avait aucun test, contrairement à `PARTIES` qui en a un. Un dev qui ajoute une personnalité à `PERSONNALITE_CODES` sans entrée dans `PERSONNALITES` aurait un crash runtime sur `getPersonnalite(code).display_name` (undefined.display_name) — aucun signal CI. 6 tests ajoutés : entrée par code, champs non-vides, group_code ∈ GroupCode, acteur_ref unique + format `PA\d+`, getPersonnalite, display_name contient prenom+nom. · `tests/personnalites.test.ts` (nouveau)
+- [FIXED] SEO · `index.html` n'avait pas de `<link rel="canonical">`. Sans canonical, Google peut indexer les preview URLs Vercel (`*.vercel.app/*`) comme alternatives à la prod — fragmente le PageRank, pollue les SERP avec des URLs éphémères. Canonical fixé sur `https://sansdetour.fr/` avec commentaire qui explique la limite SPA (routes /play, /result, etc. partagent ce canonical en l'absence de SSR ou de mise à jour côté client). · `index.html`
+
+### Vérifications à faire en session 55
+
+- [ ] grep `aria-label="Voter (contre\|pour)\|aria-label="Passer ce scrutin` dans src/routes/Play.tsx → 0 résultat (tous remplacés par le pattern "TEXTE — verbose")
+- [ ] `npm run test:run` → 108 tests verts (était 102), `tests/personnalites.test.ts` présent
+- [ ] curl https://sansdetour.fr/ | grep canonical → `<link rel="canonical" href="https://sansdetour.fr/" />`

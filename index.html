@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Pas les programmes. Les vrais votes." />
+    <!-- Canonical points at the prod homepage so Vercel preview deploys
+         and any direct /index.html or trailing-slash variants don't get
+         indexed as duplicate URLs. Routes other than `/` are SPA-rendered
+         client-side; if/when we add SSR or route-aware canonical injection
+         the per-route URLs should be set on `pathname` instead. -->
+    <link rel="canonical" href="https://sansdetour.fr/" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
