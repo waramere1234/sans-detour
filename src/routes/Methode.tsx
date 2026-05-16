@@ -12,15 +12,20 @@ export default function Methode() {
 
   return (
     <section style={{ maxWidth: 720, margin: "0 auto", padding: "24px var(--gutter) 48px" }}>
+      {/* 3-column grid keeps the wordmark centered without needing an
+        invisible placeholder span. Left col = back link (justify start),
+        center = wordmark (justify center), right col = empty (1fr) so
+        the geometry is balanced. */}
       <nav style={{
-        display: "flex", justifyContent: "space-between", alignItems: "baseline",
+        display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "baseline",
         paddingBottom: 14, borderBottom: "1px solid var(--line)",
       }}>
-        <Link to="/" style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none" }}>‹ Retour</Link>
-        <Link to="/" state={{ fromLogo: true }} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit" }}>
+        <Link to="/" style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none", justifySelf: "start" }}>
+          <span aria-hidden="true">‹ </span>Retour
+        </Link>
+        <Link to="/" state={{ fromLogo: true }} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
           <Wordmark size={14} />
         </Link>
-        <span style={{ visibility: "hidden" }}>‹</span>
       </nav>
 
       <header style={{ marginTop: 24 }}>

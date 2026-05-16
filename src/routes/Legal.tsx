@@ -5,15 +5,18 @@ import { Wordmark } from "../components/Wordmark";
 export default function Legal() {
   return (
     <section style={{ maxWidth: 640, margin: "0 auto", padding: "24px var(--gutter) 48px" }}>
+      {/* 3-column grid centers the wordmark without needing an invisible
+        spacer. Same pattern as Methode.tsx. */}
       <nav style={{
-        display: "flex", justifyContent: "space-between", alignItems: "baseline",
+        display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "baseline",
         paddingBottom: 14, borderBottom: "1px solid var(--line)",
       }}>
-        <Link to="/" style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none" }}>‹ Retour</Link>
-        <Link to="/" state={{ fromLogo: true }} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit" }}>
+        <Link to="/" style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none", justifySelf: "start" }}>
+          <span aria-hidden="true">‹ </span>Retour
+        </Link>
+        <Link to="/" state={{ fromLogo: true }} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
           <Wordmark size={14} />
         </Link>
-        <span style={{ visibility: "hidden" }}>‹</span>
       </nav>
 
       <h1 style={{

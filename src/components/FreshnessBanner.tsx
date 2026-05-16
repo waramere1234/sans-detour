@@ -1,11 +1,19 @@
 // src/components/FreshnessBanner.tsx
 import type { FreshnessInfo } from "../types";
 
+// new Date("…").getTime() returns NaN when the string isn't a valid ISO
+// date. Without the isNaN check, the banner ends up rendering "MAJ il y a
+// NaN j" if Supabase ever serves a malformed `ingere_le` value. Coerce to
+// 0 so the banner stays readable instead of leaking the math glitch.
 function diffDays(target: string, base: number = Date.now()): number {
-  return Math.max(0, Math.floor((new Date(target).getTime() - base) / 86400_000));
+  const t = new Date(target).getTime();
+  if (isNaN(t)) return 0;
+  return Math.max(0, Math.floor((t - base) / 86400_000));
 }
 function pastDays(target: string, base: number = Date.now()): number {
-  return Math.max(0, Math.floor((base - new Date(target).getTime()) / 86400_000));
+  const t = new Date(target).getTime();
+  if (isNaN(t)) return 0;
+  return Math.max(0, Math.floor((base - t) / 86400_000));
 }
 
 // Sync cadence is weekly (cf. Methode §01). Above this many days, the
