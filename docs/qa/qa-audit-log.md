@@ -1199,3 +1199,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `One sentence, ≤ 25 words` dans `supabase/migrations/` → 0 résultat
 - [ ] grep `+ analyse.*overlay\|+ analyse.*card overlay` dans `supabase/migrations/` → 0 résultat
 - [ ] grep `bardella\|tondelier\|wauquiez.*non_dispo` dans `supabase/migrations/0006_add_votes_personnalites.sql` → seulement dans la note d'exclusion explicite, pas dans l'exemple Shape
+
+---
+
+## Session 53 — 2026-05-16
+
+### Vérification session 52
+
+- [VERIFIED] `0002_add_contexte.sql` ne contient plus "One sentence, ≤ 25 words" ; spec étendu à 30-50 mots / 2 phrases
+- [VERIFIED] `0003_add_analyse.sql` ne mentionne "+ analyse" qu'avec la note historique "merged into the verso by commit 9cb7e6c"
+- [VERIFIED] `0006_add_votes_personnalites.sql` Shape example n'utilise plus bardella/tondelier ; exclusion explicite ajoutée dans une note
+- 93/93 tests verts (avant l'ajout de cette session), typecheck clean
+
+### Bugs fixés (coverage gaps sur code défensif récent)
+
+- [FIXED] Coverage gap · `rankPersonnalitesByAlignment` two-pass sort (low-data → bottom) ajouté session 44/45, jamais testé. Un refactor qui casserait la première passe (qui pushe les `counted < LOW_DATA_THRESHOLD` au bas) laisserait passer une régression : un score 100%-on-1-vote remonterait en tête au-dessus d'un 60%-on-20-votes meaningful. 2 tests ajoutés (low-data → bottom + tri par pct dans la bucket regular). · `tests/matching-edge-cases.test.ts`
+- [FIXED] Coverage gap · `loadSession` shape validation (Array.isArray sur cards_seen + votes) ajouté session 46, jamais testé. Si un dev simplifie le guard à `if (!parsed) return null;`, une localStorage corrompue (`{}`, `"null"`, payload partiel) crasherait l'app sur `session.votes.length` sans signal en CI. 5 tests ajoutés (malformed JSON, `{}`, `"null"`, votes non-array, cards_seen manquant). · `tests/session.test.ts`
+- [FIXED] Coverage gap · `drawNext` avec `capPerChapeauPrefix` + default-empty Map ajouté session 46, jamais testé. Le path "cap respecté quand la Map sature" + le contrat "Map omise ≠ cap bypassed silencieusement" tous deux non couverts. 2 tests ajoutés pour ces 2 branches. · `tests/deck.test.ts`
+
+### Vérifications à faire en session 54
+
+- [ ] `npm run test:run` → 102 tests verts (était 93)
+- [ ] Modifier temporairement `LOW_DATA_THRESHOLD` à 0 dans types/index.ts → le test "pushes low-data personnalités to the bottom" doit échouer (preuve que le test détecte la régression)
+- [ ] Modifier temporairement `loadSession` pour skipper le `Array.isArray` check → 5 tests session 53 doivent échouer

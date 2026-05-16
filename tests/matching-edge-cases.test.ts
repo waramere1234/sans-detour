@@ -129,4 +129,30 @@ describe("rankPersonnalitesByAlignment", () => {
     const ranked = rankPersonnalitesByAlignment(a);
     expect(ranked.map((r) => r.personnalite)).toEqual([...PERSONNALITE_CODES]);
   });
+
+  it("pushes low-data personnalités to the bottom even with a 100% pct", () => {
+    // A 100%-on-1-vote score must NOT outrank a 60%-on-20-votes — otherwise
+    // the ranking lies about the strength of the signal. Two-pass sort:
+    // counted < LOW_DATA_THRESHOLD (=3) bucket goes to the bottom, then by
+    // pct desc within each bucket. (Logic in src/lib/matching.ts.)
+    const empty = computeAlignmentPersonnalites([], []);
+    // Forge alignments: le_pen has 1 perfect vote (100% / counted=1, low-data);
+    // faure has 12 perfect + 8 conflict over 20 votes (60% / counted=20).
+    empty.le_pen = { ...empty.le_pen, counted: 1, perfect: 1, pct: 100 };
+    empty.faure  = { ...empty.faure,  counted: 20, perfect: 12, conflict: 8, pct: 60 };
+    const ranked = rankPersonnalitesByAlignment(empty);
+    const faureIdx = ranked.findIndex((r) => r.personnalite === "faure");
+    const lepenIdx = ranked.findIndex((r) => r.personnalite === "le_pen");
+    expect(faureIdx).toBeLessThan(lepenIdx);
+  });
+
+  it("ranks by pct within the regular (non low-data) bucket", () => {
+    const a = computeAlignmentPersonnalites([], []);
+    a.le_pen = { ...a.le_pen, counted: 10, perfect: 8, conflict: 2, pct: 80 };
+    a.faure  = { ...a.faure,  counted: 10, perfect: 5, conflict: 5, pct: 50 };
+    const ranked = rankPersonnalitesByAlignment(a);
+    const lepenIdx = ranked.findIndex((r) => r.personnalite === "le_pen");
+    const faureIdx = ranked.findIndex((r) => r.personnalite === "faure");
+    expect(lepenIdx).toBeLessThan(faureIdx);
+  });
 });

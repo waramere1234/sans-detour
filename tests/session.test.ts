@@ -48,4 +48,35 @@ describe("session (localStorage state)", () => {
     const b = newSession();
     expect(a.session_id).not.toBe(b.session_id);
   });
+
+  // Shape-validation guard (added session 46) — JSON.parse succeeds on any
+  // valid JSON, but callers assume cards_seen and votes are arrays. A
+  // corrupted localStorage payload must downgrade to "no session" instead
+  // of crashing the UI on `session.votes.length`.
+  it("loadSession returns null on malformed JSON (parse failure)", () => {
+    localStorage.setItem("sd_session_v1", "{not-json");
+    expect(loadSession()).toBeNull();
+  });
+  it("loadSession returns null on valid JSON with the wrong shape ({})", () => {
+    localStorage.setItem("sd_session_v1", "{}");
+    expect(loadSession()).toBeNull();
+  });
+  it("loadSession returns null on 'null' payload", () => {
+    localStorage.setItem("sd_session_v1", "null");
+    expect(loadSession()).toBeNull();
+  });
+  it("loadSession returns null when votes is not an array", () => {
+    localStorage.setItem(
+      "sd_session_v1",
+      JSON.stringify({ session_id: "x", cards_seen: [], votes: "boom", started_at: 0 }),
+    );
+    expect(loadSession()).toBeNull();
+  });
+  it("loadSession returns null when cards_seen is missing", () => {
+    localStorage.setItem(
+      "sd_session_v1",
+      JSON.stringify({ session_id: "x", votes: [], started_at: 0 }),
+    );
+    expect(loadSession()).toBeNull();
+  });
 });

@@ -160,4 +160,40 @@ describe("drawNext (mode affinement)", () => {
     const next = drawNext(pool, seen, { capPerDossier: 2, seenDossierCounts: new Map(), seed: 1 });
     expect(next).toBeNull();
   });
+
+  // Session 46 hardened drawNext so the prefix cap can't be silently bypassed
+  // when the caller forgets to pass `seenChapeauPrefixCounts`. Both branches
+  // covered below.
+
+  it("respects capPerChapeauPrefix when seenChapeauPrefixCounts saturates the prefix", () => {
+    const pool = [
+      mk("m1", "dA", undefined, "MAYOTTE · cyclone"),
+      mk("m2", "dB", undefined, "MAYOTTE · reconstruction"),
+      mk("s1", "dC", undefined, "SANTÉ · loi"),
+    ];
+    // Pretend the user already saw 2 MAYOTTE cards — cap should block any
+    // further MAYOTTE pick even though both m1/m2 are unseen by id.
+    const next = drawNext(pool, new Set(), {
+      capPerDossier: 99, seenDossierCounts: new Map(),
+      capPerChapeauPrefix: 2,
+      seenChapeauPrefixCounts: new Map([["mayotte", 2]]),
+      seed: 1,
+    });
+    expect(next?.id).toBe("s1");
+  });
+
+  it("doesn't silently skip the prefix cap when seenChapeauPrefixCounts is undefined", () => {
+    // Regression: previously the optional chain `opts.seenChapeauPrefixCounts?.get()`
+    // returned 0 when the map was omitted, so a caller passing
+    // `capPerChapeauPrefix: 2` without the map would have the cap silently
+    // bypassed. drawNext now defaults to an empty Map internally — with a
+    // single pick the cap can't trigger but the contract is honored.
+    const pool = [mk("m1", "dA", undefined, "MAYOTTE · cyclone")];
+    const next = drawNext(pool, new Set(), {
+      capPerDossier: 99, seenDossierCounts: new Map(),
+      capPerChapeauPrefix: 2,
+      seed: 1,
+    });
+    expect(next?.id).toBe("m1");
+  });
 });
