@@ -78,7 +78,14 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
   // on keyboard events. ESC mirrors the modal-close convention.
   useEffect(() => {
     if (!topMost || !flipped) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setFlipped(false); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      // If a modal dialog (RankingOverlay, MethodeSheet) is open in front
+      // of this card, ESC belongs to the modal — let it close that first
+      // instead of also unflipping a card the user can't see.
+      if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+      setFlipped(false);
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [topMost, flipped]);

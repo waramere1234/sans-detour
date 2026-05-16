@@ -1,6 +1,6 @@
 // src/routes/Cover.tsx
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Wordmark } from "../components/Wordmark";
 import { FreshnessBanner } from "../components/FreshnessBanner";
 import { fetchFreshness } from "../lib/scrutins";
@@ -14,6 +14,9 @@ export default function Cover() {
   const navigate = useNavigate();
   const location = useLocation();
   const [info, setInfo] = useState<FreshnessInfo | null>(null);
+  // Guard so a wordmark re-click (which mutates location.state and re-runs
+  // this effect) doesn't fire a fresh Supabase round-trip every time.
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
     // Explicit nav from the TopBar wordmark passes { fromLogo: true } so
@@ -28,6 +31,8 @@ export default function Cover() {
       else navigate("/play", { replace: true });
       return;
     }
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
     fetchFreshness().then(setInfo).catch(() => {});
   }, [navigate, location.state]);
 

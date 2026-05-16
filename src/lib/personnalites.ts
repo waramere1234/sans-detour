@@ -4,7 +4,6 @@ import type { GroupCode, PersonnaliteCode } from "../types";
 /** Metadata for a presidentially-relevant personality whose individual votes
  *  the app exposes alongside (and on top of) the group-level alignment. */
 export interface PersonnaliteMeta {
-  code: PersonnaliteCode;
   display_name: string;
   short_name: string;
   /** Parliamentary group the personality sits with on the deck UI — drives
@@ -26,7 +25,6 @@ export interface PersonnaliteMeta {
 
 export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
   le_pen: {
-    code: "le_pen",
     display_name: "Marine Le Pen",
     short_name: "Le Pen",
     group_code: "RN",
@@ -37,7 +35,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     presidentiable: true,
   },
   faure: {
-    code: "faure",
     display_name: "Olivier Faure",
     short_name: "Faure",
     group_code: "SOC",
@@ -48,7 +45,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     presidentiable: true,
   },
   chatelain: {
-    code: "chatelain",
     display_name: "Cyrielle Chatelain",
     short_name: "Chatelain",
     group_code: "ECO",
@@ -59,7 +55,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     presidentiable: false,
   },
   wauquiez: {
-    code: "wauquiez",
     display_name: "Laurent Wauquiez",
     short_name: "Wauquiez",
     group_code: "DR",
@@ -70,7 +65,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     presidentiable: true,
   },
   attal: {
-    code: "attal",
     display_name: "Gabriel Attal",
     short_name: "Attal",
     group_code: "EPR",
@@ -81,7 +75,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     presidentiable: true,
   },
   ciotti: {
-    code: "ciotti",
     display_name: "Éric Ciotti",
     short_name: "Ciotti",
     group_code: "UDR",
@@ -92,7 +85,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     presidentiable: true,
   },
   bompard: {
-    code: "bompard",
     display_name: "Manuel Bompard",
     short_name: "Bompard",
     group_code: "LFI",
@@ -103,7 +95,6 @@ export const PERSONNALITES: Record<PersonnaliteCode, PersonnaliteMeta> = {
     presidentiable: false,
   },
   panot: {
-    code: "panot",
     display_name: "Mathilde Panot",
     short_name: "Panot",
     group_code: "LFI",
