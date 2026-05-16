@@ -1378,3 +1378,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `github.com/sansdetour` dans `src/` → toujours présent (TODO production-blocker à côté) ; vérifier que chaque occurrence a un commentaire TODO juste au-dessus
 - [ ] grep `Pas les programmes, les vrais votes` dans `index.html` → 0 résultat (la version comma-no-period n'existe plus)
 - [ ] grep `46 scrutins\|46 cartes` dans `SHIP-V1.md` → 0 résultat
+
+---
+
+## Session 61 — 2026-05-17
+
+### Vérification session 60
+
+- [VERIFIED] `src/routes/{Methode,Legal}.tsx` : `github.com/sansdetour` toujours linké mais TODO production-blocker juste au-dessus de chaque occurrence (3 sites)
+- [VERIFIED] `index.html` `<title>` aligné sur "Pas les programmes. Les vrais votes."
+- [VERIFIED] `SHIP-V1.md` : 0 mention "46 scrutins" / "46 cartes"
+- 115/115 tests verts (avant session 61), typecheck clean
+
+### Bugs fixés (security headers + iOS PWA sticky + coverage gap)
+
+- [FIXED] Sécurité prod · `vercel.json` n'avait aucun security header explicite. Vercel sert HTTPS + HSTS par défaut mais pas X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy. Sans X-Frame-Options, un site malveillant peut iframer sansdetour.fr dans un overlay et faire du clickjacking sur les boutons de vote. Ajout des 4 headers standards via `headers[].source: "/(.*)"` (applique à toutes les routes). Permissions-Policy bloque cam/mic/geo/payment/usb que l'app n'utilise jamais. · `vercel.json`
+- [FIXED] iOS PWA TopBar sticky · Session 57 avait ajouté `viewport-fit=cover` + body padding `env(safe-area-inset-*)`. Le body padding protège les éléments en flow normal (Cover header, Methode/Legal headers) mais PAS la sticky position du TopBar : `position: sticky; top: 0` colle l'élément à y=0 de la viewport (notch zone) au scroll, masquant le wordmark et le bouton ••• sous le notch iPhone X+. Fix : `top: env(safe-area-inset-top, 0px)` sur TopBar — pré-scroll ET post-scroll restent cohérents en dessous du notch. · `src/components/TopBar.tsx`
+- [FIXED] Coverage gap · `FreshnessBanner` accumule 3 branches non-testées : tone switch fresh/stale (session 44 a ajouté `STALE_AFTER_DAYS = 10`), natural-language phrasing pour past=0 ("MAJ aujourd'hui") et next=0 ("sync imminente") (session 42), French plural rule `!== 1`. Plus le fallback NaN-safe sur date malformée. Une régression sur l'un de ces branches passait CI silencieusement. 8 tests ajoutés dans `tests/FreshnessBanner.test.tsx` (nouveau). · `tests/FreshnessBanner.test.tsx`
+
+### Vérifications à faire en session 62
+
+- [ ] curl -I https://sansdetour.fr/ | grep -i "x-frame-options\|referrer-policy" → présents
+- [ ] Sur iPhone X+ Simulator (PWA standalone), scroller dans `/play` → TopBar reste en-dessous du notch, jamais masqué par lui
+- [ ] `npm run test:run` → 123 tests verts (était 115)

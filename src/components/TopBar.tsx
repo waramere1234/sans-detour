@@ -36,7 +36,14 @@ export function TopBar() {
 
   return (
     <header className="sd-topbar" style={{
-      position: "sticky", top: 0,
+      position: "sticky",
+      // top respects iOS safe-area-inset-top so when the user scrolls and
+      // the bar becomes stuck, it lands BELOW the notch rather than under
+      // it (where the wordmark + ••• would be obscured on iPhone X+ in
+      // standalone PWA mode). body has matching padding-top in index.css
+      // for the pre-scroll layout, so the bar stays consistently below
+      // the notch in both states.
+      top: "env(safe-area-inset-top, 0px)",
       // Above DeckStack cards (z-index 10) and their framer-motion transforms.
       zIndex: 30,
       background: "var(--bg)",
