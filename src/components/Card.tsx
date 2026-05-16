@@ -8,6 +8,7 @@ export interface CardProps {
   scrutin: Scrutin;
   topMost: boolean;       // is this the front card (interactive)?
   onSwipe?: (dir: "left" | "right" | "down") => void;
+  onOpenMethode?: () => void;
 }
 
 const SWIPE_THRESHOLD = 120;
@@ -30,7 +31,7 @@ const FACE_STYLE: React.CSSProperties = {
   WebkitBackfaceVisibility: "hidden",
 };
 
-export function Card({ scrutin, topMost, onSwipe }: CardProps) {
+export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
   const [flipped, setFlipped] = useState(false);
   // Which content shows on the back when flipped: the explanation (default,
   // triggered by tapping the card body) or the structured analyse (triggered

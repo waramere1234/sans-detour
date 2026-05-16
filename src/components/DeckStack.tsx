@@ -5,9 +5,10 @@ import { Card } from "./Card";
 export interface DeckStackProps {
   scrutins: Scrutin[];   // current deck (head = top card)
   onVote: (scrutinId: string, choice: UserVote) => void;
+  onOpenMethode?: () => void;
 }
 
-export function DeckStack({ scrutins, onVote }: DeckStackProps) {
+export function DeckStack({ scrutins, onVote, onOpenMethode }: DeckStackProps) {
   if (scrutins.length === 0) return null;
   const visible = scrutins.slice(0, 3);
 
@@ -39,7 +40,7 @@ export function DeckStack({ scrutins, onVote }: DeckStackProps) {
               pointerEvents: isTop ? "auto" : "none",
             }}
           >
-            <Card scrutin={s} topMost={isTop} onSwipe={(dir) => handleSwipe(s, dir)} />
+            <Card scrutin={s} topMost={isTop} onSwipe={(dir) => handleSwipe(s, dir)} onOpenMethode={isTop ? onOpenMethode : undefined} />
           </div>
         );
       })}
