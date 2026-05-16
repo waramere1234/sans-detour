@@ -1289,3 +1289,25 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] DevTools console sur localhost → essayer `import.meta.env.VITE_SUPABBASE_URL` (typo) ; si VITE_TYPED → tsc devrait flag en build, sinon `undefined` à runtime (validation manuelle)
 - [ ] Mocker un contexte "Concrètement, la loi fait X. Cette mesure…" puis ouvrir Result → AuditTrail bullet doit dire "la loi fait X" (pas ", la loi fait X")
 - [ ] DevTools sur `localhost:5173` → faire un vote → DevTools Network → aucun event `event=vote` envoyé à `plausible.io` (le script peut se charger, mais `track()` no-op)
+
+---
+
+## Session 57 — 2026-05-16
+
+### Vérification session 56
+
+- [VERIFIED] `src/vite-env.d.ts` déclare `ImportMetaEnv` avec `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` typés en `string | undefined`
+- [VERIFIED] `AuditTrail.tsx:152` regex avec `[:,]?` (colon OR comma fallback)
+- [VERIFIED] `analytics.ts:12,16` `ANALYTICS_HOSTS` Set + gate hostname
+
+### Bugs fixés (iOS PWA + coverage + stale doc)
+
+- [FIXED] iOS PWA safe-area · Le manifest déclare `display: "standalone"` et index.html déclare `apple-mobile-web-app-status-bar-style="black-translucent"` (= content sous status bar), mais le viewport n'avait pas `viewport-fit=cover` ni les `env(safe-area-inset-*)` dans CSS. Sur iPhone X+ installé en PWA, TopBar wordmark était caché sous le notch, et le bottom row de boutons Contre/Je passe/Pour passait sous le home indicator. Fix : `viewport-fit=cover` ajouté + 4 paddings `env(safe-area-inset-*, 0)` sur body. Fallback `0` neutralise sur les devices non-notched. · `index.html`, `src/index.css`
+- [FIXED] Coverage gap · `ANALYTICS_HOSTS` gate (session 56) sans test. Un dev qui supprime ou élargit le Set re-pollue le dashboard prod silencieusement (aucun signal CI). Ajout `tests/analytics.test.ts` (7 cas) : prod hostname appelle plausible, www. variant appelle plausible, localhost no-op, *.vercel.app no-op, fork no-op, props envelope shape, no-props case. · `tests/analytics.test.ts` (nouveau)
+- [FIXED] Stale doc · `.env.local.example` note Plausible disait "un build de staging pousserait ses events vers le compte prod" — plus vrai depuis session 56 (le hostname gate empêche). Note réécrite pour refléter la double couche de protection (data-domain hardcoded + ANALYTICS_HOSTS allow-list) et pointer les 2 endroits à éditer si on bascule sur un autre domaine. · `.env.local.example`
+
+### Vérifications à faire en session 58
+
+- [ ] Inspecter `index.html` viewport meta → contient `viewport-fit=cover`
+- [ ] Sur iPhone X+ Simulator (Safari → Add to Home Screen) → ouvrir l'app, vérifier que TopBar/Cover header n'est pas coupé par le notch et que les boutons en bas ne sont pas masqués par le home indicator
+- [ ] `npm run test:run` → 115 tests verts (était 108)

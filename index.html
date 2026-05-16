@@ -2,7 +2,13 @@
 <html lang="fr-FR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- viewport-fit=cover lets content flow under the iOS notch + home
+         indicator when installed as a standalone PWA (manifest declares
+         display=standalone + apple-mobile-web-app-status-bar-style=
+         black-translucent). Paired with the env(safe-area-inset-*) rules
+         in index.css so TopBar, Cover header and the bottom button row
+         keep adequate breathing room on iPhone X+. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Pas les programmes. Les vrais votes." />
     <!-- Canonical points at the prod homepage so Vercel preview deploys
          and any direct /index.html or trailing-slash variants don't get

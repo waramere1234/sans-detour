@@ -59,6 +59,18 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* iOS safe-area on standalone PWAs (iPhone X+) — paired with
+ * viewport-fit=cover in index.html. body padding pushes the whole app
+ * out of the notch + home-indicator strip while leaving the background
+ * (set on html) extending edge-to-edge under them. fallback `0` keeps
+ * non-notched devices identical to before. */
+body {
+  padding-top: env(safe-area-inset-top, 0);
+  padding-right: env(safe-area-inset-right, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-left: env(safe-area-inset-left, 0);
+}
+
 * { box-sizing: border-box; }
 
 /* Focus ring for the flippable Card root. The Card needed an inline
