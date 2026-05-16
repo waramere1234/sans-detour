@@ -125,12 +125,12 @@ Configure les secrets dans GitHub → Settings → Secrets and variables → Act
 
 Une fois en prod, fais une session complète sur ton téléphone (vrai mobile, pas DevTools) :
 - Cover → Commencer
-- 20 swipes (mélange gauche/droite/bas)
-- Result → tester le flip 3D sur une carte (sur la page Result il n'y a pas de cartes, c'est sur Play)
+- 20 swipes (mélange gauche/droite/bas) ; sur une carte au passage, tap pour tester le flip 3D recto/verso
+- Result → "Voir les personnalités" déplie la section figures
 - Test "Continuer à affiner" → revenir sur Play
 - Test "Partager" → vérifier que le SVG share-card s'ouvre (l'endpoint `/api/share-card` retourne `image/svg+xml`)
 - Test "Refaire" → retour à la cover
-- Test footer : Méthode, Mentions légales, Mon résultat
+- Test menu TopBar `•••` (popover) → Méthode & sources, Mentions légales, Mon résultat, Contact (le footer secondary nav a été remplacé par ce menu depuis le commit 5040874)
 
 Si tout marche :
 
@@ -143,4 +143,8 @@ git push --tags
 
 ## Roadmap V2
 
-L'idée du pré-vote sur dossiers à venir est documentée dans [docs/v2-roadmap.md](docs/v2-roadmap.md). À démarrer une fois V1 en prod et premières métriques d'usage en main.
+État des features V2 (cf. [docs/v2-roadmap.md](docs/v2-roadmap.md)) :
+- **P1 — Corpus élargi + thématisation** : ✅ livré (100 scrutins, deck round-robin par thème).
+- **P2 — Personnalités présidentielles** : ✅ livré (8 figures indexées, toggle "Voir les personnalités" sur /result).
+- **P3 — Ton député (code postal → alignement député local)** : à démarrer, ~2 jours de dev, exploite l'infra `votes_personnalites` déjà en place.
+- **Idée parking — pré-vote sur dossiers à venir** : intéressante mais hors scope sprint 2027 ; à reprendre après la présidentielle ou si les métriques V1 montrent une demande de boucle de retour.

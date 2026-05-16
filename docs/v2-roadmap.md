@@ -106,11 +106,7 @@ Distribution : 2 LFI · 1 ECO · 1 SOC · 1 EPR · 1 DR · 1 UDR · 1 RN.
 
 ## Feature 3 — Ton député (à venir)
 
-Champ code postal optionnel sur la cover → ligne d'alignement avec son député local. Quick win qui exploite l'infra individual-votes déjà en place pour la P1.
-
-## Feature 3 — Ton député (à venir)
-
-Champ code postal optionnel sur la cover → ligne d'alignement avec son député local. Quick win qui exploite l'indexation faite en feature 2.
+Champ code postal optionnel sur la cover → ligne d'alignement avec son député local. Quick win qui exploite l'infra individual-votes déjà en place (extension du même pipeline `votes_personnalites` que la feature 2, mais pour TOUS les députés au lieu des 8 personnalités).
 
 ---
 
@@ -189,7 +185,6 @@ La V2 ajoute : *"mes intuitions sont-elles cohérentes avec mes affinités ?"*
 ## Autres idées V2 (à prioriser plus tard)
 
 - **Section "En ce moment à l'AN"** — flux d'actualité des dossiers en cours, indépendant du test d'alignement. Source : page `/dyn/17/dossiers`.
-- **Comparaison avec ton député** — entrer son code postal → savoir comment SON député a voté vs son propre alignement.
 - **Filtrage thématique** — pouvoir refaire le test sur des thèmes (économie / écologie / immigration / etc.) si suffisamment de scrutins par thème.
 - **Historique de session** — voir ses anciens résultats (nécessite Supabase Auth).
 - **Intégration motions de censure** (22 MOC) si on veut élargir la matière. ⚠️ Risque : discrimine surtout "gouvernement vs opposition" plutôt que gauche vs droite. Test à faire avant intégration permanente.

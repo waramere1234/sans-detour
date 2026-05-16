@@ -1311,3 +1311,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Inspecter `index.html` viewport meta → contient `viewport-fit=cover`
 - [ ] Sur iPhone X+ Simulator (Safari → Add to Home Screen) → ouvrir l'app, vérifier que TopBar/Cover header n'est pas coupé par le notch et que les boutons en bas ne sont pas masqués par le home indicator
 - [ ] `npm run test:run` → 115 tests verts (était 108)
+
+---
+
+## Session 58 — 2026-05-17
+
+### Vérification session 57
+
+- [VERIFIED] `index.html:11` `viewport-fit=cover` présent dans le meta viewport
+- [VERIFIED] `src/index.css:68-71` 4 paddings `env(safe-area-inset-*, 0)` sur body
+- [VERIFIED] `tests/analytics.test.ts` existe et tourne (7 cas, 115 tests total)
+- [VERIFIED] `.env.local.example` note Plausible mentionne maintenant l'allow-list `ANALYTICS_HOSTS`
+
+### Bugs fixés (stale docs — 3 doc artifacts)
+
+- [FIXED] `docs/v2-roadmap.md` triple-ref · Heading `## Feature 3 — Ton député (à venir)` dupliqué littéralement lignes 107 et 111 (probable conflit de merge non résolu), + 3e mention "Comparaison avec ton député" ligne 192 dans la section "Autres idées V2" qui décrit exactement la même feature. Cleanup en 2 endroits : 1 seule section Feature 3 enrichie avec la note sur l'infra `votes_personnalites`, suppression du bullet redondant. · `docs/v2-roadmap.md`
+- [FIXED] `SHIP-V1.md §7` smoke test items obsolètes · (a) "Result → tester le flip 3D sur une carte (sur la page Result il n'y a pas de cartes, c'est sur Play)" — sentence qui se contredit elle-même, le flip 3D a lieu sur les cartes Play. Reformulé pour préciser que le tap-pour-flip se fait pendant les 20 swipes. (b) "Test footer : Méthode, Mentions légales, Mon résultat" — le footer secondary nav a été remplacé par le menu TopBar `•••` au commit `5040874`. Reformulé pour pointer vers le popover TopBar + ajout du lien Contact qui existe dans le menu. · `SHIP-V1.md`
+- [FIXED] `SHIP-V1.md §Roadmap V2` description mensongère · "L'idée du pré-vote sur dossiers à venir est documentée dans docs/v2-roadmap.md" — le pré-vote est en réalité dans la section "Idée parking" de v2-roadmap, archivée hors scope sprint 2027. Les vraies V2 features sont P1 (livré) + P2 (livré) + P3 ton député (à venir). SHIP-V1 framing remplacé par un récap d'état des 4 chantiers V2. · `SHIP-V1.md`
+
+### Vérifications à faire en session 59
+
+- [ ] grep `## Feature 3` dans `docs/v2-roadmap.md` → 1 seul résultat
+- [ ] grep `footer.*Mentions légales\|tester le flip 3D sur une carte` dans `SHIP-V1.md` → 0 résultat
+- [ ] grep `pré-vote sur dossiers à venir est documentée` dans `SHIP-V1.md` → 0 résultat (la section parle des 4 chantiers V2 maintenant, pas du parking)
