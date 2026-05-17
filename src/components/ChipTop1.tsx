@@ -1,6 +1,6 @@
 // src/components/ChipTop1.tsx
 import { getParty, getPartyColorVar } from "../lib/parties";
-import type { GroupCode } from "../types";
+import { chipTop1AriaLabel, type GroupCode } from "../types";
 
 export interface ChipTop1Props {
   topGroup: GroupCode;
@@ -18,7 +18,7 @@ export function ChipTop1({ topGroup, pct, onTap }: ChipTop1Props) {
       // tells SR users to expect a popup before they activate — matches the
       // TopBar trigger's `aria-haspopup="menu"` pattern.
       aria-haspopup="dialog"
-      aria-label={`Top 1 actuel : ${getParty(topGroup).name} à ${pct} %. Toucher pour voir le classement complet.`}
+      aria-label={chipTop1AriaLabel(getParty(topGroup).name, pct)}
       style={{
         display: "inline-flex",
         alignItems: "center",

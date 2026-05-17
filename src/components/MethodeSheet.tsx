@@ -2,7 +2,10 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { mailto, ERROR_REPORT_SUBJECT } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
-import { MODAL_CLOSE_LABEL } from "../types";
+import {
+  MODAL_CLOSE_LABEL,
+  METHODESHEET_AN_BLOCK_TITLE, METHODESHEET_CLAUDE_BLOCK_TITLE,
+} from "../types";
 import { useModalA11y } from "../hooks/useModalA11y";
 
 export interface MethodeSheetProps {
@@ -92,12 +95,12 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
               >✕</button>
             </div>
 
-            <Block emoji="📊" title="AN officiel">
+            <Block emoji="📊" title={METHODESHEET_AN_BLOCK_TITLE}>
               Date, numéro, vote des députés, libellé brut du scrutin,
               position des groupes parlementaires.
             </Block>
 
-            <Block emoji="✨" title="Mis en forme par IA Claude">
+            <Block emoji="✨" title={METHODESHEET_CLAUDE_BLOCK_TITLE}>
               <p style={{ margin: "0 0 10px" }}>
                 Le titre court reformulé, les points clés, le résumé, la
                 synthèse du texte officiel.

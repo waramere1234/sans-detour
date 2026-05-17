@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ChipTop1 } from "../src/components/ChipTop1";
+import { chipTop1AriaLabel } from "../src/types";
+import { getParty } from "../src/lib/parties";
 
 // ChipTop1 surfaces the live-score chip on /play once the user crosses
 // MIN_FOR_RANKING. It's the user-visible affordance that opens the
@@ -20,14 +22,16 @@ describe("ChipTop1", () => {
     expect(onTap).toHaveBeenCalledTimes(1);
   });
 
-  it("has an aria-label that includes the full party name and pct", () => {
+  it("has an aria-label that round-trips via chipTop1AriaLabel(name, pct)", () => {
+    // Pin the full template (not just the {name} + {pct} slots) so the
+    // surrounding wording ("Top 1 actuel : …. Toucher pour voir le
+    // classement complet.") can't silently drift between source + tests.
     render(<ChipTop1 topGroup="EPR" pct={55} onTap={vi.fn()} />);
     const btn = screen.getByRole("button");
     expect(btn).toHaveAttribute(
       "aria-label",
-      expect.stringContaining("Ensemble pour la République"),
+      chipTop1AriaLabel(getParty("EPR").name, 55),
     );
-    expect(btn).toHaveAttribute("aria-label", expect.stringContaining("55"));
   });
 
   it("uses type=button (no implicit form submission)", () => {

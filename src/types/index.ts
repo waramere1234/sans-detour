@@ -232,6 +232,32 @@ export const METHODE_SOMMAIRE_NAV_LABEL = "Sommaire de la méthode";
 export const COVER_SOURCE_ATTRIBUTION_AN = "Données AN officielles";
 export const COVER_SOURCE_ATTRIBUTION_CLAUDE = "résumés Claude (IA)";
 
+/** Compose the aria-label for the ChipTop1 "currently #1 — tap for full
+ *  ranking" pill on /play (visible once countedTotal ≥ MIN_FOR_RANKING).
+ *  The previous inline template was `Top 1 actuel : ${name} à ${pct} %.
+ *  Toucher pour voir le classement complet.` and only the {name} + {pct}
+ *  slots were pinned by tests via `.stringContaining(...)` — the
+ *  surrounding wording was unpinned and could silently drift. The helper
+ *  encapsulates the template; round-trip tests assert the full string. */
+export function chipTop1AriaLabel(partyName: string, pct: number): string {
+  return `Top 1 actuel : ${partyName} à ${pct} %. Toucher pour voir le classement complet.`;
+}
+
+/** MethodeSheet bottom-sheet's 2 source-attribution Block titles, paired
+ *  with COVER_SOURCE_ATTRIBUTION_AN/CLAUDE (Cover header). Same IA-vs-AN
+ *  framing — the sheet's 2 emoji-prefixed blocks document what comes from
+ *  the AN open data vs what's reformulated by Claude. Centralised so the
+ *  4-site pair (Cover × 2 + Sheet × 2) stays aligned through reworks. */
+export const METHODESHEET_AN_BLOCK_TITLE = "AN officiel";
+export const METHODESHEET_CLAUDE_BLOCK_TITLE = "Mis en forme par IA Claude";
+
+/** aria-label on the ✨IA chip button inside Card recto (visible when the
+ *  card is topMost + onOpenMethode is provided). The chip opens
+ *  MethodeSheet — the aria-label briefs SR users on what they'll get
+ *  before they activate. Single source site today, no test pins;
+ *  centralising defends against silent rewording. */
+export const CARD_IA_CHIP_ARIA_LABEL = "IA — comment ce contenu a été préparé";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

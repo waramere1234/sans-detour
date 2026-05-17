@@ -5,7 +5,7 @@ import {
   MAX_POINTS_CLES_BULLETS, APP_LOCALE,
   anScrutinViewAriaLabel, DEMO_DATA_LABEL_PREFIX,
   CARD_VERSO_SEPARATOR_LABEL, AN_LINK_VISIBLE_LABEL,
-  CARD_AN_LIBELLE_PREFIX_LABEL,
+  CARD_AN_LIBELLE_PREFIX_LABEL, CARD_IA_CHIP_ARIA_LABEL,
   type Scrutin,
 } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
@@ -133,7 +133,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
                   // aria-haspopup signals to SR users that a popup is coming
                   // — same pattern as ChipTop1 and the TopBar trigger.
                   aria-haspopup="dialog"
-                  aria-label="IA — comment ce contenu a été préparé"
+                  aria-label={CARD_IA_CHIP_ARIA_LABEL}
                   style={{
                     background: "transparent",
                     border: "none",

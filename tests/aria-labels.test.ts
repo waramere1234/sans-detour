@@ -22,6 +22,9 @@ import {
   CARD_AN_LIBELLE_PREFIX_LABEL,
   METHODE_SOMMAIRE_NAV_LABEL,
   COVER_SOURCE_ATTRIBUTION_AN, COVER_SOURCE_ATTRIBUTION_CLAUDE,
+  chipTop1AriaLabel,
+  METHODESHEET_AN_BLOCK_TITLE, METHODESHEET_CLAUDE_BLOCK_TITLE,
+  CARD_IA_CHIP_ARIA_LABEL,
 } from "../src/types";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
@@ -424,6 +427,69 @@ describe("COVER_SOURCE_ATTRIBUTION_AN + _CLAUDE — Cover header source pair", (
     // A future model swap (e.g. Haiku 5) would still keep the brand
     // family name "Claude" — pin it as the load-bearing token.
     expect(COVER_SOURCE_ATTRIBUTION_CLAUDE).toContain("Claude");
+  });
+});
+
+describe("chipTop1AriaLabel — ChipTop1 'currently #1' pill aria-label", () => {
+  // Source had inline template `Top 1 actuel : ${name} à ${pct} %.
+  // Toucher pour voir le classement complet.` and the test only pinned
+  // {name} + {pct} slots via stringContaining — the surrounding wording
+  // ("Top 1 actuel :", "Toucher pour voir…") could silently drift. Helper
+  // + round-trip pin closes the gap.
+  it("composes the canonical 'Top 1 actuel : N à P %. Toucher …' template", () => {
+    expect(chipTop1AriaLabel("Rassemblement National", 57)).toBe(
+      "Top 1 actuel : Rassemblement National à 57 %. Toucher pour voir le classement complet.",
+    );
+  });
+
+  it("interpolates both party name + pct into the template slots", () => {
+    expect(chipTop1AriaLabel("LFI", 42)).toContain("LFI");
+    expect(chipTop1AriaLabel("LFI", 42)).toContain("42");
+  });
+
+  it("starts with 'Top 1 actuel' (SR skim load-bearing prefix)", () => {
+    // The SR user hears this first when the chip is focused — pin the
+    // prefix so a future rewording (e.g. "Tu es aligné à…") is explicit.
+    expect(chipTop1AriaLabel("X", 1).startsWith("Top 1 actuel")).toBe(true);
+  });
+
+  it("ends with the 'Toucher pour voir le classement complet.' action hint", () => {
+    // The chip is a button that opens RankingOverlay; the action hint
+    // tells SR users what activation does. Pin the wording.
+    expect(chipTop1AriaLabel("X", 1).endsWith("Toucher pour voir le classement complet.")).toBe(true);
+  });
+});
+
+describe("METHODESHEET_AN_BLOCK_TITLE + _CLAUDE_BLOCK_TITLE — MethodeSheet AN/Claude block titles", () => {
+  // Paired with COVER_SOURCE_ATTRIBUTION_AN/CLAUDE — same IA-vs-AN
+  // framing across the 2 surfaces (Cover header + MethodeSheet sheet).
+  it("AN block title matches the canonical 'AN officiel' wording", () => {
+    expect(METHODESHEET_AN_BLOCK_TITLE).toBe("AN officiel");
+  });
+
+  it("Claude block title matches the canonical 'Mis en forme par IA Claude' wording", () => {
+    expect(METHODESHEET_CLAUDE_BLOCK_TITLE).toBe("Mis en forme par IA Claude");
+  });
+
+  it("AN title contains 'AN' (source-name pin)", () => {
+    expect(METHODESHEET_AN_BLOCK_TITLE).toContain("AN");
+  });
+
+  it("Claude title contains 'Claude' (model-name pin)", () => {
+    expect(METHODESHEET_CLAUDE_BLOCK_TITLE).toContain("Claude");
+  });
+});
+
+describe("CARD_IA_CHIP_ARIA_LABEL — Card recto ✨IA chip aria-label", () => {
+  it("matches the canonical 'IA — comment ce contenu a été préparé' wording", () => {
+    expect(CARD_IA_CHIP_ARIA_LABEL).toBe("IA — comment ce contenu a été préparé");
+  });
+
+  it("starts with 'IA' (matches the visible button text '✨IA' for SR consistency)", () => {
+    // The chip renders "✨IA" visually (✨ is aria-hidden) — the aria-label
+    // should start with the same token the visible text shows so SR + sighted
+    // users get a consistent anchor word.
+    expect(CARD_IA_CHIP_ARIA_LABEL.startsWith("IA")).toBe(true);
   });
 });
 

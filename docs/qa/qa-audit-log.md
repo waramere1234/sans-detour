@@ -3474,3 +3474,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `CARD_AN_LIBELLE_PREFIX_LABEL\|METHODE_SOMMAIRE_NAV_LABEL\|COVER_SOURCE_ATTRIBUTION_AN\|COVER_SOURCE_ATTRIBUTION_CLAUDE` src/ tests/ → 15+ résultats
 - [ ] grep `"Intitulé officiel AN"\|"Sommaire de la méthode"\|"Données AN officielles"\|"résumés Claude"` src/ tests/ → 4-6 résultats seulement (déclarations + pin-the-value)
 - [ ] grep `~669 tests` CLAUDE.md → 0 résultat (aligné sur ~677)
+
+---
+
+## Session 148 — 2026-05-17
+
+### Vérification session 147
+
+- [VERIFIED] 32 occurrences des 4 nouveaux exports (CARD_AN_LIBELLE_PREFIX_LABEL + METHODE_SOMMAIRE_NAV_LABEL + COVER_SOURCE_ATTRIBUTION_AN/CLAUDE)
+- [VERIFIED] 8 occurrences seulement des 4 strings = 4 déclarations + 4 pin-the-value tests (pas de drift)
+- [VERIFIED] CLAUDE.md "~677 tests"
+- 677/677 tests verts, typecheck clean
+
+### Bugs fixés (chipTop1AriaLabel + METHODESHEET_AN/CLAUDE_BLOCK_TITLE × 2 + CARD_IA_CHIP_ARIA_LABEL)
+
+- [FIXED] ChipTop1.tsx avait un inline template literal `\`Top 1 actuel : ${name} à ${pct} %. Toucher pour voir le classement complet.\`` ; tests/ChipTop1.test.tsx pinnait seulement les slots {name} + {pct} via `stringContaining` (`Ensemble pour la République` + `"55"`). Le wording autour ("Top 1 actuel :", "Toucher pour voir…") était unpinned et pouvait dérive silencieusement · Drift surface : un rewording du template (e.g. drop du "Toucher pour voir" en faveur d'un focus-only hint) passerait tous les tests existants. Fix : export `chipTop1AriaLabel(partyName, pct)` helper depuis src/types. ChipTop1.tsx utilise le helper ; ChipTop1.test.tsx round-trip via `chipTop1AriaLabel(getParty("EPR").name, 55)` au lieu de stringContaining partials. 4 nouveaux tests dans aria-labels.test.ts : full-template pin-the-value, interpolation × 2 slots, startsWith "Top 1 actuel" SR-skim prefix, endsWith "Toucher pour…" action-hint invariant. · `src/types/index.ts`, `src/components/ChipTop1.tsx`, `tests/ChipTop1.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] MethodeSheet.tsx Block titles `"AN officiel"` + `"Mis en forme par IA Claude"` étaient inline en 1 site chacun, sans test pinning · Drift surface : ces 2 titles sont la paired-framing IA-vs-AN du bottom-sheet, parallèle à COVER_SOURCE_ATTRIBUTION_AN/CLAUDE (Cover header) — 4 surfaces totales documentant le même contract de provenance. Sans pin, un rewording côté Sheet pourrait laisser le Cover stale (ou inversement). Fix : export `METHODESHEET_AN_BLOCK_TITLE` + `METHODESHEET_CLAUDE_BLOCK_TITLE`. MethodeSheet utilise les consts. 4 nouveaux tests : pin-the-value × 2 + contains-token-name × 2 (load-bearing "AN" + "Claude"). · `src/types/index.ts`, `src/components/MethodeSheet.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Card.tsx chip IA aria-label `"IA — comment ce contenu a été préparé"` inline en 1 site, sans test pinning · Drift surface : la chip IA est le déclencheur de MethodeSheet et son aria-label briefe les SR users avant qu'ils activent le bottom-sheet. Sans const + test, un rewording silencieux pourrait dérouter les SR users. Fix : export `CARD_IA_CHIP_ARIA_LABEL`. Card.tsx utilise la const. 2 nouveaux tests : pin-the-value + startsWith "IA" (matches the visible "✨IA" button text for SR-vs-sighted anchor-word consistency). · `src/types/index.ts`, `src/components/Card.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 149
+
+- [ ] grep `chipTop1AriaLabel\|METHODESHEET_AN_BLOCK_TITLE\|METHODESHEET_CLAUDE_BLOCK_TITLE\|CARD_IA_CHIP_ARIA_LABEL` src/ tests/ → 15+ résultats
+- [ ] grep `"Top 1 actuel"\|"AN officiel"\|"Mis en forme par IA Claude"\|"IA — comment ce contenu"` src/ tests/ → 4-6 résultats seulement (déclarations + pin-the-value)
+- [ ] grep `~677 tests` CLAUDE.md → 0 résultat (aligné sur ~687)
