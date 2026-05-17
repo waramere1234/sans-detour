@@ -45,6 +45,13 @@ import {
   AN_LINK_SHORT_LABEL,
   NOSCRIPT_HEADING, NOSCRIPT_MESSAGE,
   ROUTE_LOADER_LABEL,
+  CARD_ANALYSE_TITLE_MESURES, CARD_ANALYSE_TITLE_CALENDRIER, CARD_ANALYSE_TITLE_EXCEPTIONS,
+  CARD_ANALYSE_CONCERNES_HEADER,
+  CARD_ANALYSE_CONCERNES_POSITIFS, CARD_ANALYSE_CONCERNES_NEGATIFS, CARD_ANALYSE_CONCERNES_NEUTRES,
+  METHODE_S07_HEADING_CE_QUE_FAIT_CLAUDE,
+  METHODE_S07_HEADING_CE_QU_IL_NE_FAIT_PAS,
+  METHODE_S07_HEADING_CADRE_BIAIS,
+  METHODE_S07_HEADING_LIMITES_SIGNALEMENT,
   LEGISLATURE_LABEL,
 } from "../src/types";
 import { VOTE_FEEDBACK_LABELS } from "../src/lib/vote-feedback";
@@ -1116,6 +1123,96 @@ describe("ROUTE_LOADER_LABEL — main.tsx <Suspense> placeholder", () => {
     // but the codepoint differs — pin the contract.
     expect(ROUTE_LOADER_LABEL).toContain("…");
     expect(ROUTE_LOADER_LABEL).not.toContain("...");
+  });
+});
+
+describe("CARD_ANALYSE_TITLE_* — Card verso ColoredSection titles", () => {
+  // The 3 titles label the 3 scalar-field analyse lists (mesures /
+  // calendrier / exceptions) on the unified verso. A rewording would
+  // change the visible section headers — pin them.
+  it("MESURES matches 'Mesures'", () => {
+    expect(CARD_ANALYSE_TITLE_MESURES).toBe("Mesures");
+  });
+
+  it("CALENDRIER matches 'Calendrier'", () => {
+    expect(CARD_ANALYSE_TITLE_CALENDRIER).toBe("Calendrier");
+  });
+
+  it("EXCEPTIONS matches 'Exceptions'", () => {
+    expect(CARD_ANALYSE_TITLE_EXCEPTIONS).toBe("Exceptions");
+  });
+
+  it("the 3 titles are distinct + each starts with a capital letter", () => {
+    const titles = [
+      CARD_ANALYSE_TITLE_MESURES, CARD_ANALYSE_TITLE_CALENDRIER, CARD_ANALYSE_TITLE_EXCEPTIONS,
+    ];
+    expect(new Set(titles).size).toBe(3);
+    for (const t of titles) expect(t[0]).toBe(t[0].toUpperCase());
+  });
+});
+
+describe("CARD_ANALYSE_CONCERNES_* — Card verso 'Qui est concerné' section", () => {
+  // Header + 3 sub-list labels for the positifs/negatifs/neutres
+  // impact groups. The 3 sub-labels are action-verbs ("Bénéficient" /
+  // "Contraints" / "À surveiller") — SR reads them as effect-on-group
+  // rather than mere group labels.
+  it("HEADER matches 'Qui est concerné'", () => {
+    expect(CARD_ANALYSE_CONCERNES_HEADER).toBe("Qui est concerné");
+  });
+
+  it("POSITIFS matches 'Bénéficient' (action-verb form)", () => {
+    expect(CARD_ANALYSE_CONCERNES_POSITIFS).toBe("Bénéficient");
+  });
+
+  it("NEGATIFS matches 'Contraints'", () => {
+    expect(CARD_ANALYSE_CONCERNES_NEGATIFS).toBe("Contraints");
+  });
+
+  it("NEUTRES matches 'À surveiller'", () => {
+    expect(CARD_ANALYSE_CONCERNES_NEUTRES).toBe("À surveiller");
+  });
+
+  it("the 3 sub-labels are distinct (anti-clone — different semantic per group)", () => {
+    const labels = [
+      CARD_ANALYSE_CONCERNES_POSITIFS,
+      CARD_ANALYSE_CONCERNES_NEGATIFS,
+      CARD_ANALYSE_CONCERNES_NEUTRES,
+    ];
+    expect(new Set(labels).size).toBe(3);
+  });
+});
+
+describe("METHODE_S07_HEADING_* — Methode §07 IA Claude sub-headings", () => {
+  // 4 strong-tagged sub-headings opening paragraphs in §07. Documents
+  // the IA-transparency framing — what Claude does / doesn't do / how
+  // bias is framed / limits + reporting.
+  it("CE_QUE_FAIT_CLAUDE matches 'Ce que fait Claude.'", () => {
+    expect(METHODE_S07_HEADING_CE_QUE_FAIT_CLAUDE).toBe("Ce que fait Claude.");
+  });
+
+  it("CE_QU_IL_NE_FAIT_PAS matches \"Ce qu'il ne fait pas.\"", () => {
+    expect(METHODE_S07_HEADING_CE_QU_IL_NE_FAIT_PAS).toBe("Ce qu'il ne fait pas.");
+  });
+
+  it("CADRE_BIAIS matches 'Comment on cadre les biais.'", () => {
+    expect(METHODE_S07_HEADING_CADRE_BIAIS).toBe("Comment on cadre les biais.");
+  });
+
+  it("LIMITES_SIGNALEMENT matches 'Limites & signalement.'", () => {
+    expect(METHODE_S07_HEADING_LIMITES_SIGNALEMENT).toBe("Limites & signalement.");
+  });
+
+  it("each heading ends with a period (sub-heading punctuation convention)", () => {
+    // The 4 sub-headings open paragraphs with the strong-period style
+    // ("**Heading.** Body…"). A regression that drops the period
+    // visually merges the heading into the body.
+    const all = [
+      METHODE_S07_HEADING_CE_QUE_FAIT_CLAUDE,
+      METHODE_S07_HEADING_CE_QU_IL_NE_FAIT_PAS,
+      METHODE_S07_HEADING_CADRE_BIAIS,
+      METHODE_S07_HEADING_LIMITES_SIGNALEMENT,
+    ];
+    for (const h of all) expect(h.endsWith(".")).toBe(true);
   });
 });
 

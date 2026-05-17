@@ -6,6 +6,9 @@ import {
   anScrutinViewAriaLabel, DEMO_DATA_LABEL_PREFIX, DEMO_FALLBACK_SHORT_LABEL,
   CARD_VERSO_SEPARATOR_LABEL, AN_LINK_VISIBLE_LABEL,
   CARD_AN_LIBELLE_PREFIX_LABEL, CARD_IA_CHIP_ARIA_LABEL,
+  CARD_ANALYSE_TITLE_MESURES, CARD_ANALYSE_TITLE_CALENDRIER, CARD_ANALYSE_TITLE_EXCEPTIONS,
+  CARD_ANALYSE_CONCERNES_HEADER,
+  CARD_ANALYSE_CONCERNES_POSITIFS, CARD_ANALYSE_CONCERNES_NEGATIFS, CARD_ANALYSE_CONCERNES_NEUTRES,
   type Scrutin,
 } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
@@ -240,14 +243,14 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
           {/* Analyse détaillée — rendue uniquement si analyse_loi présent */}
           {scrutin.analyse_loi && (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <ColoredSection accent="var(--accent)" title="Mesures" bullets={scrutin.analyse_loi.mesures_principales} />
+              <ColoredSection accent="var(--accent)" title={CARD_ANALYSE_TITLE_MESURES} bullets={scrutin.analyse_loi.mesures_principales} />
               <ColoredImpact
                 positifs={scrutin.analyse_loi.concernes_positifs}
                 negatifs={scrutin.analyse_loi.concernes_negatifs}
                 neutres={scrutin.analyse_loi.concernes_neutres}
               />
-              <ColoredSection accent="var(--warn)" title="Calendrier" bullets={scrutin.analyse_loi.calendrier} />
-              <ColoredSection accent="var(--ink-3)" title="Exceptions" bullets={scrutin.analyse_loi.exceptions} />
+              <ColoredSection accent="var(--warn)" title={CARD_ANALYSE_TITLE_CALENDRIER} bullets={scrutin.analyse_loi.calendrier} />
+              <ColoredSection accent="var(--ink-3)" title={CARD_ANALYSE_TITLE_EXCEPTIONS} bullets={scrutin.analyse_loi.exceptions} />
             </div>
           )}
 
@@ -352,16 +355,16 @@ function ColoredImpact({
         fontFamily: "var(--font-mono)", fontSize: 10,
         letterSpacing: "0.14em", textTransform: "uppercase",
         color: "var(--ink-3)", fontWeight: 600,
-      }}>Qui est concerné</span>
+      }}>{CARD_ANALYSE_CONCERNES_HEADER}</span>
 
       {positifs.length > 0 && (
-        <ColoredSubList accent="var(--pour)" label="Bénéficient" bullets={positifs} />
+        <ColoredSubList accent="var(--pour)" label={CARD_ANALYSE_CONCERNES_POSITIFS} bullets={positifs} />
       )}
       {negatifs.length > 0 && (
-        <ColoredSubList accent="var(--contre)" label="Contraints" bullets={negatifs} />
+        <ColoredSubList accent="var(--contre)" label={CARD_ANALYSE_CONCERNES_NEGATIFS} bullets={negatifs} />
       )}
       {neutres.length > 0 && (
-        <ColoredSubList accent="var(--ink-3)" label="À surveiller" bullets={neutres} />
+        <ColoredSubList accent="var(--ink-3)" label={CARD_ANALYSE_CONCERNES_NEUTRES} bullets={neutres} />
       )}
     </div>
   );

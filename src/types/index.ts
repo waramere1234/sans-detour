@@ -551,6 +551,34 @@ export const NOSCRIPT_MESSAGE = "Sans Détour calcule ton alignement politique l
  *  loading aria-labels; this is the route-level chunk-loading placeholder. */
 export const ROUTE_LOADER_LABEL = "Chargement…";
 
+/** Card verso analyse_loi ColoredSection titles — render above the 3
+ *  scalar-field analyse lists (mesures_principales / calendrier /
+ *  exceptions). Each title is the user-visible header for its
+ *  ScrutinAnalyse field on the unified verso. Centralising lets a
+ *  future rewording propagate to source + would-be-tests in one edit. */
+export const CARD_ANALYSE_TITLE_MESURES = "Mesures";
+export const CARD_ANALYSE_TITLE_CALENDRIER = "Calendrier";
+export const CARD_ANALYSE_TITLE_EXCEPTIONS = "Exceptions";
+
+/** Card verso "Qui est concerné" section — header + 3 sub-list labels
+ *  for the positifs / negatifs / neutres impact groups. The 3 sub-list
+ *  labels are intentionally action-verbs (not descriptive nouns) so the
+ *  SR reads "Bénéficient: …" / "Contraints: …" — telling the user what
+ *  happens to each group, not just labeling the group. */
+export const CARD_ANALYSE_CONCERNES_HEADER = "Qui est concerné";
+export const CARD_ANALYSE_CONCERNES_POSITIFS = "Bénéficient";
+export const CARD_ANALYSE_CONCERNES_NEGATIFS = "Contraints";
+export const CARD_ANALYSE_CONCERNES_NEUTRES = "À surveiller";
+
+/** Methode §07 IA Claude section — 4 strong-tagged sub-headings that
+ *  open paragraphs and 1 closing-tag standalone strong phrase. Pinned
+ *  via consts so a rewording of the IA-transparency framing propagates
+ *  to the prose + (eventually) tests in lockstep. */
+export const METHODE_S07_HEADING_CE_QUE_FAIT_CLAUDE = "Ce que fait Claude.";
+export const METHODE_S07_HEADING_CE_QU_IL_NE_FAIT_PAS = "Ce qu'il ne fait pas.";
+export const METHODE_S07_HEADING_CADRE_BIAIS = "Comment on cadre les biais.";
+export const METHODE_S07_HEADING_LIMITES_SIGNALEMENT = "Limites & signalement.";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

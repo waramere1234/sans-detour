@@ -3757,3 +3757,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `AN_LINK_SHORT_LABEL\|NOSCRIPT_HEADING\|NOSCRIPT_MESSAGE\|ROUTE_LOADER_LABEL` src/ tests/ → 15+ résultats
 - [ ] grep `>AN ↗<\|>Chargement…<\|"JavaScript requis"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~775 tests` CLAUDE.md → 0 résultat (aligné sur ~786)
+
+---
+
+## Session 160 — 2026-05-17 (milestone : 800 tests reached)
+
+### Vérification session 159
+
+- [VERIFIED] 35 occurrences des 4 nouveaux exports (AN_LINK_SHORT_LABEL + NOSCRIPT_HEADING + NOSCRIPT_MESSAGE + ROUTE_LOADER_LABEL)
+- [VERIFIED] 2 occurrences seulement de "JavaScript requis" = 1 déclaration + 1 pin-the-value test ; 0 inline `>AN ↗<` ou `>Chargement…<` (tous migrés)
+- [VERIFIED] CLAUDE.md "~786 tests"
+- 786/786 tests verts, typecheck clean
+
+### Bugs fixés (Card analyse ColoredSection titles × 3 + Card analyse Concernés × 4 + Methode §07 strong sub-headings × 4)
+
+- [FIXED] Card.tsx verso analyse_loi ColoredSection titles `"Mesures"`, `"Calendrier"`, `"Exceptions"` inline + untested · Drift surface : 3 visible section headers map aux 3 ScrutinAnalyse scalar fields (mesures_principales / calendrier / exceptions). Sans pin, un rewording silencieux changerait les headers visibles. Fix : export `CARD_ANALYSE_TITLE_MESURES` + `_CALENDRIER` + `_EXCEPTIONS`. Card utilise les 3 consts comme `title=` prop. 4 nouveaux tests dans aria-labels.test.ts : pin-the-value × 3, distinct-set + starts-with-capital invariant. · `src/types/index.ts`, `src/components/Card.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Card.tsx verso "Qui est concerné" section : header inline + 3 ColoredSubList labels (`"Bénéficient"`, `"Contraints"`, `"À surveiller"`) inline + untested · Drift surface : 4 sites in-source (1 header + 3 sub-labels). Les 3 sub-labels sont action-verbs (pas descriptive nouns) — un regression vers nouns ("Bénéficiaires" / "Concernés") changerait le SR "effect-on-group" framing. Fix : export `CARD_ANALYSE_CONCERNES_HEADER` + `_POSITIFS` + `_NEGATIFS` + `_NEUTRES`. Card utilise les 4 consts. 5 nouveaux tests : pin-the-value × 4 + distinct-set anti-clone. · `src/types/index.ts`, `src/components/Card.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode.tsx §07 IA Claude section : 4 strong-tagged sub-headings (`"Ce que fait Claude."`, `"Ce qu'il ne fait pas."`, `"Comment on cadre les biais."`, `"Limites & signalement."`) inline + untested · Drift surface : ces 4 sub-headings documentent le framing IA-transparency core (what Claude does / doesn't do / how bias is framed / limits + reporting). Un rewording silencieux affaibrait la transparence IA. Fix : export `METHODE_S07_HEADING_CE_QUE_FAIT_CLAUDE` + `_CE_QU_IL_NE_FAIT_PAS` + `_CADRE_BIAIS` + `_LIMITES_SIGNALEMENT`. Methode.tsx utilise les 4 consts. 5 nouveaux tests : pin-the-value × 4 + each-ends-with-period sub-heading-punctuation convention. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 161
+
+- [ ] grep `CARD_ANALYSE_TITLE_MESURES\|CARD_ANALYSE_CONCERNES_HEADER\|METHODE_S07_HEADING_CE_QUE_FAIT_CLAUDE` src/ tests/ → 9+ résultats (chaque const × 3 sites typiques)
+- [ ] grep `"Mesures"\|"Bénéficient"\|"Ce que fait Claude."` src/ tests/ → 3-6 résultats (déclarations + pin-the-value)
+- [ ] grep `~786 tests` CLAUDE.md → 0 résultat (aligné sur ~800)
