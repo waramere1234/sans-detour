@@ -3711,3 +3711,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `PLAY_DECK_EXHAUSTED_MESSAGE\|PLAY_EMPTY_POOL_MESSAGE\|COVER_HERO_PARAGRAPH` src/ tests/ → 10+ résultats
 - [ ] grep `"Plus de scrutins disponibles à voter"\|"Aucun scrutin disponible pour"\|"Découvre avec quels partis"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~758 tests` CLAUDE.md → 0 résultat (aligné sur ~766)
+
+---
+
+## Session 158 — 2026-05-17
+
+### Vérification session 157
+
+- [VERIFIED] 25 occurrences des 3 nouveaux exports (PLAY_DECK_EXHAUSTED_MESSAGE + PLAY_EMPTY_POOL_MESSAGE + COVER_HERO_PARAGRAPH)
+- [VERIFIED] 0 inline literal matches restants (tous migrés vers consts)
+- [VERIFIED] CLAUDE.md "~766 tests"
+- 766/766 tests verts, typecheck clean
+
+### Bugs fixés (CARD_FLIP_ROLE_DESCRIPTION + cardAriaLabel + VOTE_FEEDBACK_LABELS)
+
+- [FIXED] useFlipCardA11y `aria-roledescription = "carte de scrutin — glissez ou utilisez les flèches pour voter"` inline + untested · Drift surface : c'est ce que les SR users entendent en première quand ils atteignent une carte du deck — il brief les 2 modes d'interaction (swipe + flèches). Sans pin, un rewording silencieux pourrait drop "flèches" et donc le hint clavier. Fix : export `CARD_FLIP_ROLE_DESCRIPTION` depuis src/types. useFlipCardA11y utilise la const. 2 nouveaux tests dans aria-labels.test.ts : pin-the-value, contains "glissez" + "flèches" both-interaction-modes invariant. · `src/types/index.ts`, `src/hooks/useFlipCardA11y.ts`, `tests/aria-labels.test.ts`
+- [FIXED] useFlipCardA11y aria-label inline template `\`Scrutin n°${scrutin.numero} : ${scrutin.titre_pedago}\`` + tests/Card.test.tsx pinnait seulement le numero via `.stringContaining("1234")` partial-match · Drift surface : le surrounding wording "Scrutin n°…" + " : " + le titre_pedago étaient unpinned. Fix : export `cardAriaLabel(numero, titrePedago)` helper depuis src/types. useFlipCardA11y utilise le helper ; Card.test.tsx round-trip via `cardAriaLabel(scrutin.numero, scrutin.titre_pedago)` (full-template match). 2 nouveaux tests : full-template pin, interpolation slots × 2. · `src/types/index.ts`, `src/hooks/useFlipCardA11y.ts`, `tests/Card.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] vote-feedback.ts `LABELS` Record était file-local + 3 test literals dans tests/vote-feedback.test.ts pinnait chacun ("Voté pour. Carte suivante.", "Voté contre. Carte suivante.", "Passé. Carte suivante.") · Drift surface : 3 in-lockstep sites (1 source map literal + 3 test literals per choice). Fix : export `VOTE_FEEDBACK_LABELS` Record depuis vote-feedback.ts. Tests round-trip via `VOTE_FEEDBACK_LABELS.pour/contre/skip`. 5 nouveaux tests : pin-the-value × 3, distinct-set anti-clone, common-suffix "Carte suivante." SR-consistency invariant. · `src/lib/vote-feedback.ts`, `tests/vote-feedback.test.ts`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 159
+
+- [ ] grep `CARD_FLIP_ROLE_DESCRIPTION\|cardAriaLabel\|VOTE_FEEDBACK_LABELS` src/ tests/ → 15+ résultats
+- [ ] grep `"carte de scrutin — glissez"\|"Voté pour. Carte suivante"\|"Voté contre. Carte suivante"\|"Passé. Carte suivante"` src/ tests/ → 4-6 résultats (déclarations + pin-the-value)
+- [ ] grep `~766 tests` CLAUDE.md → 0 résultat (aligné sur ~775)

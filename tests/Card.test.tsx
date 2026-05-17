@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { Card } from "../src/components/Card";
 import {
   CARD_VERSO_SEPARATOR_LABEL, CARD_AN_LIBELLE_PREFIX_LABEL,
+  cardAriaLabel,
   type Scrutin,
 } from "../src/types";
 
@@ -30,10 +31,14 @@ describe("Card a11y", () => {
     expect(screen.getAllByText(/Hausse de la taxe carbone/).length).toBeGreaterThan(0);
   });
 
-  it("has role=article and aria-label including scrutin numero", () => {
-    render(<Card scrutin={mkScrutin()} topMost={true} />);
+  it("has role=article and aria-label that round-trips via cardAriaLabel(numero, titre)", () => {
+    const scrutin = mkScrutin();
+    render(<Card scrutin={scrutin} topMost={true} />);
     const card = screen.getByRole("article");
-    expect(card).toHaveAttribute("aria-label", expect.stringContaining("1234"));
+    // Full-template round-trip (previously only the numero "1234" was
+    // pinned via .stringContaining — the surrounding wording "Scrutin
+    // n°N :" + the titre_pedago were unpinned).
+    expect(card).toHaveAttribute("aria-label", cardAriaLabel(scrutin.numero, scrutin.titre_pedago));
   });
 
   it("is tabbable when topMost, not tabbable otherwise", () => {

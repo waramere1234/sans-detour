@@ -510,6 +510,24 @@ export const PLAY_EMPTY_POOL_MESSAGE = "Aucun scrutin disponible pour le moment.
  *  rewording surface in tests. */
 export const COVER_HERO_PARAGRAPH = "Découvre avec quels partis tu es vraiment aligné. On ne regarde pas les programmes — on regarde ce que les députés ont effectivement voté à l'Assemblée Nationale.";
 
+/** aria-roledescription applied by useFlipCardA11y to every Card root.
+ *  This is what SR users hear when they reach a card in the deck —
+ *  it briefs them on the 2 interaction modes (swipe + arrow keys) so
+ *  keyboard users learn the shortcuts. Without "ou flèches", the
+ *  description would suggest touch-only and keyboard users would Tab
+ *  past without trying. Untested today; centralising defends. */
+export const CARD_FLIP_ROLE_DESCRIPTION =
+  "carte de scrutin — glissez ou utilisez les flèches pour voter";
+
+/** Compose the Card aria-label rendered by useFlipCardA11y: "Scrutin
+ *  n°{N} : {titre_pedago}". Previously inline template + pinned by
+ *  `.stringContaining(numero)` partial-match — the surrounding wording
+ *  ("Scrutin n°…", " : ") was unpinned. Helper enables a full round-
+ *  trip test of the template. */
+export function cardAriaLabel(numero: number, titrePedago: string): string {
+  return `Scrutin n°${numero} : ${titrePedago}`;
+}
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

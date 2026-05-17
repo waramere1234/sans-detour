@@ -1,5 +1,8 @@
 import { useCallback, type KeyboardEvent } from "react";
-import type { Scrutin } from "../types";
+import {
+  CARD_FLIP_ROLE_DESCRIPTION, cardAriaLabel,
+  type Scrutin,
+} from "../types";
 
 export interface UseFlipCardA11yArgs {
   flipped: boolean;
@@ -51,8 +54,8 @@ export function useFlipCardA11y({
       // Mention both interaction modes so keyboard users learn the
       // shortcuts. Without "ou flèches" the role description suggests
       // touch-only and keyboard users would Tab past without trying.
-      "aria-roledescription": "carte de scrutin — glissez ou utilisez les flèches pour voter",
-      "aria-label": `Scrutin n°${scrutin.numero} : ${scrutin.titre_pedago}`,
+      "aria-roledescription": CARD_FLIP_ROLE_DESCRIPTION,
+      "aria-label": cardAriaLabel(scrutin.numero, scrutin.titre_pedago),
       tabIndex: topMost ? 0 : -1,
       onKeyDown,
     },

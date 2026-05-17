@@ -13,7 +13,11 @@
 
 import type { UserVote } from "../types";
 
-const LABELS: Record<UserVote, string> = {
+/** Aria-live announcement labels per vote choice. Exported so tests
+ *  round-trip via `VOTE_FEEDBACK_VOTE_FEEDBACK_LABELS[choice]` instead of re-typing
+ *  the literal "Voté pour. Carte suivante." 3 times in lockstep with
+ *  the source map. A future rewording propagates from one edit. */
+export const VOTE_FEEDBACK_LABELS: Record<UserVote, string> = {
   pour: "Voté pour. Carte suivante.",
   contre: "Voté contre. Carte suivante.",
   skip: "Passé. Carte suivante.",
@@ -27,12 +31,12 @@ export const ZWSP = "​";
  *  user choice. The output ends with a ZWSP iff the previous label did
  *  NOT — alternating the trailing space so the string always differs. */
 export function nextVoteLabel(prev: string, choice: UserVote): string {
-  return LABELS[choice] + (prev.endsWith(ZWSP) ? "" : ZWSP);
+  return VOTE_FEEDBACK_LABELS[choice] + (prev.endsWith(ZWSP) ? "" : ZWSP);
 }
 
 /** The base label for a given choice without the alternation marker.
  *  Exported for tests / documentation; production code should call
  *  `nextVoteLabel(prev, choice)` so the alternation kicks in. */
 export function voteLabel(choice: UserVote): string {
-  return LABELS[choice];
+  return VOTE_FEEDBACK_LABELS[choice];
 }

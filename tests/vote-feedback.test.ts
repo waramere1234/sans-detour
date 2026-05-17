@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { nextVoteLabel, voteLabel, ZWSP } from "../src/lib/vote-feedback";
+import { nextVoteLabel, voteLabel, ZWSP, VOTE_FEEDBACK_LABELS } from "../src/lib/vote-feedback";
 
 // src/lib/vote-feedback.ts owns the aria-live vote-announcement composition
 // pulled out of Play.tsx. Two invariants matter:
@@ -10,31 +10,44 @@ import { nextVoteLabel, voteLabel, ZWSP } from "../src/lib/vote-feedback";
 //     identical consecutive votes (without it, two "Pour" in a row reads
 //     once because the string didn't change)
 
-describe("voteLabel — base French phrasing per choice", () => {
-  it("pour → 'Voté pour. Carte suivante.'", () => {
-    expect(voteLabel("pour")).toBe("Voté pour. Carte suivante.");
+describe("voteLabel — base French phrasing per choice (round-trip via VOTE_FEEDBACK_LABELS)", () => {
+  it("pour → VOTE_FEEDBACK_LABELS.pour", () => {
+    expect(voteLabel("pour")).toBe(VOTE_FEEDBACK_LABELS.pour);
+    expect(VOTE_FEEDBACK_LABELS.pour).toBe("Voté pour. Carte suivante.");
   });
 
-  it("contre → 'Voté contre. Carte suivante.'", () => {
-    expect(voteLabel("contre")).toBe("Voté contre. Carte suivante.");
+  it("contre → VOTE_FEEDBACK_LABELS.contre", () => {
+    expect(voteLabel("contre")).toBe(VOTE_FEEDBACK_LABELS.contre);
+    expect(VOTE_FEEDBACK_LABELS.contre).toBe("Voté contre. Carte suivante.");
   });
 
-  it("skip → 'Passé. Carte suivante.'", () => {
-    expect(voteLabel("skip")).toBe("Passé. Carte suivante.");
+  it("skip → VOTE_FEEDBACK_LABELS.skip", () => {
+    expect(voteLabel("skip")).toBe(VOTE_FEEDBACK_LABELS.skip);
+    expect(VOTE_FEEDBACK_LABELS.skip).toBe("Passé. Carte suivante.");
+  });
+
+  it("all 3 labels end with 'Carte suivante.' (consistent SR feedback closer)", () => {
+    // Pin the contract: each vote announcement ends with the same
+    // "next card incoming" hint. A future divergence (e.g. dropping
+    // "Carte suivante." on skip) would change the SR experience
+    // unevenly across vote types.
+    expect(VOTE_FEEDBACK_LABELS.pour.endsWith("Carte suivante.")).toBe(true);
+    expect(VOTE_FEEDBACK_LABELS.contre.endsWith("Carte suivante.")).toBe(true);
+    expect(VOTE_FEEDBACK_LABELS.skip.endsWith("Carte suivante.")).toBe(true);
   });
 });
 
 describe("nextVoteLabel — zero-width-space alternation", () => {
   it("appends ZWSP on the first call (prev is empty string)", () => {
     const out = nextVoteLabel("", "pour");
-    expect(out).toBe("Voté pour. Carte suivante." + ZWSP);
+    expect(out).toBe(VOTE_FEEDBACK_LABELS.pour + ZWSP);
     expect(out.endsWith(ZWSP)).toBe(true);
   });
 
   it("strips ZWSP when prev already ended with one (alternation)", () => {
     const first = nextVoteLabel("", "pour"); // ends with ZWSP
     const second = nextVoteLabel(first, "pour"); // identical choice
-    expect(second).toBe("Voté pour. Carte suivante."); // no trailing ZWSP
+    expect(second).toBe(VOTE_FEEDBACK_LABELS.pour); // no trailing ZWSP
     expect(second).not.toBe(first); // string still mutated → aria-live re-announces
   });
 
@@ -57,7 +70,7 @@ describe("nextVoteLabel — zero-width-space alternation", () => {
     expect(pourEndZWSP.endsWith(ZWSP)).toBe(true);
     const contreNoZWSP = nextVoteLabel(pourEndZWSP, "contre");
     expect(contreNoZWSP.endsWith(ZWSP)).toBe(false);
-    expect(contreNoZWSP).toBe("Voté contre. Carte suivante.");
+    expect(contreNoZWSP).toBe(VOTE_FEEDBACK_LABELS.contre);
   });
 
   it("every consecutive call produces a string different from its predecessor", () => {

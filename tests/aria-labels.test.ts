@@ -41,8 +41,10 @@ import {
   TOPBAR_VERSION_LABEL,
   PLAY_DECK_EXHAUSTED_MESSAGE, PLAY_EMPTY_POOL_MESSAGE,
   COVER_HERO_PARAGRAPH,
+  CARD_FLIP_ROLE_DESCRIPTION, cardAriaLabel,
   LEGISLATURE_LABEL,
 } from "../src/types";
+import { VOTE_FEEDBACK_LABELS } from "../src/lib/vote-feedback";
 import { RETRY_DEFAULT_LABEL } from "../src/components/RetryError";
 import { freshnessTotalScrutinsPhrase } from "../src/components/FreshnessBanner";
 
@@ -1003,6 +1005,57 @@ describe("COVER_HERO_PARAGRAPH — Cover.tsx hero <p> value-prop explainer", () 
 
   it("contains 'Assemblée Nationale' (source attribution)", () => {
     expect(COVER_HERO_PARAGRAPH).toContain("Assemblée Nationale");
+  });
+});
+
+describe("CARD_FLIP_ROLE_DESCRIPTION + cardAriaLabel — useFlipCardA11y SR plumbing", () => {
+  // aria-roledescription briefs SR users on the 2 interaction modes
+  // (swipe + arrow keys). aria-label labels the card by its number
+  // + pedagogical title. Both untested today.
+  it("CARD_FLIP_ROLE_DESCRIPTION matches the canonical wording", () => {
+    expect(CARD_FLIP_ROLE_DESCRIPTION).toBe(
+      "carte de scrutin — glissez ou utilisez les flèches pour voter",
+    );
+  });
+
+  it("CARD_FLIP_ROLE_DESCRIPTION mentions both interaction modes (touch + keyboard)", () => {
+    // The whole point of the description is that keyboard users learn
+    // the shortcut exists. If a future rewording drops "flèches", the
+    // keyboard-shortcut hint disappears.
+    expect(CARD_FLIP_ROLE_DESCRIPTION).toContain("glissez");
+    expect(CARD_FLIP_ROLE_DESCRIPTION).toContain("flèches");
+  });
+
+  it("cardAriaLabel composes 'Scrutin n°N : titre' template", () => {
+    expect(cardAriaLabel(1234, "Hausse de la taxe carbone")).toBe(
+      "Scrutin n°1234 : Hausse de la taxe carbone",
+    );
+  });
+
+  it("cardAriaLabel interpolates both slots (numero + titre)", () => {
+    expect(cardAriaLabel(42, "Vote test")).toContain("n°42");
+    expect(cardAriaLabel(42, "Vote test")).toContain("Vote test");
+  });
+});
+
+describe("VOTE_FEEDBACK_LABELS — Play.tsx aria-live announcements per vote", () => {
+  // 3 file-local label literals previously duplicated in 3 test pins
+  // for voteLabel(). Now centralised — tests round-trip via the const.
+  it("pour matches 'Voté pour. Carte suivante.'", () => {
+    expect(VOTE_FEEDBACK_LABELS.pour).toBe("Voté pour. Carte suivante.");
+  });
+
+  it("contre matches 'Voté contre. Carte suivante.'", () => {
+    expect(VOTE_FEEDBACK_LABELS.contre).toBe("Voté contre. Carte suivante.");
+  });
+
+  it("skip matches 'Passé. Carte suivante.'", () => {
+    expect(VOTE_FEEDBACK_LABELS.skip).toBe("Passé. Carte suivante.");
+  });
+
+  it("the 3 labels are distinct (anti-clone)", () => {
+    const set = new Set(Object.values(VOTE_FEEDBACK_LABELS));
+    expect(set.size).toBe(3);
   });
 });
 
