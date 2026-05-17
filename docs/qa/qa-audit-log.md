@@ -3376,3 +3376,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `refaireConfirmMessage\|RANKING_OVERLAY_LABEL\|MODAL_CLOSE_LABEL` src/ tests/ → 15+ résultats
 - [ ] grep `"Classement partiel"\|>Fermer<\|aria-label="Fermer"\|"Tes .* votes et ton résultat"` src/ tests/ → 1-3 résultats seulement (déclarations dans src/types)
 - [ ] grep `~646 tests` CLAUDE.md → 0 résultat (aligné sur ~654)
+
+---
+
+## Session 144 — 2026-05-17
+
+### Vérification session 143
+
+- [VERIFIED] 39 occurrences de refaireConfirmMessage|RANKING_OVERLAY_LABEL|MODAL_CLOSE_LABEL dans src/ + tests/
+- [VERIFIED] 2 occurrences seulement de "Classement partiel" (1 déclaration + 1 pin-the-value test) ; 0 occurrence inline de `aria-label="Fermer"` ou `>Fermer<` (toutes via const)
+- [VERIFIED] CLAUDE.md "~654 tests"
+- 654/654 tests verts, typecheck clean
+
+### Bugs fixés (Cover vote preview reuse VOTE_LABEL_* + CARD_VERSO_SEPARATOR_LABEL + AN_LINK_VISIBLE_LABEL)
+
+- [FIXED] Cover.tsx vote-preview cards lignes 181-184 utilisaient `lbl: "Contre"`, `lbl: "Je passe"`, `lbl: "Pour"` inline alors que `VOTE_LABEL_CONTRE/SKIP/POUR` existaient depuis session 139 pour Play.tsx · Drift surface : la rewording de session 139 sur Play.tsx aurait laissé Cover stale (3 sites parallèles non-migrés). Fix : Cover.tsx importe VOTE_LABEL_CONTRE/SKIP/POUR et utilise les 3 consts dans le preview array. Pas de nouveau test (les TopBar/Play tests pinnent déjà les consts). · `src/routes/Cover.tsx`
+- [FIXED] `"↑ Synthèse IA  ·  ↓ texte officiel AN"` separator label dupliqué 3× : 1 site Card.tsx (visible div) + 2 sites tests/Card.test.tsx (regex `/Synthèse IA/i` × 2) · Drift surface : un rewording (e.g. drop des arrows, swap des poles, simplifier en "IA · AN") aurait demandé 3 edits in-lockstep. Fix : export `CARD_VERSO_SEPARATOR_LABEL` depuis src/types. Card.tsx render `{CARD_VERSO_SEPARATOR_LABEL}` ; tests round-trip via regex `new RegExp(CARD_VERSO_SEPARATOR_LABEL.replace(/\s+/g, "\\s+"))` pour survivre la whitespace-normalization de jsdom (double-spaces du `·` collapsés). 2 nouveaux tests : contient les 2 poles (Synthèse IA + texte officiel AN) + contient les 2 arrows (↑ + ↓ pour ordering hint). · `src/types/index.ts`, `src/components/Card.tsx`, `tests/Card.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] `"Voir sur AN ↗"` visible link text dupliqué 2× : Card.tsx verso footer (link text inside `<a>` element) + Methode.tsx §07 prose (référence citée « Voir sur AN ↗ ») · Drift surface : la prose Methode référence le link text exact ; un rewording de Card aurait laissé la prose stale. Fix : export `AN_LINK_VISIBLE_LABEL = "Voir sur AN ↗"` depuis src/types. Card.tsx + Methode.tsx importent + utilisent. 2 nouveaux tests : pin-the-value + endsWith "↗" arrow invariant (le ↗ signale "opens new tab" visuellement, indépendant d'EXTERNAL_LINK_SUFFIX dans l'aria-label). · `src/types/index.ts`, `src/components/Card.tsx`, `src/routes/Methode.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 145
+
+- [ ] grep `CARD_VERSO_SEPARATOR_LABEL\|AN_LINK_VISIBLE_LABEL` src/ tests/ → 10+ résultats
+- [ ] grep `"↑ Synthèse IA"\|"Voir sur AN ↗"` src/ tests/ → 2-3 résultats seulement (déclarations + pin-the-value)
+- [ ] grep `VOTE_LABEL_CONTRE` src/routes/Cover.tsx → 1 résultat (Cover utilise la const)
+- [ ] grep `~654 tests` CLAUDE.md → 0 résultat (aligné sur ~658)

@@ -15,6 +15,7 @@ import {
   RESTART_LABEL, restartConfirmMessage,
   REFAIRE_LABEL, refaireConfirmMessage,
   RANKING_OVERLAY_LABEL, MODAL_CLOSE_LABEL,
+  CARD_VERSO_SEPARATOR_LABEL, AN_LINK_VISIBLE_LABEL,
 } from "../src/types";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
@@ -264,6 +265,41 @@ describe("RANKING_OVERLAY_LABEL + MODAL_CLOSE_LABEL — modal a11y consts", () =
     // a 2-3 word aria-label here would read awkwardly when paired with
     // the visible icon. Pin the constraint to surface a future drift.
     expect(MODAL_CLOSE_LABEL.split(" ")).toHaveLength(1);
+  });
+});
+
+describe("CARD_VERSO_SEPARATOR_LABEL + AN_LINK_VISIBLE_LABEL — Card verso copy + AN link visible text", () => {
+  // Both pin user-visible Card verso copy. The separator is also pinned
+  // via 2 regex assertions in tests/Card.test.tsx (now round-tripping
+  // via the const). AN_LINK_VISIBLE_LABEL is referenced both as Card
+  // verso link text AND as a quoted reference in Methode §07 prose
+  // — a rewording must propagate to both.
+  it("CARD_VERSO_SEPARATOR_LABEL contains both 'Synthèse IA' and 'texte officiel AN' (the two pole labels)", () => {
+    // The separator's role is to make the IA/AN boundary explicit on
+    // the verso. A rewording that drops either pole would defeat the
+    // anti-bias framing called out in Methode §07. Pin the contract.
+    expect(CARD_VERSO_SEPARATOR_LABEL).toContain("Synthèse IA");
+    expect(CARD_VERSO_SEPARATOR_LABEL).toContain("texte officiel AN");
+  });
+
+  it("CARD_VERSO_SEPARATOR_LABEL uses arrows pointing up + down (visual ordering hint)", () => {
+    // ↑ = above on the verso = Synthèse IA; ↓ = below = texte officiel.
+    // A regression that swaps the arrows (or drops them) would confuse
+    // the visual hierarchy the comment line documents.
+    expect(CARD_VERSO_SEPARATOR_LABEL).toContain("↑");
+    expect(CARD_VERSO_SEPARATOR_LABEL).toContain("↓");
+  });
+
+  it("AN_LINK_VISIBLE_LABEL is the canonical 'Voir sur AN ↗' wording", () => {
+    expect(AN_LINK_VISIBLE_LABEL).toBe("Voir sur AN ↗");
+  });
+
+  it("AN_LINK_VISIBLE_LABEL ends with an external-link arrow indicator", () => {
+    // The ↗ icon signals "opens new tab" visually without needing the
+    // EXTERNAL_LINK_SUFFIX aria-label suffix on the visible text. A
+    // future change that drops the arrow should be deliberate, not
+    // accidental.
+    expect(AN_LINK_VISIBLE_LABEL.endsWith("↗")).toBe(true);
   });
 });
 

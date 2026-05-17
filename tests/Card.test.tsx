@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Card } from "../src/components/Card";
-import type { Scrutin } from "../src/types";
+import { CARD_VERSO_SEPARATOR_LABEL, type Scrutin } from "../src/types";
 
 function mkScrutin(): Scrutin {
   return {
@@ -131,7 +131,10 @@ describe("Card a11y", () => {
     // Contexte LLM (renderWithBold strips the ** markers; matching the inner word "renforcée")
     expect(screen.getByText(/renforc/i)).toBeInTheDocument();
     // Separator line marking the IA / AN boundary
-    expect(screen.getByText(/Synthèse IA/i)).toBeInTheDocument();
+    // The DOM normalises the double-spaces around the `·` to single; match
+    // a whitespace-collapsed form of the const so the test pin survives
+    // jsdom normalisation while still round-tripping via the const.
+    expect(screen.getByText(new RegExp(CARD_VERSO_SEPARATOR_LABEL.replace(/\s+/g, "\\s+")))).toBeInTheDocument();
     // Raw AN libellé below the separator
     expect(screen.getByText(/Intitulé officiel AN/i)).toBeInTheDocument();
   });
@@ -159,7 +162,10 @@ describe("Card a11y", () => {
     render(<Card scrutin={scrutin} topMost={true} />);
     fireEvent.keyDown(screen.getByRole("article"), { key: "Enter" });
     // Contexte and AN libellé still present
-    expect(screen.getByText(/Synthèse IA/i)).toBeInTheDocument();
+    // The DOM normalises the double-spaces around the `·` to single; match
+    // a whitespace-collapsed form of the const so the test pin survives
+    // jsdom normalisation while still round-tripping via the const.
+    expect(screen.getByText(new RegExp(CARD_VERSO_SEPARATOR_LABEL.replace(/\s+/g, "\\s+")))).toBeInTheDocument();
     expect(screen.getByText(/Intitulé officiel AN/i)).toBeInTheDocument();
     // No "Mesures" section header (exact-match uppercase mono label)
     expect(screen.queryByText(/^Mesures$/)).not.toBeInTheDocument();

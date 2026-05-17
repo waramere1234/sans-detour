@@ -166,6 +166,22 @@ export const RANKING_OVERLAY_LABEL = "Classement partiel";
  *  to both modals + the RankingOverlay test regex via one edit. */
 export const MODAL_CLOSE_LABEL = "Fermer";
 
+/** Separator label rendered on Card verso between the LLM-rendered
+ *  synthesis sections (above) and the raw AN libellé (below). The
+ *  "↑ Synthèse IA · ↓ texte officiel AN" inscription makes the bias
+ *  framing explicit (Methode §07 leans on the same wording). Pinned
+ *  by 2 .getByText regex assertions in tests/Card.test.tsx — exporting
+ *  the const keeps source + tests in sync, and the literal stays
+ *  available for tests/Methode.test.tsx if it ever cross-references. */
+export const CARD_VERSO_SEPARATOR_LABEL = "↑ Synthèse IA  ·  ↓ texte officiel AN";
+
+/** Visible "Voir sur AN ↗" link text on Card verso footer (the link
+ *  that opens the official AN scrutin page in a new tab). Methode §07
+ *  prose references this exact wording in quoted form ("« Voir sur
+ *  AN ↗ »") — so a rewording must propagate to both sites in lockstep.
+ *  Exporting the const enforces the round-trip. */
+export const AN_LINK_VISIBLE_LABEL = "Voir sur AN ↗";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

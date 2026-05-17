@@ -4,6 +4,7 @@ import { motion, useReducedMotion, type PanInfo } from "framer-motion";
 import {
   MAX_POINTS_CLES_BULLETS, APP_LOCALE,
   anScrutinViewAriaLabel, DEMO_DATA_LABEL_PREFIX,
+  CARD_VERSO_SEPARATOR_LABEL, AN_LINK_VISIBLE_LABEL,
   type Scrutin,
 } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
@@ -259,7 +260,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             letterSpacing: "0.1em", textTransform: "uppercase",
             color: "var(--ink-3)", textAlign: "center",
           }}>
-            ↑ Synthèse IA  ·  ↓ texte officiel AN
+            {CARD_VERSO_SEPARATOR_LABEL}
           </div>
 
           {/* Intitulé brut AN */}
@@ -288,7 +289,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
                   aria-label={anScrutinViewAriaLabel(scrutin.numero)}
                   style={{ color: "var(--accent)", textDecoration: "none" }}
                 >
-                  <span aria-hidden="true">Voir sur AN ↗</span>
+                  <span aria-hidden="true">{AN_LINK_VISIBLE_LABEL}</span>
                 </a>
               : <span aria-label={`${DEMO_DATA_LABEL_PREFIX} (pas une vraie source AN)`} style={{ color: "var(--accent)" }}>donnée démo</span>}
           </div>

@@ -14,6 +14,7 @@ import {
   START_LABEL, RESUME_LABEL, VIEW_RESULT_LABEL,
   RESTART_LABEL, VIEW_PARTIAL_RESULT_LABEL,
   WORDMARK_HOME_LABEL, restartConfirmMessage,
+  VOTE_LABEL_CONTRE, VOTE_LABEL_SKIP, VOTE_LABEL_POUR,
 } from "../types";
 
 export default function Cover() {
@@ -179,9 +180,9 @@ export default function Cover() {
           }}
         >
           {[
-            { lbl: "Contre", arr: "←", color: "var(--contre)" },
-            { lbl: "Je passe", arr: "↓", color: "var(--ink-2)" },
-            { lbl: "Pour", arr: "→", color: "var(--pour)" },
+            { lbl: VOTE_LABEL_CONTRE, arr: "←", color: "var(--contre)" },
+            { lbl: VOTE_LABEL_SKIP, arr: "↓", color: "var(--ink-2)" },
+            { lbl: VOTE_LABEL_POUR, arr: "→", color: "var(--pour)" },
           ].map(g => (
             <div key={g.lbl} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 18, color: g.color }}>{g.arr}</span>

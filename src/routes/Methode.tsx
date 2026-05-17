@@ -13,7 +13,7 @@ import {
   AN_OPEN_DATA_URL, AN_OPEN_DATA_HOSTNAME,
   GITHUB_REPO_URL, GITHUB_REPO_DISPLAY,
   READING_PAGE_MAX_WIDTH, READING_PAGE_SECTION_PADDING,
-  externalLinkLabel,
+  externalLinkLabel, AN_LINK_VISIBLE_LABEL,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -170,7 +170,7 @@ export default function Methode() {
 
         <p><strong>Ce qu'il ne fait pas.</strong> Le calcul d'alignement (formule mathématique pure), la composition du deck (round-robin algorithmique par thème), l'extraction des votes individuels (parsing des XML officiels AN). Sur ces trois plans, Claude n'intervient à aucun moment.</p>
 
-        <p><strong>Comment on cadre les biais.</strong> Le prompt envoyé à Claude est neutre par construction. Sa source : le libellé brut AN + des résultats de recherche web pour le contexte. <strong>Le libellé officiel brut est affiché sur la face Résumé du verso de chaque carte</strong> (et la page AN complète est toujours accessible via « Voir sur AN ↗ ») — tu peux comparer directement.</p>
+        <p><strong>Comment on cadre les biais.</strong> Le prompt envoyé à Claude est neutre par construction. Sa source : le libellé brut AN + des résultats de recherche web pour le contexte. <strong>Le libellé officiel brut est affiché sur la face Résumé du verso de chaque carte</strong> (et la page AN complète est toujours accessible via « {AN_LINK_VISIBLE_LABEL} ») — tu peux comparer directement.</p>
 
         <p><strong>Limites & signalement.</strong> Claude peut se tromper sur les nuances : un mot mal choisi, une mesure oubliée, un thème mal taggué. Pour l'instant, aucune relecture humaine systématique (V3 prévue). Si tu repères une erreur factuelle : <a href={mailto()}>{CONTACT_EMAIL}</a> — on corrige.</p>
 
