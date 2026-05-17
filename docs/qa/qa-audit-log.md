@@ -3450,3 +3450,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `"Voir les personnalités"` src/ tests/ → 2-3 résultats (déclaration + pin-the-value test)
 - [ ] grep `name: /\(Commencer\|Voir mon résultat\|Voir les personnalités\|Quelque chose\|Ouvrir le menu\|Accueil\|En-tête de la page\|Retour\)/` tests/ → 0 résultat (toutes les regex literales migrées vers `new RegExp(CONST)`)
 - [ ] grep `~667 tests` CLAUDE.md → 0 résultat (aligné sur ~669)
+
+---
+
+## Session 147 — 2026-05-17
+
+### Vérification session 146
+
+- [VERIFIED] 14 occurrences de PERSONNALITES_TOGGLE_LABEL dans src/ + tests/
+- [VERIFIED] 2 occurrences "Voir les personnalités" = 1 déclaration + 1 pin-the-value test
+- [VERIFIED] 1 résultat seulement matchant le pattern stale-regex (un comment dans aria-labels.test.ts, pas un assertion)
+- [VERIFIED] CLAUDE.md "~669 tests"
+- 669/669 tests verts, typecheck clean
+
+### Bugs fixés (CARD_AN_LIBELLE_PREFIX_LABEL + METHODE_SOMMAIRE_NAV_LABEL + COVER_SOURCE_ATTRIBUTION_AN/CLAUDE)
+
+- [FIXED] `"Intitulé officiel AN"` Card verso AN libellé header dupliqué 3× : 1 source (Card.tsx line 272 `<span>Intitulé officiel AN · </span>`) + 2 test regex literals (`getByText(/Intitulé officiel AN/i)` × 2 dans tests/Card.test.tsx) · Drift surface : un rewording (e.g. "Libellé officiel AN", "Texte AN brut") aurait demandé 3 edits in-lockstep. Le label est paired avec CARD_VERSO_SEPARATOR_LABEL (session 144) — ensemble ils documentent le cadre anti-bias de Methode §07. Fix : export `CARD_AN_LIBELLE_PREFIX_LABEL` depuis src/types. Card.tsx utilise `{CARD_AN_LIBELLE_PREFIX_LABEL}` ; tests round-trip via `new RegExp(CARD_AN_LIBELLE_PREFIX_LABEL, "i")` (replace_all). 2 nouveaux tests : pin-the-value + contains 'AN' invariant. · `src/types/index.ts`, `src/components/Card.tsx`, `tests/Card.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] `"Sommaire de la méthode"` Methode.tsx in-page TOC nav aria-label + tests/Methode.test.tsx regex `name: /Sommaire/` · Drift surface : 2 sites in-lockstep ; un rewording vers "Table des matières" laisserait le test stale (le regex match loosement "Sommaire" qui pourrait ne plus exister). Fix : export `METHODE_SOMMAIRE_NAV_LABEL` depuis src/types. Methode.tsx utilise la const ; test passe via `new RegExp(METHODE_SOMMAIRE_NAV_LABEL)`. 2 nouveaux tests : pin-the-value + startsWith "Sommaire" SR-landmark-rotor invariant. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Cover.tsx top-right source-attribution `"Données AN officielles"` + `"résumés Claude (IA)"` (2 lignes empilées) dupliqués comme `/Données AN/i` + `/Claude/i` regex literals dans tests/Cover.test.tsx · Drift surface : 2 source + 2 test = 4 sites in-lockstep, documentant le contract IA-vs-AN provenance (parallèle à CARD_VERSO_SEPARATOR_LABEL). Le test regex `/Claude/i` était trop loose (matcherait n'importe quel "Claude" sur la page). Fix : export `COVER_SOURCE_ATTRIBUTION_AN` + `COVER_SOURCE_ATTRIBUTION_CLAUDE` (2 consts séparés pour permettre de re-wording chaque pôle indépendamment). Source + tests utilisent. 4 nouveaux tests : pin-the-value × 2 + contains-token-name × 2 (load-bearing "AN" + "Claude"). · `src/types/index.ts`, `src/routes/Cover.tsx`, `tests/Cover.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 148
+
+- [ ] grep `CARD_AN_LIBELLE_PREFIX_LABEL\|METHODE_SOMMAIRE_NAV_LABEL\|COVER_SOURCE_ATTRIBUTION_AN\|COVER_SOURCE_ATTRIBUTION_CLAUDE` src/ tests/ → 15+ résultats
+- [ ] grep `"Intitulé officiel AN"\|"Sommaire de la méthode"\|"Données AN officielles"\|"résumés Claude"` src/ tests/ → 4-6 résultats seulement (déclarations + pin-the-value)
+- [ ] grep `~669 tests` CLAUDE.md → 0 résultat (aligné sur ~677)

@@ -9,6 +9,7 @@ import {
   MAX_POINTS_CLES_BULLETS,
   READING_PAGE_MAX_WIDTH,
   READING_PAGE_SECTION_PADDING,
+  METHODE_SOMMAIRE_NAV_LABEL,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -139,7 +140,7 @@ describe("Methode — TOC analytics (methode_toc_click × N sections)", () => {
     // (`<a href="#methode-07">section 07</a>`) in the intro paragraph that
     // intentionally has NO onClick; the previous selector picked that up
     // first because it sits before the Sommaire in DOM order.
-    const sommaire = screen.getByRole("navigation", { name: /Sommaire/ });
+    const sommaire = screen.getByRole("navigation", { name: new RegExp(METHODE_SOMMAIRE_NAV_LABEL) });
     for (const [n] of METHODE_SECTIONS) {
       trackSpy.mockClear();
       const link = Array.from(sommaire.querySelectorAll("a")).find(

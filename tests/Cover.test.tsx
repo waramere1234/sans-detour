@@ -14,6 +14,7 @@ import {
   RESTART_LABEL, VIEW_PARTIAL_RESULT_LABEL,
   restartConfirmMessage,
   MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
+  COVER_SOURCE_ATTRIBUTION_AN, COVER_SOURCE_ATTRIBUTION_CLAUDE,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -42,8 +43,8 @@ describe("Cover", () => {
 
   it("includes the updated data + AI source sub-text", () => {
     renderCover();
-    expect(screen.getByText(/Données AN/i)).toBeInTheDocument();
-    expect(screen.getByText(/Claude/i)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(COVER_SOURCE_ATTRIBUTION_AN.split(" ")[0], "i"))).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(COVER_SOURCE_ATTRIBUTION_CLAUDE.split(" ")[1], "i"))).toBeInTheDocument();
   });
 
   it("renders the LEGISLATURE_LABEL in the header eyebrow (rename-safe via const)", () => {

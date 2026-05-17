@@ -1,7 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { Card } from "../src/components/Card";
-import { CARD_VERSO_SEPARATOR_LABEL, type Scrutin } from "../src/types";
+import {
+  CARD_VERSO_SEPARATOR_LABEL, CARD_AN_LIBELLE_PREFIX_LABEL,
+  type Scrutin,
+} from "../src/types";
 
 function mkScrutin(): Scrutin {
   return {
@@ -136,7 +139,7 @@ describe("Card a11y", () => {
     // jsdom normalisation while still round-tripping via the const.
     expect(screen.getByText(new RegExp(CARD_VERSO_SEPARATOR_LABEL.replace(/\s+/g, "\\s+")))).toBeInTheDocument();
     // Raw AN libellé below the separator
-    expect(screen.getByText(/Intitulé officiel AN/i)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(CARD_AN_LIBELLE_PREFIX_LABEL, "i"))).toBeInTheDocument();
   });
 
   it("verso shows analyse sections when analyse_loi is present", () => {
@@ -166,7 +169,7 @@ describe("Card a11y", () => {
     // a whitespace-collapsed form of the const so the test pin survives
     // jsdom normalisation while still round-tripping via the const.
     expect(screen.getByText(new RegExp(CARD_VERSO_SEPARATOR_LABEL.replace(/\s+/g, "\\s+")))).toBeInTheDocument();
-    expect(screen.getByText(/Intitulé officiel AN/i)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(CARD_AN_LIBELLE_PREFIX_LABEL, "i"))).toBeInTheDocument();
     // No "Mesures" section header (exact-match uppercase mono label)
     expect(screen.queryByText(/^Mesures$/)).not.toBeInTheDocument();
   });

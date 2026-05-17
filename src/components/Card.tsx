@@ -5,6 +5,7 @@ import {
   MAX_POINTS_CLES_BULLETS, APP_LOCALE,
   anScrutinViewAriaLabel, DEMO_DATA_LABEL_PREFIX,
   CARD_VERSO_SEPARATOR_LABEL, AN_LINK_VISIBLE_LABEL,
+  CARD_AN_LIBELLE_PREFIX_LABEL,
   type Scrutin,
 } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
@@ -269,7 +270,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             color: "var(--ink-3)", letterSpacing: "0.04em",
             lineHeight: 1.5,
           }}>
-            <span style={{ textTransform: "uppercase", letterSpacing: "0.12em" }}>Intitulé officiel AN · </span>
+            <span style={{ textTransform: "uppercase", letterSpacing: "0.12em" }}>{CARD_AN_LIBELLE_PREFIX_LABEL} · </span>
             <span style={{ fontFamily: "var(--font-sans)", fontSize: 11.5 }}>{scrutin.titre_brut}</span>
           </div>
 

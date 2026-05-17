@@ -19,6 +19,9 @@ import {
   MENU_OPEN_LABEL, MENU_CLOSE_LABEL, MAIN_MENU_LABEL,
   ERROR_FALLBACK_HEADING, ERROR_FALLBACK_MESSAGE, ERROR_FALLBACK_RELOAD_LABEL,
   PERSONNALITES_TOGGLE_LABEL,
+  CARD_AN_LIBELLE_PREFIX_LABEL,
+  METHODE_SOMMAIRE_NAV_LABEL,
+  COVER_SOURCE_ATTRIBUTION_AN, COVER_SOURCE_ATTRIBUTION_CLAUDE,
 } from "../src/types";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
@@ -372,6 +375,55 @@ describe("PERSONNALITES_TOGGLE_LABEL — Result.tsx personnalités toggle button
     // start with the verb so the SR announcement reads naturally
     // alongside the chevron.
     expect(PERSONNALITES_TOGGLE_LABEL.startsWith("Voir")).toBe(true);
+  });
+});
+
+describe("CARD_AN_LIBELLE_PREFIX_LABEL — Card verso AN libellé header", () => {
+  // Paired with CARD_VERSO_SEPARATOR_LABEL (session 144) — together
+  // they document the "↓ texte officiel AN" / "Intitulé officiel AN ·"
+  // anti-bias framing called out in Methode §07.
+  it("matches the canonical 'Intitulé officiel AN' wording", () => {
+    expect(CARD_AN_LIBELLE_PREFIX_LABEL).toBe("Intitulé officiel AN");
+  });
+
+  it("contains 'AN' (the load-bearing official-source token)", () => {
+    expect(CARD_AN_LIBELLE_PREFIX_LABEL).toContain("AN");
+  });
+});
+
+describe("METHODE_SOMMAIRE_NAV_LABEL — Methode in-page TOC nav landmark", () => {
+  it("matches the canonical 'Sommaire de la méthode' wording", () => {
+    expect(METHODE_SOMMAIRE_NAV_LABEL).toBe("Sommaire de la méthode");
+  });
+
+  it("starts with 'Sommaire' (anti-rename guard for the SR landmark rotor)", () => {
+    // A future rewording to "Table des matières" would change the SR
+    // skim — pin the load-bearing first word so the change is explicit.
+    expect(METHODE_SOMMAIRE_NAV_LABEL.startsWith("Sommaire")).toBe(true);
+  });
+});
+
+describe("COVER_SOURCE_ATTRIBUTION_AN + _CLAUDE — Cover header source pair", () => {
+  // The 2 stacked-line attribution block in the top-right header
+  // documents the same IA-vs-AN provenance contract as
+  // CARD_VERSO_SEPARATOR_LABEL. Two consts so each pole can be reworded
+  // independently.
+  it("AN attribution matches the canonical 'Données AN officielles' wording", () => {
+    expect(COVER_SOURCE_ATTRIBUTION_AN).toBe("Données AN officielles");
+  });
+
+  it("Claude attribution matches the canonical 'résumés Claude (IA)' wording", () => {
+    expect(COVER_SOURCE_ATTRIBUTION_CLAUDE).toBe("résumés Claude (IA)");
+  });
+
+  it("AN attribution contains 'AN' (source-name pin)", () => {
+    expect(COVER_SOURCE_ATTRIBUTION_AN).toContain("AN");
+  });
+
+  it("Claude attribution contains 'Claude' (model-name pin)", () => {
+    // A future model swap (e.g. Haiku 5) would still keep the brand
+    // family name "Claude" — pin it as the load-bearing token.
+    expect(COVER_SOURCE_ATTRIBUTION_CLAUDE).toContain("Claude");
   });
 });
 

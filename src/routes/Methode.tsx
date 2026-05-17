@@ -14,6 +14,7 @@ import {
   GITHUB_REPO_URL, GITHUB_REPO_DISPLAY,
   READING_PAGE_MAX_WIDTH, READING_PAGE_SECTION_PADDING,
   externalLinkLabel, AN_LINK_VISIBLE_LABEL,
+  METHODE_SOMMAIRE_NAV_LABEL,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -85,7 +86,7 @@ export default function Methode() {
         scroller pour trouver une partie précise. Les ancres `#methode-NN`
         existent déjà (cf. Section component) ; on les expose ici. */}
       <nav
-        aria-label="Sommaire de la méthode"
+        aria-label={METHODE_SOMMAIRE_NAV_LABEL}
         style={{
           marginTop: 24, padding: "12px 14px",
           border: "1px solid var(--line)", borderRadius: 6,

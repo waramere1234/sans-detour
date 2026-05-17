@@ -16,6 +16,7 @@ import {
   WORDMARK_HOME_LABEL, restartConfirmMessage,
   VOTE_LABEL_CONTRE, VOTE_LABEL_SKIP, VOTE_LABEL_POUR,
   MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
+  COVER_SOURCE_ATTRIBUTION_AN, COVER_SOURCE_ATTRIBUTION_CLAUDE,
 } from "../types";
 
 export default function Cover() {
@@ -127,7 +128,7 @@ export default function Cover() {
           textAlign: "right",
           lineHeight: 1.5,
         }}>
-          Données AN officielles<br /><span style={{ color: "var(--ink-2)", fontWeight: 500 }}>résumés Claude (IA)</span>
+          {COVER_SOURCE_ATTRIBUTION_AN}<br /><span style={{ color: "var(--ink-2)", fontWeight: 500 }}>{COVER_SOURCE_ATTRIBUTION_CLAUDE}</span>
         </span>
       </header>
 

@@ -210,6 +210,28 @@ export const ERROR_FALLBACK_RELOAD_LABEL = "Recharger";
  *  to all 7 sites via one edit. */
 export const PERSONNALITES_TOGGLE_LABEL = "Voir les personnalités";
 
+/** Header label above the raw AN libellé block on Card verso. The
+ *  string makes explicit "below this is the unmodified official AN
+ *  wording" — pair to CARD_VERSO_SEPARATOR_LABEL. Used 1× in source
+ *  + 2× in tests/Card.test.tsx as regex literals; centralised so a
+ *  rewording propagates from one edit. */
+export const CARD_AN_LIBELLE_PREFIX_LABEL = "Intitulé officiel AN";
+
+/** aria-label on the Methode.tsx in-page Sommaire <nav> landmark
+ *  (the table-of-contents listing the 7 sections). Pinned by 1
+ *  test regex `name: /Sommaire/` — exporting the const keeps source
+ *  + test in sync and surfaces a future rewording (e.g. "Table des
+ *  matières") to the test pin. */
+export const METHODE_SOMMAIRE_NAV_LABEL = "Sommaire de la méthode";
+
+/** Cover.tsx top-right source-attribution block (two stacked lines).
+ *  Pinned by 2 test regex literals (`/Données AN/i`, `/Claude/i`).
+ *  Two consts so a rewording of either pole (AN-side vs Claude-side)
+ *  is independent. The two strings document the same contract as
+ *  CARD_VERSO_SEPARATOR_LABEL: explicit IA-vs-AN provenance. */
+export const COVER_SOURCE_ATTRIBUTION_AN = "Données AN officielles";
+export const COVER_SOURCE_ATTRIBUTION_CLAUDE = "résumés Claude (IA)";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use
