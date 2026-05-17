@@ -84,7 +84,11 @@ export interface Scrutin {
   chapeau: string;             // "RETRAITES · PLFSS 2024"
   titre_brut: string;          // raw AN title
   titre_pedago: string;        // 12-word generated summary
-  contexte?: string;           // 1-line stake/context, ≤ 25 words (added in migration 0002)
+  contexte?: string;           // 30-50 words, 2 short sentences with "Concrètement: …"
+                               // or "Par exemple: …" as the second sentence (added
+                               // in migration 0002 — see that file's comment for the
+                               // full spec, which was widened from the original
+                               // "one sentence ≤ 25 words" pre-V1)
   analyse_loi?: ScrutinAnalyse;  // structured 4-axis breakdown (migration 0003).
                                  // Column named `analyse_loi` because ANALYSE
                                  // is a PostgreSQL reserved word.

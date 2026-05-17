@@ -1654,3 +1654,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `INGEST_LIMIT` dans `.env.local.example` → 1 résultat
 - [ ] grep `ingere_le` dans `scripts/` → 4 sites (ingest-an, resume-ingest, ingest-personnalites, seed-supabase) tous avec stamping explicite
 - [ ] Mock un re-run de `npx tsx scripts/ingest-personnalites.ts` → FreshnessBanner doit afficher la date du jour
+
+---
+
+## Session 73 — 2026-05-17
+
+### Vérification session 72
+
+- [VERIFIED] `.env.local.example` mentionne `INGEST_LIMIT` + `BATCH_ID`
+- [VERIFIED] `scripts/ingest-personnalites.ts` UPDATE inclut `ingere_le: patchedAt`
+- [VERIFIED] `scripts/seed-supabase.ts` upsert avec `ingere_le: seededAt`
+- 126/126 tests verts, typecheck clean
+
+### Bugs fixés (3 stale doc drifts)
+
+- [FIXED] `types/index.ts:87` stale contexte comment · Le comment disait "1-line stake/context, ≤ 25 words" — session 52 a updated `supabase/migrations/0002_add_contexte.sql` pour refléter la vraie spec ("30-50 mots, 2 phrases courtes, 'Concrètement: …' obligatoire") mais a raté le comment dans le type interface. Un dev qui implémente quelque chose dépendant du contexte aurait le mauvais modèle mental. Aligné + pointeur vers la migration pour les détails. · `src/types/index.ts`
+- [FIXED] `SHIP-V1.md §7` test "Partager" mensonger · L'instruction disait "Test 'Partager' → vérifier que le SVG share-card s'ouvre (l'endpoint `/api/share-card` retourne `image/svg+xml`)". Mais `Result.tsx share()` utilise `navigator.share({text, url})` directement — ne fetch pas l'endpoint share-card. Le bouton Partager ouvre la share sheet native iOS/Android avec du texte. Reformulé en 2 items : (a) test native share sheet, (b) test endpoint via curl séparé. · `SHIP-V1.md`
+- [FIXED] CLAUDE.md "Commandes utiles" sans `npm run seed` · Le script `seed` existe dans package.json (seed Supabase locale avec dev-fixtures.json) mais n'était pas listé dans la doc dev. Ajouté + clarifié les 2 autres scripts npx (BATCH_ID requis pour resume-ingest, ingest-personnalites = V2 P2). · `CLAUDE.md`
+
+### Vérifications à faire en session 74
+
+- [ ] grep `≤ 25 words\|1-line stake` dans `src/types/index.ts` → 0 résultat
+- [ ] grep `vérifier que le SVG share-card s'ouvre` dans `SHIP-V1.md` → 0 résultat
+- [ ] grep `npm run seed` dans `CLAUDE.md` → 1 résultat (dans Commandes utiles)

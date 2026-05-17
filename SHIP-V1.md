@@ -135,7 +135,8 @@ Une fois en prod, fais une session complète sur ton téléphone (vrai mobile, p
 - 20 swipes (mélange gauche/droite/bas) ; sur une carte au passage, tap pour tester le flip 3D recto/verso
 - Result → "Voir les personnalités" déplie la section figures
 - Test "Continuer à affiner" → revenir sur Play
-- Test "Partager" → vérifier que le SVG share-card s'ouvre (l'endpoint `/api/share-card` retourne `image/svg+xml`)
+- Test "Partager" → la share sheet native du téléphone s'ouvre avec le texte du résultat + l'URL ; `Result.tsx share()` utilise `navigator.share` directement, ne fetch pas l'endpoint share-card
+- Test endpoint share-card (séparément, pas via le bouton) : `curl https://TON-PROJET.vercel.app/api/share-card.svg?t=EPR:42,RN:35,LFI:28` → réponse `Content-Type: image/svg+xml`
 - Test "Refaire" → retour à la cover
 - Test menu TopBar `•••` (popover) → Méthode & sources, Mentions légales, Mon résultat, Contact (le footer secondary nav a été remplacé par ce menu depuis le commit 5040874)
 
