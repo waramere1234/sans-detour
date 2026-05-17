@@ -20,10 +20,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { computeGroupPosition } from "../src/lib/compute-positions";
-import type {
-  GroupCode, GroupPosition, GroupVoteBreakdown,
-} from "../src/types";
 import {
   type Summary,
   type MinimalAnthropicMessage,
@@ -31,7 +27,11 @@ import {
   extractAnthropicSummary,
 } from "./lib/parse-summary";
 import { isEligibleScrutin } from "./lib/an-filter";
-import { GROUP_MAPPING } from "./lib/an-groups";
+import {
+  type ANScrutinRaw,
+  type ParsedScrutinCore,
+  parseRaw,
+} from "./lib/an-parse";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -45,81 +45,12 @@ if (!SUPABASE_URL || !SUPABASE_KEY || !ANTHROPIC_KEY || !BATCH_ID) {
 
 const JSON_DIR = path.join("/tmp/sd-an-cache", "json");
 
-// ──────────────────── AN parsing (mirrors ingest-an.ts intentionally) ────────
-// GROUP_MAPPING was inlined in both scripts until session 95; it now lives
-// in scripts/lib/an-groups.ts and both scripts import it.
-
-interface ANGroupVote {
-  organeRef: string;
-  vote: { decompteVoix: { nonVotants: string; pour: string; contre: string; abstentions: string; nonVotantsVolontaires: string }; };
-}
-interface ANScrutinRaw {
-  uid: string;
-  numero: string;
-  dateScrutin: string;
-  typeVote: { codeTypeVote: string; libelleTypeVote: string };
-  objet: { libelle: string; dossierLegislatif: { libelle: string; dossierRef: string } | null };
-  ventilationVotes: { organe: { groupes: { groupe: ANGroupVote[] } } };
-}
-
-interface ParsedRaw {
-  id: string;
-  numero: number;
-  date: string;
-  dossier_id: string;
-  dossier_titre: string;
-  titre_brut: string;
-  position_par_groupe: Record<GroupCode, GroupPosition>;
-  votes_bruts: Record<GroupCode, GroupVoteBreakdown>;
-  est_solennel: boolean;
-  url_an_officielle: string;
-  pedago_relu: boolean;
-}
-
-function n(s: string | null | undefined): number {
-  return parseInt(s ?? "0", 10) || 0;
-}
-
-function parseRaw(raw: ANScrutinRaw): ParsedRaw {
-  const votes_bruts = {} as Record<GroupCode, GroupVoteBreakdown>;
-  const position_par_groupe = {} as Record<GroupCode, GroupPosition>;
-  for (const g of raw.ventilationVotes?.organe?.groupes?.groupe ?? []) {
-    const code = GROUP_MAPPING[g.organeRef];
-    if (!code) continue;
-    const dv = g.vote.decompteVoix;
-    const breakdown: GroupVoteBreakdown = {
-      pour: n(dv.pour),
-      contre: n(dv.contre),
-      abstention: n(dv.abstentions),
-      absent: n(dv.nonVotants) + n(dv.nonVotantsVolontaires),
-    };
-    if (votes_bruts[code]) {
-      votes_bruts[code] = {
-        pour: votes_bruts[code].pour + breakdown.pour,
-        contre: votes_bruts[code].contre + breakdown.contre,
-        abstention: votes_bruts[code].abstention + breakdown.abstention,
-        absent: votes_bruts[code].absent + breakdown.absent,
-      };
-    } else {
-      votes_bruts[code] = breakdown;
-    }
-    position_par_groupe[code] = computeGroupPosition(votes_bruts[code]);
-  }
-  const dossier = raw.objet?.dossierLegislatif;
-  return {
-    id: raw.uid,
-    numero: parseInt(raw.numero, 10),
-    date: raw.dateScrutin,
-    dossier_id: dossier?.dossierRef ?? `STANDALONE-${raw.uid}`,
-    dossier_titre: dossier?.libelle ?? raw.objet?.libelle?.slice(0, 120) ?? "Sans dossier",
-    titre_brut: raw.objet?.libelle ?? "",
-    position_par_groupe,
-    votes_bruts,
-    est_solennel: raw.typeVote?.codeTypeVote === "SPS",
-    url_an_officielle: `https://www.assemblee-nationale.fr/dyn/17/scrutins/${raw.numero}`,
-    pedago_relu: false,
-  };
-}
+// ──────────────────── AN parsing ─────────────────────────────────────────────
+// ANScrutinRaw, ANGroupVote, ParsedScrutinCore, and parseRaw live in
+// scripts/lib/an-parse.ts (shared with ingest-an.ts since session 96).
+// `ParsedRaw` was the local alias the resume script used — it's now the
+// same shape as ParsedScrutinCore.
+type ParsedRaw = ParsedScrutinCore;
 
 // ──────────────────────────── LLM summary parsing ────────────────────────────
 

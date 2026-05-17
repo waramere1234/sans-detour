@@ -19,10 +19,7 @@ import { createClient } from "@supabase/supabase-js";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
-import { computeGroupPosition } from "../src/lib/compute-positions";
-import type {
-  GroupCode, GroupPosition, GroupVoteBreakdown, ScrutinAnalyse, Theme,
-} from "../src/types";
+import type { ScrutinAnalyse, Theme } from "../src/types";
 import {
   type Summary,
   type MinimalAnthropicMessage,
@@ -30,7 +27,7 @@ import {
   extractAnthropicSummary,
 } from "./lib/parse-summary";
 import { isEligibleScrutin } from "./lib/an-filter";
-import { GROUP_MAPPING } from "./lib/an-groups";
+import { type ParsedScrutinCore, parseRaw } from "./lib/an-parse";
 
 // ───────────────────────────────────────────────────────────────── config
 
@@ -84,106 +81,23 @@ async function ensureBulk(): Promise<void> {
 }
 
 // ──────────────────────────────────────────────────────── AN scrutin parse
+// ANGroupVote, ANScrutinRaw, parseRaw, and the `n` helper live in
+// scripts/lib/an-parse.ts (shared with resume-ingest.ts).
 
-interface ANGroupVote {
-  organeRef: string;
-  nombreMembresGroupe: string;
-  vote: {
-    positionMajoritaire: string;
-    decompteVoix: {
-      nonVotants: string;
-      pour: string;
-      contre: string;
-      abstentions: string;
-      nonVotantsVolontaires: string;
-    };
-  };
-}
-
-interface ANScrutinRaw {
-  uid: string;
-  numero: string;
-  dateScrutin: string;
-  typeVote: { codeTypeVote: string; libelleTypeVote: string };
-  objet: {
-    libelle: string;
-    dossierLegislatif: { libelle: string; dossierRef: string } | null;
-  };
-  ventilationVotes: {
-    organe: { groupes: { groupe: ANGroupVote[] } };
-  };
-}
-
-interface ParsedScrutin {
-  id: string;
-  numero: number;
-  date: string;
-  dossier_id: string;
-  dossier_titre: string;
-  titre_brut: string;
+/** The full row shape ingest-an.ts produces: the parseRaw core plus the
+ *  LLM-generated titre_pedago / chapeau / contexte / analyse_loi /
+ *  points_cles / theme. resume-ingest.ts uses ParsedScrutinCore directly
+ *  because its summaries are re-fetched, not freshly generated. */
+interface ParsedScrutin extends ParsedScrutinCore {
   titre_pedago: string;
   chapeau: string;
   contexte: string;
   analyse_loi?: ScrutinAnalyse;
   points_cles?: string[];
   theme?: Theme;
-  position_par_groupe: Record<GroupCode, GroupPosition>;
-  votes_bruts: Record<GroupCode, GroupVoteBreakdown>;
-  est_solennel: boolean;
-  url_an_officielle: string;
-  pedago_relu: boolean;
 }
 
 // ───────────────────────────── corpus filter (V2: SPS + SOR/MOC selected)
-
-function n(s: string | null | undefined): number {
-  return parseInt(s ?? "0", 10) || 0;
-}
-
-function parseRaw(raw: ANScrutinRaw): Omit<ParsedScrutin, "titre_pedago" | "chapeau" | "contexte"> {
-  const votes_bruts = {} as Record<GroupCode, GroupVoteBreakdown>;
-  const position_par_groupe = {} as Record<GroupCode, GroupPosition>;
-
-  for (const g of raw.ventilationVotes?.organe?.groupes?.groupe ?? []) {
-    const code = GROUP_MAPPING[g.organeRef];
-    if (!code) continue;
-    const dv = g.vote.decompteVoix;
-    const breakdown: GroupVoteBreakdown = {
-      pour: n(dv.pour),
-      contre: n(dv.contre),
-      abstention: n(dv.abstentions),
-      absent: n(dv.nonVotants) + n(dv.nonVotantsVolontaires),
-    };
-    // If UDR appears as both PO847173 and PO872880 in the same scrutin
-    // (shouldn't happen — they alternate by date — but defensive merge):
-    if (votes_bruts[code]) {
-      votes_bruts[code] = {
-        pour: votes_bruts[code].pour + breakdown.pour,
-        contre: votes_bruts[code].contre + breakdown.contre,
-        abstention: votes_bruts[code].abstention + breakdown.abstention,
-        absent: votes_bruts[code].absent + breakdown.absent,
-      };
-    } else {
-      votes_bruts[code] = breakdown;
-    }
-    position_par_groupe[code] = computeGroupPosition(votes_bruts[code]);
-  }
-
-  const dossier = raw.objet?.dossierLegislatif;
-  return {
-    id: raw.uid,
-    numero: parseInt(raw.numero, 10),
-    date: raw.dateScrutin,
-    dossier_id: dossier?.dossierRef ?? `STANDALONE-${raw.uid}`,
-    dossier_titre: dossier?.libelle ?? raw.objet?.libelle?.slice(0, 120) ?? "Sans dossier",
-    titre_brut: raw.objet?.libelle ?? "",
-    position_par_groupe,
-    votes_bruts,
-    est_solennel: raw.typeVote?.codeTypeVote === "SPS",
-    url_an_officielle: `https://www.assemblee-nationale.fr/dyn/17/scrutins/${raw.numero}`,
-    pedago_relu: false,
-  };
-}
 
 // ─────────────────────────────────────────────── titre pédago (LLM optional)
 

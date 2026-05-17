@@ -2205,3 +2205,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] `ls scripts/lib/an-groups.ts` → présent ; 1 export `GROUP_MAPPING`
 - [ ] grep `GROUP_MAPPING:` scripts/ingest-an.ts scripts/resume-ingest.ts → 0 résultat (les déclarations sont retirées, seuls les imports restent)
 - [ ] grep -c "it(" tests/parse-summary.test.ts → 34 (était 24, +10 pour extractAnthropicSummary)
+
+---
+
+## Session 96 — 2026-05-17
+
+### Vérification session 95
+
+- [VERIFIED] `function extractSummary` / `extractSummaryFromMessage` → 0 résultat dans scripts/ (tout passe par extractAnthropicSummary)
+- [VERIFIED] `scripts/lib/an-groups.ts` présent ; export GROUP_MAPPING
+- [VERIFIED] aucune déclaration `GROUP_MAPPING:` dans les 2 scripts (juste les imports)
+- [VERIFIED] tests/parse-summary.test.ts a 35 `it(` (24 base + 10 extractAnthropicSummary + 1 dans la nouvelle describe)
+- 223/223 tests verts, typecheck clean
+
+### Bugs fixés (AN parse dedup — types + parseRaw + tests)
+
+- [FIXED] `ANScrutinRaw` + `ANGroupVote` types dupliqués · Les 2 scripts inlinaient le même envelope shape. `ingest-an.ts`'s `ANGroupVote` avait 2 fields extra (`nombreMembresGroupe`, `vote.positionMajoritaire`) que le parser ne lit JAMAIS — code dead. Extraction dans `scripts/lib/an-parse.ts` avec interface minimale (juste les fields que parseRaw consomme : organeRef + vote.decompteVoix). · `scripts/lib/an-parse.ts` (nouveau)
+- [FIXED] `parseRaw` + `n` helper dupliqués identiquement · Même corps de fonction (vote breakdown, UDR merge defensive, dossier_id fallback), différait uniquement par le return-type annotation : ingest-an retournait `Omit<ParsedScrutin, ...>`, resume-ingest retournait `ParsedRaw`. Les 2 produisaient la même shape runtime. Extraction de `parseRaw` + helper `n` + nouveau type `ParsedScrutinCore` (single source of truth pour le shape). ingest-an redéfinit `ParsedScrutin extends ParsedScrutinCore` pour ajouter les champs LLM (titre_pedago, chapeau, contexte, analyse_loi, points_cles, theme). resume-ingest fait `type ParsedRaw = ParsedScrutinCore` (alias). · `scripts/ingest-an.ts`, `scripts/resume-ingest.ts`
+- [FIXED] `parseRaw` 0 test coverage · La fonction critique qui transforme JSON AN brut en rows DB n'avait aucun test. Ajout de `tests/an-parse.test.ts` avec 17 cas : shape (id/numero/titre_brut/est_solennel/url_an_officielle/pedago_relu), dossier handling (présent / null / libelle fallback), vote breakdown (RN mapping, unknown organeRef, non-inscrits PO840056 = null, UDR merge defensive PO847173+PO872880, absent = nonVotants + nonVotantsVolontaires, coerce missing/garbage counts to 0), position_par_groupe (pour à ≥70%, divisé sinon). · `tests/an-parse.test.ts` (nouveau)
+
+### Vérifications à faire en session 97
+
+- [ ] `ls scripts/lib/an-parse.ts` → présent ; exports `ANScrutinRaw`, `ANGroupVote`, `ParsedScrutinCore`, `parseRaw`
+- [ ] grep `^interface ANScrutinRaw\|^interface ANGroupVote\|^function parseRaw\|^function n\(` scripts/ingest-an.ts scripts/resume-ingest.ts → 0 résultat (tout déplacé)
+- [ ] grep `~223 tests` CLAUDE.md → 0 résultat (aligné sur ~240)
+- [ ] grep `nombreMembresGroupe\|positionMajoritaire` scripts/ → 0 résultat (dead fields retirés via la dedup)
