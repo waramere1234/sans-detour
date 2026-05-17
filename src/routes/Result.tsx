@@ -12,7 +12,7 @@ import { PersonnaliteRow } from "../components/PersonnaliteRow";
 import { AuditTrail } from "../components/AuditTrail";
 import { RetryError, RETRY_FETCH_FAILED_MESSAGE } from "../components/RetryError";
 import { getPartyColorVar, getParty } from "../lib/parties";
-import { composeShareText } from "../lib/share";
+import { composeShareText, performShare } from "../lib/share";
 import { track } from "../lib/analytics";
 import { ROUTES, PLAY_AFFINEMENT } from "../lib/routes";
 import { TARGET, LEGISLATURE_LABEL, type Scrutin, type GroupCode } from "../types";
@@ -138,25 +138,9 @@ export default function Result() {
     // → shareUrl becomes "undefined"). Be explicit so the global stays
     // unambiguous.
     const shareUrl = window.location.origin;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ text, url: shareUrl });
-        return;
-      } catch (err) {
-        // AbortError = user dismissed the share sheet intentionally.
-        // Respecting that requires we DON'T silently fall through to
-        // clipboard — otherwise their result gets copied without consent.
-        // Other errors (NotAllowedError, etc.) = share API unavailable,
-        // safe to try clipboard as a backup path.
-        if ((err as { name?: string }).name === "AbortError") return;
-      }
-    }
-    try {
-      await navigator.clipboard.writeText(`${text}\n${shareUrl}`);
-    } catch {
-      window.prompt("Copie ton résultat :", `${text}\n${shareUrl}`);
-    }
+    // performShare handles the navigator.share → clipboard → prompt
+    // fallback chain + the AbortError consent invariant.
+    await performShare(text, shareUrl);
   }
 
   return (

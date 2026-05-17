@@ -3096,3 +3096,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `PROD_HOSTNAME` src/ api/ tests/ → 12+ résultats
 - [ ] grep `'"sansdetour\.fr"'` src/ api/ → 0 résultat (toutes derivées)
 - [ ] grep `~582 tests` CLAUDE.md → 0 résultat (aligné sur ~586)
+
+---
+
+## Session 132 — 2026-05-17
+
+### Vérification session 131
+
+- [VERIFIED] 31 occurrences de PROD_HOSTNAME dans src/ + api/ + tests/
+- [VERIFIED] 0 literal `"sansdetour.fr"` dans src/ + api/ (les 3 hits restants sont des comments)
+- [VERIFIED] CLAUDE.md "~586 tests"
+- 586/586 tests verts, typecheck clean
+
+### Bugs fixés (DRY share-text lead + performShare extraction + AbortError consent invariant test)
+
+- [FIXED] `composeShareText` ternaire dans src/lib/share.ts dupliquait `"Mes affinités politiques réelles"` + `"basées sur les vrais votes de l'AN"` sur les 2 branches · Seul le parenthétique `(résultat partiel N/M)` differs. Une rewording aurait dû être éditée 2× en lockstep. Fix : extract `LEAD_PREFIX` / `LEAD_SUFFIX` consts privées + compute `partialParen` séparément ; le lead se compose en une expression unique. Tests existants restent verts (le format de sortie est identique). · `src/lib/share.ts`
+- [FIXED] `share()` flow inline dans Result.tsx avec le 3-tier fallback (navigator.share → clipboard → window.prompt) untested · Le contract critique "AbortError = user cancel → ne PAS silently fall through to clipboard" était buried dans un one-liner du handler. Un refactor qui drop le `if (...AbortError) return` aurait silently copié le résultat à l'utilisateur qui a explicitement cancelé. Fix : extract `performShare(text, url)` async function dans share.ts retournant `ShareOutcome` ("shared" | "aborted" | "copied" | "prompted"). Result.tsx remplace les ~15 lignes par un seul `await performShare(...)`. · `src/lib/share.ts`, `src/routes/Result.tsx`
+- [FIXED] 0 test pin le AbortError consent invariant + les 3 autres fallback branches · 6 tests dans `tests/share.test.ts` : (a) shared on navigator.share resolve, (b) aborted on AbortError + clipboardSpy.not.toHaveBeenCalled (le critical guard), (c) fallthrough sur non-AbortError, (d) fallthrough sur missing navigator.share (Safari < 13), (e) prompt fallback sur clipboard fail, (f) clipboard payload format pin (`text\nurl` newline-joined). · `tests/share.test.ts`
+
+### Vérifications à faire en session 133
+
+- [ ] grep `performShare` src/ tests/ → 4+ résultats
+- [ ] grep `"AbortError"` src/ tests/ → 2+ résultats (la check + le test)
+- [ ] grep `~586 tests` CLAUDE.md → 0 résultat (aligné sur ~592)

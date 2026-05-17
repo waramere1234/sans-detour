@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { composeShareText, SHARE_TOP_N } from "../src/lib/share";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { composeShareText, performShare, SHARE_TOP_N } from "../src/lib/share";
 import type { GroupAlignment, GroupCode } from "../src/types";
 import { GROUP_CODES } from "../src/types";
 import { getParty } from "../src/lib/parties";
@@ -99,5 +99,99 @@ describe("composeShareText — SHARE_TOP_N truncation", () => {
     expect(out).toContain("1. RN 50%");
     expect(out).toContain("2. LFI 40%");
     expect(out).not.toContain("3. ");
+  });
+});
+
+describe("performShare — 3-tier fallback chain", () => {
+  // performShare runs the navigator.share → clipboard → prompt waterfall
+  // with one critical invariant: an AbortError from navigator.share (user
+  // dismissed the share sheet) MUST NOT silently fall through to clipboard.
+  // The previous inline implementation in Result.tsx had this nuance buried
+  // in a one-liner; extracting + testing pins the consent guarantee.
+
+  let originalShare: ((data: ShareData) => Promise<void>) | undefined;
+  let originalClipboard: Clipboard | undefined;
+  let originalPrompt: typeof window.prompt;
+
+  beforeEach(() => {
+    originalShare = (navigator as Navigator & { share?: (d: ShareData) => Promise<void> }).share;
+    originalClipboard = (navigator as Navigator & { clipboard?: Clipboard }).clipboard;
+    originalPrompt = window.prompt;
+  });
+
+  afterEach(() => {
+    // Restore via defineProperty since navigator.share + clipboard are
+    // read-only on the Navigator prototype in jsdom.
+    Object.defineProperty(navigator, "share", { configurable: true, value: originalShare });
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: originalClipboard });
+    window.prompt = originalPrompt;
+  });
+
+  function setShare(fn: ((data: ShareData) => Promise<void>) | undefined) {
+    Object.defineProperty(navigator, "share", { configurable: true, value: fn });
+  }
+  function setClipboard(writeText: ((text: string) => Promise<void>) | undefined) {
+    const clipboard = writeText ? { writeText } : undefined;
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: clipboard });
+  }
+
+  it("returns 'shared' when navigator.share resolves", async () => {
+    const shareSpy = vi.fn().mockResolvedValue(undefined);
+    setShare(shareSpy);
+    const result = await performShare("text", "https://example.test");
+    expect(result).toBe("shared");
+    expect(shareSpy).toHaveBeenCalledWith({ text: "text", url: "https://example.test" });
+  });
+
+  it("returns 'aborted' when navigator.share rejects with AbortError (user-cancel CONSENT invariant)", async () => {
+    // Regression guard: a previous refactor that drops the AbortError
+    // early-return would silently copy the result to clipboard. Pin
+    // here that an aborted share NEVER reaches clipboard.
+    const abortErr = Object.assign(new Error("user dismissed"), { name: "AbortError" });
+    const shareSpy = vi.fn().mockRejectedValue(abortErr);
+    const clipboardSpy = vi.fn().mockResolvedValue(undefined);
+    setShare(shareSpy);
+    setClipboard(clipboardSpy);
+    const result = await performShare("text", "https://example.test");
+    expect(result).toBe("aborted");
+    expect(clipboardSpy).not.toHaveBeenCalled(); // critical consent invariant
+  });
+
+  it("falls through to clipboard when navigator.share rejects with non-AbortError", async () => {
+    const otherErr = Object.assign(new Error("not allowed"), { name: "NotAllowedError" });
+    const shareSpy = vi.fn().mockRejectedValue(otherErr);
+    const clipboardSpy = vi.fn().mockResolvedValue(undefined);
+    setShare(shareSpy);
+    setClipboard(clipboardSpy);
+    const result = await performShare("text", "https://example.test");
+    expect(result).toBe("copied");
+    expect(clipboardSpy).toHaveBeenCalledWith("text\nhttps://example.test");
+  });
+
+  it("falls through to clipboard when navigator.share is unavailable (Safari < 13)", async () => {
+    setShare(undefined);
+    const clipboardSpy = vi.fn().mockResolvedValue(undefined);
+    setClipboard(clipboardSpy);
+    const result = await performShare("text", "https://example.test");
+    expect(result).toBe("copied");
+    expect(clipboardSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("falls through to window.prompt when clipboard fails (last resort)", async () => {
+    setShare(undefined);
+    setClipboard(vi.fn().mockRejectedValue(new Error("clipboard blocked")));
+    const promptSpy = vi.fn().mockReturnValue(null);
+    window.prompt = promptSpy;
+    const result = await performShare("text", "https://example.test");
+    expect(result).toBe("prompted");
+    expect(promptSpy).toHaveBeenCalledWith("Copie ton résultat :", "text\nhttps://example.test");
+  });
+
+  it("clipboard payload joins text + url with a newline (single canonical format)", async () => {
+    setShare(undefined);
+    const clipboardSpy = vi.fn().mockResolvedValue(undefined);
+    setClipboard(clipboardSpy);
+    await performShare("the share line", "https://sansdetour.fr");
+    expect(clipboardSpy).toHaveBeenCalledWith("the share line\nhttps://sansdetour.fr");
   });
 });
