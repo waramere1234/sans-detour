@@ -284,9 +284,25 @@ export default function Cover() {
             letterSpacing: "0.06em",
             color: "var(--ink-3)",
           }}>
-          <Link to="/methode" onClick={() => track("cover_footer_nav", { target: "methode" })} style={{ color: "inherit", textDecoration: "none" }}>Méthode &amp; sources</Link>
-          <Link to="/legal" onClick={() => track("cover_footer_nav", { target: "legal" })} style={{ color: "inherit", textDecoration: "none" }}>Mentions légales</Link>
-          <a href="mailto:contact@sansdetour.fr" onClick={() => track("cover_footer_nav", { target: "contact" })} style={{ color: "inherit", textDecoration: "none" }}>Contact</a>
+          {/* underline so the 3 links aren't visually indistinguishable
+              from regular text (parent + child both at var(--ink-3), no
+              other affordance). Same pattern as the "Voir mon résultat
+              partiel" + "Recommencer à zéro" links above (session 65). */}
+          {(() => {
+            const linkStyle = {
+              color: "inherit",
+              textDecoration: "underline" as const,
+              textDecorationColor: "var(--ink-4)",
+              textUnderlineOffset: 3,
+            };
+            return (
+              <>
+                <Link to="/methode" onClick={() => track("cover_footer_nav", { target: "methode" })} style={linkStyle}>Méthode &amp; sources</Link>
+                <Link to="/legal" onClick={() => track("cover_footer_nav", { target: "legal" })} style={linkStyle}>Mentions légales</Link>
+                <a href="mailto:contact@sansdetour.fr" onClick={() => track("cover_footer_nav", { target: "contact" })} style={linkStyle}>Contact</a>
+              </>
+            );
+          })()}
         </nav>
       </div>
     </section>

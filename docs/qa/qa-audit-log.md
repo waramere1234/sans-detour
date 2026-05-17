@@ -1493,3 +1493,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] DevTools Vision Deficiencies → "Achromatopsie" sur Cover hasInProgress → "Voir mon résultat partiel" reste identifiable comme lien (underline)
 - [ ] curl https://sansdetour.fr/favicon.ico → réponse (404 maintenant tant que les icons ne sont pas créés, mais le `<link rel="icon">` indique au browser de fetcher icon-192.png à la place — quand le fichier existera, le browser le trouvera)
 - [ ] Nouveau Claude session sur ce repo lisant la memory → comprend l'état V2 actuel, pas V1 figé
+
+---
+
+## Session 66 — 2026-05-17
+
+### Vérification session 65
+
+- [VERIFIED] `Cover.tsx:244` "Voir mon résultat partiel" link a `textDecoration: "underline"` + `textDecorationColor: var(--ink-4)`
+- [VERIFIED] `index.html:42` `<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">` présent
+- [VERIFIED] User memory réécrite avec état V2 + MEMORY.md index mis à jour
+- 123/123 tests verts, typecheck clean
+
+### Bugs fixés (WCAG 1.4.1 sweep + aria-current)
+
+- [FIXED] Cover footer 3 nav links · Session 65 a fixé "Voir mon résultat partiel" mais a raté les 3 siblings dans le footer secondary nav (`Méthode & sources`, `Mentions légales`, `Contact`). Tous 3 ont `color: "inherit"` (= parent var(--ink-3)) + `textDecoration: "none"` → indistinguables de plain text, même cue color manquant. linkStyle commun extrait pour les 3 avec underline + ink-4. · `src/routes/Cover.tsx`
+- [FIXED] CSS global pour bare `<a>` · Tailwind preflight reset `text-decoration: inherit` sur `<a>` → tous les `<a>` sans inline textDecoration (Methode "voir section 07", Methode §06+§07 external/mailto links, ErrorBoundary contact link) rendent sans underline → WCAG 1.4.1 sur ~6 liens. Règle CSS globale ajoutée : `a { text-decoration: underline; text-decoration-color: currentColor; text-underline-offset: 3px; }`. Inline `textDecoration: "none"` continue à win pour Wordmark Link, TOC accent-number anchors, TopBar MenuLink (qui ont leur propre affordance). · `src/index.css`
+- [FIXED] aria-current TopBar menu · TopBar `MenuPopover` rendait 4 destinations (Mon résultat / Méthode & sources / Mentions légales / Contact) sans aucune indication de la page courante. Un user sur `/methode` ouvrant le menu voyait 4 liens équivalents. Prop `current?: boolean` ajoutée à MenuLink → `aria-current="page"` sur le Link interne quand actif, + ton visuel ink-3 (au lieu de ink) pour signaler la position. Wired pour `/methode` et `/legal` (Mon résultat est déjà hidden sur /result, Contact est mailto). · `src/components/TopBar.tsx`
+
+### Vérifications à faire en session 67
+
+- [ ] grep `textDecoration: "none"` dans Cover footer → 0 résultat (les 3 utilisent linkStyle commun avec underline)
+- [ ] Sur `/methode`, ouvrir TopBar menu `•••` → "Méthode & sources" en ink-3 (au lieu de ink), DevTools attribute `aria-current="page"` sur ce Link
+- [ ] Sur `/methode`, inspecter `<a href="#methode-07">section 07` → underline visible (CSS rule globale), couleur accent (currentColor)

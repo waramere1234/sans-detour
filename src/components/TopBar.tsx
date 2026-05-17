@@ -194,6 +194,10 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
               }}
             />
 
+            {/* aria-current="page" on the link matching the current route
+                so SR users know they're already on it — otherwise the menu
+                advertises 4 destinations as equivalent even when one is
+                the page in front of them. */}
             <nav style={{ display: "flex", flexDirection: "column", gap: 0 }}>
               {showResultLink && (
                 <MenuLink
@@ -204,8 +208,18 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
                   onNavigate={() => { track("topbar_nav", { target: "result" }); onClose(); }}
                 />
               )}
-              <MenuLink to="/methode" label="Méthode & sources" onNavigate={() => { track("topbar_nav", { target: "methode" }); onClose(); }} />
-              <MenuLink to="/legal" label="Mentions légales" onNavigate={() => { track("topbar_nav", { target: "legal" }); onClose(); }} />
+              <MenuLink
+                to="/methode"
+                label="Méthode & sources"
+                current={location.pathname === "/methode"}
+                onNavigate={() => { track("topbar_nav", { target: "methode" }); onClose(); }}
+              />
+              <MenuLink
+                to="/legal"
+                label="Mentions légales"
+                current={location.pathname === "/legal"}
+                onNavigate={() => { track("topbar_nav", { target: "legal" }); onClose(); }}
+              />
               <MenuLink
                 href="mailto:contact@sansdetour.fr"
                 label="Contact"
@@ -239,6 +253,10 @@ function MenuLink(props: {
   badge?: string;
   accent?: boolean;
   external?: boolean;
+  /** True when this link points at the route the user is already on —
+   *  drives aria-current="page" so SR users know they're on it, and
+   *  visually tones the label down to ink-3. */
+  current?: boolean;
   onNavigate?: () => void;
 }) {
   const style: CSSProperties = {
@@ -247,7 +265,9 @@ function MenuLink(props: {
     justifyContent: "space-between",
     gap: 10,
     fontFamily: "var(--font-sans)", fontSize: 14, fontWeight: 500,
-    color: props.accent ? "var(--accent)" : "var(--ink)",
+    color: props.accent
+      ? "var(--accent)"
+      : props.current ? "var(--ink-3)" : "var(--ink)",
     textDecoration: "none",
     padding: "10px 12px",
     borderRadius: 4,
@@ -295,6 +315,7 @@ function MenuLink(props: {
       className="sd-menu-item"
       to={props.to!}
       role="menuitem"
+      aria-current={props.current ? "page" : undefined}
       style={style}
       onClick={props.onNavigate}
     >

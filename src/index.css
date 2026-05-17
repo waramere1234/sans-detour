@@ -73,6 +73,21 @@ body {
 
 * { box-sizing: border-box; }
 
+/* Tailwind preflight sets `text-decoration: inherit` on <a>, which strips
+ * the browser's default underline. Re-establish underline as the
+ * baseline link affordance so bare <a> tags (Methode external/mailto,
+ * "voir section 07", ErrorBoundary contact link, etc.) aren't identified
+ * by color alone (WCAG 1.4.1). Inline `textDecoration: "none"` still wins
+ * for elements that have their own affordance (Wordmark Link, Methode
+ * TOC anchors with accent number prefix, TopBar MenuLink items inside a
+ * bordered popover). currentColor means the underline matches the link's
+ * text color — keeps the accent palette consistent. */
+a {
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+  text-underline-offset: 3px;
+}
+
 /* Focus ring for the flippable Card root. The Card needed an inline
  * outline:none to suppress the browser default on pointer (drag/tap),
  * but inline > class specificity so a plain class wouldn't override.
