@@ -56,6 +56,19 @@ describe("Methode — section structure", () => {
     // round-trip section-body test above.
     expect(METHODE_SECTIONS).toHaveLength(7);
   });
+
+  it("the number of rendered Section bodies matches METHODE_SECTIONS.length (no orphan body)", () => {
+    // Reverse-drift guard: the test "renders one numbered section per
+    // METHODE_SECTIONS entry" catches a missing body but not a body
+    // rendered without a matching METHODE_SECTIONS entry. Counting the
+    // region landmarks closes the round-trip — a `<Section n="08">` JSX
+    // body added without `["08", "…"]` in METHODE_SECTIONS still surfaces
+    // here because the count diverges.
+    renderMethode();
+    const regions = Array.from(document.querySelectorAll('[role="region"]'))
+      .filter((el) => el.id.startsWith("methode-"));
+    expect(regions).toHaveLength(METHODE_SECTIONS.length);
+  });
 });
 
 describe("Methode — SPA hash deep-link", () => {

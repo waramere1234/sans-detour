@@ -174,6 +174,59 @@ describe("Cover — restart() flow (confirm + reset + analytics)", () => {
   });
 });
 
+describe("Cover — auto-resume analytics (cover_result_revisit + cover_partial_result)", () => {
+  let trackSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    localStorage.clear();
+    resetSession();
+    trackSpy = vi.spyOn(analytics, "track").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    trackSpy.mockRestore();
+  });
+
+  it("fires 'cover_result_revisit' when user clicks the primary CTA with a completed session", () => {
+    // cover_result_revisit fires inside start() when hasCompleted=true — i.e.
+    // user already finished a 20-vote session and clicks the primary CTA
+    // (labelled "Voir mon résultat" in that branch). We need fromLogo=true
+    // so the auto-resume effect doesn't intercept before the button renders.
+    localStorage.setItem(COVER_STORAGE_KEY, "true");
+    for (let i = 1; i <= TARGET; i++) recordVote(`s${i}`, "pour");
+    renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
+    fireEvent.click(screen.getByRole("button", { name: /Voir mon résultat/ }));
+    expect(trackSpy).toHaveBeenCalledWith("cover_result_revisit");
+    expect(trackSpy).not.toHaveBeenCalledWith("cover_started");
+    expect(trackSpy).not.toHaveBeenCalledWith("cover_resumed");
+  });
+
+  it("does NOT fire 'cover_result_revisit' on a fresh visit (no completed session)", () => {
+    renderCover();
+    fireEvent.click(screen.getByRole("button", { name: /Commencer/ }));
+    expect(trackSpy).not.toHaveBeenCalledWith("cover_result_revisit");
+  });
+
+  it("fires 'cover_partial_result' on the 'Voir mon résultat partiel' link click", () => {
+    // Gate: votes >= MIN_FOR_RANKING + hasInProgress (votes < TARGET).
+    localStorage.setItem(COVER_STORAGE_KEY, "true");
+    // 5 votes = MIN_FOR_RANKING boundary. fromLogo bypasses auto-resume.
+    for (let i = 1; i <= 5; i++) recordVote(`s${i}`, "pour");
+    renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
+    const link = screen.getByRole("link", { name: /Voir mon résultat partiel/ });
+    fireEvent.click(link);
+    expect(trackSpy).toHaveBeenCalledWith("cover_partial_result");
+  });
+
+  it("does NOT render the partial-result link when below MIN_FOR_RANKING", () => {
+    localStorage.setItem(COVER_STORAGE_KEY, "true");
+    // 1 vote — below MIN_FOR_RANKING=5.
+    recordVote("s1", "pour");
+    renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
+    expect(screen.queryByRole("link", { name: /Voir mon résultat partiel/ })).not.toBeInTheDocument();
+  });
+});
+
 describe("Cover — footer nav analytics (cover_footer_nav × 3 targets)", () => {
   let trackSpy: ReturnType<typeof vi.spyOn>;
 

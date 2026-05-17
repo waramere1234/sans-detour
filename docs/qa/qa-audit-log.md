@@ -2653,3 +2653,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `'["01", "Données"]'` src/ tests/ → max 1 résultat (la déclaration `METHODE_SECTIONS`)
 - [ ] grep `topbar_nav\|methode_toc_click` tests/TopBar.test.tsx tests/Methode.test.tsx → résultats dans chacun des deux fichiers
 - [ ] grep `~459 tests` CLAUDE.md → 0 résultat (aligné sur ~465)
+
+---
+
+## Session 114 — 2026-05-17
+
+### Vérification session 113
+
+- [VERIFIED] METHODE_SECTIONS diffused : déclaration + usage dans Methode.tsx, import + iterations dans Methode.test.tsx
+- [VERIFIED] 1 occurrence seulement de `["01", "Données"]` dans src/ (la déclaration)
+- [VERIFIED] tests/TopBar.test.tsx contient le describe topbar_nav, tests/Methode.test.tsx contient le describe methode_toc_click
+- [VERIFIED] CLAUDE.md "~465 tests"
+- 465/465 tests verts, typecheck clean
+
+### Bugs fixés (useFreshnessOnce silent-fail + Cover remaining analytics + Methode round-trip)
+
+- [FIXED] `useFreshnessOnce` silent-failure contract jamais testé · Le `.catch(() => {})` dans le hook swallow une rejection de `fetchFreshness()` — par contrat la banner ne rend pas (graceful degradation). Documenté dans le commentaire source mais 0 test. Supprimer le catch (crash de Cover au premier blip réseau) ou changer son comportement (par exemple setError(true)) passerait CI vert. 1 test ajouté : mock `fetchFreshness` pour rejeter, render le hook via une harness, vérifier que `info` reste null + que `fetchFreshness` a été appelé exactement 1 fois. · `tests/useFreshnessOnce.test.tsx`
+- [FIXED] Cover.tsx 2 analytics events restants non testés · `cover_result_revisit` fire dans `start()` quand `hasCompleted = true` (user revient après avoir fini 20 votes et clique "Voir mon résultat") ; `cover_partial_result` fire sur le link "Voir mon résultat partiel" gated sur `canSeePartialResult = votes >= MIN_FOR_RANKING`. Bug initial du draft : j'ai d'abord testé `cover_result_revisit` en attendant que l'auto-resume effect le fire automatiquement, mais l'event ne fire QUE dans `start()` — pas dans l'effect. Correction : fromLogo state bypass l'effect, puis fireEvent.click sur le bouton "Voir mon résultat". 4 tests ajoutés : cover_result_revisit fired via click (pas via effect), pas fired sur fresh visit, cover_partial_result fired sur le link click, partial-result link absent below MIN_FOR_RANKING. · `tests/Cover.test.tsx`
+- [FIXED] Methode "no orphan Section body" round-trip guard manquant · La test existante "renders one numbered section per METHODE_SECTIONS entry" itère METHODE_SECTIONS et vérifie chaque id rendu — catche un body manquant. Mais le REVERSE direction (ajouter un `<Section n="08">` JSX sans `["08", "..."]` dans METHODE_SECTIONS) passait silently : la section rend OK, juste pas dans la TOC. Le user voit le contenu mais ne peut pas y naviguer via l'index. 1 test ajouté : count des `[role="region"][id^="methode-"]` landmarks et asserts === METHODE_SECTIONS.length — un body orphelin surface immédiatement. · `tests/Methode.test.tsx`
+
+### Vérifications à faire en session 115
+
+- [ ] grep `mockRejectedValueOnce.*fetchFreshness` tests/useFreshnessOnce.test.tsx → 1 résultat
+- [ ] grep `cover_result_revisit\|cover_partial_result` tests/Cover.test.tsx → 4+ résultats (les nouveaux tests)
+- [ ] grep `no orphan Section body` tests/Methode.test.tsx → 1 résultat (le commentaire du nouveau test)
+- [ ] grep `~465 tests` CLAUDE.md → 0 résultat (aligné sur ~471)

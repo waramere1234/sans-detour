@@ -59,4 +59,34 @@ describe("useFreshnessOnce", () => {
     rerender(<Harness onInfo={captureInfo} />);
     expect(infoCalls[infoCalls.length - 1]).toBe(first);
   });
+
+  // The hook's `.catch(() => {})` swallows a fetchFreshness rejection — by
+  // contract the banner simply doesn't render (graceful degradation). The
+  // path mattered enough to comment but had no test, so removing the catch
+  // (which would crash Cover on the first network blip) wouldn't have
+  // flagged in CI. We mock the module to force a rejection.
+  it("stays null when fetchFreshness rejects (silent failure)", async () => {
+    const scrutinsMod = await import("../src/lib/scrutins");
+    const fetchSpy = vi
+      .spyOn(scrutinsMod, "fetchFreshness")
+      .mockRejectedValueOnce(new Error("network blip"));
+    // Re-import the hook module under test AFTER installing the spy, so
+    // the new `fetchFreshness` binding is used. (The hook reads it from
+    // the imported namespace each call — vi.spyOn on the module record
+    // propagates via live binding.)
+    const { useFreshnessOnce: hook } = await import("../src/hooks/useFreshnessOnce");
+    function FailHarness() {
+      const v = hook();
+      captureInfo(v);
+      return null;
+    }
+    render(<FailHarness />);
+    // Initial render returns null synchronously.
+    expect(infoCalls[0]).toBeNull();
+    // Allow the rejected promise to flush; info must remain null.
+    await new Promise((r) => setTimeout(r, 0));
+    expect(infoCalls[infoCalls.length - 1]).toBeNull();
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    fetchSpy.mockRestore();
+  });
 });
