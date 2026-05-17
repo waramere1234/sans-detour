@@ -15,6 +15,15 @@ export interface Bar {
   pct: number;
 }
 
+/** Maximum bars rendered on the share-card SVG (api/share-card.ts).
+ *  Higher than `SHARE_TOP_N = 6` in src/lib/share.ts (the natural-
+ *  language summary cap) because the SVG card's taller layout fits
+ *  more rows: a hero top1 + up to 5 body rows = up to 6 visible, with
+ *  2 slots of headroom if a future redesign extends the body block.
+ *  Centralised here so a redesign that bumps the row count flows
+ *  through both the URL cap and the slice ranges. */
+export const MAX_SHARE_CARD_BARS = 8;
+
 /** Parse the `?t=RN:57,LFI:30,EPR:22` URL param into `Bar[]`. Defends the
  *  rendered card against malformed input (negative pcts, NaN, missing
  *  pieces) so a hand-crafted or buggy share URL can't ship a "-50%" or

@@ -6,18 +6,20 @@
 // in 1–2 s by Satori alone, embeds cleanly in browser tabs and the Web Share
 // API, and is good enough for V1.
 import satori from "satori";
-import { parseTopParam } from "./_lib/parse-top";
+import { parseTopParam, MAX_SHARE_CARD_BARS } from "./_lib/parse-top";
+import {
+  BRAND_BG, BRAND_ACCENT, BRAND_INK, BRAND_INK_2,
+} from "./_lib/brand-colors";
 
 export const config = { runtime: "nodejs" };
 
-const BG = "#1d1f24";
-// Orange signal — sRGB approximation of `oklch(0.76 0.16 55)` (index.css
-// `--accent`, board 04 direction D3). Server-side rendering can't read CSS
-// vars, so the hex is duplicated. Previously held `#7eb6ff` (D2 république
-// blue, archived) — share images visibly diverged from the app's identity.
-const ACCENT = "#ed9846";
-const INK = "#f0f1f3";
-const INK_2 = "#a7adb8";
+// Brand colors live in api/_lib/brand-colors.ts (single source of
+// truth for the share card SVG, PWA manifest, and index.html meta
+// theme-color). See that file for the OKLCH-derivation rationale.
+const BG = BRAND_BG;
+const ACCENT = BRAND_ACCENT;
+const INK = BRAND_INK;
+const INK_2 = BRAND_INK_2;
 
 // Stable TTF mirror of IBM Plex Mono Regular (Google Fonts repo via jsDelivr).
 // Satori only supports TTF/OTF (opentype/cff) — woff/woff2 are not decoded.
@@ -42,7 +44,7 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     const { searchParams } = new URL(req.url);
     const fmt = searchParams.get("fmt") === "story" ? "story" : "square";
-    const bars = parseTopParam(searchParams.get("t")).slice(0, 8);
+    const bars = parseTopParam(searchParams.get("t")).slice(0, MAX_SHARE_CARD_BARS);
     if (bars.length === 0) {
       // Mirror the 500 path: explicit `text/plain` so curl / scrapers /
       // browsers don't interpret the short body via a platform-default

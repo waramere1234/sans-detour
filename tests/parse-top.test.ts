@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { parseTopParam } from "../api/_lib/parse-top";
+import { parseTopParam, MAX_SHARE_CARD_BARS } from "../api/_lib/parse-top";
+import { SHARE_TOP_N } from "../src/lib/share";
 
 // api/_lib/parse-top.ts is the pure parser pulled out of api/share-card.ts
 // (it used to live inline above the satori-rendering handler). Tests here
@@ -42,6 +43,20 @@ describe("parseTopParam — pct clamp [0, 100]", () => {
       { code: "A", pct: 0 },
       { code: "B", pct: 100 },
     ]);
+  });
+});
+
+describe("MAX_SHARE_CARD_BARS — share-card row cap", () => {
+  it("is 8 (the URL-input cap, larger than the natural-language SHARE_TOP_N)", () => {
+    expect(MAX_SHARE_CARD_BARS).toBe(8);
+  });
+
+  it("is strictly greater than SHARE_TOP_N (SVG fits more rows than the text)", () => {
+    // The SVG card has a taller layout; the text share is constrained to
+    // a tweet preview. Document the relationship: a future bump to either
+    // const should preserve `MAX_SHARE_CARD_BARS >= SHARE_TOP_N` so the
+    // SVG can always include everything the text mentions.
+    expect(MAX_SHARE_CARD_BARS).toBeGreaterThanOrEqual(SHARE_TOP_N);
   });
 });
 

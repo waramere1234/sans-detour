@@ -2926,3 +2926,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `"web_search_20260209"` scripts/ → 1 résultat seulement (la déclaration env.ts)
 - [ ] grep `const BATCH = 20` scripts/ → 0 résultat (migrated to SUPABASE_UPDATE_BATCH_SIZE)
 - [ ] grep `~542 tests` CLAUDE.md → 0 résultat (aligné sur ~547)
+
+---
+
+## Session 125 — 2026-05-17
+
+### Vérification session 124
+
+- [VERIFIED] 1 occurrence seulement de "0 18px 30px -16px #000" dans src/ (CARD_FACE_BOX_SHADOW déclaration)
+- [VERIFIED] 1 occurrence seulement de "web_search_20260209" dans scripts/ (env.ts déclaration)
+- [VERIFIED] 0 occurrence de `const BATCH = 20` dans scripts/ (migré vers SUPABASE_UPDATE_BATCH_SIZE)
+- [VERIFIED] CLAUDE.md "~547 tests"
+- 547/547 tests verts, typecheck clean
+
+### Bugs fixés (BRAND_BG + brand colors extraction + MAX_SHARE_CARD_BARS)
+
+- [FIXED] `#1d1f24` brand-background hex dupliqué 4× (api/share-card.ts:13 BG, public/manifest.webmanifest:9 background_color + theme_color, index.html:23 meta theme-color) · Une re-skin (par exemple bump l'OKLCH bg vers une lightness différente) aurait laissé certains des 4 sites stale + créé un visual flash entre la PWA install (manifest background), le tab color (HTML meta), et la share card SVG (Satori). Fix : create `api/_lib/brand-colors.ts` avec `BRAND_BG = "#1d1f24"` + 3 autres colors approximations (BRAND_ACCENT/INK/INK_2 — les autres are share-card-only). share-card.ts importe + utilise. Static files (manifest, index.html) restent inline mais 3 nouveaux tests dans `tests/brand-colors.test.ts` pin la sync : lit le manifest JSON parse + lit l'index.html avec regex, asserts === BRAND_BG. Une drift one-sided (TS changé mais static oublié) surface immédiatement. · `api/_lib/brand-colors.ts` (nouveau), `api/share-card.ts`, `tests/brand-colors.test.ts` (nouveau)
+- [FIXED] BRAND_ACCENT / BRAND_INK / BRAND_INK_2 hex approximations encore inline dans `api/share-card.ts` · Même drift surface que BRAND_BG mais ces 3 ne sont utilisées que par la share card SVG (pas par manifest/HTML). Fix : extract en consts dans le même `brand-colors.ts`. share-card.ts garde `const BG = BRAND_BG` etc. comme aliases pour minimiser le diff. 3 tests : shape (6-digit hex), distinct (no accidental dup), BRAND_BG pin-the-value. · `api/_lib/brand-colors.ts`, `api/share-card.ts`
+- [FIXED] `bars.slice(0, 8)` inline dans api/share-card.ts (URL input cap) · Le `8` (max bars accepted from `?t=` param) is distinct de `SHARE_TOP_N = 6` dans src/lib/share.ts (natural-language summary cap). The two are intentionally different (SVG fits more rows than tweet preview) but the relationship was undocumented. Fix : export `MAX_SHARE_CARD_BARS = 8` from `api/_lib/parse-top.ts`. share-card.ts importe + utilise. 2 tests : pin-the-value, et un round-trip qui asserts `MAX_SHARE_CARD_BARS >= SHARE_TOP_N` (the SVG must always be able to display everything the text mentions). · `api/_lib/parse-top.ts`, `api/share-card.ts`, `tests/parse-top.test.ts`
+
+### Vérifications à faire en session 126
+
+- [ ] grep `"#1d1f24"` api/ public/ index.html → 4+ résultats avec exactement 3 hors brand-colors.ts (les 2 dans manifest + 1 dans index.html — static files)
+- [ ] grep `BRAND_BG\|BRAND_ACCENT\|BRAND_INK\|BRAND_INK_2` api/ tests/ → 8+ résultats
+- [ ] grep `MAX_SHARE_CARD_BARS\|SHARE_TOP_N` api/ src/ tests/ → 8+ résultats
+- [ ] grep `~547 tests` CLAUDE.md → 0 résultat (aligné sur ~555)
