@@ -1516,3 +1516,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `textDecoration: "none"` dans Cover footer → 0 résultat (les 3 utilisent linkStyle commun avec underline)
 - [ ] Sur `/methode`, ouvrir TopBar menu `•••` → "Méthode & sources" en ink-3 (au lieu de ink), DevTools attribute `aria-current="page"` sur ce Link
 - [ ] Sur `/methode`, inspecter `<a href="#methode-07">section 07` → underline visible (CSS rule globale), couleur accent (currentColor)
+
+---
+
+## Session 67 — 2026-05-17
+
+### Vérification session 66
+
+- [VERIFIED] `Cover.tsx:292+` `linkStyle` partagé sur les 3 footer links avec textDecoration: underline
+- [VERIFIED] `src/index.css:85+` règle globale `a { text-decoration: underline; ... }`
+- [VERIFIED] `TopBar.tsx` `MenuLink` accepte prop `current` qui set `aria-current="page"` + ink-3 visuel
+- 123/123 tests verts, typecheck clean
+
+### Bugs fixés (Cover wordmark + CLAUDE.md status + Wordmark prop cleanup)
+
+- [FIXED] Cover Wordmark self-link sans aria-current · Cover est à pathname `/`, et le wordmark dans son header pointe vers `<Link to="/">` — un click ne navigue nulle part visuellement, mais SR users entendent un lien "Accueil" sans signal qu'on est DÉJÀ dessus. `aria-current="page"` ajouté (même pattern que TopBar MenuLink session 66). Le Link reste cliquable pour cohérence (state.fromLogo re-trigger l'effect), mais l'a11y est honnête maintenant. · `src/routes/Cover.tsx`
+- [FIXED] CLAUDE.md V2 transparence status drift · La ligne 213 listait 3 items en TODO ("disclaimer 'généré par IA' sur cartes, liens vers sources web_search, page `/limitations`") avec un indicateur 🟡, mais le 1er item est shipped : chip ✨IA + MethodeSheet + footer "Synthèse mise en forme par Claude" + séparateur "↑ Synthèse IA / ↓ AN" sur le verso. Future Claude session aurait re-implémenté un truc déjà en place. Section restructurée en 3 sub-bullets ✅ / ⏳ / ⏳ avec pointeurs vers ce qui existe déjà. · `CLAUDE.md`
+- [FIXED] Wordmark `size={14}` redondant · 4 call sites (TopBar, Cover, Methode, Legal) passaient `size={14}` qui est exactement la valeur default du composant. Lecture noise sans information ajoutée — si un dev veut un autre size, il l'ajoutera. Drop sur les 4. · `src/components/TopBar.tsx`, `src/routes/Cover.tsx`, `src/routes/Methode.tsx`, `src/routes/Legal.tsx`
+
+### Vérifications à faire en session 68
+
+- [ ] Sur `/` (Cover), inspecter le wordmark Link → `aria-current="page"` présent
+- [ ] grep `Wordmark size=` dans `src/` → 0 résultat
+- [ ] grep `V2 transparence (optionnel)` dans `CLAUDE.md` → 0 résultat (remplacé par "en partie livré")

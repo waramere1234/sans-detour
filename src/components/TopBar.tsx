@@ -64,7 +64,7 @@ export function TopBar() {
           aria-label="Accueil"
           style={{ textDecoration: "none", color: "inherit" }}
         >
-          <Wordmark size={14} />
+          <Wordmark />
         </Link>
 
         <MenuTrigger

@@ -210,8 +210,14 @@ npx tsx scripts/ingest-personnalites.ts  # injection votes personnalités
   d'alignement avec son député local. Quick win (~2 jours) qui exploite
   l'infra `votes_personnalites` déjà en place mais pour TOUS les députés
   (pas que les 8 personnalités).
-- 🟡 V2 transparence (optionnel) — disclaimer "généré par IA" sur cartes,
-  liens vers sources web_search, page `/limitations`.
+- 🟡 V2 transparence (en partie livré) :
+  - ✅ Disclaimer "généré par IA" sur cartes — chip ✨IA sur le recto ouvre
+    MethodeSheet, footer "Synthèse mise en forme par Claude" sur le verso,
+    séparateur "↑ Synthèse IA · ↓ texte officiel AN".
+  - ⏳ Liens vers sources web_search (citations stripées par `stripCitations`
+    aujourd'hui — pourrait être surfacé dans MethodeSheet).
+  - ⏳ Page `/limitations` dédiée (le contenu existe en partie dans `/methode`
+    §07 "Le rôle de l'IA Claude").
 - ⏳ V3 — pré-vote sur dossiers à venir (cf v2-roadmap.md, "idée parking")
 
 ## Décisions de design importantes

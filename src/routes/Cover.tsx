@@ -108,9 +108,15 @@ export default function Cover() {
           to="/"
           state={{ fromLogo: true }}
           aria-label="Accueil"
+          // aria-current="page" because Cover IS at "/" — without it, SR
+          // users have no way to know the wordmark link is a self-link
+          // (visually it looks like a navigation affordance, semantically
+          // it's a "you are here" marker). Matches the pattern applied to
+          // TopBar MenuLink in session 66.
+          aria-current="page"
           style={{ textDecoration: "none", color: "inherit" }}
         >
-          <Wordmark size={14} />
+          <Wordmark />
         </Link>
         <span style={{
           fontFamily: "var(--font-mono)",

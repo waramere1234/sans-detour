@@ -18,7 +18,7 @@ export default function Legal() {
           <span aria-hidden="true">‹ </span>Retour
         </Link>
         <Link to="/" state={{ fromLogo: true }} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
-          <Wordmark size={14} />
+          <Wordmark />
         </Link>
       </nav>
 
