@@ -27,6 +27,7 @@ import path from "node:path";
 import { PERSONNALITES } from "../src/lib/personnalites";
 import { PERSONNALITE_CODES } from "../src/types";
 import type { PersonnaliteCode, PersonnaliteVote } from "../src/types";
+import { JSON_DIR } from "./lib/an-cache";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -36,7 +37,10 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
   process.exit(1);
 }
 
-const SCRUTINS_JSON_DIR = path.join("/tmp/sd-an-cache", "json");
+// JSON_DIR lives in scripts/lib/an-cache.ts; this script reads the
+// nominative votes (decompteNominatif) which the shared iterEligibleScrutins
+// doesn't expose — so we do our own directory walk below, but on the same
+// path as the other two scripts.
 
 // ──────────── scan local scrutins for nominative votes ──────────────────
 
@@ -117,12 +121,12 @@ async function main(): Promise<void> {
   const targetIds = new Set((scrutinsInDb ?? []).map((r) => r.id as string));
   console.log(`◯ ${targetIds.size} scrutins en base à patcher`);
 
-  const files = (await fs.readdir(SCRUTINS_JSON_DIR)).filter((f) => f.endsWith(".json"));
+  const files = (await fs.readdir(JSON_DIR)).filter((f) => f.endsWith(".json"));
   console.log(`◯ ${files.length} fichiers de scrutins dans le cache local`);
 
   const updates: Array<{ id: string; votes_personnalites: Partial<Record<PersonnaliteCode, PersonnaliteVote>> }> = [];
   for (const f of files) {
-    const raw = JSON.parse(await fs.readFile(path.join(SCRUTINS_JSON_DIR, f), "utf-8"));
+    const raw = JSON.parse(await fs.readFile(path.join(JSON_DIR, f), "utf-8"));
     const scrutin: ANScrutin = raw.scrutin ?? raw;
     if (!targetIds.has(scrutin.uid)) continue;
     const votes = extractVotesFromScrutin(scrutin, refToCode);

@@ -2230,3 +2230,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `^interface ANScrutinRaw\|^interface ANGroupVote\|^function parseRaw\|^function n\(` scripts/ingest-an.ts scripts/resume-ingest.ts → 0 résultat (tout déplacé)
 - [ ] grep `~223 tests` CLAUDE.md → 0 résultat (aligné sur ~240)
 - [ ] grep `nombreMembresGroupe\|positionMajoritaire` scripts/ → 0 résultat (dead fields retirés via la dedup)
+
+---
+
+## Session 97 — 2026-05-17
+
+### Vérification session 96
+
+- [VERIFIED] `scripts/lib/an-parse.ts` présent avec exports complets
+- [VERIFIED] 0 résultat pour `^interface ANScrutinRaw|^interface ANGroupVote|^function parseRaw|^function n(` dans les 2 scripts
+- [VERIFIED] `nombreMembresGroupe` / `positionMajoritaire` n'apparaissent plus que dans des commentaires lib (pas dans le code consommé)
+- [VERIFIED] CLAUDE.md "~240 tests"
+- 240/240 tests verts, typecheck clean
+
+### Bugs fixés (cache + scan + BatchResultLine dedup)
+
+- [FIXED] `CACHE_DIR` + `JSON_DIR` hardcodés à 3 sites · `/tmp/sd-an-cache` figé dans ingest-an.ts (CACHE_DIR + JSON_DIR), resume-ingest.ts (JSON_DIR direct), ingest-personnalites.ts (SCRUTINS_JSON_DIR direct). Un futur move (e.g. vers `~/.cache/sans-detour`) demanderait 3 edits. Extraction dans `scripts/lib/an-cache.ts` avec `CACHE_DIR` + `JSON_DIR` exportés. Les 3 scripts importent depuis là (ingest-personnalites garde son own scan loop car elle lit decompteNominatif, pas decompteVoix — incompatible avec le shared iterEligibleScrutins). · `scripts/lib/an-cache.ts` (nouveau), 3 scripts modifiés
+- [FIXED] `iterEligibleScrutins` scan-loop dupliquée entre ingest-an + resume-ingest · Les 2 scripts faisaient le même chain : `fs.readdir(JSON_DIR).filter(.json)` → `JSON.parse` → `raw.scrutin ?? raw` unwrap → `isEligibleScrutin` filter → `parseRaw`. ingest-an pushait vers array + comptait SPS, resume-ingest construisait Map<id, parsed>. Extraction comme async generator (yields `{raw, parsed}`) qui laisse la collection strategy au caller — clean dedup sans imposer une shape. Imports `isEligibleScrutin` + `parseRaw` éliminés des 2 scripts (transitifs via an-cache.ts). · `scripts/lib/an-cache.ts`, `scripts/ingest-an.ts`, `scripts/resume-ingest.ts`
+- [FIXED] `BatchResultLine` interface dupliquée · ingest-an avait la version riche (typed `error` field avec nested `error.error` per Anthropic batch shape) ; resume-ingest avait `error?: unknown` (loose). Risk : un fix sur l'error-shape ne se propage pas. Extraction dans `parse-summary.ts` avec la version riche (loose `error?: unknown` était strict subset → safe migration). 2 scripts importent depuis là. Drop aussi imports inutiles fs + path dans resume-ingest (caught par tsc -b puisque iterEligibleScrutins est dans an-cache.ts). · `scripts/lib/parse-summary.ts`, `scripts/ingest-an.ts`, `scripts/resume-ingest.ts`
+
+### Vérifications à faire en session 98
+
+- [ ] `ls scripts/lib/an-cache.ts` → présent ; exports `CACHE_DIR`, `JSON_DIR`, `iterEligibleScrutins`
+- [ ] grep `JSON_DIR = path.join` scripts/*.ts → 0 résultat (les 3 scripts importent depuis an-cache.ts)
+- [ ] grep `interface BatchResultLine` scripts/ingest-an.ts scripts/resume-ingest.ts → 0 résultat (déplacée vers parse-summary.ts)
+- [ ] `npx tsc -b` propre + 240/240 tests verts

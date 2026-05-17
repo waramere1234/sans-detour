@@ -80,6 +80,28 @@ export function sanitizeJsonControlChars(json: string): string {
   return out;
 }
 
+/** One line of the JSONL stream Anthropic returns from the Batches API
+ *  results endpoint. `custom_id` is the per-request key the script set on
+ *  submission (we use the scrutin uid). The `errored` shape mirrors what
+ *  Anthropic actually sends — the inner `error.error` is where the
+ *  user-facing fields live. Both ingest scripts decode this; the loose
+ *  typing on `errored` lets each consumer probe the depth it cares about. */
+export interface BatchResultLine {
+  custom_id: string;
+  result:
+    | { type: "succeeded"; message: MinimalAnthropicMessage }
+    | {
+        type: "errored";
+        error?: {
+          type?: string;
+          message?: string;
+          error?: { type?: string; message?: string };
+        };
+      }
+    | { type: "canceled" }
+    | { type: "expired" };
+}
+
 /** Minimal Anthropic message shape that `extractAnthropicSummary` inspects.
  *  Each script defines its own full Anthropic response type with extra
  *  per-block variants (thinking, server_tool_use, etc.); this lib only needs

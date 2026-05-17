@@ -18,20 +18,14 @@
 //   npx tsx scripts/resume-ingest.ts
 
 import { createClient } from "@supabase/supabase-js";
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import {
   type Summary,
-  type MinimalAnthropicMessage,
+  type BatchResultLine,
   fallbackSummary,
   extractAnthropicSummary,
 } from "./lib/parse-summary";
-import { isEligibleScrutin } from "./lib/an-filter";
-import {
-  type ANScrutinRaw,
-  type ParsedScrutinCore,
-  parseRaw,
-} from "./lib/an-parse";
+import { type ParsedScrutinCore } from "./lib/an-parse";
+import { iterEligibleScrutins } from "./lib/an-cache";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -43,36 +37,17 @@ if (!SUPABASE_URL || !SUPABASE_KEY || !ANTHROPIC_KEY || !BATCH_ID) {
   process.exit(1);
 }
 
-const JSON_DIR = path.join("/tmp/sd-an-cache", "json");
-
 // ──────────────────── AN parsing ─────────────────────────────────────────────
-// ANScrutinRaw, ANGroupVote, ParsedScrutinCore, and parseRaw live in
-// scripts/lib/an-parse.ts (shared with ingest-an.ts since session 96).
-// `ParsedRaw` was the local alias the resume script used — it's now the
-// same shape as ParsedScrutinCore.
+// CACHE_DIR + JSON_DIR + iterEligibleScrutins live in scripts/lib/an-cache.ts
+// (shared with ingest-an.ts + ingest-personnalites.ts since session 97).
+// `ParsedRaw` is kept as a local alias for readability in this script.
 type ParsedRaw = ParsedScrutinCore;
-
-// ──────────────────────────── LLM summary parsing ────────────────────────────
-
-interface BatchResultLine {
-  custom_id: string;
-  result:
-    | { type: "succeeded"; message: MinimalAnthropicMessage }
-    | { type: "errored"; error?: unknown }
-    | { type: "canceled" }
-    | { type: "expired" };
-}
 
 // ─────────────────────────────────── main ────────────────────────────────────
 
 async function loadEligibleScrutins(): Promise<Map<string, ParsedRaw>> {
-  const files = (await fs.readdir(JSON_DIR)).filter((f) => f.endsWith(".json"));
   const out = new Map<string, ParsedRaw>();
-  for (const f of files) {
-    const raw = JSON.parse(await fs.readFile(path.join(JSON_DIR, f), "utf-8"));
-    const s: ANScrutinRaw = raw.scrutin ?? raw;
-    if (!isEligibleScrutin(s)) continue;
-    const parsed = parseRaw(s);
+  for await (const { parsed } of iterEligibleScrutins()) {
     out.set(parsed.id, parsed);
   }
   return out;

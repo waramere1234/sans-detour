@@ -22,12 +22,12 @@ import { execSync } from "node:child_process";
 import type { ScrutinAnalyse, Theme } from "../src/types";
 import {
   type Summary,
-  type MinimalAnthropicMessage,
+  type BatchResultLine,
   fallbackSummary,
   extractAnthropicSummary,
 } from "./lib/parse-summary";
-import { isEligibleScrutin } from "./lib/an-filter";
-import { type ParsedScrutinCore, parseRaw } from "./lib/an-parse";
+import { type ParsedScrutinCore } from "./lib/an-parse";
+import { CACHE_DIR, JSON_DIR, iterEligibleScrutins } from "./lib/an-cache";
 
 // ───────────────────────────────────────────────────────────────── config
 
@@ -42,9 +42,10 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 
 const BULK_URL =
   "https://data.assemblee-nationale.fr/static/openData/repository/17/loi/scrutins/Scrutins.json.zip";
-const CACHE_DIR = "/tmp/sd-an-cache";
+// CACHE_DIR + JSON_DIR live in scripts/lib/an-cache.ts (shared with
+// resume-ingest.ts + ingest-personnalites.ts). ZIP_PATH is local since
+// only this script downloads the bulk archive.
 const ZIP_PATH = path.join(CACHE_DIR, "Scrutins.json.zip");
-const JSON_DIR = path.join(CACHE_DIR, "json");
 
 // AN organeRef → GroupCode lives in scripts/lib/an-groups.ts (shared with
 // resume-ingest.ts; see that file for the rationale on the PO847173 /
@@ -378,26 +379,6 @@ async function pollBatch(batchId: string): Promise<BatchStatus> {
   }
 }
 
-interface BatchResultLine {
-  custom_id: string;
-  result:
-    | { type: "succeeded"; message: MinimalAnthropicMessage }
-    // Empirically, Anthropic wraps batch errors as
-    //   { type: "errored", error: { type: "error", error: { type, message } } }
-    // — the inner `error.error` is where the user-facing fields live. We type
-    // the outer loosely and probe both shapes when logging.
-    | {
-        type: "errored";
-        error?: {
-          type?: string;
-          message?: string;
-          error?: { type?: string; message?: string };
-        };
-      }
-    | { type: "canceled" }
-    | { type: "expired" };
-}
-
 async function fetchBatchResults(batchId: string): Promise<Map<string, Summary>> {
   const r = await fetch(`https://api.anthropic.com/v1/messages/batches/${batchId}/results`, {
     headers: COMMON_HEADERS(),
@@ -445,19 +426,14 @@ async function fetchBatchResults(batchId: string): Promise<Map<string, Summary>>
 
 async function main(): Promise<void> {
   await ensureBulk();
+  console.log(`◯ Scanning local AN cache (${JSON_DIR})…`);
 
-  const files = (await fs.readdir(JSON_DIR)).filter(f => f.endsWith(".json"));
-  console.log(`◯ Scanning ${files.length} scrutin files…`);
-
-  const allEligible: Awaited<ReturnType<typeof parseRaw>>[] = [];
+  const allEligible: ParsedScrutinCore[] = [];
   let spsCount = 0;
   let otherCount = 0;
-  for (const f of files) {
-    const raw = JSON.parse(await fs.readFile(path.join(JSON_DIR, f), "utf-8"));
-    const s = raw.scrutin ?? raw;
-    if (!isEligibleScrutin(s)) continue;
-    if (s.typeVote?.codeTypeVote === "SPS") spsCount++; else otherCount++;
-    allEligible.push(parseRaw(s));
+  for await (const { raw, parsed } of iterEligibleScrutins()) {
+    if (raw.typeVote?.codeTypeVote === "SPS") spsCount++; else otherCount++;
+    allEligible.push(parsed);
   }
   console.log(`◯ Found ${allEligible.length} eligible scrutins (${spsCount} SPS + ${otherCount} ordinaires/motions/résolutions)`);
 
