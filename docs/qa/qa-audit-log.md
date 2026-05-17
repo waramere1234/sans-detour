@@ -2106,3 +2106,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `purpose` public/manifest.webmanifest → 3 résultats (1 par icon)
 - [ ] grep `mailto:contact@sansdetour.fr` src/ → 0 résultat (literal éliminé)
 - [ ] grep `mailto(` src/ → ≥7 résultats (1 def + 1 helper + 6+ call sites)
+
+---
+
+## Session 92 — 2026-05-17
+
+### Vérification session 91
+
+- [VERIFIED] `grep "unset or invalid" scripts/ingest-an.ts` → 0 résultat (commentaire réécrit)
+- [VERIFIED] `grep -c purpose public/manifest.webmanifest` → 3 résultats
+- [VERIFIED] `grep "mailto:contact@sansdetour" src/` → 0 résultat (sauf doc dans contact.ts)
+- [VERIFIED] 8 occurrences `mailto(` dans src/ (def + 7 sites)
+- 169/169 tests verts, typecheck clean
+
+### Bugs fixés (citation strip dedup + 3 new lib test files)
+
+- [FIXED] `AuditTrail.tsx extractConcrete` strip citations moins robuste que `Card.tsx stripCitations` · Card avait 4 passes (wrapped tag strip, orphan tag strip, whitespace collapse, trim) ; AuditTrail avait 2 (wrapped + orphan) puis se contentait du trim sentence-level. Donc une LLM output avec un `<cite ...>` orphelin (cut mid-token) leakerait des tags dans le bullet AuditTrail. Extraction dans `src/lib/text-cleanup.ts` : `stripCitations`, `stripVoteResult`, `stripBoldMarkers`. Card.tsx + AuditTrail.tsx importent tous depuis là — lockstep behavior. · `src/lib/text-cleanup.ts` (nouveau), `src/components/Card.tsx`, `src/components/AuditTrail.tsx`
+- [FIXED] `src/lib/contact.ts` (session 91) zero test coverage · Le `mailto(subject?)` helper fait `encodeURIComponent(subject)` — une régression silencieuse (e.g. quelqu'un qui retire l'encoding) ferait que les subjects avec accents français (`Sans Détour — …`) génèrent des URLs cassées sur Gmail/Safari. 6 tests ajoutés (bare mailto, simple subject, spaces, French accents + em dash, special chars `& : =`, canonical address match). · `tests/contact.test.ts` (nouveau)
+- [FIXED] `src/lib/nav-state.ts` (session 90) zero test coverage · `FROM_LOGO_STATE` est lu via cast `as LocationStateFromLogo` dans Cover. Le test pin la shape (fromLogo: true), la compatibilité const ↔ read type (sans cast), et la stable-identity (même reference cross-render — requis pour la stabilité des deps `useEffect([location.state])`). + 9 tests dans `tests/text-cleanup.test.ts` pour stripCitations / stripVoteResult / stripBoldMarkers (orphan tag, false-positive prevention, unbalanced markers). · `tests/nav-state.test.ts` (nouveau), `tests/text-cleanup.test.ts` (nouveau)
+
+### Vérifications à faire en session 93
+
+- [ ] `ls src/lib/text-cleanup.ts` → présent ; 3 exports (stripCitations, stripVoteResult, stripBoldMarkers)
+- [ ] grep `stripCitations\|stripVoteResult\|stripBoldMarkers` src/components/ → uniquement les imports depuis text-cleanup, aucun inline copy
+- [ ] `ls tests/contact.test.ts tests/nav-state.test.ts tests/text-cleanup.test.ts` → 3 fichiers présents
+- [ ] grep `~169 tests` CLAUDE.md → 0 résultat (aligné sur ~193)

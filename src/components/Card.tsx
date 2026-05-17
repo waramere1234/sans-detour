@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { motion, useReducedMotion, type PanInfo } from "framer-motion";
 import type { Scrutin } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
+import { stripCitations, stripVoteResult } from "../lib/text-cleanup";
 
 export interface CardProps {
   scrutin: Scrutin;
@@ -383,31 +384,6 @@ function ColoredSubList({
 }
 
 // ─────────────────────────────────────────────────── TEXT HELPERS
-
-/** Strip Anthropic web_search citation markup like
- *  `<cite index="20-2,20-3">text</cite>` — preserve the inner text, drop the
- *  wrapper. Also drops any orphan opening/closing tags. */
-function stripCitations(text: string): string {
-  return text
-    .replace(/<cite[^>]*>([\s\S]*?)<\/cite>/g, "$1")
-    .replace(/<\/?cite[^>]*>/g, "")
-    .replace(/[ \t]+/g, " ")
-    .trim();
-}
-
-/** Strip trailing "Vote : X oui, Y non" / "Résultat : ..." fragments the LLM
- *  sometimes appends. The vote outcome is computed elsewhere; including it
- *  in the explanation conflates "what the law does" with "what happened at
- *  the vote", which spoils the user's own vote and is off-topic.
- *
- *  Matches ONLY the colon form (`Vote :`, `Résultat :`) because that's the
- *  LLM's appendage style. Matching `.` would eat ordinary French usage like
- *  "passer un texte sans vote." which truncates the contexte mid-sentence. */
-function stripVoteResult(text: string): string {
-  const m = text.match(/\s+(Vote|Résultat)\s*:/i);
-  if (!m || m.index === undefined) return text;
-  return text.slice(0, m.index).trim();
-}
 
 /** Parse **bold** markdown markup and return alternating text / <strong> nodes.
  *  Applies citation/vote-result cleanup first so we never render Anthropic

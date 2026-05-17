@@ -2,6 +2,7 @@
 import type { GroupAlignment, Scrutin, SessionVote } from "../types";
 import { alignmentScore } from "../lib/matching";
 import { getParty } from "../lib/parties";
+import { stripCitations, stripBoldMarkers } from "../lib/text-cleanup";
 
 export interface AuditTrailProps {
   alignment: GroupAlignment;
@@ -138,11 +139,11 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
  *  markup, and trailing punctuation to keep the bullet visually compact. */
 function extractConcrete(contexte?: string): string | null {
   if (!contexte) return null;
-  // Strip Anthropic <cite ...> tags first (the LLM injects them when using
-  // web_search and they would leak into the bullet text otherwise).
-  const cleaned = contexte
-    .replace(/<cite[^>]*>([\s\S]*?)<\/cite>/g, "$1")
-    .replace(/<\/?cite[^>]*>/g, "");
+  // Use the shared stripCitations (session 92): handles wrapped tags AND
+  // orphan opening/closing tags (a model that cut its output mid-token).
+  // The previous inline version was missing the orphan-strip pass, so a
+  // malformed `<cite ...>` without a `</cite>` would leak into the bullet.
+  const cleaned = stripCitations(contexte);
   // Match "Concrètement :" or "Par exemple :" (or rarely a comma instead of
   // colon if the LLM drifts from its spec — see ingest-an.ts SYSTEM_PROMPT)
   // followed by content up to the next sentence boundary (period followed by
@@ -153,5 +154,5 @@ function extractConcrete(contexte?: string): string | null {
   if (!m) return null;
   const sentence = m[1].trim().replace(/\.$/, "");
   // Strip **bold** markers — the AuditTrail row is dense, no need for emphasis
-  return sentence.replace(/\*\*(.+?)\*\*/g, "$1");
+  return stripBoldMarkers(sentence);
 }
