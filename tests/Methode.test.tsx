@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
-import Methode, { METHODE_SECTIONS } from "../src/routes/Methode";
+import Methode, { METHODE_SECTIONS, METHODE_SECTION_BODY_TITLES } from "../src/routes/Methode";
 import { ROUTES } from "../src/lib/routes";
 import { DEFAULT_CAP_PER_DOSSIER, DEFAULT_CAP_PER_CHAPEAU_PREFIX } from "../src/lib/deck";
 import { THRESHOLD } from "../src/lib/compute-positions";
@@ -64,6 +64,23 @@ describe("Methode — section structure", () => {
     // Pin the count so an off-by-one addition surfaces here AND in the
     // round-trip section-body test above.
     expect(METHODE_SECTIONS).toHaveLength(7);
+  });
+
+  it("each Section body renders its METHODE_SECTION_BODY_TITLES title (round-trip)", () => {
+    renderMethode();
+    for (const [n] of METHODE_SECTIONS) {
+      const expected = METHODE_SECTION_BODY_TITLES[n];
+      // Section renders the title in an h2 with id=`methode-heading-${n}`.
+      const heading = document.getElementById(`methode-heading-${n}`);
+      expect(heading).not.toBeNull();
+      expect(heading!.textContent).toContain(expected);
+    }
+  });
+
+  it("METHODE_SECTION_BODY_TITLES has the same 7 ids as METHODE_SECTIONS (no orphan title)", () => {
+    const sectionIds = METHODE_SECTIONS.map(([n]) => n);
+    const titleIds = Object.keys(METHODE_SECTION_BODY_TITLES);
+    expect(titleIds.sort()).toEqual(sectionIds.slice().sort());
   });
 
   it("the number of rendered Section bodies matches METHODE_SECTIONS.length (no orphan body)", () => {

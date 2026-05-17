@@ -7,6 +7,7 @@ import { CONTACT_EMAIL } from "../src/lib/contact";
 import {
   AN_OPEN_DATA_URL,
   WORDMARK_HOME_LABEL, PAGE_HEADER_NAV_LABEL,
+  MENU_LEGAL_LABEL,
 } from "../src/types";
 import { BACK_LINK_LABEL } from "../src/components/ReadingPageHeader";
 
@@ -37,7 +38,7 @@ function renderLegal() {
 describe("Legal — structure", () => {
   it("renders the 'Mentions légales' page title", () => {
     renderLegal();
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/Mentions légales/);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(new RegExp(MENU_LEGAL_LABEL));
   });
 
   it("declares the en-tête nav landmark with aria-label", () => {

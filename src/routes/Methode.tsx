@@ -41,6 +41,30 @@ export const METHODE_SECTIONS = [
 ] as const satisfies ReadonlyArray<readonly [string, string]>;
 export type MethodeSectionId = typeof METHODE_SECTIONS[number][0];
 
+/** Section body titles — the full descriptive h2 rendered by each
+ *  `<Section>` (vs METHODE_SECTIONS which has the short TOC nav
+ *  labels). 7 titles map 1:1 to the 7 section ids. Centralised so
+ *  a rewording propagates from one edit + the tests can iterate
+ *  to verify each rendered Section has the canonical body title. */
+export const METHODE_SECTION_BODY_TITLES: Record<MethodeSectionId, string> = {
+  "01": "D'où viennent les données",
+  "02": "Quels scrutins on garde",
+  "03": "Comment on définit la position d'un groupe",
+  "04": "Comment on calcule ton alignement",
+  "05": "Ce qu'on ne fait pas avec tes données",
+  "06": "Indépendance & financement",
+  "07": "Le rôle de l'IA Claude",
+};
+
+/** Methode source-list annotations rendered as " — {annotation}" after
+ *  each external-link bullet in §06 + §07. Each describes what the
+ *  link is (open data, code source, signalement). Centralised so a
+ *  rewording propagates from one edit. */
+export const METHODE_LINK_ANNOTATION_OPEN_DATA = "open data officiel";
+export const METHODE_LINK_ANNOTATION_CODE_SOURCE_MIT = "code source MIT";
+export const METHODE_LINK_ANNOTATION_PROMPT_CODE_PUBLIC = "prompt et code source publics";
+export const METHODE_LINK_ANNOTATION_SIGNALER_ERREUR = "signaler une erreur";
+
 export default function Methode() {
   // Freshness fetch + once-per-mount guard live in the useFreshnessOnce
   // hook (session 99), shared with Cover.tsx.
@@ -117,17 +141,17 @@ export default function Methode() {
         ))}
       </nav>
 
-      <Section n="01" title="D'où viennent les données">
+      <Section n="01" title={METHODE_SECTION_BODY_TITLES["01"]}>
         <p>Les votes proviennent de <strong>l'open data officiel de l'Assemblée Nationale</strong>, exposé sur <code>{AN_OPEN_DATA_HOSTNAME}</code>. Ce sont les mêmes fichiers que ceux utilisés par les médias de référence et le service interne de l'AN. Aucune retranscription manuelle, aucune source secondaire.</p>
         <p>Mise à jour automatisée toutes les semaines.</p>
       </Section>
 
-      <Section n="02" title="Quels scrutins on garde">
+      <Section n="02" title={METHODE_SECTION_BODY_TITLES["02"]}>
         <p>On garde les <strong>scrutins solennels</strong> (SPS), les <strong>votes finaux sur l'ensemble d'une loi</strong> (SOR), les <strong>motions de censure</strong>, les <strong>motions référendaires</strong> et les <strong>propositions de résolution</strong>. On exclut les amendements, les votes en commission et les motions procédurales (rejet préalable, renvoi).</p>
         <p>Pour chaque session, on en tire <strong>{TARGET}</strong> en équilibrant les thèmes (santé, immigration, fiscalité…) plutôt qu'au hasard pur, avec deux garde-fous : <strong>jamais plus de {DEFAULT_CAP_PER_DOSSIER} scrutins du même dossier législatif</strong> et <strong>jamais plus de {DEFAULT_CAP_PER_CHAPEAU_PREFIX} scrutins du même sujet</strong> (pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée).</p>
       </Section>
 
-      <Section n="03" title="Comment on définit la position d'un groupe">
+      <Section n="03" title={METHODE_SECTION_BODY_TITLES["03"]}>
         <p>Un groupe parlementaire compte plusieurs dizaines de députés qui ne votent pas toujours pareil. Pour résumer en une position unique :</p>
         <Formula>
           si ≥ {Math.round(THRESHOLD * 100)}% des votants effectifs du groupe → pour / contre / abstention<br/>
@@ -137,7 +161,7 @@ export default function Methode() {
         <p>Un scrutin sur lequel un groupe est <strong>divisé</strong> ne compte pas pour ce groupe — pas pour toi non plus, dans cette comparaison.</p>
       </Section>
 
-      <Section n="04" title="Comment on calcule ton alignement">
+      <Section n="04" title={METHODE_SECTION_BODY_TITLES["04"]}>
         <p>Pour chaque groupe, on compare ce que tu as voté à ce que ce groupe a voté, scrutin par scrutin :</p>
         <Formula>
           Score par scrutin :<br/>
@@ -150,28 +174,28 @@ export default function Methode() {
         <p>Le ranking apparaît à partir du <strong>{MIN_FOR_RANKING}<sup>e</sup> scrutin compté</strong> — en dessous, les pourcentages bougent trop pour signifier quoi que ce soit.</p>
       </Section>
 
-      <Section n="05" title="Ce qu'on ne fait pas avec tes données">
+      <Section n="05" title={METHODE_SECTION_BODY_TITLES["05"]}>
         <p>Pas de compte utilisateur, pas de cookie de tracking, pas d'analytics nominatifs, pas de POST.</p>
         <p>Tes votes vivent dans le <code>localStorage</code> de ton navigateur. Si tu vides ton cache, ils disparaissent. C'est volontaire : on n'a aucun moyen technique de savoir comment tu as voté ni qui tu es.</p>
       </Section>
 
-      <Section n="06" title="Indépendance & financement">
+      <Section n="06" title={METHODE_SECTION_BODY_TITLES["06"]}>
         <p>Sans Détour est un projet <strong>indépendant</strong>. Aucune affiliation parti / média / institution.</p>
         <p>Hébergement sur fonds personnels. Pas d'annonceur, pas de sponsor, pas de don accepté pendant les 6 mois précédant un scrutin national.</p>
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)" }}>
-          <li><a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(AN_OPEN_DATA_HOSTNAME)}>{AN_OPEN_DATA_HOSTNAME}</a> — open data officiel</li>
+          <li><a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(AN_OPEN_DATA_HOSTNAME)}>{AN_OPEN_DATA_HOSTNAME}</a> — {METHODE_LINK_ANNOTATION_OPEN_DATA}</li>
           {/* TODO production-blocker · github.com/sansdetour is a 404 today
               (real repo is private at waramere1234/sans-detour per CLAUDE.md)
               AND no LICENSE file exists despite the "MIT" claim. Either
               publish under the sansdetour org with a LICENSE.md, or drop
               this bullet until the repo is public. Same TODO in §07 below
               and in Legal.tsx — keep them in sync. */}
-          <li><a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a> — code source MIT</li>
-          <li><a href={mailto()}>{CONTACT_EMAIL}</a> — signaler une erreur</li>
+          <li><a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a> — {METHODE_LINK_ANNOTATION_CODE_SOURCE_MIT}</li>
+          <li><a href={mailto()}>{CONTACT_EMAIL}</a> — {METHODE_LINK_ANNOTATION_SIGNALER_ERREUR}</li>
         </ul>
       </Section>
 
-      <Section n="07" title="Le rôle de l'IA Claude">
+      <Section n="07" title={METHODE_SECTION_BODY_TITLES["07"]}>
         <p><strong>{METHODE_S07_HEADING_CE_QUE_FAIT_CLAUDE}</strong> Reformuler le titre brut du scrutin en 12 mots, condenser le projet de loi en {MAX_POINTS_CLES_BULLETS} points clés, rédiger un résumé contextuel de 30 à 50 mots, structurer une synthèse détaillée (mesures, concernés, calendrier, exceptions), et taguer le scrutin par thème. <strong>Mise en forme, pas commentaire.</strong></p>
 
         <p><strong>{METHODE_S07_HEADING_CE_QU_IL_NE_FAIT_PAS}</strong> Le calcul d'alignement (formule mathématique pure), la composition du deck (round-robin algorithmique par thème), l'extraction des votes individuels (parsing des XML officiels AN). Sur ces trois plans, Claude n'intervient à aucun moment.</p>
@@ -184,7 +208,7 @@ export default function Methode() {
           {/* TODO production-blocker · same broken github.com/sansdetour
               link as §06 above. The "prompt et code source publics" claim
               is aspirational until the repo is published. */}
-          <li><a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a> — prompt et code source publics</li>
+          <li><a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a> — {METHODE_LINK_ANNOTATION_PROMPT_CODE_PUBLIC}</li>
           <li>Modèle : Claude Haiku 4.5 d'Anthropic, via Batches API + web_search</li>
         </ul>
       </Section>

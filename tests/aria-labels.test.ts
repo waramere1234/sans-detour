@@ -54,6 +54,13 @@ import {
   METHODE_S07_HEADING_LIMITES_SIGNALEMENT,
   LEGISLATURE_LABEL,
 } from "../src/types";
+import {
+  METHODE_SECTION_BODY_TITLES,
+  METHODE_LINK_ANNOTATION_OPEN_DATA,
+  METHODE_LINK_ANNOTATION_CODE_SOURCE_MIT,
+  METHODE_LINK_ANNOTATION_PROMPT_CODE_PUBLIC,
+  METHODE_LINK_ANNOTATION_SIGNALER_ERREUR,
+} from "../src/routes/Methode";
 import { VOTE_FEEDBACK_LABELS } from "../src/lib/vote-feedback";
 import { RETRY_DEFAULT_LABEL } from "../src/components/RetryError";
 import { freshnessTotalScrutinsPhrase } from "../src/components/FreshnessBanner";
@@ -1213,6 +1220,54 @@ describe("METHODE_S07_HEADING_* — Methode §07 IA Claude sub-headings", () => 
       METHODE_S07_HEADING_LIMITES_SIGNALEMENT,
     ];
     for (const h of all) expect(h.endsWith(".")).toBe(true);
+  });
+});
+
+describe("METHODE_SECTION_BODY_TITLES — Methode 7 Section body h2 landmarks", () => {
+  // Body title = the full descriptive heading rendered by each <Section>.
+  // Distinct from METHODE_SECTIONS short labels (TOC nav).
+  it("01 matches 'D'où viennent les données'", () => {
+    expect(METHODE_SECTION_BODY_TITLES["01"]).toBe("D'où viennent les données");
+  });
+
+  it("04 matches 'Comment on calcule ton alignement'", () => {
+    expect(METHODE_SECTION_BODY_TITLES["04"]).toBe("Comment on calcule ton alignement");
+  });
+
+  it("07 matches 'Le rôle de l'IA Claude'", () => {
+    expect(METHODE_SECTION_BODY_TITLES["07"]).toBe("Le rôle de l'IA Claude");
+  });
+
+  it("the 7 body titles are all distinct (anti-clone)", () => {
+    const titles = Object.values(METHODE_SECTION_BODY_TITLES);
+    expect(new Set(titles).size).toBe(titles.length);
+    expect(titles.length).toBe(7);
+  });
+});
+
+describe("METHODE_LINK_ANNOTATION_* — Methode §06/§07 source-list annotations", () => {
+  it("OPEN_DATA matches 'open data officiel'", () => {
+    expect(METHODE_LINK_ANNOTATION_OPEN_DATA).toBe("open data officiel");
+  });
+
+  it("CODE_SOURCE_MIT matches 'code source MIT'", () => {
+    expect(METHODE_LINK_ANNOTATION_CODE_SOURCE_MIT).toBe("code source MIT");
+  });
+
+  it("PROMPT_CODE_PUBLIC matches 'prompt et code source publics'", () => {
+    expect(METHODE_LINK_ANNOTATION_PROMPT_CODE_PUBLIC).toBe("prompt et code source publics");
+  });
+
+  it("SIGNALER_ERREUR matches 'signaler une erreur'", () => {
+    expect(METHODE_LINK_ANNOTATION_SIGNALER_ERREUR).toBe("signaler une erreur");
+  });
+
+  it("OPEN_DATA + CODE_SOURCE_MIT mention 'data' / 'source' respectively (semantic guard)", () => {
+    // The 2 §06 list bullets describe what each link IS — the AN
+    // open-data portal vs the github code repo. Pin the load-bearing
+    // tokens so a rewording that swaps the labels surfaces here.
+    expect(METHODE_LINK_ANNOTATION_OPEN_DATA).toContain("data");
+    expect(METHODE_LINK_ANNOTATION_CODE_SOURCE_MIT).toContain("source");
   });
 });
 

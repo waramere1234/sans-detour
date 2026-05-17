@@ -3780,3 +3780,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `CARD_ANALYSE_TITLE_MESURES\|CARD_ANALYSE_CONCERNES_HEADER\|METHODE_S07_HEADING_CE_QUE_FAIT_CLAUDE` src/ tests/ → 9+ résultats (chaque const × 3 sites typiques)
 - [ ] grep `"Mesures"\|"Bénéficient"\|"Ce que fait Claude."` src/ tests/ → 3-6 résultats (déclarations + pin-the-value)
 - [ ] grep `~786 tests` CLAUDE.md → 0 résultat (aligné sur ~800)
+
+---
+
+## Session 161 — 2026-05-18
+
+### Vérification session 160
+
+- [VERIFIED] 17 occurrences des 11 nouveaux exports (CARD_ANALYSE_TITLE_* × 3 + CARD_ANALYSE_CONCERNES_* × 4 + METHODE_S07_HEADING_* × 4)
+- [VERIFIED] 5 occurrences seulement de "Bénéficient" et "Ce que fait Claude." (déclarations + pin-the-value tests)
+- [VERIFIED] CLAUDE.md "~800 tests"
+- 800/800 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_SECTION_BODY_TITLES + METHODE_LINK_ANNOTATION_* × 4 + Legal.test.tsx h1 regex cleanup)
+
+- [FIXED] Methode.tsx avait 7 Section body titles inline (`title="D'où viennent les données"` etc.) sans test pinning · Drift surface : 7 SR-rotor h2 landmarks ; sans pin, un rewording silencieux d'un section heading changerait l'expérience SR sans alerte. Fix : export `METHODE_SECTION_BODY_TITLES: Record<MethodeSectionId, string>` depuis Methode.tsx — co-localisé avec METHODE_SECTIONS pour que le mapping id ↔ title reste évident. Les 7 Section components utilisent `title={METHODE_SECTION_BODY_TITLES[n]}`. 2 nouveaux tests dans Methode.test.tsx : round-trip iterating METHODE_SECTIONS for each rendered Section, no-orphan-title invariant. 4 nouveaux tests aria-labels.test.ts : pin-the-value × 3 (representative sample 01/04/07), all-distinct anti-clone. · `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode.tsx §06 + §07 4 source-list link annotations (`"— open data officiel"`, `"— code source MIT"`, `"— prompt et code source publics"`, `"— signaler une erreur"`) inline + untested · Drift surface : chaque annotation décrit ce qu'est le lien adjacent (open data portal vs github vs mailto). Sans pin, un rewording changerait silencieusement la description user-visible des sources. Fix : export `METHODE_LINK_ANNOTATION_OPEN_DATA` + `_CODE_SOURCE_MIT` + `_PROMPT_CODE_PUBLIC` + `_SIGNALER_ERREUR`. Methode.tsx utilise les 4 consts. 5 nouveaux tests aria-labels.test.ts : pin-the-value × 4 + semantic-guard (OPEN_DATA contient "data", CODE_SOURCE_MIT contient "source"). · `src/routes/Methode.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] tests/Legal.test.tsx h1 regex literal `/Mentions légales/` stale parallèle à `MENU_LEGAL_LABEL` (session 149's Legal h1 reuse) · Cleanup : symétrique aux migrations précédentes. Fix : test passe `new RegExp(MENU_LEGAL_LABEL)` au lieu du literal. · `tests/Legal.test.tsx`
+
+### Vérifications à faire en session 162
+
+- [ ] grep `METHODE_SECTION_BODY_TITLES\|METHODE_LINK_ANNOTATION_OPEN_DATA\|METHODE_LINK_ANNOTATION_CODE_SOURCE_MIT` src/ tests/ → 15+ résultats
+- [ ] grep `title="D.où viennent\|title="Quels scrutins\|— open data officiel` src/ → 0 résultats (toutes les inline templates migrées)
+- [ ] grep `/Mentions légales/` tests/Legal.test.tsx → 0 résultats (migré vers MENU_LEGAL_LABEL)
+- [ ] grep `~800 tests` CLAUDE.md → 0 résultat (aligné sur ~811)
