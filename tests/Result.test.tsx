@@ -15,7 +15,10 @@ import {
 } from "../src/lib/session";
 import fixtures from "../supabase/seed/dev-fixtures.json";
 import type { Scrutin } from "../src/types";
-import { TARGET, LEGISLATURE_LABEL } from "../src/types";
+import {
+  TARGET, LEGISLATURE_LABEL,
+  SHARE_LABEL, REFAIRE_LABEL, CONTINUE_REFINE_LABEL, CONTINUE_TEST_LABEL_PREFIX,
+} from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
 // Result.tsx fires 5 analytics events (result_reached, result_refaire,
@@ -62,24 +65,38 @@ describe("Result — refaire() flow (confirm + reset + forgetCover + navigate + 
     confirmSpy.mockRestore();
   });
 
-  it("renders the 'Refaire depuis le début' button after a completed session", async () => {
+  it("renders the REFAIRE_LABEL button after a completed session (rename-safe)", async () => {
     renderResult();
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /Refaire depuis le début/ })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) })).toBeInTheDocument();
+    });
+  });
+
+  it("includes REFAIRE_LABEL in the confirm prompt (re-uses the button copy)", async () => {
+    renderResult();
+    await waitFor(() => screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) }));
+    expect(confirmSpy).toHaveBeenCalledWith(expect.stringContaining(REFAIRE_LABEL));
+  });
+
+  it("renders the SHARE_LABEL button on every completed session", async () => {
+    renderResult();
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: new RegExp(SHARE_LABEL) })).toBeInTheDocument();
     });
   });
 
   it("prompts the user before wiping (no silent destroy)", async () => {
     renderResult();
-    await waitFor(() => screen.getByRole("button", { name: /Refaire depuis le début/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Refaire depuis le début/ }));
+    await waitFor(() => screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) }));
     expect(confirmSpy).toHaveBeenCalledTimes(1);
   });
 
   it("uses the plural phrasing with the TARGET count", async () => {
     renderResult();
-    await waitFor(() => screen.getByRole("button", { name: /Refaire depuis le début/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Refaire depuis le début/ }));
+    await waitFor(() => screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) }));
     expect(confirmSpy).toHaveBeenCalledWith(
       expect.stringMatching(new RegExp(`Tes ${TARGET} votes et ton résultat`)),
     );
@@ -88,8 +105,8 @@ describe("Result — refaire() flow (confirm + reset + forgetCover + navigate + 
   it("clears the session AND the cover-seen flag on confirm OK + fires result_refaire", async () => {
     expect(hasSeenCover()).toBe(true); // sanity pre-state
     renderResult();
-    await waitFor(() => screen.getByRole("button", { name: /Refaire depuis le début/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Refaire depuis le début/ }));
+    await waitFor(() => screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) }));
     // Session wiped + cover-seen forgotten (symmetric counterpart to Cover.restart).
     expect(loadSession()).toBeNull();
     expect(hasSeenCover()).toBe(false);
@@ -101,8 +118,8 @@ describe("Result — refaire() flow (confirm + reset + forgetCover + navigate + 
   it("does NOTHING when the user cancels (session preserved, no analytics, stays on /result)", async () => {
     confirmSpy.mockReturnValueOnce(false);
     renderResult();
-    await waitFor(() => screen.getByRole("button", { name: /Refaire depuis le début/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Refaire depuis le début/ }));
+    await waitFor(() => screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) }));
     expect(loadSession()?.votes).toHaveLength(TARGET);
     expect(hasSeenCover()).toBe(true);
     expect(trackSpy).not.toHaveBeenCalledWith("result_refaire");
@@ -112,8 +129,8 @@ describe("Result — refaire() flow (confirm + reset + forgetCover + navigate + 
   it("tracks result_refaire AFTER the confirm passes (so cancelled confirms don't inflate the metric)", async () => {
     // Already covered indirectly above; assert call ordering explicitly.
     renderResult();
-    await waitFor(() => screen.getByRole("button", { name: /Refaire depuis le début/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Refaire depuis le début/ }));
+    await waitFor(() => screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) }));
     const confirmCallIdx = confirmSpy.mock.invocationCallOrder[0];
     const trackCalls = trackSpy.mock.invocationCallOrder;
     // First track call after the click must come AFTER the confirm.
@@ -160,9 +177,9 @@ describe("Result — affinement_clicked analytics + result_reached on mount", ()
     renderResult();
     // Completed session → not partial → the affinement button is rendered.
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: /Continuer à affiner/ })).toBeInTheDocument()
+      expect(screen.getByRole("button", { name: new RegExp(CONTINUE_REFINE_LABEL) })).toBeInTheDocument()
     );
-    fireEvent.click(screen.getByRole("button", { name: /Continuer à affiner/ }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(CONTINUE_REFINE_LABEL) }));
     expect(trackSpy).toHaveBeenCalledWith("affinement_clicked");
   });
 
@@ -173,9 +190,9 @@ describe("Result — affinement_clicked analytics + result_reached on mount", ()
     // Wait for pool to load + Result to render. The partial branch shows
     // "Continuer le test" instead.
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: /Continuer le test/ })).toBeInTheDocument()
+      expect(screen.getByRole("button", { name: new RegExp(CONTINUE_TEST_LABEL_PREFIX) })).toBeInTheDocument()
     );
-    expect(screen.queryByRole("button", { name: /Continuer à affiner/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: new RegExp(CONTINUE_REFINE_LABEL) })).not.toBeInTheDocument();
   });
 });
 

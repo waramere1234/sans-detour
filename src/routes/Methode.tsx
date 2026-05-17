@@ -12,7 +12,7 @@ import {
   TARGET, MIN_FOR_RANKING, MAX_POINTS_CLES_BULLETS,
   AN_OPEN_DATA_URL, AN_OPEN_DATA_HOSTNAME,
   GITHUB_REPO_URL, GITHUB_REPO_DISPLAY,
-  READING_PAGE_MAX_WIDTH,
+  READING_PAGE_MAX_WIDTH, READING_PAGE_SECTION_PADDING,
   externalLinkLabel,
 } from "../types";
 
@@ -61,7 +61,7 @@ export default function Methode() {
   }, [location.hash]);
 
   return (
-    <section style={{ maxWidth: READING_PAGE_MAX_WIDTH, margin: "0 auto", padding: "24px var(--gutter) 48px" }}>
+    <section style={{ maxWidth: READING_PAGE_MAX_WIDTH, margin: "0 auto", padding: READING_PAGE_SECTION_PADDING }}>
       <ReadingPageHeader />
 
       <header style={{ marginTop: 24 }}>

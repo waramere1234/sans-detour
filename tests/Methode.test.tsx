@@ -5,7 +5,11 @@ import Methode, { METHODE_SECTIONS } from "../src/routes/Methode";
 import { ROUTES } from "../src/lib/routes";
 import { DEFAULT_CAP_PER_DOSSIER, DEFAULT_CAP_PER_CHAPEAU_PREFIX } from "../src/lib/deck";
 import { THRESHOLD } from "../src/lib/compute-positions";
-import { MAX_POINTS_CLES_BULLETS, READING_PAGE_MAX_WIDTH } from "../src/types";
+import {
+  MAX_POINTS_CLES_BULLETS,
+  READING_PAGE_MAX_WIDTH,
+  READING_PAGE_SECTION_PADDING,
+} from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
 // Methode.tsx owns:
@@ -192,6 +196,14 @@ describe("Methode — prose derived from canonical const values (no drift betwee
     const section = screen.getByRole("heading", { level: 1 }).closest("section");
     expect(section).not.toBeNull();
     expect((section as HTMLElement).style.maxWidth).toBe(`${READING_PAGE_MAX_WIDTH}px`);
+  });
+
+  it("page <section> padding derives from READING_PAGE_SECTION_PADDING", () => {
+    // Methode + Legal share this padding; pin via test so a one-sided
+    // edit on either route surfaces.
+    renderMethode();
+    const section = screen.getByRole("heading", { level: 1 }).closest("section");
+    expect((section as HTMLElement).style.padding).toBe(READING_PAGE_SECTION_PADDING);
   });
 });
 

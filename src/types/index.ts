@@ -108,6 +108,28 @@ export const START_LABEL = "Commencer";
 export const RESUME_LABEL = "Reprendre";
 export const VIEW_RESULT_LABEL = "Voir mon résultat";
 
+/** Result.tsx CTA labels. Each is pinned by regex in tests/Result.test.tsx;
+ *  centralising the strings keeps the source + the tests + the confirm
+ *  prompt (refaire) on Result.tsx in sync.
+ *
+ *  - SHARE_LABEL: native-share / clipboard fallback CTA ("Partager mon résultat").
+ *  - REFAIRE_LABEL: destructive "wipe session + go back to Cover" CTA.
+ *  - CONTINUE_REFINE_LABEL: post-completion "draw 20 more" CTA.
+ *  - CONTINUE_TEST_LABEL_PREFIX: the front of the "Continuer le test (N
+ *    votes restants)" partial-session CTA. The (N votes restants) suffix
+ *    is composed inline with the plural rule. */
+export const SHARE_LABEL = "Partager mon résultat";
+export const REFAIRE_LABEL = "Refaire depuis le début";
+export const CONTINUE_REFINE_LABEL = "Continuer à affiner";
+export const CONTINUE_TEST_LABEL_PREFIX = "Continuer le test";
+
+/** Padding for the prose-heavy <section> wrappers on Methode + Legal.
+ *  Both routes use the same "24px var(--gutter) 48px" — a future bump
+ *  to align with a redesign should propagate atomically. Distinct from
+ *  the `READING_PAGE_MAX_WIDTH` const (which is per-route since Legal
+ *  uses 640 while Methode uses 720) — the padding is the same on both. */
+export const READING_PAGE_SECTION_PADDING = "24px var(--gutter) 48px";
+
 /** Canonical "data source" tagline appended to the share text and
  *  shown as a sub-header on the SVG share card (api/share-card.ts).
  *  Lives in src/types (DOM-free) so api/share-card can import it

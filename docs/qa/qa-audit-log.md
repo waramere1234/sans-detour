@@ -3211,3 +3211,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] `ls src/components/ReadingPageHeader.tsx tests/ReadingPageHeader.test.tsx` → 2 fichiers présents
 - [ ] grep `START_LABEL\|RESUME_LABEL\|VIEW_RESULT_LABEL` src/ tests/ → 10+ résultats
 - [ ] grep `~606 tests` CLAUDE.md → 0 résultat (aligné sur ~613)
+
+---
+
+## Session 137 — 2026-05-17
+
+### Vérification session 136
+
+- [VERIFIED] ReadingPageHeader files (component + test) présents
+- [VERIFIED] 17 occurrences de START_LABEL|RESUME_LABEL|VIEW_RESULT_LABEL dans src/ + tests/
+- [VERIFIED] CLAUDE.md "~613 tests"
+- 613/613 tests verts, typecheck clean
+
+### Bugs fixés (Result.tsx CTA labels + READING_PAGE_SECTION_PADDING + label round-trip tests)
+
+- [FIXED] Result.tsx avait 4 button labels inline ("Refaire depuis le début", "Continuer à affiner", "Continuer le test", "Partager mon résultat") tested via regex match · Une rewording aurait demandé d'updater source + tests en lockstep, plus le confirm prompt sur refaire() qui inclut le label en tant que prefix. Fix : export `SHARE_LABEL`, `REFAIRE_LABEL`, `CONTINUE_REFINE_LABEL`, `CONTINUE_TEST_LABEL_PREFIX` depuis src/types. Result.tsx utilise les 4 consts (incluant le confirm prompt template literal). tests/Result.test.tsx migré pour `new RegExp(LABEL)` au lieu de regex literals. 2 tests new round-trip : confirm prompt `.toContain(REFAIRE_LABEL)`, SHARE_LABEL button rendered. · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/Result.test.tsx`
+- [FIXED] `"24px var(--gutter) 48px"` padding inline 2× sur les `<section>` wrappers de Methode + Legal · Same reading-page padding pour les 2 routes. Un bump (par exemple "32px var(--gutter) 64px" pour plus d'air) aurait demandé 2 edits in-lockstep. Fix : export `READING_PAGE_SECTION_PADDING` depuis src/types. Methode + Legal importent + utilisent. 1 test Methode round-trip pin `style.padding === READING_PAGE_SECTION_PADDING`. · `src/types/index.ts`, `src/routes/Methode.tsx`, `src/routes/Legal.tsx`, `tests/Methode.test.tsx`
+- [FIXED] Tests Result.test.tsx regex literals (`/Refaire depuis le début/`, etc.) hardcodaient les labels en parallèle · Drift surface — une rewording du label source pourrait laisser la regex test stale (ou inversement). Fix : migrer toutes les regex literals vers `new RegExp(LABEL_CONST)` (4 sites × 4 labels). Same drift fix pattern que les sessions précédentes pour STALE_AFTER_DAYS / THRESHOLD / LOW_DATA_THRESHOLD boundaries. · `tests/Result.test.tsx`
+
+### Vérifications à faire en session 138
+
+- [ ] grep `SHARE_LABEL\|REFAIRE_LABEL\|CONTINUE_REFINE_LABEL\|CONTINUE_TEST_LABEL_PREFIX` src/ tests/ → 15+ résultats
+- [ ] grep `READING_PAGE_SECTION_PADDING` src/ tests/ → 5+ résultats
+- [ ] grep `"24px var..--gutter.. 48px"` src/ → 1 résultat seulement (la déclaration)
+- [ ] grep `~613 tests` CLAUDE.md → 0 résultat (aligné sur ~616)

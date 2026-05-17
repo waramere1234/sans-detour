@@ -15,7 +15,11 @@ import { getPartyColorVar, getParty } from "../lib/parties";
 import { composeShareText, performShare } from "../lib/share";
 import { track } from "../lib/analytics";
 import { ROUTES, PLAY_AFFINEMENT } from "../lib/routes";
-import { TARGET, LEGISLATURE_LABEL, type Scrutin, type GroupCode } from "../types";
+import {
+  TARGET, LEGISLATURE_LABEL,
+  SHARE_LABEL, REFAIRE_LABEL, CONTINUE_REFINE_LABEL, CONTINUE_TEST_LABEL_PREFIX,
+  type Scrutin, type GroupCode,
+} from "../types";
 
 export default function Result() {
   // All hooks at the top so the call order is uniform and easy to scan.
@@ -115,7 +119,7 @@ export default function Result() {
     // the in-progress case; this is the symmetric guard for the
     // completed/post-result case.
     const ok = window.confirm(
-      `Refaire depuis le début ? Tes ${total} vote${total !== 1 ? "s" : ""} et ton résultat seront perdus.`,
+      `${REFAIRE_LABEL} ? Tes ${total} vote${total !== 1 ? "s" : ""} et ton résultat seront perdus.`,
     );
     if (!ok) return;
     // Track AFTER the confirm passes so a cancelled confirm doesn't
@@ -262,17 +266,17 @@ export default function Result() {
         {isPartial && (
           <button type="button"
             onClick={() => navigate(ROUTES.play)}
-            style={btnPrimary()}><span aria-hidden="true">→ </span>Continuer le test ({remaining} {remaining === 1 ? "vote restant" : "votes restants"})</button>
+            style={btnPrimary()}><span aria-hidden="true">→ </span>{CONTINUE_TEST_LABEL_PREFIX} ({remaining} {remaining === 1 ? "vote restant" : "votes restants"})</button>
         )}
         <button type="button"
           onClick={share}
-          style={isPartial ? btnSecondary() : btnPrimary()}><span aria-hidden="true">📤 </span>Partager mon résultat</button>
+          style={isPartial ? btnSecondary() : btnPrimary()}><span aria-hidden="true">📤 </span>{SHARE_LABEL}</button>
         {!isPartial && (
           <button type="button"
             onClick={() => { track("affinement_clicked"); navigate(PLAY_AFFINEMENT); }}
-            style={btnSecondary()}><span aria-hidden="true">↻ </span>Continuer à affiner</button>
+            style={btnSecondary()}><span aria-hidden="true">↻ </span>{CONTINUE_REFINE_LABEL}</button>
         )}
-        <button type="button" onClick={refaire} style={btnTertiary()}><span aria-hidden="true">↻ </span>Refaire depuis le début</button>
+        <button type="button" onClick={refaire} style={btnTertiary()}><span aria-hidden="true">↻ </span>{REFAIRE_LABEL}</button>
       </div>
     </section>
   );

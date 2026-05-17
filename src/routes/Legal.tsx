@@ -4,12 +4,13 @@ import { CONTACT_EMAIL, mailto } from "../lib/contact";
 import {
   AN_OPEN_DATA_URL, AN_OPEN_DATA_HOSTNAME,
   GITHUB_REPO_URL, GITHUB_REPO_DISPLAY,
+  READING_PAGE_SECTION_PADDING,
   externalLinkLabel,
 } from "../types";
 
 export default function Legal() {
   return (
-    <section style={{ maxWidth: 640, margin: "0 auto", padding: "24px var(--gutter) 48px" }}>
+    <section style={{ maxWidth: 640, margin: "0 auto", padding: READING_PAGE_SECTION_PADDING }}>
       <ReadingPageHeader />
 
       <h1 style={{
