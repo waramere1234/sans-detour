@@ -3804,3 +3804,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `title="D.où viennent\|title="Quels scrutins\|— open data officiel` src/ → 0 résultats (toutes les inline templates migrées)
 - [ ] grep `/Mentions légales/` tests/Legal.test.tsx → 0 résultats (migré vers MENU_LEGAL_LABEL)
 - [ ] grep `~800 tests` CLAUDE.md → 0 résultat (aligné sur ~811)
+
+---
+
+## Session 162 — 2026-05-18
+
+### Vérification session 161
+
+- [VERIFIED] 29 occurrences des 3 nouveaux exports (METHODE_SECTION_BODY_TITLES + METHODE_LINK_ANNOTATION_OPEN_DATA + METHODE_LINK_ANNOTATION_CODE_SOURCE_MIT)
+- [VERIFIED] 0 inline templates `title="D'où viennent"`, etc. dans Methode.tsx (tous migrés)
+- [VERIFIED] 0 stale `/Mentions légales/` dans Legal.test.tsx (migré vers MENU_LEGAL_LABEL)
+- [VERIFIED] CLAUDE.md "~811 tests"
+- 811/811 tests verts, typecheck clean
+
+### Bugs fixés (LEGAL_RGPD_HEADING_* × 7 + Legal.test.tsx migration + COVER_SECONDARY_NAV_LABEL)
+
+- [FIXED] Legal.tsx 7 RGPD-required sub-headings (`Éditeur`, `Hébergeur`, `Données personnelles`, `Analytics`, `Indépendance`, `Sources des données`, `Code source`) inline — 3 loosely pinned par `/Éditeur/`, `/Hébergeur/`, `/Données personnelles/` regex literals + 4 untested · Drift surface : 7 RGPD-compliance load-bearing labels (article-aligned : editor + host + personal-data + analytics + indep. + sources + code). Sans pin sur les 4, un rewording silencieux affaibrait la compliance RGPD. Fix : export `LEGAL_RGPD_HEADING_*` × 7 depuis src/types. Legal.tsx utilise les 7 consts comme `<strong>` prefixes. 8 nouveaux tests aria-labels.test.ts : pin-the-value × 7 + 7-distinct anti-clone. · `src/types/index.ts`, `src/routes/Legal.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] tests/Legal.test.tsx avait 5 regex literals (`/Éditeur/`, `/Hébergeur/`, `/Données personnelles/`, `/Analytics/`, `/Sources des données/`) stale parallèles aux 7 nouveaux LEGAL_RGPD_HEADING_* consts · Cleanup : migrate les 5 + add 2 missing (Indépendance, Code source) = test maintenant assert all 7 RGPD headings round-trip via const. Sans cette migration, un rewording de la const ne propagerait pas au test. Fix : `expect(body).toContain(LEGAL_RGPD_HEADING_*)` × 7 (couvre tous les 7 sub-headings). · `tests/Legal.test.tsx`
+- [FIXED] Cover.tsx `aria-label="Liens secondaires"` inline + untested (nav landmark du footer avec les 3 links méthode/légal/contact) · Drift surface : single source ; le nav landmark est entendu par SR users naviguant par rotor — un rewording silencieux changerait l'expérience. Fix : export `COVER_SECONDARY_NAV_LABEL = "Liens secondaires"` depuis src/types. Cover.tsx utilise la const. 1 nouveau test pin-the-value. · `src/types/index.ts`, `src/routes/Cover.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 163
+
+- [ ] grep `LEGAL_RGPD_HEADING_EDITEUR\|LEGAL_RGPD_HEADING_HEBERGEUR\|COVER_SECONDARY_NAV_LABEL` src/ tests/ → 25+ résultats
+- [ ] grep `"Éditeur"\|"Hébergeur"\|"Liens secondaires"\|/Éditeur/` src/ tests/ → 4-7 résultats (déclarations + pin-the-value, pas de stale regex)
+- [ ] grep `~811 tests` CLAUDE.md → 0 résultat (aligné sur ~820)

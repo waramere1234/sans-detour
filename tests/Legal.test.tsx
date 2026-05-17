@@ -8,6 +8,10 @@ import {
   AN_OPEN_DATA_URL,
   WORDMARK_HOME_LABEL, PAGE_HEADER_NAV_LABEL,
   MENU_LEGAL_LABEL,
+  LEGAL_RGPD_HEADING_EDITEUR, LEGAL_RGPD_HEADING_HEBERGEUR,
+  LEGAL_RGPD_HEADING_DONNEES_PERSONNELLES, LEGAL_RGPD_HEADING_ANALYTICS,
+  LEGAL_RGPD_HEADING_INDEPENDANCE, LEGAL_RGPD_HEADING_SOURCES_DONNEES,
+  LEGAL_RGPD_HEADING_CODE_SOURCE,
 } from "../src/types";
 import { BACK_LINK_LABEL } from "../src/components/ReadingPageHeader";
 
@@ -62,14 +66,18 @@ describe("Legal — links to cover (route-aware)", () => {
 });
 
 describe("Legal — RGPD-required content", () => {
-  it("declares the éditeur, hébergeur, RGPD, analytics, sources sections", () => {
+  it("declares all 7 RGPD-required sub-headings (round-trip via LEGAL_RGPD_HEADING_* consts)", () => {
     renderLegal();
     const body = document.body.textContent || "";
-    expect(body).toMatch(/Éditeur/);
-    expect(body).toMatch(/Hébergeur/);
-    expect(body).toMatch(/Données personnelles/);
-    expect(body).toMatch(/Analytics/);
-    expect(body).toMatch(/Sources des données/);
+    // Every const = a rendered <strong> sub-heading. A missing section
+    // or a silent rewording in either source or const surfaces here.
+    expect(body).toContain(LEGAL_RGPD_HEADING_EDITEUR);
+    expect(body).toContain(LEGAL_RGPD_HEADING_HEBERGEUR);
+    expect(body).toContain(LEGAL_RGPD_HEADING_DONNEES_PERSONNELLES);
+    expect(body).toContain(LEGAL_RGPD_HEADING_ANALYTICS);
+    expect(body).toContain(LEGAL_RGPD_HEADING_INDEPENDANCE);
+    expect(body).toContain(LEGAL_RGPD_HEADING_SOURCES_DONNEES);
+    expect(body).toContain(LEGAL_RGPD_HEADING_CODE_SOURCE);
   });
 
   it("surfaces CONTACT_EMAIL as a mailto link (no hardcoded literal)", () => {

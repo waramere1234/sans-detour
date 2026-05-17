@@ -6,6 +6,10 @@ import {
   GITHUB_REPO_URL, GITHUB_REPO_DISPLAY,
   READING_PAGE_SECTION_PADDING,
   externalLinkLabel, MENU_LEGAL_LABEL,
+  LEGAL_RGPD_HEADING_EDITEUR, LEGAL_RGPD_HEADING_HEBERGEUR,
+  LEGAL_RGPD_HEADING_DONNEES_PERSONNELLES, LEGAL_RGPD_HEADING_ANALYTICS,
+  LEGAL_RGPD_HEADING_INDEPENDANCE, LEGAL_RGPD_HEADING_SOURCES_DONNEES,
+  LEGAL_RGPD_HEADING_CODE_SOURCE,
 } from "../types";
 
 export default function Legal() {
@@ -27,20 +31,20 @@ export default function Legal() {
           SHIP-V1.md §4 "Mentions légales" — that section never existed:
           §4 is "Déploiement Vercel". The reference is now intrinsic to
           this file so it can't drift again.) */}
-        <p><strong>Éditeur</strong> — [Nom complet · à compléter]<br/>
+        <p><strong>{LEGAL_RGPD_HEADING_EDITEUR}</strong> — [Nom complet · à compléter]<br/>
         Adresse : [adresse postale]<br/>
         Email : <a href={mailto()}>{CONTACT_EMAIL}</a></p>
 
-        <p><strong>Hébergeur</strong> — Vercel Inc.<br/>
+        <p><strong>{LEGAL_RGPD_HEADING_HEBERGEUR}</strong> — Vercel Inc.<br/>
         340 S Lemon Ave #4133, Walnut, CA 91789, USA</p>
 
-        <p><strong>Données personnelles</strong> — Sans Détour ne collecte aucune donnée personnelle. Aucune inscription, aucun cookie de tracking. Toutes les interactions sont stockées localement dans le navigateur (localStorage). Aucune donnée n'est transmise à un serveur Sans Détour.</p>
+        <p><strong>{LEGAL_RGPD_HEADING_DONNEES_PERSONNELLES}</strong> — Sans Détour ne collecte aucune donnée personnelle. Aucune inscription, aucun cookie de tracking. Toutes les interactions sont stockées localement dans le navigateur (localStorage). Aucune donnée n'est transmise à un serveur Sans Détour.</p>
 
-        <p><strong>Analytics</strong> — Plausible (analytics anonymisés sans cookies, conformes RGPD).</p>
+        <p><strong>{LEGAL_RGPD_HEADING_ANALYTICS}</strong> — Plausible (analytics anonymisés sans cookies, conformes RGPD).</p>
 
-        <p><strong>Indépendance</strong> — Sans Détour est un projet indépendant. Aucune affiliation politique, médiatique ou institutionnelle.</p>
+        <p><strong>{LEGAL_RGPD_HEADING_INDEPENDANCE}</strong> — Sans Détour est un projet indépendant. Aucune affiliation politique, médiatique ou institutionnelle.</p>
 
-        <p><strong>Sources des données</strong> — Open data officiel de l'Assemblée Nationale (<a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(AN_OPEN_DATA_HOSTNAME)}>{AN_OPEN_DATA_HOSTNAME}</a>), licence Etalab 2.0.</p>
+        <p><strong>{LEGAL_RGPD_HEADING_SOURCES_DONNEES}</strong> — Open data officiel de l'Assemblée Nationale (<a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(AN_OPEN_DATA_HOSTNAME)}>{AN_OPEN_DATA_HOSTNAME}</a>), licence Etalab 2.0.</p>
 
         {/* TODO production-blocker · same broken github.com/sansdetour
             link as Methode §06 + §07 (real repo is private at
@@ -49,7 +53,7 @@ export default function Legal() {
             is published, also add LICENSE.md before exposing this link
             (RGPD/legal cleanliness). Drop this <p> entirely if the open-
             source path is deferred. */}
-        <p><strong>Code source</strong> — Open source sous licence MIT, disponible sur <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a>.</p>
+        <p><strong>{LEGAL_RGPD_HEADING_CODE_SOURCE}</strong> — Open source sous licence MIT, disponible sur <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a>.</p>
       </div>
     </section>
   );

@@ -18,6 +18,7 @@ import {
   MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
   COVER_SOURCE_ATTRIBUTION_AN, COVER_SOURCE_ATTRIBUTION_CLAUDE,
   coverProgressChipText, COVER_HERO_PARAGRAPH,
+  COVER_SECONDARY_NAV_LABEL,
 } from "../types";
 
 export default function Cover() {
@@ -280,7 +281,7 @@ export default function Cover() {
             inline here. aria-label avoids an unlabeled "navigation"
             landmark in SR rotors alongside the Cover header. */}
         <nav
-          aria-label="Liens secondaires"
+          aria-label={COVER_SECONDARY_NAV_LABEL}
           style={{
             display: "flex",
             flexWrap: "wrap",

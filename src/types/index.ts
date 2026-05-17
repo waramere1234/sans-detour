@@ -579,6 +579,25 @@ export const METHODE_S07_HEADING_CE_QU_IL_NE_FAIT_PAS = "Ce qu'il ne fait pas.";
 export const METHODE_S07_HEADING_CADRE_BIAIS = "Comment on cadre les biais.";
 export const METHODE_S07_HEADING_LIMITES_SIGNALEMENT = "Limites & signalement.";
 
+/** Legal.tsx 7 RGPD-required sub-headings rendered as bold prefixes of
+ *  each prose block ("**Éditeur** — [Nom]…"). These are the load-bearing
+ *  identity + compliance labels the RGPD requires: editor + host +
+ *  personal data + analytics + independence + data sources + code source.
+ *  3 are loosely pinned by /Éditeur/, /Hébergeur/, /Données personnelles/
+ *  regex in tests/Legal.test.tsx; the other 4 are untested. Centralising
+ *  closes the gap. */
+export const LEGAL_RGPD_HEADING_EDITEUR = "Éditeur";
+export const LEGAL_RGPD_HEADING_HEBERGEUR = "Hébergeur";
+export const LEGAL_RGPD_HEADING_DONNEES_PERSONNELLES = "Données personnelles";
+export const LEGAL_RGPD_HEADING_ANALYTICS = "Analytics";
+export const LEGAL_RGPD_HEADING_INDEPENDANCE = "Indépendance";
+export const LEGAL_RGPD_HEADING_SOURCES_DONNEES = "Sources des données";
+export const LEGAL_RGPD_HEADING_CODE_SOURCE = "Code source";
+
+/** Cover.tsx secondary <nav> aria-label — the bottom row with the
+ *  Methode/Legal/Contact links. Single source today + 0 tests. */
+export const COVER_SECONDARY_NAV_LABEL = "Liens secondaires";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

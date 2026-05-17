@@ -52,6 +52,11 @@ import {
   METHODE_S07_HEADING_CE_QU_IL_NE_FAIT_PAS,
   METHODE_S07_HEADING_CADRE_BIAIS,
   METHODE_S07_HEADING_LIMITES_SIGNALEMENT,
+  LEGAL_RGPD_HEADING_EDITEUR, LEGAL_RGPD_HEADING_HEBERGEUR,
+  LEGAL_RGPD_HEADING_DONNEES_PERSONNELLES, LEGAL_RGPD_HEADING_ANALYTICS,
+  LEGAL_RGPD_HEADING_INDEPENDANCE, LEGAL_RGPD_HEADING_SOURCES_DONNEES,
+  LEGAL_RGPD_HEADING_CODE_SOURCE,
+  COVER_SECONDARY_NAV_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
 import {
@@ -1268,6 +1273,57 @@ describe("METHODE_LINK_ANNOTATION_* — Methode §06/§07 source-list annotation
     // tokens so a rewording that swaps the labels surfaces here.
     expect(METHODE_LINK_ANNOTATION_OPEN_DATA).toContain("data");
     expect(METHODE_LINK_ANNOTATION_CODE_SOURCE_MIT).toContain("source");
+  });
+});
+
+describe("LEGAL_RGPD_HEADING_* — Legal.tsx 7 RGPD sub-headings", () => {
+  // Pin the canonical wording of each RGPD-required identity +
+  // compliance disclosure. Used as <strong> prefixes inside Legal.tsx
+  // prose blocks; the 7 consts collectively map to RGPD article
+  // requirements (editor + host + data + analytics + indep. + sources
+  // + code).
+  it("EDITEUR matches 'Éditeur'", () => {
+    expect(LEGAL_RGPD_HEADING_EDITEUR).toBe("Éditeur");
+  });
+
+  it("HEBERGEUR matches 'Hébergeur'", () => {
+    expect(LEGAL_RGPD_HEADING_HEBERGEUR).toBe("Hébergeur");
+  });
+
+  it("DONNEES_PERSONNELLES matches 'Données personnelles'", () => {
+    expect(LEGAL_RGPD_HEADING_DONNEES_PERSONNELLES).toBe("Données personnelles");
+  });
+
+  it("ANALYTICS matches 'Analytics'", () => {
+    expect(LEGAL_RGPD_HEADING_ANALYTICS).toBe("Analytics");
+  });
+
+  it("INDEPENDANCE matches 'Indépendance'", () => {
+    expect(LEGAL_RGPD_HEADING_INDEPENDANCE).toBe("Indépendance");
+  });
+
+  it("SOURCES_DONNEES matches 'Sources des données'", () => {
+    expect(LEGAL_RGPD_HEADING_SOURCES_DONNEES).toBe("Sources des données");
+  });
+
+  it("CODE_SOURCE matches 'Code source'", () => {
+    expect(LEGAL_RGPD_HEADING_CODE_SOURCE).toBe("Code source");
+  });
+
+  it("the 7 headings are distinct (anti-clone)", () => {
+    const set = new Set([
+      LEGAL_RGPD_HEADING_EDITEUR, LEGAL_RGPD_HEADING_HEBERGEUR,
+      LEGAL_RGPD_HEADING_DONNEES_PERSONNELLES, LEGAL_RGPD_HEADING_ANALYTICS,
+      LEGAL_RGPD_HEADING_INDEPENDANCE, LEGAL_RGPD_HEADING_SOURCES_DONNEES,
+      LEGAL_RGPD_HEADING_CODE_SOURCE,
+    ]);
+    expect(set.size).toBe(7);
+  });
+});
+
+describe("COVER_SECONDARY_NAV_LABEL — Cover.tsx footer nav aria-label", () => {
+  it("matches 'Liens secondaires'", () => {
+    expect(COVER_SECONDARY_NAV_LABEL).toBe("Liens secondaires");
   });
 });
 
