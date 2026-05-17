@@ -43,6 +43,15 @@ describe("Cover", () => {
     expect(screen.getByText("play page")).toBeInTheDocument();
   });
 
+  it("redirects to /result when hasSeenCover and votes >= TARGET (completed)", () => {
+    localStorage.setItem("sd_seen_cover", "true");
+    // Record TARGET votes so the completion branch fires.
+    for (let i = 1; i <= 20; i++) recordVote(`s${i}`, "pour");
+    renderCover();
+    expect(screen.getByText("result page")).toBeInTheDocument();
+    expect(screen.queryByText("play page")).not.toBeInTheDocument();
+  });
+
   it("stays on cover when navigated with state.fromLogo=true (bypass auto-resume)", () => {
     localStorage.setItem("sd_seen_cover", "true");
     recordVote("s1", "pour");

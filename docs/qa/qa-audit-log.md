@@ -1677,3 +1677,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `≤ 25 words\|1-line stake` dans `src/types/index.ts` → 0 résultat
 - [ ] grep `vérifier que le SVG share-card s'ouvre` dans `SHIP-V1.md` → 0 résultat
 - [ ] grep `npm run seed` dans `CLAUDE.md` → 1 résultat (dans Commandes utiles)
+
+---
+
+## Session 74 — 2026-05-17
+
+### Vérification session 73
+
+- [VERIFIED] `src/types/index.ts:87` comment contexte aligné sur "30-50 words, 2 short sentences"
+- [VERIFIED] `SHIP-V1.md §7` : 0 mention "vérifier que le SVG share-card s'ouvre" (test Partager reformulé)
+- [VERIFIED] `CLAUDE.md` Commandes utiles inclut `npm run seed`
+- 126/126 tests verts, typecheck clean
+
+### Bugs fixés (coverage + DRY drift + history hygiene)
+
+- [FIXED] Coverage gap · `tests/Cover.test.tsx` ne testait que les redirections vers `/play` (hasInProgress) et l'état "stay on cover" (fromLogo). La branche hasCompleted → `/result` (votes >= TARGET) n'avait aucun test. Une régression sur ce path enverrait un user qui a terminé son test vers /play (deck vide → écran "Plus de scrutins disponibles"). Test ajouté avec 20 recordVote → expect "result page". · `tests/Cover.test.tsx`
+- [FIXED] DRY drift · `scripts/resume-ingest.ts:159-163` déclarait `const THEMES = [...]` localement (11 valeurs) + `type Theme = typeof THEMES[number]` — duplication du `src/types/index.ts:29`. Même pattern de drift que ScrutinAnalyse (session 50). Si un thème est ajouté en src/types, resume-ingest le mapperait silencieusement vers "autre". Import depuis src/types maintenant ; suppression du bloc local. · `scripts/resume-ingest.ts`
+- [FIXED] Browser history pollution · Cover.tsx wordmark Link self-link `<Link to="/" state={{ fromLogo: true }}>` poussait une entrée history à chaque click. Un user cliquant 3× sur le wordmark devait presser back 3× pour échapper la Cover. `replace` ajouté — la mutation state.fromLogo continue à trigger l'effect (visible refresh), mais sans polluer la back-stack. · `src/routes/Cover.tsx`
+
+### Vérifications à faire en session 75
+
+- [ ] `npm run test:run` → 127 tests verts (était 126)
+- [ ] grep `const THEMES` dans `scripts/resume-ingest.ts` → 0 résultat (importé maintenant)
+- [ ] Sur Cover, cliquer le wordmark 3× → DevTools Application > History : pas d'entrées supplémentaires accumulées

@@ -106,6 +106,12 @@ export default function Cover() {
       }}>
         <Link
           to="/"
+          // `replace` because this is a self-link (Cover is at "/"). Without
+          // it, every click pushes an extra history entry — a user clicking
+          // the wordmark 3× would then press back 3× to escape the same
+          // page. The state mutation (fromLogo: true) still triggers
+          // Cover's effect, just without polluting the back-stack.
+          replace
           state={{ fromLogo: true }}
           aria-label="Accueil"
           // aria-current="page" because Cover IS at "/" — without it, SR

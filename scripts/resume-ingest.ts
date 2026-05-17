@@ -21,8 +21,9 @@ import { createClient } from "@supabase/supabase-js";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { computeGroupPosition } from "../src/lib/compute-positions";
+import { THEMES } from "../src/types";
 import type {
-  GroupCode, GroupPosition, GroupVoteBreakdown, ScrutinAnalyse,
+  GroupCode, GroupPosition, GroupVoteBreakdown, ScrutinAnalyse, Theme,
 } from "../src/types";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -154,12 +155,6 @@ interface BatchResultLine {
     | { type: "canceled" }
     | { type: "expired" };
 }
-
-const THEMES = [
-  "pouvoir-achat","retraites","immigration","sécurité","écologie",
-  "santé","école","fiscalité","institutions","international","autre",
-] as const;
-type Theme = typeof THEMES[number];
 
 interface Summary {
   chapeau: string;
