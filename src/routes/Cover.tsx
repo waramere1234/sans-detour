@@ -9,7 +9,7 @@ import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE, type LocationStateFromLogo } from "../lib/nav-state";
 import { mailto } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
-import { TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL, VIEW_RESULT_LABEL } from "../types";
+import { TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL, VIEW_RESULT_LABEL, WORDMARK_HOME_LABEL } from "../types";
 
 export default function Cover() {
   const navigate = useNavigate();
@@ -104,7 +104,7 @@ export default function Cover() {
           // Cover's effect, just without polluting the back-stack.
           replace
           state={FROM_LOGO_STATE}
-          aria-label="Accueil"
+          aria-label={WORDMARK_HOME_LABEL}
           // aria-current="page" because Cover IS at "/" — without it, SR
           // users have no way to know the wordmark link is a self-link
           // (visually it looks like a navigation affordance, semantically

@@ -13,6 +13,7 @@ import { THRESHOLD } from "../lib/compute-positions";
 import {
   TARGET, MIN_FOR_RANKING, MAX_POINTS_CLES_BULLETS, AN_OPEN_DATA_URL,
   READING_PAGE_MAX_WIDTH,
+  WORDMARK_HOME_LABEL, PAGE_HEADER_NAV_LABEL, externalLinkLabel,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -67,7 +68,7 @@ export default function Methode() {
         the geometry is balanced. aria-label distinguishes this landmark
         from the Sommaire <nav> below for SR users navigating by landmarks. */}
       <nav
-        aria-label="En-tête de la page"
+        aria-label={PAGE_HEADER_NAV_LABEL}
         style={{
           display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "baseline",
           paddingBottom: 14, borderBottom: "1px solid var(--line)",
@@ -75,7 +76,7 @@ export default function Methode() {
         <Link to={ROUTES.cover} style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none", justifySelf: "start" }}>
           <span aria-hidden="true">‹ </span>Retour
         </Link>
-        <Link to={ROUTES.cover} state={FROM_LOGO_STATE} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
+        <Link to={ROUTES.cover} state={FROM_LOGO_STATE} aria-label={WORDMARK_HOME_LABEL} style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
           <Wordmark />
         </Link>
       </nav>
@@ -169,14 +170,14 @@ export default function Methode() {
         <p>Sans Détour est un projet <strong>indépendant</strong>. Aucune affiliation parti / média / institution.</p>
         <p>Hébergement sur fonds personnels. Pas d'annonceur, pas de sponsor, pas de don accepté pendant les 6 mois précédant un scrutin national.</p>
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)" }}>
-          <li><a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label="data.assemblee-nationale.fr (nouvel onglet)">data.assemblee-nationale.fr</a> — open data officiel</li>
+          <li><a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel("data.assemblee-nationale.fr")}>data.assemblee-nationale.fr</a> — open data officiel</li>
           {/* TODO production-blocker · github.com/sansdetour is a 404 today
               (real repo is private at waramere1234/sans-detour per CLAUDE.md)
               AND no LICENSE file exists despite the "MIT" claim. Either
               publish under the sansdetour org with a LICENSE.md, or drop
               this bullet until the repo is public. Same TODO in §07 below
               and in Legal.tsx — keep them in sync. */}
-          <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label="github.com/sansdetour (nouvel onglet)">github.com/sansdetour</a> — code source MIT</li>
+          <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel("github.com/sansdetour")}>github.com/sansdetour</a> — code source MIT</li>
           <li><a href={mailto()}>{CONTACT_EMAIL}</a> — signaler une erreur</li>
         </ul>
       </Section>
@@ -194,7 +195,7 @@ export default function Methode() {
           {/* TODO production-blocker · same broken github.com/sansdetour
               link as §06 above. The "prompt et code source publics" claim
               is aspirational until the repo is published. */}
-          <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label="github.com/sansdetour (nouvel onglet)">github.com/sansdetour</a> — prompt et code source publics</li>
+          <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel("github.com/sansdetour")}>github.com/sansdetour</a> — prompt et code source publics</li>
           <li>Modèle : Claude Haiku 4.5 d'Anthropic, via Batches API + web_search</li>
         </ul>
       </Section>

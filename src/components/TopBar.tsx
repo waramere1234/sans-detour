@@ -8,7 +8,7 @@ import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE } from "../lib/nav-state";
 import { mailto } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
-import { MIN_FOR_RANKING, PROD_HOSTNAME } from "../types";
+import { MIN_FOR_RANKING, PROD_HOSTNAME, WORDMARK_HOME_LABEL } from "../types";
 
 
 /** Top bar shown on every page except the Cover. Wordmark on the left
@@ -64,7 +64,7 @@ export function TopBar() {
         <Link
           to={ROUTES.cover}
           state={FROM_LOGO_STATE}
-          aria-label="Accueil"
+          aria-label={WORDMARK_HOME_LABEL}
           style={{ textDecoration: "none", color: "inherit" }}
         >
           <Wordmark />

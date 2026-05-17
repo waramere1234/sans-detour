@@ -4,7 +4,10 @@ import { Wordmark } from "../components/Wordmark";
 import { FROM_LOGO_STATE } from "../lib/nav-state";
 import { CONTACT_EMAIL, mailto } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
-import { AN_OPEN_DATA_URL } from "../types";
+import {
+  AN_OPEN_DATA_URL,
+  WORDMARK_HOME_LABEL, PAGE_HEADER_NAV_LABEL, externalLinkLabel,
+} from "../types";
 
 export default function Legal() {
   return (
@@ -13,7 +16,7 @@ export default function Legal() {
         spacer. Same pattern as Methode.tsx. aria-label distinguishes this
         landmark from the TopBar header for SR users navigating by landmarks. */}
       <nav
-        aria-label="En-tête de la page"
+        aria-label={PAGE_HEADER_NAV_LABEL}
         style={{
           display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "baseline",
           paddingBottom: 14, borderBottom: "1px solid var(--line)",
@@ -21,7 +24,7 @@ export default function Legal() {
         <Link to={ROUTES.cover} style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none", justifySelf: "start" }}>
           <span aria-hidden="true">‹ </span>Retour
         </Link>
-        <Link to={ROUTES.cover} state={FROM_LOGO_STATE} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
+        <Link to={ROUTES.cover} state={FROM_LOGO_STATE} aria-label={WORDMARK_HOME_LABEL} style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
           <Wordmark />
         </Link>
       </nav>
@@ -53,7 +56,7 @@ export default function Legal() {
 
         <p><strong>Indépendance</strong> — Sans Détour est un projet indépendant. Aucune affiliation politique, médiatique ou institutionnelle.</p>
 
-        <p><strong>Sources des données</strong> — Open data officiel de l'Assemblée Nationale (<a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label="data.assemblee-nationale.fr (nouvel onglet)">data.assemblee-nationale.fr</a>), licence Etalab 2.0.</p>
+        <p><strong>Sources des données</strong> — Open data officiel de l'Assemblée Nationale (<a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel("data.assemblee-nationale.fr")}>data.assemblee-nationale.fr</a>), licence Etalab 2.0.</p>
 
         {/* TODO production-blocker · same broken github.com/sansdetour
             link as Methode §06 + §07 (real repo is private at
@@ -62,7 +65,7 @@ export default function Legal() {
             is published, also add LICENSE.md before exposing this link
             (RGPD/legal cleanliness). Drop this <p> entirely if the open-
             source path is deferred. */}
-        <p><strong>Code source</strong> — Open source sous licence MIT, disponible sur <a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label="github.com/sansdetour (nouvel onglet)">github.com/sansdetour</a>.</p>
+        <p><strong>Code source</strong> — Open source sous licence MIT, disponible sur <a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel("github.com/sansdetour")}>github.com/sansdetour</a>.</p>
       </div>
     </section>
   );

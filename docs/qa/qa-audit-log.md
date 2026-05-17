@@ -3142,3 +3142,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `SHARE_SOURCE_LINE\|VIEW_RESULT_LABEL` src/ api/ tests/ → 10+ résultats
 - [ ] grep "basées sur les vrais votes" src/ api/ → 1 résultat seulement (la déclaration SHARE_SOURCE_LINE)
 - [ ] grep `~592 tests` CLAUDE.md → 0 résultat (aligné sur ~594)
+
+---
+
+## Session 134 — 2026-05-17
+
+### Vérification session 133
+
+- [VERIFIED] 18 occurrences de SHARE_SOURCE_LINE|VIEW_RESULT_LABEL dans src/ + api/ + tests/
+- [VERIFIED] 1 résultat seulement de "basées sur les vrais votes" (la déclaration SHARE_SOURCE_LINE)
+- [VERIFIED] CLAUDE.md "~594 tests"
+- 594/594 tests verts, typecheck clean
+
+### Bugs fixés (WORDMARK_HOME_LABEL + PAGE_HEADER_NAV_LABEL + externalLinkLabel helper)
+
+- [FIXED] `aria-label="Accueil"` dupliqué 4× sur les Wordmark Links (Cover, Methode, Legal, TopBar) · Le label sur le SR a11y rotor doit être identique sur chaque route pour que VoiceOver / NVDA users entendent toujours la même destination ("Lien — Accueil"). Une rewording one-sided créerait de la confusion. Fix : export `WORDMARK_HOME_LABEL = "Accueil"` depuis src/types. Les 4 sites importent. · `src/types/index.ts`, `src/routes/Cover.tsx`, `src/routes/Methode.tsx`, `src/routes/Legal.tsx`, `src/components/TopBar.tsx`
+- [FIXED] `aria-label="En-tête de la page"` dupliqué 2× (Methode + Legal) sur le nav landmark du header · Le landmark distinguer le header du body Sommaire/back-link nav dans le SR landmarks rotor. Drift surface modeste (2 sites) mais same drift pattern. Fix : export `PAGE_HEADER_NAV_LABEL`. · `src/types/index.ts`, `src/routes/Methode.tsx`, `src/routes/Legal.tsx`
+- [FIXED] `" (nouvel onglet)"` suffix dupliqué 5× sur les external links aria-label (Methode × 4 + Legal × 1) — pattern `aria-label="${visible} (nouvel onglet)"` pour data.assemblee-nationale.fr + github.com/sansdetour · Drift surface notable. Fix : export const `EXTERNAL_LINK_SUFFIX` + helper `externalLinkLabel(visibleText)`. Les 5 sites utilisent `externalLinkLabel("...")`. 4 tests nouveaux dans `tests/aria-labels.test.ts` : pin-the-value des 3 consts + composition test du helper + invariant `endsWith(SUFFIX)`. · `src/types/index.ts`, `src/routes/Methode.tsx`, `src/routes/Legal.tsx`, `tests/aria-labels.test.ts` (nouveau)
+
+### Vérifications à faire en session 135
+
+- [ ] grep `WORDMARK_HOME_LABEL\|PAGE_HEADER_NAV_LABEL\|externalLinkLabel` src/ tests/ → 12+ résultats
+- [ ] grep `'aria-label="Accueil"\|aria-label="En-tête de la page"\|(nouvel onglet)'` src/ → 0 literals (toutes derivées sauf la déclaration)
+- [ ] grep `~594 tests` CLAUDE.md → 0 résultat (aligné sur ~600)

@@ -109,6 +109,31 @@ export const VIEW_RESULT_LABEL = "Voir mon résultat";
  *  A rewording propagates from one edit to both surfaces. */
 export const SHARE_SOURCE_LINE = "basées sur les vrais votes de l'AN";
 
+/** aria-label for the Wordmark Link that returns to Cover. Used on
+ *  Cover (self-link), Methode (back to home), Legal (back to home),
+ *  and TopBar (every non-Cover route). Same screen-reader announcement
+ *  on every route so a SR user always hears the same destination
+ *  description. */
+export const WORDMARK_HOME_LABEL = "Accueil";
+
+/** aria-label for the header-region nav landmark on reading pages
+ *  (Methode + Legal). Distinguishes the header from the page-body
+ *  Sommaire/back-link nav in the SR landmarks rotor. */
+export const PAGE_HEADER_NAV_LABEL = "En-tête de la page";
+
+/** Suffix appended to aria-labels on external links (target="_blank")
+ *  so screen readers warn the user "this opens in a new tab" before
+ *  they activate. Used 5× across Methode + Legal — centralised so a
+ *  rewording / French → English flip propagates from one edit. */
+export const EXTERNAL_LINK_SUFFIX = " (nouvel onglet)";
+
+/** Build an aria-label for an external link given the visible label.
+ *  Usage: `<a aria-label={externalLinkLabel("data.assemblee-nationale.fr")}>`
+ *  produces "data.assemblee-nationale.fr (nouvel onglet)". */
+export function externalLinkLabel(visibleText: string): string {
+  return visibleText + EXTERNAL_LINK_SUFFIX;
+}
+
 /** Official AN open-data portal — both the user-facing reference (Methode
  *  §01 + §06 prose, Legal data-sources block) and the script-side bulk
  *  download (`scripts/ingest-an.ts` builds `${AN_OPEN_DATA_URL}static/...`
