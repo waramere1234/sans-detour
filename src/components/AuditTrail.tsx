@@ -4,6 +4,7 @@ import {
   DEMO_DATA_LABEL_PREFIX, DEMO_FALLBACK_SHORT_LABEL,
   AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
   AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
+  auditTrailChipNoun,
   type GroupAlignment, type Scrutin, type SessionVote,
 } from "../types";
 import { alignmentScore } from "../lib/matching";
@@ -81,10 +82,10 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
         display: "flex", gap: 14, marginBottom: 12, flexWrap: "wrap",
         paddingBottom: 10, borderBottom: "1px solid var(--line)",
       }}>
-        <span><span style={{ color: "var(--pour)" }}><span aria-hidden="true">✓ </span>{alignment.perfect}</span> aligné{alignment.perfect !== 1 ? "s" : ""}</span>
-        <span><span style={{ color: "var(--warn)" }}><span aria-hidden="true">≈ </span>{alignment.partial}</span> partiel{alignment.partial !== 1 ? "s" : ""}</span>
-        <span><span style={{ color: "var(--contre)" }}><span aria-hidden="true">✕ </span>{alignment.conflict}</span> opposé{alignment.conflict !== 1 ? "s" : ""}</span>
-        <span style={{ color: "var(--ink-3)" }}><span aria-hidden="true">÷ </span>{alignment.divided_excluded} divisé{alignment.divided_excluded !== 1 ? "s" : ""} non compté{alignment.divided_excluded !== 1 ? "s" : ""}</span>
+        <span><span style={{ color: "var(--pour)" }}><span aria-hidden="true">✓ </span>{alignment.perfect}</span> {auditTrailChipNoun(alignment.perfect, "aligned")}</span>
+        <span><span style={{ color: "var(--warn)" }}><span aria-hidden="true">≈ </span>{alignment.partial}</span> {auditTrailChipNoun(alignment.partial, "partial")}</span>
+        <span><span style={{ color: "var(--contre)" }}><span aria-hidden="true">✕ </span>{alignment.conflict}</span> {auditTrailChipNoun(alignment.conflict, "opposed")}</span>
+        <span style={{ color: "var(--ink-3)" }}><span aria-hidden="true">÷ </span>{alignment.divided_excluded} {auditTrailChipNoun(alignment.divided_excluded, "divided")}</span>
       </div>
 
       {/* Per-scrutin breakdown */}

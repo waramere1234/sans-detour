@@ -5,6 +5,7 @@ import {
   anScrutinViewAriaLabel, DEMO_FALLBACK_SHORT_LABEL,
   AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
   AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
+  auditTrailChipText,
   type GroupAlignment, type Scrutin, type SessionVote,
   type GroupCode, type GroupPosition,
 } from "../src/types";
@@ -156,21 +157,25 @@ describe("AuditTrail — breakdown chips (plural rule, sessions 78-83)", () => {
   // Use toHaveTextContent on the region landmark, which concatenates
   // all descendant text nodes — that's what an SR user actually hears.
 
-  it("singularises each chip when the count is exactly 1", () => {
+  it("singularises each chip when the count is exactly 1 (round-trip via auditTrailChipText)", () => {
     const align = mkAlign("LFI", {
       perfect: 1, partial: 1, conflict: 1, divided_excluded: 1, counted: 3,
     });
     render(<AuditTrail alignment={align} scrutins={[]} votes={[]} />);
     const region = screen.getByRole("region");
-    expect(region).toHaveTextContent(/1 aligné(?!s)/);
-    expect(region).toHaveTextContent(/1 partiel(?!s)/);
-    expect(region).toHaveTextContent(/1 opposé(?!s)/);
-    expect(region).toHaveTextContent(/1 divisé non compté(?!s)/);
+    expect(region).toHaveTextContent(auditTrailChipText(1, "aligned"));
+    expect(region).toHaveTextContent(auditTrailChipText(1, "partial"));
+    expect(region).toHaveTextContent(auditTrailChipText(1, "opposed"));
+    expect(region).toHaveTextContent(auditTrailChipText(1, "divided"));
+    // Defence: each helper output is the singular form when count === 1.
+    expect(auditTrailChipText(1, "aligned")).toMatch(/1 aligné(?!s)/);
+    expect(auditTrailChipText(1, "divided")).toMatch(/1 divisé non compté(?!s)/);
   });
 
-  it("pluralises 'divisé non comptés' when count >= 2 (both adjectives agree)", () => {
+  it("pluralises 'divisé non comptés' when count >= 2 (round-trip via helper)", () => {
     const align = mkAlign("LFI", { divided_excluded: 5 });
     render(<AuditTrail alignment={align} scrutins={[]} votes={[]} />);
-    expect(screen.getByRole("region")).toHaveTextContent(/5 divisés non comptés/);
+    expect(screen.getByRole("region")).toHaveTextContent(auditTrailChipText(5, "divided"));
+    expect(auditTrailChipText(5, "divided")).toMatch(/5 divisés non comptés/);
   });
 });

@@ -3570,3 +3570,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `"92 scrutins"\|"1 scrutin"\|"57%.*12"` tests/ → 0 résultat (toutes les regex migrées vers helpers)
 - [ ] grep `"MAJ il y a 1 jour"\|"MAJ il y a 5 jours"` tests/FreshnessBanner.test.tsx → 0 résultat (migré vers freshnessPastPhrase)
 - [ ] grep `~707 tests` CLAUDE.md → 0 résultat (aligné sur ~715)
+
+---
+
+## Session 152 — 2026-05-17
+
+### Vérification session 151
+
+- [VERIFIED] 30 occurrences des 2 nouveaux exports (freshnessTotalScrutinsPhrase + personnaliteRowRightColumnText)
+- [VERIFIED] 3 occurrences seulement des 3 strings = tous des pin-the-value tests (clean)
+- [VERIFIED] CLAUDE.md "~715 tests"
+- 715/715 tests verts, typecheck clean
+
+### Bugs fixés (auditTrailChipNoun/Text × 4 kinds + rankingOverlayHeaderText + resultEyebrowText)
+
+- [FIXED] AuditTrail.tsx breakdown chips × 4 (`{N} aligné(s)`, `{N} partiel(s)`, `{N} opposé(s)`, `{N} divisé(s) non compté(s)`) inline avec plural rule + 5 test regex partial-matches (4 singulier + 1 pluriel "divisé") · Drift surface : 8 sites in-lockstep + plural rule + "divisé non compté" agreement (les 2 adjectifs doivent agree). Fix : export `AuditTrailChipKind` union type + `auditTrailChipNoun(count, kind)` (renvoie noun-with-plural seul, sans le count — car la UI sépare le count coloré du noun uncolored) + `auditTrailChipText(count, kind)` (renvoie `${count} ${noun}` pour les tests). AuditTrail.tsx utilise auditTrailChipNoun ; tests utilisent auditTrailChipText pour `.toHaveTextContent`. 4 nouveaux tests : noun helper × 3 kinds, divided agreement × 2 (both adjectives), text helper wrapper, 0-as-plural French rule. · `src/types/index.ts`, `src/components/AuditTrail.tsx`, `tests/AuditTrail.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] RankingOverlay.tsx visible header text `{RANKING_OVERLAY_LABEL} · {countedTotal} compté(s)` inline + tests/RankingOverlay.test.tsx 2 regex partial-matches (`new RegExp(\`${RANKING_OVERLAY_LABEL} · 1 compté(?!s)\`)` + `new RegExp(\`${RANKING_OVERLAY_LABEL} · 12 comptés\`)`) · Drift surface : 3 sites + plural rule. Fix : export `rankingOverlayHeaderText(countedTotal)` helper qui combine label + count + plural. Source utilise le helper ; tests round-trip via `toHaveTextContent(rankingOverlayHeaderText(N))`. 3 nouveaux tests : full-template pin-the-value, singular vs plural × 3 cases (0 / 1 / 12). · `src/types/index.ts`, `src/components/RankingOverlay.tsx`, `tests/RankingOverlay.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Result.tsx eyebrow span `isPartial ? \`RÉSULTAT PARTIEL · ${total}/${TARGET}\` : \`RÉSULTAT · ${LEGISLATURE_LABEL}\`` inline 2-branch ternary, untested · Drift surface non-évidente : sans tests, un rewording silencieux passerait. Fix : export `resultEyebrowText(isPartial, total, target)` helper depuis src/types. Result.tsx utilise le helper. 4 nouveaux tests dans aria-labels.test.ts : complete branch pin-the-value avec LEGISLATURE_LABEL round-trip, partial branch pin × 2 cases, startsWith "RÉSULTAT" invariant (SR skim), PARTIEL-only-in-partial-branch invariant. · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 153
+
+- [ ] grep `auditTrailChipNoun\|auditTrailChipText\|rankingOverlayHeaderText\|resultEyebrowText` src/ tests/ → 20+ résultats
+- [ ] grep `aligné{|partiel{|opposé{|divisé{` src/components/AuditTrail.tsx → 0 résultat (toutes les inline templates migrées)
+- [ ] grep `compté{|RÉSULTAT PARTIEL ·|RÉSULTAT · \${LEGISLATURE_LABEL}` src/ → 0 résultat (migrés vers helpers)
+- [ ] grep `~715 tests` CLAUDE.md → 0 résultat (aligné sur ~726)

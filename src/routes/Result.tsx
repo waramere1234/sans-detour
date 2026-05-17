@@ -16,9 +16,10 @@ import { composeShareText, performShare } from "../lib/share";
 import { track } from "../lib/analytics";
 import { ROUTES, PLAY_AFFINEMENT } from "../lib/routes";
 import {
-  TARGET, LEGISLATURE_LABEL,
+  TARGET,
   SHARE_LABEL, REFAIRE_LABEL, CONTINUE_REFINE_LABEL, CONTINUE_TEST_LABEL_PREFIX,
   refaireConfirmMessage, PERSONNALITES_TOGGLE_LABEL,
+  resultEyebrowText,
   type Scrutin, type GroupCode,
 } from "../types";
 
@@ -157,7 +158,7 @@ export default function Result() {
           fontFamily: "var(--font-mono)", fontSize: 10.5,
           letterSpacing: "0.14em", textTransform: "uppercase",
           color: isPartial ? "var(--accent)" : "var(--ink-3)",
-        }}>{isPartial ? `RÉSULTAT PARTIEL · ${total}/${TARGET}` : `RÉSULTAT · ${LEGISLATURE_LABEL}`}</span>
+        }}>{resultEyebrowText(isPartial, total, TARGET)}</span>
         <h1 style={{
           fontFamily: "var(--font-sans)", fontWeight: 700,
           fontSize: 28, lineHeight: 1.15, letterSpacing: "-0.022em",

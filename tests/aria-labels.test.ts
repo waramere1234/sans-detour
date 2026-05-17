@@ -30,6 +30,10 @@ import {
   AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
   AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
   partyRowAriaLabel, personnaliteRowAriaLabel, personnaliteRowRightColumnText,
+  auditTrailChipNoun, auditTrailChipText,
+  rankingOverlayHeaderText,
+  resultEyebrowText,
+  LEGISLATURE_LABEL,
 } from "../src/types";
 import { freshnessTotalScrutinsPhrase } from "../src/components/FreshnessBanner";
 
@@ -673,6 +677,75 @@ describe("personnaliteRowRightColumnText — PersonnaliteRow visible right-colum
     // Even passing a non-zero pct, the low-data branch must not surface
     // it visually — the whole point of the low-data state.
     expect(personnaliteRowRightColumnText(80, 2, true)).not.toContain("80");
+  });
+});
+
+describe("auditTrailChipNoun + auditTrailChipText — AuditTrail breakdown chips × 4", () => {
+  // Pulled out of 4 inline `aligné{plural}` templates + 5 test regex
+  // partial-matches. The 4 kinds mirror the 4 alignmentScore outcomes.
+  it("noun helper composes 'aligné(s)' / 'partiel(s)' / 'opposé(s)' / 'divisé(s) non compté(s)'", () => {
+    expect(auditTrailChipNoun(1, "aligned")).toBe("aligné");
+    expect(auditTrailChipNoun(2, "aligned")).toBe("alignés");
+    expect(auditTrailChipNoun(1, "partial")).toBe("partiel");
+    expect(auditTrailChipNoun(2, "partial")).toBe("partiels");
+    expect(auditTrailChipNoun(1, "opposed")).toBe("opposé");
+    expect(auditTrailChipNoun(2, "opposed")).toBe("opposés");
+  });
+
+  it("'divided' kind agrees both adjectives ('divisé' + 'non compté')", () => {
+    // French rule: both adjectives in "divisé non compté" must agree
+    // with the count. Singular "1 divisé non compté", plural "5 divisés
+    // non comptés". A regression that only pluralises one of the two
+    // adjectives would surface here.
+    expect(auditTrailChipNoun(1, "divided")).toBe("divisé non compté");
+    expect(auditTrailChipNoun(5, "divided")).toBe("divisés non comptés");
+  });
+
+  it("text helper wraps noun with count ('N noun')", () => {
+    expect(auditTrailChipText(1, "aligned")).toBe("1 aligné");
+    expect(auditTrailChipText(5, "divided")).toBe("5 divisés non comptés");
+  });
+
+  it("uses plural 'aligné(s)' for 0 (French rule treats 0 as plural)", () => {
+    expect(auditTrailChipNoun(0, "aligned")).toBe("alignés");
+  });
+});
+
+describe("rankingOverlayHeaderText — RankingOverlay visible header", () => {
+  it("composes '{label} · N compté(s)' with the canonical RANKING_OVERLAY_LABEL prefix", () => {
+    expect(rankingOverlayHeaderText(12)).toBe("Classement partiel · 12 comptés");
+    expect(rankingOverlayHeaderText(1)).toBe("Classement partiel · 1 compté");
+  });
+
+  it("uses singular 'compté' when countedTotal === 1", () => {
+    expect(rankingOverlayHeaderText(1)).toContain("1 compté");
+    expect(rankingOverlayHeaderText(1)).not.toContain("comptés");
+  });
+
+  it("uses plural 'comptés' for 0 and ≥ 2 (French rule)", () => {
+    expect(rankingOverlayHeaderText(0)).toContain("0 comptés");
+    expect(rankingOverlayHeaderText(2)).toContain("2 comptés");
+  });
+});
+
+describe("resultEyebrowText — Result.tsx page header eyebrow", () => {
+  it("complete branch composes 'RÉSULTAT · {LEGISLATURE_LABEL}'", () => {
+    expect(resultEyebrowText(false, 20, 20)).toBe(`RÉSULTAT · ${LEGISLATURE_LABEL}`);
+  });
+
+  it("partial branch composes 'RÉSULTAT PARTIEL · N/TARGET'", () => {
+    expect(resultEyebrowText(true, 7, 20)).toBe("RÉSULTAT PARTIEL · 7/20");
+    expect(resultEyebrowText(true, 12, 30)).toBe("RÉSULTAT PARTIEL · 12/30");
+  });
+
+  it("starts with 'RÉSULTAT' on both branches (SR skim invariant)", () => {
+    expect(resultEyebrowText(true, 7, 20).startsWith("RÉSULTAT")).toBe(true);
+    expect(resultEyebrowText(false, 20, 20).startsWith("RÉSULTAT")).toBe(true);
+  });
+
+  it("partial branch includes 'PARTIEL', complete branch does not", () => {
+    expect(resultEyebrowText(true, 7, 20)).toContain("PARTIEL");
+    expect(resultEyebrowText(false, 20, 20)).not.toContain("PARTIEL");
   });
 });
 

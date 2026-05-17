@@ -1,7 +1,7 @@
 // src/components/RankingOverlay.tsx
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
-  RANKING_OVERLAY_LABEL, MODAL_CLOSE_LABEL,
+  RANKING_OVERLAY_LABEL, MODAL_CLOSE_LABEL, rankingOverlayHeaderText,
   type GroupAlignment, type GroupCode,
 } from "../types";
 import { PartyRow } from "./PartyRow";
@@ -63,7 +63,7 @@ export function RankingOverlay({ open, alignments, countedTotal, onClose }: Rank
               <span style={{
                 fontFamily: "var(--font-mono)", fontSize: 11,
                 color: "var(--ink-3)", letterSpacing: "0.12em", textTransform: "uppercase",
-              }}>{RANKING_OVERLAY_LABEL} · {countedTotal} compté{countedTotal !== 1 ? "s" : ""}</span>
+              }}>{rankingOverlayHeaderText(countedTotal)}</span>
               <button
                 ref={closeBtnRef}
                 type="button"

@@ -342,6 +342,58 @@ export function personnaliteRowRightColumnText(
   return `${pct}% · ${counted}`;
 }
 
+/** AuditTrail breakdown-chip kinds, used by `auditTrailChipText` to
+ *  pick the right wording + plural rule. The 4 kinds mirror the 4
+ *  outcomes of alignmentScore (perfect → "aligné", partial → "partiel",
+ *  conflict → "opposé", divided → "divisé non compté"). */
+export type AuditTrailChipKind = "aligned" | "partial" | "opposed" | "divided";
+
+/** Compose the noun-with-plural for the AuditTrail breakdown chip
+ *  ("aligné(s)" / "partiel(s)" / "opposé(s)" / "divisé(s) non
+ *  compté(s)"). Pulled out of 4 inline `aligné{plural}` templates +
+ *  5 test regex partial-matches in tests/AuditTrail.test.tsx (one
+ *  per kind + a plural-rule pin for "divisé"). The UI puts the count
+ *  in a separately-colored span; this helper just returns the noun.
+ *  Each kind has its own French plural rule + optional modifier
+ *  agreement ("non compté" agrees with "divisé"). */
+export function auditTrailChipNoun(count: number, kind: AuditTrailChipKind): string {
+  const s = count !== 1 ? "s" : "";
+  switch (kind) {
+    case "aligned":  return `aligné${s}`;
+    case "partial":  return `partiel${s}`;
+    case "opposed":  return `opposé${s}`;
+    case "divided":  return `divisé${s} non compté${s}`;
+  }
+}
+
+/** Compose the full "N noun" form used by tests for textContent
+ *  assertions (toHaveTextContent matches the count + noun together).
+ *  Wraps auditTrailChipNoun + the count. */
+export function auditTrailChipText(count: number, kind: AuditTrailChipKind): string {
+  return `${count} ${auditTrailChipNoun(count, kind)}`;
+}
+
+/** Compose the visible RankingOverlay header text rendered before the
+ *  list of PartyRow ranks ("Classement partiel · N comptés"). Pulled
+ *  out of the inline `{RANKING_OVERLAY_LABEL} · {N} compté(s)` template
+ *  in RankingOverlay.tsx + 2 test regex partial-matches. Centralised
+ *  so source + tests round-trip via the helper. */
+export function rankingOverlayHeaderText(countedTotal: number): string {
+  const s = countedTotal !== 1 ? "s" : "";
+  return `${RANKING_OVERLAY_LABEL} · ${countedTotal} compté${s}`;
+}
+
+/** Compose the Result.tsx eyebrow span text — the small uppercase
+ *  label above the h1. Two branches:
+ *    - Partial: "RÉSULTAT PARTIEL · N/TARGET" (when isPartial=true)
+ *    - Complete: "RÉSULTAT · 17e LÉGISLATURE" (uses LEGISLATURE_LABEL)
+ *  Pulled out of the inline 2-branch ternary in Result.tsx so the
+ *  branching logic + the wording are testable independently. */
+export function resultEyebrowText(isPartial: boolean, total: number, target: number): string {
+  if (isPartial) return `RÉSULTAT PARTIEL · ${total}/${target}`;
+  return `RÉSULTAT · ${LEGISLATURE_LABEL}`;
+}
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use
