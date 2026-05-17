@@ -16,10 +16,15 @@ function pastDays(target: string, base: number = Date.now()): number {
   return Math.max(0, Math.floor((base - t) / 86400_000));
 }
 
-// Sync cadence is weekly (cf. Methode §01). Above this many days, the
-// pipeline is considered late and we drop the "à jour" framing so the
-// banner doesn't lie when ingestion has actually stalled.
-const STALE_AFTER_DAYS = 10;
+/** Sync cadence is weekly (cf. Methode §01). Above this many days, the
+ *  pipeline is considered late and we drop the "à jour" framing so the
+ *  banner doesn't lie when ingestion has actually stalled.
+ *
+ *  Exported so the test suite can derive `pastDays > STALE_AFTER_DAYS`
+ *  instead of hardcoding `mk(15, …)` against the implicit value `10` —
+ *  a future bump to 14 or 20 would otherwise need parallel edits in
+ *  source + test, with silent test-passing if forgotten. */
+export const STALE_AFTER_DAYS = 10;
 
 export function FreshnessBanner({ info }: { info: FreshnessInfo }) {
   const past = pastDays(info.last_sync_at);

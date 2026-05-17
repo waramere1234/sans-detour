@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { FreshnessBanner } from "../src/components/FreshnessBanner";
+import { FreshnessBanner, STALE_AFTER_DAYS } from "../src/components/FreshnessBanner";
 import type { FreshnessInfo } from "../src/types";
 
 // Session 42 promoted the "0 j" boundary cases to natural-language phrasing
@@ -20,13 +20,13 @@ function mk(pastDays: number, nextDays: number, total = 100): FreshnessInfo {
 }
 
 describe("FreshnessBanner", () => {
-  it("renders the fresh tone title when past <= STALE_AFTER_DAYS", () => {
-    render(<FreshnessBanner info={mk(3, 4)} />);
+  it("renders the fresh tone title at exactly STALE_AFTER_DAYS (boundary)", () => {
+    render(<FreshnessBanner info={mk(STALE_AFTER_DAYS, 4)} />);
     expect(screen.getByText("Données à jour")).toBeInTheDocument();
   });
 
-  it("switches to the stale tone title when past > 10 days", () => {
-    render(<FreshnessBanner info={mk(15, 0)} />);
+  it("switches to the stale tone title at STALE_AFTER_DAYS + 1 (just over)", () => {
+    render(<FreshnessBanner info={mk(STALE_AFTER_DAYS + 1, 0)} />);
     expect(screen.getByText("Synchronisation en retard")).toBeInTheDocument();
   });
 

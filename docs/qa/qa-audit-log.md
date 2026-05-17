@@ -2574,3 +2574,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `ANALYTICS_HOSTS\|ANALYTICS_EVENTS` src/ tests/ → résultats dans analytics.ts + analytics.test.ts (consumers)
 - [ ] `ls api/_lib/parse-top.ts tests/parse-top.test.ts` → 2 fichiers présents
 - [ ] grep `~412 tests` CLAUDE.md → 0 résultat (aligné sur ~424)
+
+---
+
+## Session 111 — 2026-05-17
+
+### Vérification session 110
+
+- [VERIFIED] tests/analytics.test.ts contient 2 `sansdetour.fr` mais les deux dans le pin-shape test (`ANALYTICS_HOSTS.has(...)`) — non-drift
+- [VERIFIED] 19 occurrences de ANALYTICS_HOSTS/EVENTS diffusées
+- [VERIFIED] api/_lib/parse-top.ts + tests/parse-top.test.ts présents
+- [VERIFIED] CLAUDE.md "~424 tests"
+- 424/424 tests verts, typecheck clean
+
+### Bugs fixés (App.tsx coverage gap + STALE_AFTER_DAYS drift + GROUP_MAPPING shape)
+
+- [FIXED] `src/App.tsx` 0 test coverage · L'App shell mounte TopBar + ErrorBoundary autour de chaque route avec `<ErrorBoundary key={location.pathname}>` — le `key` prop est l'invariant critique qui remount la boundary à chaque navigation, sinon un crash sur /play laisserait la fallback affichée même après navigation vers /result (documenté dans le commentaire source mais 0 test). Sans test, supprimer accidentellement la `key` prop dans un refactor casserait silencieusement la récupération multi-routes. 4 tests dans `tests/App.test.tsx` : children rendus inside <main>, TopBar mounted sur /play, ErrorBoundary trappe les crashes route-level, l'isolation route-par-route (un App séparé pour /result mount le healthy child même si /play crashed dans un autre render). · `tests/App.test.tsx` (nouveau)
+- [FIXED] `STALE_AFTER_DAYS = 10` private const dans `src/components/FreshnessBanner.tsx`, dupliqué implicitement dans les tests (test "switches to stale tone title when past > 10 days" + `mk(15, 0)` hardcoded) · Si la cadence sync change (par exemple weekly+slack → 14j, ou bi-weekly → 20j), le const update mais les tests passent toujours avec leur literal 15 — soit en testant l'ancienne policy (faux positif vert), soit en cassant correctement si 15 < nouvelle threshold (vrai négatif). Pas safe dans le sens "rename-safe". Fix : export `STALE_AFTER_DAYS`, tests utilisent `mk(STALE_AFTER_DAYS, 4)` (boundary fresh) et `mk(STALE_AFTER_DAYS + 1, 0)` (just over) — un bump propage automatiquement aux tests + ils testent toujours le bon boundary. · `src/components/FreshnessBanner.tsx`, `tests/FreshnessBanner.test.tsx`
+- [FIXED] `GROUP_MAPPING` (13 entrées AN organeRef → GroupCode) avait seulement 3 entrées testées indirectement via `parseRaw` · Une faute de frappe comme `PO845470: "HOR"` → `"DR"` ou la suppression accidentelle d'une entrée non-couverte (UDR-PO872880, GDR, DEM, etc.) passerait toute la suite. Fix : `tests/an-groups.test.ts` (nouveau) — 13 tests pinent chaque entrée explicite + 3 tests d'invariants globaux : (a) le nombre total d'entrées (no surprise add/drop), (b) tous les targets non-null sont des GroupCode valides, (c) UDR est le seul code reach par 2 organeRefs (PO847173 + PO872880, reconstitution 2025-09). Toute édition d'une entrée surface ici plutôt que masquer la régression dans la pipeline d'ingestion. · `tests/an-groups.test.ts` (nouveau)
+
+### Vérifications à faire en session 112
+
+- [ ] `ls tests/App.test.tsx tests/an-groups.test.ts` → 2 fichiers présents
+- [ ] grep `STALE_AFTER_DAYS` src/ tests/ → résultats dans FreshnessBanner.tsx (déclaration export) + FreshnessBanner.test.tsx (import + 2 usages)
+- [ ] grep -c "PO[0-9]\{6\}" tests/an-groups.test.ts → 13 (toutes les entrées pinées)
+- [ ] grep `~424 tests` CLAUDE.md → 0 résultat (aligné sur ~444)
