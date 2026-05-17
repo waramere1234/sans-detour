@@ -2378,3 +2378,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `createClient(SUPABASE` scripts/ → 0 résultat (tout passe par requireSupabaseClient)
 - [ ] grep `SUPABASE_URL!` scripts/ → 0 résultat (no more `!` assertions)
 - [ ] grep `~305 tests` CLAUDE.md → 0 résultat (aligné sur ~312)
+
+---
+
+## Session 103 — 2026-05-17
+
+### Vérification session 102
+
+- [VERIFIED] `process.env.SUPABASE_URL` apparaît uniquement dans scripts/lib/env.ts (declaration + JSDoc) ; les 4 ingest scripts utilisent maintenant requireSupabaseClient()
+- [VERIFIED] 0 résultat pour `createClient(SUPABASE` hors lib/env.ts
+- [VERIFIED] 0 résultat pour `SUPABASE_URL!` (le helper retourne narrowed string)
+- [VERIFIED] CLAUDE.md "~312 tests"
+- 312/312 tests verts, typecheck clean
+
+### Bugs fixés (residual `!` cleanup + 2 session test gaps)
+
+- [FIXED] `ANTHROPIC_KEY!` non-null assertions résiduelles · Session 102 a remplacé `process.env.ANTHROPIC_API_KEY` par `requireAnthropicEnv()` dans resume-ingest.ts + debug-batch.ts, mais 3 sites d'appel (`"x-api-key": ANTHROPIC_KEY!`) gardaient le `!` redondant — le helper retourne déjà `string` narrowed. Drop les 3 `!` (resume-ingest.ts:64, debug-batch.ts:27 + :41). ingest-an.ts garde son `ANTHROPIC_KEY!` parce qu'il lit toujours `process.env.ANTHROPIC_API_KEY` directement (optionnel — fallback path valide sans la clé). · `scripts/resume-ingest.ts`, `scripts/debug-batch.ts`
+- [FIXED] `newSession` shape testée uniquement par uniqueness · Le test `newSession produces unique ids` (session 46) couvrait l'unicité du session_id mais pas les invariants de shape (cards_seen=[], votes=[], started_at numeric). Un downstream change à SessionState (rename de field, ajout de required field sans default) slipperait. Ajout `newSession returns the canonical empty-session shape` qui pin les 5 fields. · `tests/session.test.ts`
+- [FIXED] `getOrCreateSession` 0 test dedicated · Helper utilisé par Play.tsx:85 pour garantir une session avant compose deck. Le branching (loadSession existing → return; else newSession + saveSession + return) n'avait aucune couverture. 4 tests ajoutés : creates new + persists, returns existing, idempotent on repeated calls, preserves votes across calls. · `tests/session.test.ts`
+
+### Vérifications à faire en session 104
+
+- [ ] grep `ANTHROPIC_KEY!` scripts/ → 1 résultat seulement (ingest-an.ts ligne 339 — le seul fichier où c'est optionnel)
+- [ ] grep "describe.*getOrCreateSession" tests/session.test.ts → 1 résultat
+- [ ] grep "canonical empty-session shape" tests/session.test.ts → 1 résultat
+- [ ] grep `~312 tests` CLAUDE.md → 0 résultat (aligné sur ~317)

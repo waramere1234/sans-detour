@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
   loadSession, saveSession, recordVote, resetSession, newSession,
-  hasSeenCover, markCoverSeen, forgetCover,
+  hasSeenCover, markCoverSeen, forgetCover, getOrCreateSession,
 } from "../src/lib/session";
 
 describe("session (localStorage state)", () => {
@@ -60,6 +60,57 @@ describe("session (localStorage state)", () => {
     const a = newSession();
     const b = newSession();
     expect(a.session_id).not.toBe(b.session_id);
+  });
+
+  it("newSession returns the canonical empty-session shape", () => {
+    // Session 103: previously only uniqueness was tested. Pin the shape
+    // so a downstream change to SessionState (renaming a field, adding
+    // a required field without a default) surfaces here.
+    const s = newSession();
+    expect(typeof s.session_id).toBe("string");
+    expect(s.session_id.length).toBeGreaterThan(0);
+    expect(s.cards_seen).toEqual([]);
+    expect(s.votes).toEqual([]);
+    expect(typeof s.started_at).toBe("number");
+    expect(s.started_at).toBeGreaterThan(0);
+  });
+
+  describe("getOrCreateSession", () => {
+    // Session 103: dedicated tests for the helper Play.tsx uses to
+    // ensure a session exists before composing the deck. No test before,
+    // so a regression to its load-or-create branching would slip past.
+
+    it("creates a new session + persists when none exists", () => {
+      expect(loadSession()).toBeNull();
+      const fresh = getOrCreateSession();
+      expect(fresh).not.toBeNull();
+      expect(fresh.cards_seen).toEqual([]);
+      expect(fresh.votes).toEqual([]);
+      // The fresh session is persisted, so a subsequent loadSession sees it.
+      const loaded = loadSession();
+      expect(loaded?.session_id).toBe(fresh.session_id);
+    });
+
+    it("returns the existing session when one is already saved", () => {
+      const existing = newSession();
+      saveSession(existing);
+      const out = getOrCreateSession();
+      expect(out.session_id).toBe(existing.session_id);
+    });
+
+    it("does not mint a fresh id on repeated calls (idempotent)", () => {
+      const a = getOrCreateSession();
+      const b = getOrCreateSession();
+      expect(a.session_id).toBe(b.session_id);
+    });
+
+    it("preserves votes recorded on the returned session across calls", () => {
+      getOrCreateSession();
+      recordVote("s1", "pour");
+      const out = getOrCreateSession();
+      expect(out.votes).toHaveLength(1);
+      expect(out.votes[0].scrutin_id).toBe("s1");
+    });
   });
 
   // Shape-validation guard (added session 46) — JSON.parse succeeds on any

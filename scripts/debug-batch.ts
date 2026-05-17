@@ -24,7 +24,7 @@ async function main() {
   console.log(`→ Fetching status of ${batchId}…\n`);
   const statusR = await fetch(`https://api.anthropic.com/v1/messages/batches/${batchId}`, {
     headers: {
-      "x-api-key": ANTHROPIC_KEY!,
+      "x-api-key": ANTHROPIC_KEY,
       "anthropic-version": "2023-06-01",
     },
   });
@@ -38,7 +38,7 @@ async function main() {
   console.log(`\n→ Fetching results…\n`);
   const resultsR = await fetch(`https://api.anthropic.com/v1/messages/batches/${batchId}/results`, {
     headers: {
-      "x-api-key": ANTHROPIC_KEY!,
+      "x-api-key": ANTHROPIC_KEY,
       "anthropic-version": "2023-06-01",
     },
   });

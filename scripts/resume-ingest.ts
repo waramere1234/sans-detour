@@ -61,7 +61,7 @@ async function main(): Promise<void> {
   console.log(`↓ Fetching batch ${BATCH_ID} results from Anthropic…`);
   const r = await fetch(`https://api.anthropic.com/v1/messages/batches/${BATCH_ID}/results`, {
     headers: {
-      "x-api-key": ANTHROPIC_KEY!,
+      "x-api-key": ANTHROPIC_KEY,
       "anthropic-version": "2023-06-01",
     },
   });
