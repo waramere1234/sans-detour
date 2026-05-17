@@ -5,6 +5,7 @@ import App from "./App";
 import Cover from "./routes/Cover";
 import Play from "./routes/Play";
 import Result from "./routes/Result";
+import { ROUTES } from "./lib/routes";
 import "./index.css";
 
 // Methode and Legal are reading-only secondary pages (TOC + paragraphs)
@@ -40,12 +41,12 @@ createRoot(document.getElementById("root")!).render(
       <App>
         <Suspense fallback={<RouteLoader />}>
           <Routes>
-            <Route path="/" element={<Cover />} />
-            <Route path="/play" element={<Play />} />
-            <Route path="/result" element={<Result />} />
-            <Route path="/methode" element={<Methode />} />
-            <Route path="/legal" element={<Legal />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path={ROUTES.cover} element={<Cover />} />
+            <Route path={ROUTES.play} element={<Play />} />
+            <Route path={ROUTES.result} element={<Result />} />
+            <Route path={ROUTES.methode} element={<Methode />} />
+            <Route path={ROUTES.legal} element={<Legal />} />
+            <Route path="*" element={<Navigate to={ROUTES.cover} replace />} />
           </Routes>
         </Suspense>
       </App>

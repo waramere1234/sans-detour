@@ -7,6 +7,7 @@ import { loadSession } from "../lib/session";
 import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE } from "../lib/nav-state";
 import { mailto } from "../lib/contact";
+import { ROUTES } from "../lib/routes";
 import { MIN_FOR_RANKING } from "../types";
 
 
@@ -34,7 +35,7 @@ export function TopBar() {
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
 
   // The Cover already shows its own header.
-  if (location.pathname === "/") return null;
+  if (location.pathname === ROUTES.cover) return null;
 
   return (
     <header className="sd-topbar" style={{
@@ -61,7 +62,7 @@ export function TopBar() {
         position: "relative", // anchor for the popover
       }}>
         <Link
-          to="/"
+          to={ROUTES.cover}
           state={FROM_LOGO_STATE}
           aria-label="Accueil"
           style={{ textDecoration: "none", color: "inherit" }}
@@ -124,7 +125,7 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
   const reducedMotion = useReducedMotion();
   const session = loadSession();
   const votes = session?.votes.length ?? 0;
-  const showResultLink = votes >= MIN_FOR_RANKING && location.pathname !== "/result";
+  const showResultLink = votes >= MIN_FOR_RANKING && location.pathname !== ROUTES.result;
 
   useEffect(() => {
     if (!open) return;
@@ -203,7 +204,7 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
             <nav style={{ display: "flex", flexDirection: "column", gap: 0 }}>
               {showResultLink && (
                 <MenuLink
-                  to="/result"
+                  to={ROUTES.result}
                   label="Mon résultat"
                   badge={String(votes)}
                   accent
@@ -211,15 +212,15 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
                 />
               )}
               <MenuLink
-                to="/methode"
+                to={ROUTES.methode}
                 label="Méthode & sources"
-                current={location.pathname === "/methode"}
+                current={location.pathname === ROUTES.methode}
                 onNavigate={() => { track("topbar_nav", { target: "methode" }); onClose(); }}
               />
               <MenuLink
-                to="/legal"
+                to={ROUTES.legal}
                 label="Mentions légales"
-                current={location.pathname === "/legal"}
+                current={location.pathname === ROUTES.legal}
                 onNavigate={() => { track("topbar_nav", { target: "legal" }); onClose(); }}
               />
               <MenuLink

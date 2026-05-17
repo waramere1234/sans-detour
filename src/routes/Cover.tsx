@@ -8,6 +8,7 @@ import { hasSeenCover, loadSession, markCoverSeen, resetSession } from "../lib/s
 import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE, type LocationStateFromLogo } from "../lib/nav-state";
 import { mailto } from "../lib/contact";
+import { ROUTES } from "../lib/routes";
 import { TARGET, MIN_FOR_RANKING } from "../types";
 
 export default function Cover() {
@@ -29,8 +30,8 @@ export default function Cover() {
     if (!fromLogo && hasSeenCover()) {
       const s = loadSession();
       const votes = s?.votes.length ?? 0;
-      if (votes >= TARGET) navigate("/result", { replace: true });
-      else navigate("/play", { replace: true });
+      if (votes >= TARGET) navigate(ROUTES.result, { replace: true });
+      else navigate(ROUTES.play, { replace: true });
     }
   }, [navigate, location.state]);
 
@@ -49,11 +50,11 @@ export default function Cover() {
     if (!hasSeenCover()) markCoverSeen();
     if (hasCompleted) {
       track("cover_result_revisit");
-      navigate("/result");
+      navigate(ROUTES.result);
       return;
     }
     track(hasInProgress ? "cover_resumed" : "cover_started");
-    navigate("/play");
+    navigate(ROUTES.play);
   }
 
   function restart() {
@@ -69,7 +70,7 @@ export default function Cover() {
     // No need to re-mark.
     resetSession();
     track("cover_restarted");
-    navigate("/play");
+    navigate(ROUTES.play);
   }
 
   return (
@@ -95,7 +96,7 @@ export default function Cover() {
         borderBottom: "1px solid var(--line)",
       }}>
         <Link
-          to="/"
+          to={ROUTES.cover}
           // `replace` because this is a self-link (Cover is at "/"). Without
           // it, every click pushes an extra history entry — a user clicking
           // the wordmark 3× would then press back 3× to escape the same
@@ -235,7 +236,7 @@ export default function Cover() {
             }}>
               {canSeePartialResult && (
                 <Link
-                  to="/result"
+                  to={ROUTES.result}
                   onClick={() => track("cover_partial_result")}
                   // textDecoration:underline so the link isn't identified by
                   // color alone (WCAG 1.4.1) — color-blind / high-contrast
@@ -299,8 +300,8 @@ export default function Cover() {
             };
             return (
               <>
-                <Link to="/methode" onClick={() => track("cover_footer_nav", { target: "methode" })} style={linkStyle}>Méthode &amp; sources</Link>
-                <Link to="/legal" onClick={() => track("cover_footer_nav", { target: "legal" })} style={linkStyle}>Mentions légales</Link>
+                <Link to={ROUTES.methode} onClick={() => track("cover_footer_nav", { target: "methode" })} style={linkStyle}>Méthode &amp; sources</Link>
+                <Link to={ROUTES.legal} onClick={() => track("cover_footer_nav", { target: "legal" })} style={linkStyle}>Mentions légales</Link>
                 <a href={mailto()} onClick={() => track("cover_footer_nav", { target: "contact" })} style={linkStyle}>Contact</a>
               </>
             );

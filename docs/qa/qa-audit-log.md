@@ -2403,3 +2403,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep "describe.*getOrCreateSession" tests/session.test.ts → 1 résultat
 - [ ] grep "canonical empty-session shape" tests/session.test.ts → 1 résultat
 - [ ] grep `~312 tests` CLAUDE.md → 0 résultat (aligné sur ~317)
+
+---
+
+## Session 104 — 2026-05-17
+
+### Vérification session 103
+
+- [VERIFIED] 1 résultat pour `ANTHROPIC_KEY!` dans scripts/ (uniquement ingest-an.ts:339, intentionnel)
+- [VERIFIED] describe + canonical shape tests présents dans tests/session.test.ts
+- [VERIFIED] CLAUDE.md "~317 tests"
+- 317/317 tests verts, typecheck clean
+
+### Bugs fixés (route literals → ROUTES const, 41+ sites, plus tests)
+
+- [FIXED] Route paths hardcodés à 41+ sites · `/`, `/play`, `/result`, `/methode`, `/legal` inlinés dans main.tsx (Route definitions × 6), Cover.tsx (navigate × 5 + Link × 4), Result.tsx (navigate × 3 + Navigate × 1), Play.tsx (navigate × 7), TopBar.tsx (Link × 4 + pathname comparisons × 3), Methode.tsx + Legal.tsx (Link × 4), MethodeSheet.tsx (Link × 1). Un rename `/play` → `/swipe` aurait demandé 41 edits avec typo silencieuse possible à chaque site. Extraction dans `src/lib/routes.ts` : const `ROUTES = { cover, play, result, methode, legal } as const` + type `RoutePath` (union literal). Tous les sites migrés. · `src/lib/routes.ts` (nouveau), 7 fichiers src/ modifiés
+- [FIXED] `?affinement=1` query string hardcodé 2 fois · Cover.tsx + Result.tsx avaient le literal `"/play?affinement=1"` dupliqué. Extraction comme `PLAY_AFFINEMENT = `${ROUTES.play}?affinement=1` as const` qui compose depuis ROUTES.play — un rename `/play` propage automatiquement vers le PLAY_AFFINEMENT. Result.tsx migré (Cover ne contenait pas ce literal en fait — c'était Result + le useEffect Play qui lisait params.get). · `src/lib/routes.ts`, `src/routes/Result.tsx`
+- [FIXED] `ROUTES` + `PLAY_AFFINEMENT` 0 test à l'extraction · 6 tests dans `tests/routes.test.ts` : pin l'objet shape (cover/play/result/methode/legal), chaque valeur commence par `/`, type compat avec `RoutePath` union, PLAY_AFFINEMENT composé depuis ROUTES.play (rename-safe), query string `?affinement=1` documenté comme la convention canonique. · `tests/routes.test.ts` (nouveau)
+
+### Vérifications à faire en session 105
+
+- [ ] grep `"/play"\|"/result"\|"/methode"\|"/legal"` src/ (hors lib/routes.ts) → 0 résultat
+- [ ] grep `"/?affinement=1"` src/ → 0 résultat (uniquement PLAY_AFFINEMENT const)
+- [ ] grep -c "it(" tests/routes.test.ts → 6
+- [ ] grep `~317 tests` CLAUDE.md → 0 résultat (aligné sur ~323)

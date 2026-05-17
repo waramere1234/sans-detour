@@ -10,6 +10,7 @@ import { composeDeck, drawNext, chapeauPrefix } from "../lib/deck";
 import { computeAlignment, rankByAlignment } from "../lib/matching";
 import { getOrCreateSession, recordVote, loadSession } from "../lib/session";
 import { track } from "../lib/analytics";
+import { ROUTES } from "../lib/routes";
 import {
   GROUP_CODES, TARGET, MIN_FOR_RANKING,
   type Scrutin, type UserVote, type GroupCode, type GroupAlignment,
@@ -65,7 +66,7 @@ export default function Play() {
     const existing = loadSession();
     const isAffinement = params.get("affinement") === "1";
     if (existing && existing.votes.length >= TARGET && !isAffinement) {
-      navigate("/result", { replace: true });
+      navigate(ROUTES.result, { replace: true });
       return;
     }
     // Affinement only makes sense after a completed session — it's the
@@ -74,7 +75,7 @@ export default function Play() {
     // localStorage cleared), strip the flag so they get a normal "0 / 20"
     // run instead of a refinement-mode header without a target count.
     if (isAffinement && (!existing || existing.votes.length < TARGET)) {
-      navigate("/play", { replace: true });
+      navigate(ROUTES.play, { replace: true });
       return;
     }
     setLoadError(false);
@@ -174,7 +175,7 @@ export default function Play() {
     const remaining = deck.slice(1);
     if (remaining.length === 0) {
       if ((session?.votes.length ?? 0) + 1 >= TARGET) {
-        navigate("/result");
+        navigate(ROUTES.result);
         return;
       }
       // The counts above were captured at render time, BEFORE recordVote
@@ -199,13 +200,13 @@ export default function Play() {
         seenChapeauPrefixCounts: fresherPrefixes,
       });
       setDeck(next ? [next] : []);
-      if (!next) navigate("/result");
+      if (!next) navigate(ROUTES.result);
     } else {
       setDeck(remaining);
     }
 
     if ((session?.votes.length ?? 0) + 1 === TARGET && !refinementMode) {
-      navigate("/result");
+      navigate(ROUTES.result);
     }
   }
 
@@ -238,7 +239,7 @@ export default function Play() {
         </p>
         <button
           type="button"
-          onClick={() => navigate("/result")}
+          onClick={() => navigate(ROUTES.result)}
           style={{
             alignSelf: "flex-start",
             background: "var(--accent)", color: "var(--bg)", border: "none",
@@ -339,7 +340,7 @@ export default function Play() {
         {showLiveScore && (
           <button
             type="button"
-            onClick={() => navigate("/result")}
+            onClick={() => navigate(ROUTES.result)}
             style={{
               fontFamily: "var(--font-mono)",
               fontSize: 11,

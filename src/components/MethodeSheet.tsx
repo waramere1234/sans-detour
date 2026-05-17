@@ -1,6 +1,7 @@
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { mailto } from "../lib/contact";
+import { ROUTES } from "../lib/routes";
 import { useModalA11y } from "../hooks/useModalA11y";
 
 export interface MethodeSheetProps {
@@ -114,7 +115,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
               <Link
-                to="/methode"
+                to={ROUTES.methode}
                 onClick={onClose}
                 style={btnPrimary()}
               ><span aria-hidden="true">→ </span>Méthode complète</Link>

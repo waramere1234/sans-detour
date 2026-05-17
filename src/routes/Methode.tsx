@@ -7,6 +7,7 @@ import { useFreshnessOnce } from "../hooks/useFreshnessOnce";
 import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE } from "../lib/nav-state";
 import { CONTACT_EMAIL, mailto } from "../lib/contact";
+import { ROUTES } from "../lib/routes";
 import { TARGET, MIN_FOR_RANKING } from "../types";
 
 export default function Methode() {
@@ -47,10 +48,10 @@ export default function Methode() {
           display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "baseline",
           paddingBottom: 14, borderBottom: "1px solid var(--line)",
         }}>
-        <Link to="/" style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none", justifySelf: "start" }}>
+        <Link to={ROUTES.cover} style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none", justifySelf: "start" }}>
           <span aria-hidden="true">‹ </span>Retour
         </Link>
-        <Link to="/" state={FROM_LOGO_STATE} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
+        <Link to={ROUTES.cover} state={FROM_LOGO_STATE} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
           <Wordmark />
         </Link>
       </nav>

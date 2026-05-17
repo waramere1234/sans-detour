@@ -12,6 +12,7 @@ import { PersonnaliteRow } from "../components/PersonnaliteRow";
 import { AuditTrail } from "../components/AuditTrail";
 import { getParty, getPartyColorVar } from "../lib/parties";
 import { track } from "../lib/analytics";
+import { ROUTES, PLAY_AFFINEMENT } from "../lib/routes";
 import { TARGET, type Scrutin, type GroupCode } from "../types";
 
 export default function Result() {
@@ -78,7 +79,7 @@ export default function Result() {
   // <Navigate> here (instead of useEffect+navigate) prevents the
   // misleading content from flashing before the redirect.
   if (!session || session.votes.length === 0) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={ROUTES.cover} replace />;
   }
 
   if (loadError) {
@@ -148,7 +149,7 @@ export default function Result() {
     track("result_refaire");
     resetSession();
     forgetCover();
-    navigate("/");
+    navigate(ROUTES.cover);
   }
 
   async function share() {
@@ -307,7 +308,7 @@ export default function Result() {
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {isPartial && (
           <button type="button"
-            onClick={() => navigate("/play")}
+            onClick={() => navigate(ROUTES.play)}
             style={btnPrimary()}><span aria-hidden="true">→ </span>Continuer le test ({remaining} {remaining === 1 ? "vote restant" : "votes restants"})</button>
         )}
         <button type="button"
@@ -315,7 +316,7 @@ export default function Result() {
           style={isPartial ? btnSecondary() : btnPrimary()}><span aria-hidden="true">📤 </span>Partager mon résultat</button>
         {!isPartial && (
           <button type="button"
-            onClick={() => { track("affinement_clicked"); navigate("/play?affinement=1"); }}
+            onClick={() => { track("affinement_clicked"); navigate(PLAY_AFFINEMENT); }}
             style={btnSecondary()}><span aria-hidden="true">↻ </span>Continuer à affiner</button>
         )}
         <button type="button" onClick={refaire} style={btnTertiary()}><span aria-hidden="true">↻ </span>Refaire depuis le début</button>
