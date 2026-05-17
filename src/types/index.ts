@@ -679,6 +679,25 @@ export const METHODE_S03_DIVIDED_RULE_BODY =
 export const METHODE_S03_DIVIDED_RULE_TAIL =
   " ne compte pas pour ce groupe — pas pour toi non plus, dans cette comparaison.";
 
+/** Methode §03 group-introduction opener — the prose explaining why
+ *  per-group position computation is needed (députés don't always
+ *  vote the same way). Pin so a future rewording surfaces. */
+export const METHODE_S03_GROUP_INTRO =
+  "Un groupe parlementaire compte plusieurs dizaines de députés qui ne votent pas toujours pareil. Pour résumer en une position unique :";
+
+/** Methode §07 closing strong-tag of the "Ce que fait Claude." paragraph
+ *  — "Mise en forme, pas commentaire." Pairs with the heading to make
+ *  the IA's role boundary explicit: the model reformulates content, it
+ *  doesn't comment on it. Load-bearing IA-transparency claim. */
+export const METHODE_S07_MISE_EN_FORME_CLOSER = "Mise en forme, pas commentaire.";
+
+/** Methode §07 transparency guarantee — the load-bearing claim that
+ *  the raw AN libellé is always shown alongside the LLM-rendered
+ *  synthesis. This is the anti-bias contract: users can always
+ *  compare the IA output against the official source. */
+export const METHODE_S07_LIBELLE_BRUT_GUARANTEE =
+  "Le libellé officiel brut est affiché sur la face Résumé du verso de chaque carte";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

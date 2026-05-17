@@ -15,6 +15,8 @@ import {
   METHODE_S06_HOSTING_FUNDING_BODY,
   METHODE_S01_UPDATE_CADENCE,
   METHODE_S05_NO_TRACKING_PHRASE,
+  METHODE_S03_GROUP_INTRO,
+  METHODE_S07_MISE_EN_FORME_CLOSER, METHODE_S07_LIBELLE_BRUT_GUARANTEE,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -109,6 +111,24 @@ describe("Methode — section structure", () => {
     renderMethode();
     const section = document.getElementById("methode-05")!;
     expect(section.textContent).toContain(METHODE_S05_NO_TRACKING_PHRASE);
+  });
+
+  it("§03 surfaces METHODE_S03_GROUP_INTRO (per-group position-computation rationale)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-03")!;
+    expect(section.textContent).toContain(METHODE_S03_GROUP_INTRO);
+  });
+
+  it("§07 surfaces METHODE_S07_MISE_EN_FORME_CLOSER (IA-role-boundary claim)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-07")!;
+    expect(section.textContent).toContain(METHODE_S07_MISE_EN_FORME_CLOSER);
+  });
+
+  it("§07 surfaces METHODE_S07_LIBELLE_BRUT_GUARANTEE (anti-bias transparency contract)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-07")!;
+    expect(section.textContent).toContain(METHODE_S07_LIBELLE_BRUT_GUARANTEE);
   });
 
   it("the number of rendered Section bodies matches METHODE_SECTIONS.length (no orphan body)", () => {

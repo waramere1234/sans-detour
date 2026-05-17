@@ -3897,3 +3897,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `METHODE_S05_NO_TRACKING_PHRASE\|METHODE_S05_LOCALSTORAGE_EXPLANATION\|METHODE_S01_UPDATE_CADENCE\|METHODE_S03_DIVIDED_RULE_BODY` src/ tests/ → 20+ résultats
 - [ ] grep `"Pas de compte utilisateur"\|"Mise à jour automatisée"\|"ne compte pas pour ce groupe"` src/ tests/ → 4-6 résultats (déclarations + pin-the-value)
 - [ ] grep `~843 tests` CLAUDE.md → 0 résultat (aligné sur ~852)
+
+---
+
+## Session 166 — 2026-05-18
+
+### Vérification session 165
+
+- [VERIFIED] 32 occurrences des 4 nouveaux exports (METHODE_S05_NO_TRACKING_PHRASE + METHODE_S05_LOCALSTORAGE_EXPLANATION + METHODE_S01_UPDATE_CADENCE + METHODE_S03_DIVIDED_RULE_BODY)
+- [VERIFIED] 1 occurrence seulement inline literal (pin-the-value test pour `"ne compte pas pour ce groupe"`)
+- [VERIFIED] CLAUDE.md "~852 tests"
+- 852/852 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_S03_GROUP_INTRO + METHODE_S07_MISE_EN_FORME_CLOSER + METHODE_S07_LIBELLE_BRUT_GUARANTEE)
+
+- [FIXED] Methode §03 group-introduction opener `"Un groupe parlementaire compte plusieurs dizaines de députés qui ne votent pas toujours pareil. Pour résumer en une position unique :"` inline + untested · Drift surface : lead paragraph qui introduit le `<Formula>` block suivant. Le trailing ":" est load-bearing — sans lui, le formula block flotterait orphelin visuellement. Fix : export `METHODE_S03_GROUP_INTRO`. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + ends-with-":" anti-formula-orphan guard. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §07 closing strong-tag `"Mise en forme, pas commentaire."` inline + untested · Drift surface : load-bearing IA-role boundary claim. Le "pas commentaire" est le complément critique de "Mise en forme" — un rewording silencieux qui supprime "pas commentaire" affaibrait le contract IA-transparency. Fix : export `METHODE_S07_MISE_EN_FORME_CLOSER`. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + contains "forme" + "pas commentaire" load-bearing guards. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §07 transparency claim `"Le libellé officiel brut est affiché sur la face Résumé du verso de chaque carte"` inline + untested · Drift surface : load-bearing anti-bias contract — l'IA's output is always comparable contre la raw AN libellé. Un rewording qui drop "officiel" softens le source-of-truth claim. Fix : export `METHODE_S07_LIBELLE_BRUT_GUARANTEE`. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + contains "libellé officiel" anti-soften guard. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 167
+
+- [ ] grep `METHODE_S03_GROUP_INTRO\|METHODE_S07_MISE_EN_FORME_CLOSER\|METHODE_S07_LIBELLE_BRUT_GUARANTEE` src/ tests/ → 15+ résultats
+- [ ] grep `"Un groupe parlementaire compte\|"Mise en forme, pas commentaire"\|"Le libellé officiel brut est affiché"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~852 tests` CLAUDE.md → 0 résultat (aligné sur ~861)

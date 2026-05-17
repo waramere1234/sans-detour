@@ -66,6 +66,8 @@ import {
   METHODE_S05_LOCALSTORAGE_EXPLANATION, METHODE_S05_LOCALSTORAGE_TAIL,
   METHODE_S01_UPDATE_CADENCE,
   METHODE_S03_DIVIDED_RULE_BODY, METHODE_S03_DIVIDED_RULE_TAIL,
+  METHODE_S03_GROUP_INTRO,
+  METHODE_S07_MISE_EN_FORME_CLOSER, METHODE_S07_LIBELLE_BRUT_GUARANTEE,
   COVER_SECONDARY_NAV_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
@@ -1495,6 +1497,49 @@ describe("METHODE_S03_DIVIDED_RULE — divided-group exclusion", () => {
     // alignment math. Pin so a rewording that softens or drops the
     // exclusion rule surfaces in tests.
     expect(METHODE_S03_DIVIDED_RULE_TAIL).toContain("ne compte pas pour ce groupe");
+  });
+});
+
+describe("METHODE_S03_GROUP_INTRO — per-group position-computation rationale", () => {
+  it("matches the canonical opener", () => {
+    expect(METHODE_S03_GROUP_INTRO).toBe(
+      "Un groupe parlementaire compte plusieurs dizaines de députés qui ne votent pas toujours pareil. Pour résumer en une position unique :",
+    );
+  });
+
+  it("ends with ':' (colon introducing the formula that follows)", () => {
+    // The JSX renders this paragraph immediately before <Formula>;
+    // the trailing colon is what introduces the formula block. A
+    // regression that drops the colon would visually orphan the
+    // formula from its lead paragraph.
+    expect(METHODE_S03_GROUP_INTRO.trimEnd().endsWith(":")).toBe(true);
+  });
+});
+
+describe("METHODE_S07_MISE_EN_FORME_CLOSER + METHODE_S07_LIBELLE_BRUT_GUARANTEE — §07 IA framing", () => {
+  it("CLOSER matches 'Mise en forme, pas commentaire.'", () => {
+    expect(METHODE_S07_MISE_EN_FORME_CLOSER).toBe("Mise en forme, pas commentaire.");
+  });
+
+  it("CLOSER contains both 'forme' and 'pas commentaire' (load-bearing role-limit phrase)", () => {
+    // The whole point: explicit boundary between "reformulate" and
+    // "comment". A future rewording that drops "pas commentaire"
+    // would weaken the IA-transparency contract.
+    expect(METHODE_S07_MISE_EN_FORME_CLOSER).toContain("forme");
+    expect(METHODE_S07_MISE_EN_FORME_CLOSER).toContain("pas commentaire");
+  });
+
+  it("LIBELLE_BRUT_GUARANTEE matches the canonical wording", () => {
+    expect(METHODE_S07_LIBELLE_BRUT_GUARANTEE).toBe(
+      "Le libellé officiel brut est affiché sur la face Résumé du verso de chaque carte",
+    );
+  });
+
+  it("LIBELLE_BRUT_GUARANTEE contains 'libellé officiel' (anti-bias source-availability claim)", () => {
+    // The §07 contract: users can always check the IA's output
+    // against the raw AN libellé. A rewording that drops the
+    // "officiel" qualifier softens the source-of-truth claim.
+    expect(METHODE_S07_LIBELLE_BRUT_GUARANTEE).toContain("libellé officiel");
   });
 });
 

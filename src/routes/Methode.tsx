@@ -26,6 +26,8 @@ import {
   METHODE_S05_LOCALSTORAGE_EXPLANATION, METHODE_S05_LOCALSTORAGE_TAIL,
   METHODE_S01_UPDATE_CADENCE,
   METHODE_S03_DIVIDED_RULE_BODY, METHODE_S03_DIVIDED_RULE_TAIL,
+  METHODE_S03_GROUP_INTRO,
+  METHODE_S07_MISE_EN_FORME_CLOSER, METHODE_S07_LIBELLE_BRUT_GUARANTEE,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -158,7 +160,7 @@ export default function Methode() {
       </Section>
 
       <Section n="03" title={METHODE_SECTION_BODY_TITLES["03"]}>
-        <p>Un groupe parlementaire compte plusieurs dizaines de députés qui ne votent pas toujours pareil. Pour résumer en une position unique :</p>
+        <p>{METHODE_S03_GROUP_INTRO}</p>
         <Formula>
           si ≥ {Math.round(THRESHOLD * 100)}% des votants effectifs du groupe → pour / contre / abstention<br/>
           sinon → groupe divisé<br/>
@@ -202,11 +204,11 @@ export default function Methode() {
       </Section>
 
       <Section n="07" title={METHODE_SECTION_BODY_TITLES["07"]}>
-        <p><strong>{METHODE_S07_HEADING_CE_QUE_FAIT_CLAUDE}</strong> Reformuler le titre brut du scrutin en 12 mots, condenser le projet de loi en {MAX_POINTS_CLES_BULLETS} points clés, rédiger un résumé contextuel de 30 à 50 mots, structurer une synthèse détaillée (mesures, concernés, calendrier, exceptions), et taguer le scrutin par thème. <strong>Mise en forme, pas commentaire.</strong></p>
+        <p><strong>{METHODE_S07_HEADING_CE_QUE_FAIT_CLAUDE}</strong> Reformuler le titre brut du scrutin en 12 mots, condenser le projet de loi en {MAX_POINTS_CLES_BULLETS} points clés, rédiger un résumé contextuel de 30 à 50 mots, structurer une synthèse détaillée (mesures, concernés, calendrier, exceptions), et taguer le scrutin par thème. <strong>{METHODE_S07_MISE_EN_FORME_CLOSER}</strong></p>
 
         <p><strong>{METHODE_S07_HEADING_CE_QU_IL_NE_FAIT_PAS}</strong> Le calcul d'alignement (formule mathématique pure), la composition du deck (round-robin algorithmique par thème), l'extraction des votes individuels (parsing des XML officiels AN). Sur ces trois plans, Claude n'intervient à aucun moment.</p>
 
-        <p><strong>{METHODE_S07_HEADING_CADRE_BIAIS}</strong> Le prompt envoyé à Claude est neutre par construction. Sa source : le libellé brut AN + des résultats de recherche web pour le contexte. <strong>Le libellé officiel brut est affiché sur la face Résumé du verso de chaque carte</strong> (et la page AN complète est toujours accessible via « {AN_LINK_VISIBLE_LABEL} ») — tu peux comparer directement.</p>
+        <p><strong>{METHODE_S07_HEADING_CADRE_BIAIS}</strong> Le prompt envoyé à Claude est neutre par construction. Sa source : le libellé brut AN + des résultats de recherche web pour le contexte. <strong>{METHODE_S07_LIBELLE_BRUT_GUARANTEE}</strong> (et la page AN complète est toujours accessible via « {AN_LINK_VISIBLE_LABEL} ») — tu peux comparer directement.</p>
 
         <p><strong>{METHODE_S07_HEADING_LIMITES_SIGNALEMENT}</strong> Claude peut se tromper sur les nuances : un mot mal choisi, une mesure oubliée, un thème mal taggué. Pour l'instant, aucune relecture humaine systématique (V3 prévue). Si tu repères une erreur factuelle : <a href={mailto()}>{CONTACT_EMAIL}</a> — on corrige.</p>
 
