@@ -12,6 +12,9 @@ import {
   LEGAL_RGPD_HEADING_DONNEES_PERSONNELLES, LEGAL_RGPD_HEADING_ANALYTICS,
   LEGAL_RGPD_HEADING_INDEPENDANCE, LEGAL_RGPD_HEADING_SOURCES_DONNEES,
   LEGAL_RGPD_HEADING_CODE_SOURCE,
+  LEGAL_HEBERGEUR_NAME, LEGAL_HEBERGEUR_ADDRESS,
+  LEGAL_ANALYTICS_DESCRIPTION, LEGAL_DATA_LICENSE_LABEL,
+  LEGAL_PERSONAL_DATA_BODY,
 } from "../src/types";
 import { BACK_LINK_LABEL } from "../src/components/ReadingPageHeader";
 
@@ -96,9 +99,29 @@ describe("Legal — RGPD-required content", () => {
     expect(anLink).toHaveAttribute("rel", expect.stringContaining("noopener"));
   });
 
-  it("Vercel hébergeur block names Vercel Inc. (RGPD identity disclosure)", () => {
+  it("hébergeur block names LEGAL_HEBERGEUR_NAME + LEGAL_HEBERGEUR_ADDRESS (RGPD identity disclosure)", () => {
     renderLegal();
-    expect(document.body.textContent || "").toMatch(/Vercel Inc\./);
+    const body = document.body.textContent || "";
+    expect(body).toContain(LEGAL_HEBERGEUR_NAME);
+    expect(body).toContain(LEGAL_HEBERGEUR_ADDRESS);
+  });
+
+  it("analytics block surfaces LEGAL_ANALYTICS_DESCRIPTION (Plausible RGPD disclosure)", () => {
+    renderLegal();
+    const body = document.body.textContent || "";
+    expect(body).toContain(LEGAL_ANALYTICS_DESCRIPTION);
+  });
+
+  it("sources block surfaces LEGAL_DATA_LICENSE_LABEL (Etalab attribution)", () => {
+    renderLegal();
+    const body = document.body.textContent || "";
+    expect(body).toContain(LEGAL_DATA_LICENSE_LABEL);
+  });
+
+  it("données personnelles block surfaces LEGAL_PERSONAL_DATA_BODY verbatim (privacy contract)", () => {
+    renderLegal();
+    const body = document.body.textContent || "";
+    expect(body).toContain(LEGAL_PERSONAL_DATA_BODY);
   });
 });
 

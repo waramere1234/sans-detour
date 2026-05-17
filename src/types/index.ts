@@ -598,6 +598,30 @@ export const LEGAL_RGPD_HEADING_CODE_SOURCE = "Code source";
  *  Methode/Legal/Contact links. Single source today + 0 tests. */
 export const COVER_SECONDARY_NAV_LABEL = "Liens secondaires";
 
+/** Legal.tsx Vercel hébergeur identity — name + postal address, RGPD-
+ *  required hosting disclosure. Currently 1 source line + 1 test regex
+ *  `/Vercel Inc\./` partial-match. A future host change (Cloudflare,
+ *  Netlify…) updates these 2 consts atomically. */
+export const LEGAL_HEBERGEUR_NAME = "Vercel Inc.";
+export const LEGAL_HEBERGEUR_ADDRESS = "340 S Lemon Ave #4133, Walnut, CA 91789, USA";
+
+/** Legal.tsx analytics-tool disclosure — the parenthetical clarifying
+ *  Plausible's RGPD compliance. Single source + 0 tests. */
+export const LEGAL_ANALYTICS_DESCRIPTION =
+  "Plausible (analytics anonymisés sans cookies, conformes RGPD).";
+
+/** Legal.tsx data-license label rendered after the AN open-data link
+ *  ("…), licence Etalab 2.0."). Single source + 0 tests. */
+export const LEGAL_DATA_LICENSE_LABEL = "licence Etalab 2.0";
+
+/** Legal.tsx Données personnelles body — the load-bearing privacy
+ *  claim. Distinct from but conceptually paired with NOSCRIPT_MESSAGE's
+ *  privacy clause ("Aucune donnée n'est envoyée à un serveur") — both
+ *  surfaces document the same no-data-server contract. Pin so a future
+ *  weakening (e.g. adding analytics fields) surfaces here. */
+export const LEGAL_PERSONAL_DATA_BODY =
+  "Sans Détour ne collecte aucune donnée personnelle. Aucune inscription, aucun cookie de tracking. Toutes les interactions sont stockées localement dans le navigateur (localStorage). Aucune donnée n'est transmise à un serveur Sans Détour.";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

@@ -10,6 +10,9 @@ import {
   LEGAL_RGPD_HEADING_DONNEES_PERSONNELLES, LEGAL_RGPD_HEADING_ANALYTICS,
   LEGAL_RGPD_HEADING_INDEPENDANCE, LEGAL_RGPD_HEADING_SOURCES_DONNEES,
   LEGAL_RGPD_HEADING_CODE_SOURCE,
+  LEGAL_HEBERGEUR_NAME, LEGAL_HEBERGEUR_ADDRESS,
+  LEGAL_ANALYTICS_DESCRIPTION, LEGAL_DATA_LICENSE_LABEL,
+  LEGAL_PERSONAL_DATA_BODY,
 } from "../types";
 
 export default function Legal() {
@@ -35,16 +38,16 @@ export default function Legal() {
         Adresse : [adresse postale]<br/>
         Email : <a href={mailto()}>{CONTACT_EMAIL}</a></p>
 
-        <p><strong>{LEGAL_RGPD_HEADING_HEBERGEUR}</strong> — Vercel Inc.<br/>
-        340 S Lemon Ave #4133, Walnut, CA 91789, USA</p>
+        <p><strong>{LEGAL_RGPD_HEADING_HEBERGEUR}</strong> — {LEGAL_HEBERGEUR_NAME}<br/>
+        {LEGAL_HEBERGEUR_ADDRESS}</p>
 
-        <p><strong>{LEGAL_RGPD_HEADING_DONNEES_PERSONNELLES}</strong> — Sans Détour ne collecte aucune donnée personnelle. Aucune inscription, aucun cookie de tracking. Toutes les interactions sont stockées localement dans le navigateur (localStorage). Aucune donnée n'est transmise à un serveur Sans Détour.</p>
+        <p><strong>{LEGAL_RGPD_HEADING_DONNEES_PERSONNELLES}</strong> — {LEGAL_PERSONAL_DATA_BODY}</p>
 
-        <p><strong>{LEGAL_RGPD_HEADING_ANALYTICS}</strong> — Plausible (analytics anonymisés sans cookies, conformes RGPD).</p>
+        <p><strong>{LEGAL_RGPD_HEADING_ANALYTICS}</strong> — {LEGAL_ANALYTICS_DESCRIPTION}</p>
 
         <p><strong>{LEGAL_RGPD_HEADING_INDEPENDANCE}</strong> — Sans Détour est un projet indépendant. Aucune affiliation politique, médiatique ou institutionnelle.</p>
 
-        <p><strong>{LEGAL_RGPD_HEADING_SOURCES_DONNEES}</strong> — Open data officiel de l'Assemblée Nationale (<a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(AN_OPEN_DATA_HOSTNAME)}>{AN_OPEN_DATA_HOSTNAME}</a>), licence Etalab 2.0.</p>
+        <p><strong>{LEGAL_RGPD_HEADING_SOURCES_DONNEES}</strong> — Open data officiel de l'Assemblée Nationale (<a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(AN_OPEN_DATA_HOSTNAME)}>{AN_OPEN_DATA_HOSTNAME}</a>), {LEGAL_DATA_LICENSE_LABEL}.</p>
 
         {/* TODO production-blocker · same broken github.com/sansdetour
             link as Methode §06 + §07 (real repo is private at

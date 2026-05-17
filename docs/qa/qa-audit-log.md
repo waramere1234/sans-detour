@@ -3828,3 +3828,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `LEGAL_RGPD_HEADING_EDITEUR\|LEGAL_RGPD_HEADING_HEBERGEUR\|COVER_SECONDARY_NAV_LABEL` src/ tests/ → 25+ résultats
 - [ ] grep `"Éditeur"\|"Hébergeur"\|"Liens secondaires"\|/Éditeur/` src/ tests/ → 4-7 résultats (déclarations + pin-the-value, pas de stale regex)
 - [ ] grep `~811 tests` CLAUDE.md → 0 résultat (aligné sur ~820)
+
+---
+
+## Session 163 — 2026-05-18
+
+### Vérification session 162
+
+- [VERIFIED] 18 occurrences des 3 representative consts (LEGAL_RGPD_HEADING_EDITEUR/HEBERGEUR + COVER_SECONDARY_NAV_LABEL)
+- [VERIFIED] 0 inline stale regex literals (`/Éditeur/`, `/Hébergeur/`, etc.) dans tests/
+- [VERIFIED] CLAUDE.md "~820 tests"
+- 820/820 tests verts, typecheck clean
+
+### Bugs fixés (LEGAL_HEBERGEUR_NAME/ADDRESS + LEGAL_ANALYTICS_DESCRIPTION + LEGAL_DATA_LICENSE_LABEL + LEGAL_PERSONAL_DATA_BODY)
+
+- [FIXED] Legal.tsx Vercel hébergeur identity `"Vercel Inc."` + address `"340 S Lemon Ave #4133, Walnut, CA 91789, USA"` inline + 1 stale test regex `/Vercel Inc\./` · Drift surface : RGPD-required hosting identity disclosure. Un future host change (Cloudflare, Netlify…) demande update des 2 strings + le test in lockstep. Fix : export `LEGAL_HEBERGEUR_NAME` + `LEGAL_HEBERGEUR_ADDRESS` depuis src/types. Legal.tsx utilise les 2 consts (render via <br/> entre les 2). Test migré vers `toContain(LEGAL_HEBERGEUR_NAME)` + `toContain(LEGAL_HEBERGEUR_ADDRESS)`. 3 nouveaux tests pin-the-value + distinct guard. · `src/types/index.ts`, `src/routes/Legal.tsx`, `tests/Legal.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Legal.tsx Analytics description `"Plausible (analytics anonymisés sans cookies, conformes RGPD)."` + AN data license `"licence Etalab 2.0"` inline + 0 tests · Drift surface : 2 RGPD-compliance disclosures (analytics tool + data license). Sans pin, un rewording silencieux compromet la compliance documentée user-side. Fix : export `LEGAL_ANALYTICS_DESCRIPTION` + `LEGAL_DATA_LICENSE_LABEL`. Legal.tsx utilise les 2 consts. Tests Legal + aria-labels : 2 round-trip Legal `.toContain` + 4 pin-the-value (incluant contains-"Plausible"/"RGPD" + contains-"2.0" anti-bump guards). · `src/types/index.ts`, `src/routes/Legal.tsx`, `tests/Legal.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Legal.tsx Données personnelles body (`"Sans Détour ne collecte aucune donnée personnelle. … Aucune donnée n'est transmise à un serveur Sans Détour."`) inline + 0 tests · Drift surface : load-bearing privacy contract conceptuellement paired avec NOSCRIPT_MESSAGE's similar clause. Un weakening silencieux (e.g. adding analytics caveats) affaibrait le privacy contract documented user-side. Fix : export `LEGAL_PERSONAL_DATA_BODY` depuis src/types. Legal.tsx utilise la const. Test Legal `.toContain` + 3 round-trip aria-labels (contains "aucune donnée personnelle" + "localStorage" + "Aucune donnée n'est transmise à un serveur" load-bearing clauses). · `src/types/index.ts`, `src/routes/Legal.tsx`, `tests/Legal.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 164
+
+- [ ] grep `LEGAL_HEBERGEUR_NAME\|LEGAL_HEBERGEUR_ADDRESS\|LEGAL_ANALYTICS_DESCRIPTION\|LEGAL_DATA_LICENSE_LABEL\|LEGAL_PERSONAL_DATA_BODY` src/ tests/ → 20+ résultats
+- [ ] grep `"Vercel Inc.\|"340 S Lemon\|"Plausible"\|"licence Etalab 2.0"` src/ tests/ → 5-7 résultats (déclarations + pin-the-value)
+- [ ] grep `~820 tests` CLAUDE.md → 0 résultat (aligné sur ~833)

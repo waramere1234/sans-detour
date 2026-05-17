@@ -56,6 +56,9 @@ import {
   LEGAL_RGPD_HEADING_DONNEES_PERSONNELLES, LEGAL_RGPD_HEADING_ANALYTICS,
   LEGAL_RGPD_HEADING_INDEPENDANCE, LEGAL_RGPD_HEADING_SOURCES_DONNEES,
   LEGAL_RGPD_HEADING_CODE_SOURCE,
+  LEGAL_HEBERGEUR_NAME, LEGAL_HEBERGEUR_ADDRESS,
+  LEGAL_ANALYTICS_DESCRIPTION, LEGAL_DATA_LICENSE_LABEL,
+  LEGAL_PERSONAL_DATA_BODY,
   COVER_SECONDARY_NAV_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
@@ -1324,6 +1327,64 @@ describe("LEGAL_RGPD_HEADING_* — Legal.tsx 7 RGPD sub-headings", () => {
 describe("COVER_SECONDARY_NAV_LABEL — Cover.tsx footer nav aria-label", () => {
   it("matches 'Liens secondaires'", () => {
     expect(COVER_SECONDARY_NAV_LABEL).toBe("Liens secondaires");
+  });
+});
+
+describe("LEGAL_HEBERGEUR_NAME + LEGAL_HEBERGEUR_ADDRESS — Vercel hosting identity", () => {
+  it("HEBERGEUR_NAME matches 'Vercel Inc.'", () => {
+    expect(LEGAL_HEBERGEUR_NAME).toBe("Vercel Inc.");
+  });
+
+  it("HEBERGEUR_ADDRESS matches the full Vercel HQ postal address", () => {
+    expect(LEGAL_HEBERGEUR_ADDRESS).toBe("340 S Lemon Ave #4133, Walnut, CA 91789, USA");
+  });
+
+  it("HEBERGEUR_NAME + ADDRESS are distinct (anti-merge guard for the 2-line layout)", () => {
+    // The Legal.tsx <p> renders the 2 across a <br/> — a future flattening
+    // into a single string would break the visual line break.
+    expect(LEGAL_HEBERGEUR_NAME).not.toBe(LEGAL_HEBERGEUR_ADDRESS);
+  });
+});
+
+describe("LEGAL_ANALYTICS_DESCRIPTION — Plausible RGPD disclosure", () => {
+  it("matches the canonical 'Plausible (analytics anonymisés sans cookies, conformes RGPD).'", () => {
+    expect(LEGAL_ANALYTICS_DESCRIPTION).toBe("Plausible (analytics anonymisés sans cookies, conformes RGPD).");
+  });
+
+  it("contains 'Plausible' (analytics-tool name) + 'RGPD' (compliance claim)", () => {
+    // Both tokens are load-bearing: Plausible is the actual tool used;
+    // RGPD is the compliance contract documented to the user. A future
+    // rewording must preserve both or surface here.
+    expect(LEGAL_ANALYTICS_DESCRIPTION).toContain("Plausible");
+    expect(LEGAL_ANALYTICS_DESCRIPTION).toContain("RGPD");
+  });
+});
+
+describe("LEGAL_DATA_LICENSE_LABEL — Etalab data license", () => {
+  it("matches 'licence Etalab 2.0'", () => {
+    expect(LEGAL_DATA_LICENSE_LABEL).toBe("licence Etalab 2.0");
+  });
+
+  it("contains the version number '2.0' (anti-bump guard)", () => {
+    // The Etalab license is versioned (2.0 today; future versions exist).
+    // Pinning the version surfaces a deliberate vs accidental update.
+    expect(LEGAL_DATA_LICENSE_LABEL).toContain("2.0");
+  });
+});
+
+describe("LEGAL_PERSONAL_DATA_BODY — privacy contract claim", () => {
+  it("contains the load-bearing 'aucune donnée personnelle' clause", () => {
+    expect(LEGAL_PERSONAL_DATA_BODY).toContain("aucune donnée personnelle");
+  });
+
+  it("contains 'localStorage' (technical disclosure of where data lives)", () => {
+    // The RGPD compliance angle hinges on data being browser-local.
+    // Drop this token = lose the privacy contract.
+    expect(LEGAL_PERSONAL_DATA_BODY).toContain("localStorage");
+  });
+
+  it("contains 'Aucune donnée n'est transmise à un serveur' (no-server claim)", () => {
+    expect(LEGAL_PERSONAL_DATA_BODY).toContain("Aucune donnée n'est transmise à un serveur");
   });
 });
 
