@@ -6,6 +6,7 @@ import Cover from "./routes/Cover";
 import Play from "./routes/Play";
 import Result from "./routes/Result";
 import { ROUTES } from "./lib/routes";
+import { READING_PAGE_MAX_WIDTH } from "./types";
 import "./index.css";
 
 // Methode and Legal are reading-only secondary pages (TOC + paragraphs)
@@ -24,7 +25,7 @@ function RouteLoader() {
       role="status"
       aria-live="polite"
       style={{
-        maxWidth: 720, margin: "0 auto",
+        maxWidth: READING_PAGE_MAX_WIDTH, margin: "0 auto",
         padding: "48px var(--gutter)",
         color: "var(--ink-3)", fontFamily: "var(--font-mono)", fontSize: 11,
         letterSpacing: "0.08em", textTransform: "uppercase",

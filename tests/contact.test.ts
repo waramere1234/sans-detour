@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { CONTACT_EMAIL, mailto } from "../src/lib/contact";
+import { CONTACT_EMAIL, ERROR_REPORT_SUBJECT, mailto } from "../src/lib/contact";
+import { BRAND_NAME } from "../src/types";
 
 // Session 91 extracted the mailto contact address from 7 sites into a
 // single const + helper. The helper's encodeURIComponent pass is what
@@ -31,11 +32,17 @@ describe("mailto()", () => {
   it("URL-encodes French accents in the subject", () => {
     // Session 91 replaced a hand-rolled %C3%A9 literal in MethodeSheet
     // with this helper. Pin the encoding so we don't regress.
-    const out = mailto("Sans Détour — Signalement d'une erreur factuelle");
+    const out = mailto(ERROR_REPORT_SUBJECT);
     expect(out).toContain("Sans%20D%C3%A9tour");
     expect(out).toContain("Signalement");
     // Em dash is U+2014 → %E2%80%94
     expect(out).toContain("%E2%80%94");
+  });
+
+  it("ERROR_REPORT_SUBJECT begins with BRAND_NAME (rebrand-safe)", () => {
+    // A future rebrand updating BRAND_NAME propagates here without
+    // touching MethodeSheet.tsx OR this test. Pin the linkage.
+    expect(ERROR_REPORT_SUBJECT.startsWith(BRAND_NAME)).toBe(true);
   });
 
   it("URL-encodes special chars (& : =) so they don't break the query", () => {

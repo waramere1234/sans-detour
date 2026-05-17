@@ -5,7 +5,7 @@ import Methode, { METHODE_SECTIONS } from "../src/routes/Methode";
 import { ROUTES } from "../src/lib/routes";
 import { DEFAULT_CAP_PER_DOSSIER, DEFAULT_CAP_PER_CHAPEAU_PREFIX } from "../src/lib/deck";
 import { THRESHOLD } from "../src/lib/compute-positions";
-import { MAX_POINTS_CLES_BULLETS } from "../src/types";
+import { MAX_POINTS_CLES_BULLETS, READING_PAGE_MAX_WIDTH } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
 // Methode.tsx owns:
@@ -182,6 +182,16 @@ describe("Methode — prose derived from canonical const values (no drift betwee
     renderMethode();
     const section = document.getElementById("methode-07")!;
     expect(section.textContent).toContain(`${MAX_POINTS_CLES_BULLETS} points clés`);
+  });
+
+  it("page <section> maxWidth derives from READING_PAGE_MAX_WIDTH", () => {
+    // Pin the const-derived inline style so a bump in src/types
+    // (e.g. 720 → 760 for better line-length) propagates to the
+    // rendered DOM without a separate Methode edit.
+    renderMethode();
+    const section = screen.getByRole("heading", { level: 1 }).closest("section");
+    expect(section).not.toBeNull();
+    expect((section as HTMLElement).style.maxWidth).toBe(`${READING_PAGE_MAX_WIDTH}px`);
   });
 });
 

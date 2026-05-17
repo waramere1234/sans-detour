@@ -6,7 +6,16 @@
 // changing the address (or fronting a contact form one day) forced six
 // edits with drift risk.
 
+import { BRAND_NAME } from "../types";
+
 export const CONTACT_EMAIL = "contact@sansdetour.fr";
+
+/** Pre-filled subject for the "Signaler une erreur factuelle" mailto in
+ *  MethodeSheet. Composed from BRAND_NAME so a rebrand propagates to
+ *  the subject line via one edit. Previously inlined identically in
+ *  MethodeSheet.tsx and tests/contact.test.ts — a copy-paste mismatch
+ *  (typo, extra space) would have shipped without notice. */
+export const ERROR_REPORT_SUBJECT = `${BRAND_NAME} — Signalement d'une erreur factuelle`;
 
 /** Build a `mailto:` href, optionally with a pre-filled subject line.
  *  Subject is `encodeURIComponent`-ed so spaces, accents, and `:` survive

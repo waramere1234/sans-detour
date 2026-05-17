@@ -1,6 +1,6 @@
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { mailto } from "../lib/contact";
+import { mailto, ERROR_REPORT_SUBJECT } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
 import { useModalA11y } from "../hooks/useModalA11y";
 
@@ -120,7 +120,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
                 style={btnPrimary()}
               ><span aria-hidden="true">→ </span>Méthode complète</Link>
               <a
-                href={mailto("Sans Détour — Signalement d'une erreur factuelle")}
+                href={mailto(ERROR_REPORT_SUBJECT)}
                 onClick={onClose}
                 style={btnSecondary()}
               ><span aria-hidden="true">✉ </span>Signaler une erreur factuelle</a>

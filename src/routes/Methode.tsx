@@ -10,7 +10,10 @@ import { CONTACT_EMAIL, mailto } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
 import { DEFAULT_CAP_PER_DOSSIER, DEFAULT_CAP_PER_CHAPEAU_PREFIX } from "../lib/deck";
 import { THRESHOLD } from "../lib/compute-positions";
-import { TARGET, MIN_FOR_RANKING, MAX_POINTS_CLES_BULLETS, AN_OPEN_DATA_URL } from "../types";
+import {
+  TARGET, MIN_FOR_RANKING, MAX_POINTS_CLES_BULLETS, AN_OPEN_DATA_URL,
+  READING_PAGE_MAX_WIDTH,
+} from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
  *  inline Sommaire above and the test suite (which iterates over this
@@ -57,7 +60,7 @@ export default function Methode() {
   }, [location.hash]);
 
   return (
-    <section style={{ maxWidth: 720, margin: "0 auto", padding: "24px var(--gutter) 48px" }}>
+    <section style={{ maxWidth: READING_PAGE_MAX_WIDTH, margin: "0 auto", padding: "24px var(--gutter) 48px" }}>
       {/* 3-column grid keeps the wordmark centered without needing an
         invisible placeholder span. Left col = back link (justify start),
         center = wordmark (justify center), right col = empty (1fr) so

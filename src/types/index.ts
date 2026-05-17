@@ -79,6 +79,16 @@ export const APP_LOCALE = "fr-FR";
  *  one edit. */
 export const OG_LOCALE = APP_LOCALE.replace("-", "_");
 
+/** Max content width (px) for prose-heavy "reading" pages: Methode +
+ *  the RouteLoader fallback in main.tsx that the Suspense boundary
+ *  shows while Methode/Legal lazy-load. Wider than the app screens
+ *  (Cover/Play/Result use `var(--max-content)` which is ~480) and
+ *  Legal (640) so the longer Methode paragraphs don't wrap awkwardly.
+ *  Previously inlined 720 in 2 places — a future bump (e.g. to 760
+ *  for better line-length) would have left RouteLoader showing the
+ *  old width during the Methode lazy-load flash. */
+export const READING_PAGE_MAX_WIDTH = 720;
+
 /** Official AN open-data portal — both the user-facing reference (Methode
  *  §01 + §06 prose, Legal data-sources block) and the script-side bulk
  *  download (`scripts/ingest-an.ts` builds `${AN_OPEN_DATA_URL}static/...`
