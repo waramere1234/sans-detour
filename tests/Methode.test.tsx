@@ -3,6 +3,8 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import Methode, { METHODE_SECTIONS } from "../src/routes/Methode";
 import { ROUTES } from "../src/lib/routes";
+import { DEFAULT_CAP_PER_DOSSIER, DEFAULT_CAP_PER_CHAPEAU_PREFIX } from "../src/lib/deck";
+import { THRESHOLD } from "../src/lib/compute-positions";
 import * as analytics from "../src/lib/analytics";
 
 // Methode.tsx owns:
@@ -142,6 +144,37 @@ describe("Methode — TOC analytics (methode_toc_click × N sections)", () => {
       fireEvent.click(link!);
       expect(trackSpy).toHaveBeenCalledWith("methode_toc_click", { section: n });
     }
+  });
+});
+
+describe("Methode — prose derived from canonical const values (no drift between policy + doc)", () => {
+  // The Methode page describes the deck composition policy + the
+  // group-position threshold to users. Those numbers used to be inlined
+  // as literals ("jamais plus de 2 scrutins", "≥ 70%"), so a bump to
+  // DEFAULT_CAP_PER_DOSSIER or THRESHOLD in src/lib/* would leave the
+  // documentation lying to users. Pin the round-trip here.
+
+  it("§02 'dossier' cap mention matches DEFAULT_CAP_PER_DOSSIER", () => {
+    renderMethode();
+    const section = document.getElementById("methode-02")!;
+    expect(section.textContent).toContain(
+      `jamais plus de ${DEFAULT_CAP_PER_DOSSIER} scrutins du même dossier`,
+    );
+  });
+
+  it("§02 'sujet' cap mention matches DEFAULT_CAP_PER_CHAPEAU_PREFIX", () => {
+    renderMethode();
+    const section = document.getElementById("methode-02")!;
+    expect(section.textContent).toContain(
+      `jamais plus de ${DEFAULT_CAP_PER_CHAPEAU_PREFIX} scrutins du même sujet`,
+    );
+  });
+
+  it("§03 group-position threshold matches THRESHOLD * 100", () => {
+    renderMethode();
+    const section = document.getElementById("methode-03")!;
+    const expectedPct = Math.round(THRESHOLD * 100);
+    expect(section.textContent).toContain(`≥ ${expectedPct}%`);
   });
 });
 

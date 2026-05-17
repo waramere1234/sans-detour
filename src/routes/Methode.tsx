@@ -8,6 +8,8 @@ import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE } from "../lib/nav-state";
 import { CONTACT_EMAIL, mailto } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
+import { DEFAULT_CAP_PER_DOSSIER, DEFAULT_CAP_PER_CHAPEAU_PREFIX } from "../lib/deck";
+import { THRESHOLD } from "../lib/compute-positions";
 import { TARGET, MIN_FOR_RANKING } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -129,13 +131,13 @@ export default function Methode() {
 
       <Section n="02" title="Quels scrutins on garde">
         <p>On garde les <strong>scrutins solennels</strong> (SPS), les <strong>votes finaux sur l'ensemble d'une loi</strong> (SOR), les <strong>motions de censure</strong>, les <strong>motions référendaires</strong> et les <strong>propositions de résolution</strong>. On exclut les amendements, les votes en commission et les motions procédurales (rejet préalable, renvoi).</p>
-        <p>Pour chaque session, on en tire <strong>{TARGET}</strong> en équilibrant les thèmes (santé, immigration, fiscalité…) plutôt qu'au hasard pur, avec deux garde-fous : <strong>jamais plus de 2 scrutins du même dossier législatif</strong> et <strong>jamais plus de 2 scrutins du même sujet</strong> (pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée).</p>
+        <p>Pour chaque session, on en tire <strong>{TARGET}</strong> en équilibrant les thèmes (santé, immigration, fiscalité…) plutôt qu'au hasard pur, avec deux garde-fous : <strong>jamais plus de {DEFAULT_CAP_PER_DOSSIER} scrutins du même dossier législatif</strong> et <strong>jamais plus de {DEFAULT_CAP_PER_CHAPEAU_PREFIX} scrutins du même sujet</strong> (pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée).</p>
       </Section>
 
       <Section n="03" title="Comment on définit la position d'un groupe">
         <p>Un groupe parlementaire compte plusieurs dizaines de députés qui ne votent pas toujours pareil. Pour résumer en une position unique :</p>
         <Formula>
-          si ≥ 70% des votants effectifs du groupe → pour / contre / abstention<br/>
+          si ≥ {Math.round(THRESHOLD * 100)}% des votants effectifs du groupe → pour / contre / abstention<br/>
           sinon → groupe divisé<br/>
           (absents et non-votants exclus du calcul)
         </Formula>

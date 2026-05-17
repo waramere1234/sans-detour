@@ -8,7 +8,7 @@ import Cover from "../src/routes/Cover";
 import { resetSession, recordVote, COVER_STORAGE_KEY, loadSession } from "../src/lib/session";
 import { FROM_LOGO_STATE } from "../src/lib/nav-state";
 import { ROUTES } from "../src/lib/routes";
-import { TARGET } from "../src/types";
+import { TARGET, MIN_FOR_RANKING } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
 function renderCover(initialEntries: InitialEntry[] = [ROUTES.cover]) {
@@ -210,8 +210,10 @@ describe("Cover — auto-resume analytics (cover_result_revisit + cover_partial_
   it("fires 'cover_partial_result' on the 'Voir mon résultat partiel' link click", () => {
     // Gate: votes >= MIN_FOR_RANKING + hasInProgress (votes < TARGET).
     localStorage.setItem(COVER_STORAGE_KEY, "true");
-    // 5 votes = MIN_FOR_RANKING boundary. fromLogo bypasses auto-resume.
-    for (let i = 1; i <= 5; i++) recordVote(`s${i}`, "pour");
+    // Seed exactly MIN_FOR_RANKING votes so the canSeePartialResult gate
+    // (votes >= MIN_FOR_RANKING) opens at the boundary. fromLogo bypasses
+    // the auto-resume effect so we reach the rendered Cover.
+    for (let i = 1; i <= MIN_FOR_RANKING; i++) recordVote(`s${i}`, "pour");
     renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
     const link = screen.getByRole("link", { name: /Voir mon résultat partiel/ });
     fireEvent.click(link);

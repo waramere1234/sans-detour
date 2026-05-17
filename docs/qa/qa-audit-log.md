@@ -2753,3 +2753,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `nextVoteLabel\|voteLabel\|ZWSP` src/ tests/ → résultats dans vote-feedback.ts + Play.tsx + vote-feedback.test.ts
 - [ ] grep `LOW_DATA_THRESHOLD` tests/PersonnaliteRow.test.tsx → 4+ résultats (l'import + 4 usages)
 - [ ] grep `~494 tests` CLAUDE.md → 0 résultat (aligné sur ~507)
+
+---
+
+## Session 118 — 2026-05-17
+
+### Vérification session 117
+
+- [VERIFIED] src/lib/vote-feedback.ts + tests/vote-feedback.test.ts présents
+- [VERIFIED] 36 occurrences de `nextVoteLabel|voteLabel|ZWSP` dans src/ + tests/
+- [VERIFIED] 13 occurrences de LOW_DATA_THRESHOLD dans tests/PersonnaliteRow.test.tsx
+- [VERIFIED] CLAUDE.md "~507 tests"
+- 507/507 tests verts, typecheck clean
+
+### Bugs fixés (Cover.test MIN_FOR_RANKING boundary + Methode prose drift × 2 constants)
+
+- [FIXED] `tests/Cover.test.tsx:214` hardcodait `for (let i = 1; i <= 5; i++) recordVote(...)` au lieu de dériver de `MIN_FOR_RANKING` · Même drift pattern que sessions 111 / 115 / 117. Si MIN_FOR_RANKING bumpe à 8 (raise the threshold), le test "fires cover_partial_result on link click" continuerait avec 5 votes — sous le nouveau threshold → canSeePartialResult=false → le lien n'est plus rendu → test fail. La fail est correcte, mais le test SHOULD adapt automatiquement. TopBar.test.tsx avait déjà le bon pattern (`for (let i = 1; i <= MIN_FOR_RANKING; i++)`) depuis session 106. Fix : import + utilisation cohérente. · `tests/Cover.test.tsx`
+- [FIXED] `src/routes/Methode.tsx:132` hardcodait "jamais plus de 2 scrutins du même dossier" + "jamais plus de 2 scrutins du même sujet" en literal · Les 2 caps de composition de deck (DEFAULT_CAP_PER_DOSSIER + DEFAULT_CAP_PER_CHAPEAU_PREFIX, exportés en session 109 depuis src/lib/deck.ts) étaient documentés en literal "2" dans la prose user-facing — un bump à 3 dans deck.ts laisserait la Methode disant "jamais plus de 2", mensonge sur la policy effective. Fix : interpolation `{DEFAULT_CAP_PER_DOSSIER}` + `{DEFAULT_CAP_PER_CHAPEAU_PREFIX}` dans le JSX. 2 tests Methode round-trip ajoutés qui asserts que la prose contient le bon literal dérivé du const. · `src/routes/Methode.tsx`, `tests/Methode.test.tsx`
+- [FIXED] `src/routes/Methode.tsx:138` hardcodait "si ≥ 70% des votants effectifs" dans le bloc `<Formula>` · `THRESHOLD = 0.70` est exporté depuis src/lib/compute-positions.ts (session 115) — un bump à 0.75 laisserait la Methode disant "≥ 70%" alors que le code applique 75%. Fix : interpolation `{Math.round(THRESHOLD * 100)}%` dans le Formula. 1 test round-trip ajouté. · `src/routes/Methode.tsx`, `tests/Methode.test.tsx`
+
+### Vérifications à faire en session 119
+
+- [ ] grep "for.*<= 5\|for.*<= 4" tests/Cover.test.tsx → 0 résultat (toutes les boundaries dérivent)
+- [ ] grep "jamais plus de 2\|≥ 70%" src/routes/Methode.tsx → 0 résultat (toutes interpolées)
+- [ ] grep "DEFAULT_CAP_PER_DOSSIER\|THRESHOLD" src/routes/Methode.tsx tests/Methode.test.tsx → 4+ résultats
+- [ ] grep `~507 tests` CLAUDE.md → 0 résultat (aligné sur ~510)

@@ -188,7 +188,7 @@ Pas de mention du modèle dans les commits/PR (Claude Code 1M context, etc.).
 
 ### Tests
 
-`npm run test:run` (Vitest, ~507 tests aujourd'hui couvrant matching / deck / session / parties / personnalites / analytics / themes / App / Card / ChipTop1 / Cover / Legal / Methode / MethodeSheet / Result / ErrorBoundary / FreshnessBanner / Skeleton / compute-positions (incluant boundary via THRESHOLD) / sanity / deck-invariants / parse-summary / parse-top / contact / nav-state / routes (incluant isAffinementMode) / scrutins / share / text-cleanup / vote-feedback / an-filter / an-groups / an-parse / an-personnalites / env / useModalA11y / useFreshnessOnce / useFlipCardA11y / AuditTrail / DeckStack / PartyRow / PersonnaliteRow / RankingOverlay / TopBar / Wordmark, doivent rester verts à chaque commit).
+`npm run test:run` (Vitest, ~510 tests aujourd'hui couvrant matching / deck / session / parties / personnalites / analytics / themes / App / Card / ChipTop1 / Cover / Legal / Methode (incluant prose const round-trip) / MethodeSheet / Result / ErrorBoundary / FreshnessBanner / Skeleton / compute-positions (incluant boundary via THRESHOLD) / sanity / deck-invariants / parse-summary / parse-top / contact / nav-state / routes (incluant isAffinementMode) / scrutins / share / text-cleanup / vote-feedback / an-filter / an-groups / an-parse / an-personnalites / env / useModalA11y / useFreshnessOnce / useFlipCardA11y / AuditTrail / DeckStack / PartyRow / PersonnaliteRow / RankingOverlay / TopBar / Wordmark, doivent rester verts à chaque commit).
 
 ### Commandes utiles
 
