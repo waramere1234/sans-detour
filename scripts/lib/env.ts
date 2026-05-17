@@ -84,6 +84,29 @@ export const ANTHROPIC_API_VERSION = "2023-06-01";
  *  V2 pipeline runs on Haiku 4.5 specifically. */
 export const ANTHROPIC_MODEL = "claude-haiku-4-5";
 
+/** Output token budget per scrutin batch request. The analyse field
+ *  adds 6 string[] arrays with multiple bullets each — observed
+ *  outputs land around 600-900 tokens including the JSON wrapper, so
+ *  4096 leaves plenty of headroom. A bump would deliberately accept
+ *  higher per-scrutin cost (rare). Exported so future param-tuning
+ *  experiments are visible at the lib-level and a regression that
+ *  silently drops max_tokens to 1024 (truncating analyse) is caught. */
+export const ANTHROPIC_INGEST_MAX_TOKENS = 4096;
+
+/** Cap on web_search invocations per scrutin in the Batches request.
+ *  CLAUDE.md V2 P1: "1 à 2 recherches max". Hard-cap defends cost — a
+ *  refactor that raises this to 5 would multiply the per-batch search
+ *  charge. Pin the value so any change is a deliberate edit. */
+export const MAX_WEB_SEARCHES_PER_SCRUTIN = 2;
+
+/** Poll interval (ms) between `getBatchStatus` requests inside
+ *  pollBatch. 15 s matches Anthropic's recommended cadence for typical
+ *  2-10 min batches — too aggressive wastes status-endpoint quota,
+ *  too slow delays the orchestrator's "succeeded → fetch results"
+ *  hop. Centralised so a regression accidentally setting it to 100ms
+ *  (DoS-ing the status endpoint) surfaces here. */
+export const BATCH_POLL_INTERVAL_MS = 15_000;
+
 /** Build the common headers every Anthropic Batches API request needs:
  *  api-key, version, and content-type. Pass the key explicitly so the
  *  helper is usable from both narrowed (`requireAnthropicEnv`) and

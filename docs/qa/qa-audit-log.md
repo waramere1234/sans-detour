@@ -2878,3 +2878,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `RETRY_FETCH_FAILED_MESSAGE` src/ tests/ → 6+ résultats
 - [ ] grep `FALLBACK_TITRE_PEDAGO_WORDS\|FALLBACK_CONTEXTE_WORDS\|FALLBACK_CHAPEAU_WORDS` scripts/ tests/ → 10+ résultats
 - [ ] grep `~531 tests` CLAUDE.md → 0 résultat (aligné sur ~536)
+
+---
+
+## Session 123 — 2026-05-17
+
+### Vérification session 122
+
+- [VERIFIED] 1 occurrence seulement de "claude-haiku-4-5" dans scripts/ (la déclaration env.ts:85)
+- [VERIFIED] 11 occurrences de RETRY_FETCH_FAILED_MESSAGE dans src/ + tests/
+- [VERIFIED] 26 occurrences de FALLBACK_*_WORDS dans scripts/ + tests/
+- [VERIFIED] CLAUDE.md "~536 tests"
+- 536/536 tests verts, typecheck clean
+
+### Bugs fixés (3 magic numbers in ingest-an.ts → env.ts consts + bounds tests)
+
+- [FIXED] `max_tokens: 4096` magic inline dans `scripts/ingest-an.ts:318` buildRequestParams · Cap critical pour l'analyse field (6 string[] arrays, ~600-900 tokens observed) — un refactor accidentel à 1024 truncate analyse silently. Fix : export `ANTHROPIC_INGEST_MAX_TOKENS = 4096` depuis env.ts ; ingest-an.ts importe + utilise. 2 tests : pin-the-value à 4096, sanity bound ≥ 2048 pour défendre contre un drop accidentel sous le ceiling typique observé. · `scripts/lib/env.ts`, `scripts/ingest-an.ts`, `tests/env.test.ts`
+- [FIXED] `max_uses: 2` magic inline dans le web_search tool config · CLAUDE.md V2 P1 documente "1 à 2 recherches max" pour cost control — une bump à 5 multiplie le per-batch search charge. Fix : export `MAX_WEB_SEARCHES_PER_SCRUTIN = 2`. 2 tests : pin-the-value à 2, sanity bound 1 ≤ N ≤ 5 (défend contre un runaway). · `scripts/lib/env.ts`, `scripts/ingest-an.ts`, `tests/env.test.ts`
+- [FIXED] `setTimeout(res, 15000)` polling interval inline dans pollBatch · 15s match l'Anthropic-recommended cadence pour les batches typiques de 2-10min — too aggressive burn la status-endpoint quota, too slow delay l'orchestrator. Une régression à 100ms DoS-erait le status endpoint sur un batch de 5+ min. Fix : export `BATCH_POLL_INTERVAL_MS = 15_000` depuis env.ts. 2 tests : pin-the-value, sanity bound ≥ 1000ms pour défendre contre un DoS accidentel. · `scripts/lib/env.ts`, `scripts/ingest-an.ts`, `tests/env.test.ts`
+
+### Vérifications à faire en session 124
+
+- [ ] grep "max_tokens: 4096\|max_uses: 2\|setTimeout.*15000" scripts/ingest-an.ts → 0 résultat literal (tous via const)
+- [ ] grep "ANTHROPIC_INGEST_MAX_TOKENS\|MAX_WEB_SEARCHES_PER_SCRUTIN\|BATCH_POLL_INTERVAL_MS" scripts/ tests/ → 8+ résultats
+- [ ] grep `~536 tests` CLAUDE.md → 0 résultat (aligné sur ~542)

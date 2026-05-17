@@ -31,6 +31,8 @@ import {
   requireSupabaseClient,
   ANTHROPIC_BATCHES_URL, anthropicBatchUrl, anthropicBatchResultsUrl,
   anthropicHeaders, ANTHROPIC_MODEL,
+  ANTHROPIC_INGEST_MAX_TOKENS, MAX_WEB_SEARCHES_PER_SCRUTIN,
+  BATCH_POLL_INTERVAL_MS,
 } from "./lib/env";
 
 // ───────────────────────────────────────────────────────────────── config
@@ -312,10 +314,10 @@ Cherche sur le web (1 à 2 recherches max) les détails concrets de ce scrutin :
 function buildRequestParams(scrutin: { titre_brut: string; dossier_titre: string; numero: number }): Record<string, unknown> {
   return {
     model: ANTHROPIC_MODEL,
-    // 4096 instead of 2048: the analyse field adds 6 string[] arrays with
-    // multiple bullets each. Total output now lands around 600-900 tokens
-    // including the 4-field wrapper JSON. 4096 leaves plenty of headroom.
-    max_tokens: 4096,
+    // 4096 leaves headroom for the analyse field's 6 string[] arrays
+    // (observed outputs ~600-900 tokens). Centralised in env.ts so a
+    // future bump documents itself; rationale lives next to the const.
+    max_tokens: ANTHROPIC_INGEST_MAX_TOKENS,
     system: [
       {
         type: "text",
@@ -327,7 +329,7 @@ function buildRequestParams(scrutin: { titre_brut: string; dossier_titre: string
       {
         type: "web_search_20260209",
         name: "web_search",
-        max_uses: 2,
+        max_uses: MAX_WEB_SEARCHES_PER_SCRUTIN,
         // Haiku 4.5 doesn't support programmatic tool calling; web_search must
         // be declared as direct-caller only. Without this, batch returns 400
         // with "does not support programmatic tool calling".
@@ -380,7 +382,7 @@ async function pollBatch(batchId: string): Promise<BatchStatus> {
     const c = json.request_counts;
     console.log(`  status: ${json.processing_status} · processing=${c.processing} succeeded=${c.succeeded} errored=${c.errored}`);
     if (json.processing_status === "ended") return json;
-    await new Promise((res) => setTimeout(res, 15000));
+    await new Promise((res) => setTimeout(res, BATCH_POLL_INTERVAL_MS));
   }
 }
 

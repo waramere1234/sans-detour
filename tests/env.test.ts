@@ -6,6 +6,9 @@ import {
   ANTHROPIC_BATCHES_URL,
   ANTHROPIC_API_VERSION,
   ANTHROPIC_MODEL,
+  ANTHROPIC_INGEST_MAX_TOKENS,
+  MAX_WEB_SEARCHES_PER_SCRUTIN,
+  BATCH_POLL_INTERVAL_MS,
   anthropicBatchUrl,
   anthropicBatchResultsUrl,
   anthropicHeaders,
@@ -204,5 +207,41 @@ describe("ANTHROPIC_API_VERSION + anthropicHeaders", () => {
     // A model upgrade should be a deliberate edit here + the buildRequest
     // call site in ingest-an.ts; pin the value so a typo doesn't drift.
     expect(ANTHROPIC_MODEL).toBe("claude-haiku-4-5");
+  });
+});
+
+describe("Anthropic ingest tuning consts (max_tokens / max_uses / poll interval)", () => {
+  // Three magic numbers that used to live inline in ingest-an.ts —
+  // each has a real cost/quality impact (truncated analyse, runaway
+  // search billing, DoS on the status endpoint). Tests pin the
+  // current values + sanity bounds so a future tweak is deliberate.
+
+  it("ANTHROPIC_INGEST_MAX_TOKENS is 4096 (room for the 6-array analyse field)", () => {
+    expect(ANTHROPIC_INGEST_MAX_TOKENS).toBe(4096);
+  });
+
+  it("ANTHROPIC_INGEST_MAX_TOKENS leaves headroom over the observed ~900-token ceiling", () => {
+    // Defensive: a refactor accidentally setting it below the observed
+    // typical output would silently truncate the analyse field.
+    expect(ANTHROPIC_INGEST_MAX_TOKENS).toBeGreaterThanOrEqual(2048);
+  });
+
+  it("MAX_WEB_SEARCHES_PER_SCRUTIN is 2 (CLAUDE.md V2 P1: 1 à 2 recherches max)", () => {
+    expect(MAX_WEB_SEARCHES_PER_SCRUTIN).toBe(2);
+  });
+
+  it("MAX_WEB_SEARCHES_PER_SCRUTIN is a small positive cap (defends cost)", () => {
+    expect(MAX_WEB_SEARCHES_PER_SCRUTIN).toBeGreaterThanOrEqual(1);
+    expect(MAX_WEB_SEARCHES_PER_SCRUTIN).toBeLessThanOrEqual(5);
+  });
+
+  it("BATCH_POLL_INTERVAL_MS is 15 seconds (Anthropic-recommended cadence)", () => {
+    expect(BATCH_POLL_INTERVAL_MS).toBe(15_000);
+  });
+
+  it("BATCH_POLL_INTERVAL_MS isn't pathologically short (no status-endpoint DoS)", () => {
+    // A regression that drops the interval to <1s would burn through the
+    // status-endpoint rate limit on a batch that takes 5+ minutes.
+    expect(BATCH_POLL_INTERVAL_MS).toBeGreaterThanOrEqual(1000);
   });
 });
