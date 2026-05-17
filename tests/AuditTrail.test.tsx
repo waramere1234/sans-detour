@@ -1,8 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AuditTrail } from "../src/components/AuditTrail";
-import type {
-  GroupAlignment, Scrutin, SessionVote, GroupCode, GroupPosition,
+import {
+  anScrutinViewAriaLabel,
+  type GroupAlignment, type Scrutin, type SessionVote,
+  type GroupCode, type GroupPosition,
 } from "../src/types";
 
 // AuditTrail is the per-group breakdown panel that opens under each
@@ -126,7 +128,12 @@ describe("AuditTrail — AN link vs demo fallback", () => {
     const sc = mkScrutin("s1", "pour", "LFI", { url_an_officielle: "https://an.example/123" });
     const votes: SessionVote[] = [{ scrutin_id: "s1", choice: "pour", voted_at: 1 }];
     render(<AuditTrail alignment={mkAlign()} scrutins={[sc]} votes={votes} />);
-    const link = screen.getByRole("link", { name: /Voir le scrutin/ });
+    // Round-trip via anScrutinViewAriaLabel — a regression that changes
+    // the aria-label template would surface here instead of silently
+    // breaking the AN link a11y. Take the prefix before the numero
+    // interpolation so the regex matches any scrutin number.
+    const labelPrefix = anScrutinViewAriaLabel(0).split(" n°")[0]; // "Voir le scrutin"
+    const link = screen.getByRole("link", { name: new RegExp(labelPrefix) });
     expect(link).toHaveAttribute("href", "https://an.example/123");
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noopener noreferrer");

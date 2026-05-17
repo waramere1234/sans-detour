@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import App from "../src/App";
 import { ROUTES } from "../src/lib/routes";
+import { ERROR_FALLBACK_MESSAGE, MENU_OPEN_LABEL } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
 // App.tsx is the shared shell mounted around every route. Two invariants
@@ -43,7 +44,7 @@ describe("App — shell composition", () => {
   it("mounts the TopBar (visible on /play)", () => {
     renderApp(ROUTES.play, <HealthyChild />);
     // TopBar renders the menu trigger on every non-Cover route.
-    expect(screen.getByRole("button", { name: /Ouvrir le menu/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: new RegExp(MENU_OPEN_LABEL) })).toBeInTheDocument();
   });
 });
 
@@ -63,8 +64,8 @@ describe("App — ErrorBoundary key={location.pathname} remount on nav", () => {
 
   it("traps a route-level crash and renders the error fallback", () => {
     renderApp(ROUTES.play, <ThrowingChild />);
-    // ErrorBoundary fallback uses "Quelque chose s'est cassé"
-    expect(screen.getByText(/Quelque chose s'est cassé/i)).toBeInTheDocument();
+    // ErrorBoundary fallback renders ERROR_FALLBACK_MESSAGE
+    expect(screen.getByText(new RegExp(ERROR_FALLBACK_MESSAGE.slice(0, 30), "i"))).toBeInTheDocument();
   });
 
   it("isolates the crashed route — a healthy sibling route mounts cleanly under a separate App instance", () => {
@@ -74,7 +75,7 @@ describe("App — ErrorBoundary key={location.pathname} remount on nav", () => {
     // /result (mounts the healthy child) — both should reach their final
     // state independently, with no shared error state.
     renderApp(ROUTES.play, <ThrowingChild />);
-    expect(screen.getByText(/Quelque chose s'est cassé/i)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(ERROR_FALLBACK_MESSAGE.slice(0, 30), "i"))).toBeInTheDocument();
 
     // Independent App for /result — the healthy child must reach the DOM,
     // proving the boundary doesn't have process-wide state.

@@ -18,6 +18,7 @@ import {
   CARD_VERSO_SEPARATOR_LABEL, AN_LINK_VISIBLE_LABEL,
   MENU_OPEN_LABEL, MENU_CLOSE_LABEL, MAIN_MENU_LABEL,
   ERROR_FALLBACK_HEADING, ERROR_FALLBACK_MESSAGE, ERROR_FALLBACK_RELOAD_LABEL,
+  PERSONNALITES_TOGGLE_LABEL,
 } from "../src/types";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
@@ -354,6 +355,23 @@ describe("ERROR_FALLBACK_HEADING + _MESSAGE + _RELOAD_LABEL — ErrorBoundary co
     // ErrorBoundary renders this as a standalone <p>; if a future
     // rewording drops the period, the prose reads truncated.
     expect(ERROR_FALLBACK_MESSAGE.endsWith(".")).toBe(true);
+  });
+});
+
+describe("PERSONNALITES_TOGGLE_LABEL — Result.tsx personnalités toggle button", () => {
+  // 1 source site (Result.tsx button text) + 6 test regex sites in
+  // tests/Result.test.tsx. A rewording (e.g. "Voir les candidat·e·s"
+  // / "Show candidates") would have required 7 in-lockstep edits.
+  it("matches the canonical 'Voir les personnalités' wording", () => {
+    expect(PERSONNALITES_TOGGLE_LABEL).toBe("Voir les personnalités");
+  });
+
+  it("starts with 'Voir' (the visible chevron + label pattern: '{▾|▸} Voir les …')", () => {
+    // Result.tsx prefixes the label with a chevron span ("▾ " or "▸ ")
+    // depending on showPersonnalites state. The label itself should
+    // start with the verb so the SR announcement reads naturally
+    // alongside the chevron.
+    expect(PERSONNALITES_TOGGLE_LABEL.startsWith("Voir")).toBe(true);
   });
 });
 

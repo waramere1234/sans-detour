@@ -18,7 +18,7 @@ import type { Scrutin } from "../src/types";
 import {
   TARGET, LEGISLATURE_LABEL,
   SHARE_LABEL, REFAIRE_LABEL, CONTINUE_REFINE_LABEL, CONTINUE_TEST_LABEL_PREFIX,
-  refaireConfirmMessage,
+  refaireConfirmMessage, PERSONNALITES_TOGGLE_LABEL,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -229,18 +229,18 @@ describe("Result — personnalites_revealed analytics + once-per-mount guard", (
   it("fires 'personnalites_revealed' on the first toggle-open click", async () => {
     renderResult();
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: /Voir les personnalités/ })).toBeInTheDocument()
+      expect(screen.getByRole("button", { name: new RegExp(PERSONNALITES_TOGGLE_LABEL) })).toBeInTheDocument()
     );
-    fireEvent.click(screen.getByRole("button", { name: /Voir les personnalités/ }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(PERSONNALITES_TOGGLE_LABEL) }));
     expect(trackSpy).toHaveBeenCalledWith("personnalites_revealed");
   });
 
   it("does NOT fire 'personnalites_revealed' again on subsequent toggles (once-per-mount via personnalitesReportedRef)", async () => {
     renderResult();
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: /Voir les personnalités/ })).toBeInTheDocument()
+      expect(screen.getByRole("button", { name: new RegExp(PERSONNALITES_TOGGLE_LABEL) })).toBeInTheDocument()
     );
-    const btn = screen.getByRole("button", { name: /Voir les personnalités/ });
+    const btn = screen.getByRole("button", { name: new RegExp(PERSONNALITES_TOGGLE_LABEL) });
     fireEvent.click(btn); // open → fires
     fireEvent.click(btn); // close → no-op for analytics
     fireEvent.click(btn); // open again → still no-op (guard)
@@ -253,9 +253,9 @@ describe("Result — personnalites_revealed analytics + once-per-mount guard", (
   it("does NOT fire 'personnalites_revealed' on a closing toggle when the panel was already open", async () => {
     renderResult();
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: /Voir les personnalités/ })).toBeInTheDocument()
+      expect(screen.getByRole("button", { name: new RegExp(PERSONNALITES_TOGGLE_LABEL) })).toBeInTheDocument()
     );
-    const btn = screen.getByRole("button", { name: /Voir les personnalités/ });
+    const btn = screen.getByRole("button", { name: new RegExp(PERSONNALITES_TOGGLE_LABEL) });
     fireEvent.click(btn); // open
     trackSpy.mockClear();
     fireEvent.click(btn); // close

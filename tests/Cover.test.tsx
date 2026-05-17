@@ -13,6 +13,7 @@ import {
   START_LABEL, RESUME_LABEL, VIEW_RESULT_LABEL,
   RESTART_LABEL, VIEW_PARTIAL_RESULT_LABEL,
   restartConfirmMessage,
+  MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -255,7 +256,7 @@ describe("Cover — auto-resume analytics (cover_result_revisit + cover_partial_
     localStorage.setItem(COVER_STORAGE_KEY, "true");
     for (let i = 1; i <= TARGET; i++) recordVote(`s${i}`, "pour");
     renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
-    fireEvent.click(screen.getByRole("button", { name: /Voir mon résultat/ }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(VIEW_RESULT_LABEL) }));
     expect(trackSpy).toHaveBeenCalledWith("cover_result_revisit");
     expect(trackSpy).not.toHaveBeenCalledWith("cover_started");
     expect(trackSpy).not.toHaveBeenCalledWith("cover_resumed");
@@ -263,7 +264,7 @@ describe("Cover — auto-resume analytics (cover_result_revisit + cover_partial_
 
   it("does NOT fire 'cover_result_revisit' on a fresh visit (no completed session)", () => {
     renderCover();
-    fireEvent.click(screen.getByRole("button", { name: /Commencer/ }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(START_LABEL) }));
     expect(trackSpy).not.toHaveBeenCalledWith("cover_result_revisit");
   });
 
@@ -304,19 +305,19 @@ describe("Cover — footer nav analytics (cover_footer_nav × 3 targets)", () =>
 
   it("fires cover_footer_nav with target=methode on the Méthode link click", () => {
     renderCover();
-    fireEvent.click(screen.getByRole("link", { name: /Méthode/ }));
+    fireEvent.click(screen.getByRole("link", { name: new RegExp(MENU_METHODE_LABEL) }));
     expect(trackSpy).toHaveBeenCalledWith("cover_footer_nav", { target: "methode" });
   });
 
   it("fires cover_footer_nav with target=legal on the Mentions link click", () => {
     renderCover();
-    fireEvent.click(screen.getByRole("link", { name: /Mentions légales/ }));
+    fireEvent.click(screen.getByRole("link", { name: new RegExp(MENU_LEGAL_LABEL) }));
     expect(trackSpy).toHaveBeenCalledWith("cover_footer_nav", { target: "legal" });
   });
 
   it("fires cover_footer_nav with target=contact on the Contact mailto click", () => {
     renderCover();
-    fireEvent.click(screen.getByRole("link", { name: /Contact/ }));
+    fireEvent.click(screen.getByRole("link", { name: new RegExp(MENU_CONTACT_LABEL) }));
     expect(trackSpy).toHaveBeenCalledWith("cover_footer_nav", { target: "contact" });
   });
 });

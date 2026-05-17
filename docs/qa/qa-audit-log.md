@@ -3425,3 +3425,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `"Ouvrir le menu"\|"Fermer le menu"\|"Menu principal"\|"Quelque chose s.est cassé"\|"Recharger"` src/ tests/ → 5-7 résultats seulement (déclarations + pin-the-value tests)
 - [ ] grep `MENU_METHODE_LABEL` src/routes/Cover.tsx → 1 résultat (Cover utilise la const)
 - [ ] grep `~658 tests` CLAUDE.md → 0 résultat (aligné sur ~667)
+
+---
+
+## Session 146 — 2026-05-17
+
+### Vérification session 145
+
+- [VERIFIED] 64 occurrences des 6 nouveaux exports (MENU_OPEN/CLOSE_LABEL + MAIN_MENU_LABEL + ERROR_FALLBACK_HEADING/MESSAGE/RELOAD_LABEL)
+- [VERIFIED] 7 occurrences des 5 strings = 3 déclarations + 3 pin-the-value tests + 1 comment (pas de drift) ; 2 sites stale dans App.test.tsx fixed en bug #3
+- [VERIFIED] Cover.tsx utilise MENU_METHODE_LABEL (import + usage = 2 mentions)
+- [VERIFIED] CLAUDE.md "~667 tests"
+- 667/667 tests verts, typecheck clean
+
+### Bugs fixés (PERSONNALITES_TOGGLE_LABEL + Cover.test.tsx const reuse × 5 + test regex cleanup × 5)
+
+- [FIXED] `"Voir les personnalités"` Result.tsx button label dupliqué 7× : 1 source (Result.tsx button text inline) + 6 test regex literals (`name: /Voir les personnalités/`) · Drift surface : rewording = 7 edits in-lockstep. Fix : export `PERSONNALITES_TOGGLE_LABEL` depuis src/types. Result.tsx utilise `{PERSONNALITES_TOGGLE_LABEL}` ; tests/Result.test.tsx 6 sites migrent via replace_all vers `new RegExp(PERSONNALITES_TOGGLE_LABEL)`. 2 nouveaux tests : pin-the-value + startsWith "Voir" (chevron prefix invariant). · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/Result.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] tests/Cover.test.tsx avait 5 regex literals stale (`/Commencer/`, `/Voir mon résultat/`, `/Méthode/`, `/Mentions légales/`, `/Contact/`) alors que les 5 consts existaient (START_LABEL session 136 + VIEW_RESULT_LABEL session 133 + MENU_METHODE/LEGAL/CONTACT_LABEL session 138) · Drift surface : un rewording d'une des 5 consts laisserait les 5 tests verts mais déconnectés de la source. Fix : tests/Cover.test.tsx importe les 3 MENU_*_LABEL (les autres déjà importés) + migre les 5 regex vers `new RegExp(CONST)`. Pas de nouveau test (les consts étaient déjà pinned via leur own tests). · `tests/Cover.test.tsx`
+- [FIXED] 5 sites stale dans tests/App.test.tsx (2× `Quelque chose s'est cassé` + 1× `Ouvrir le menu`), tests/Legal.test.tsx (1× `En-tête de la page` + 1× `Retour` + 1× `Accueil`), tests/TopBar.test.tsx (1× `Accueil`), tests/AuditTrail.test.tsx (1× `Voir le scrutin` template prefix) · Drift cleanup : ces test regexes étaient parallèles aux consts existantes (ERROR_FALLBACK_MESSAGE session 145 + MENU_OPEN_LABEL session 145 + PAGE_HEADER_NAV_LABEL session 134 + BACK_LINK_LABEL session 136 + WORDMARK_HOME_LABEL session 134 + anScrutinViewAriaLabel session 140). Fix : imports ajoutés, regex literals migrés vers `new RegExp(CONST)` ou pattern derived (AuditTrail utilise `anScrutinViewAriaLabel(0).split(" n°")[0]` pour matcher n'importe quel scrutin number). · `tests/App.test.tsx`, `tests/Legal.test.tsx`, `tests/TopBar.test.tsx`, `tests/AuditTrail.test.tsx`
+
+### Vérifications à faire en session 147
+
+- [ ] grep `PERSONNALITES_TOGGLE_LABEL` src/ tests/ → 10+ résultats
+- [ ] grep `"Voir les personnalités"` src/ tests/ → 2-3 résultats (déclaration + pin-the-value test)
+- [ ] grep `name: /\(Commencer\|Voir mon résultat\|Voir les personnalités\|Quelque chose\|Ouvrir le menu\|Accueil\|En-tête de la page\|Retour\)/` tests/ → 0 résultat (toutes les regex literales migrées vers `new RegExp(CONST)`)
+- [ ] grep `~667 tests` CLAUDE.md → 0 résultat (aligné sur ~669)

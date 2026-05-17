@@ -202,6 +202,14 @@ export const ERROR_FALLBACK_HEADING = "Erreur";
 export const ERROR_FALLBACK_MESSAGE = "Quelque chose s'est cassé de notre côté.";
 export const ERROR_FALLBACK_RELOAD_LABEL = "Recharger";
 
+/** Result.tsx button label that toggles the personnalités section
+ *  (V2 P2 — 8 indexed presidential figures). Used 1× in source +
+ *  6× in tests/Result.test.tsx as regex literals — a rewording
+ *  would have required 7 in-lockstep edits. Centralised so a future
+ *  i18n flip ("Show candidates" / "Voir les candidat·e·s") propagates
+ *  to all 7 sites via one edit. */
+export const PERSONNALITES_TOGGLE_LABEL = "Voir les personnalités";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

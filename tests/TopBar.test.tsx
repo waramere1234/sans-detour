@@ -8,6 +8,7 @@ import {
   MIN_FOR_RANKING,
   MENU_RESULT_LABEL, MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
   MENU_OPEN_LABEL, MENU_CLOSE_LABEL,
+  WORDMARK_HOME_LABEL,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -45,7 +46,7 @@ describe("TopBar — route gating", () => {
 
   it("renders the wordmark Link + menu trigger on /play", () => {
     renderTopBar(ROUTES.play);
-    expect(screen.getByRole("link", { name: /Accueil/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: new RegExp(WORDMARK_HOME_LABEL) })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: new RegExp(MENU_OPEN_LABEL) })).toBeInTheDocument();
   });
 

@@ -4,7 +4,11 @@ import { MemoryRouter, Routes, Route } from "react-router-dom";
 import Legal from "../src/routes/Legal";
 import { ROUTES } from "../src/lib/routes";
 import { CONTACT_EMAIL } from "../src/lib/contact";
-import { AN_OPEN_DATA_URL } from "../src/types";
+import {
+  AN_OPEN_DATA_URL,
+  WORDMARK_HOME_LABEL, PAGE_HEADER_NAV_LABEL,
+} from "../src/types";
+import { BACK_LINK_LABEL } from "../src/components/ReadingPageHeader";
 
 // Legal.tsx is the sibling of Methode.tsx (which got dedicated tests in
 // session 106). It owns:
@@ -38,20 +42,20 @@ describe("Legal — structure", () => {
 
   it("declares the en-tête nav landmark with aria-label", () => {
     renderLegal();
-    expect(screen.getByRole("navigation", { name: /En-tête de la page/ })).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: new RegExp(PAGE_HEADER_NAV_LABEL) })).toBeInTheDocument();
   });
 });
 
 describe("Legal — links to cover (route-aware)", () => {
   it("Retour link points at ROUTES.cover (not a hardcoded '/')", () => {
     renderLegal();
-    const retour = screen.getByRole("link", { name: /Retour/ });
+    const retour = screen.getByRole("link", { name: new RegExp(BACK_LINK_LABEL) });
     expect(retour).toHaveAttribute("href", ROUTES.cover);
   });
 
   it("Wordmark Link is labelled 'Accueil' and points at ROUTES.cover", () => {
     renderLegal();
-    const accueil = screen.getByRole("link", { name: /Accueil/ });
+    const accueil = screen.getByRole("link", { name: new RegExp(WORDMARK_HOME_LABEL) });
     expect(accueil).toHaveAttribute("href", ROUTES.cover);
   });
 });
