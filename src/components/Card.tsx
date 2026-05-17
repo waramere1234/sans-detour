@@ -1,7 +1,7 @@
 // src/components/Card.tsx
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion, type PanInfo } from "framer-motion";
-import { MAX_POINTS_CLES_BULLETS, type Scrutin } from "../types";
+import { MAX_POINTS_CLES_BULLETS, APP_LOCALE, type Scrutin } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
 import { stripCitations, stripVoteResult } from "../lib/text-cleanup";
 
@@ -183,7 +183,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             borderTop: "1px solid var(--line)",
             paddingTop: 14,
           }}>
-            <span>{new Date(scrutin.date).toLocaleDateString("fr-FR")}</span>
+            <span>{new Date(scrutin.date).toLocaleDateString(APP_LOCALE)}</span>
             {scrutin.url_an_officielle
               ? <span>n° {scrutin.numero}</span>
               : <span style={{ color: "var(--accent)" }}>démo</span>}
@@ -214,7 +214,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             paddingBottom: 8, borderBottom: "1px solid var(--line)",
           }}>
             <span style={{ color: "var(--accent)" }}>{scrutin.chapeau}</span>
-            <span>n° {scrutin.numero} · {new Date(scrutin.date).toLocaleDateString("fr-FR")}</span>
+            <span>n° {scrutin.numero} · {new Date(scrutin.date).toLocaleDateString(APP_LOCALE)}</span>
           </div>
 
           {/* Contexte LLM (or friendly fallback if absent) */}

@@ -3,6 +3,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import {
   TAGLINE, BRAND_NAME, LEGISLATURE_LABEL_LOWERCASE, PROD_ORIGIN,
+  APP_LOCALE, OG_LOCALE,
 } from "../src/types";
 
 // index.html + public/manifest.webmanifest both carry copy that the
@@ -145,6 +146,36 @@ describe("PROD_ORIGIN sync (index.html canonical + og:url + og:image + twitter:i
     const match = html.match(/<meta name="twitter:image" content="([^"]+)"/);
     expect(match).not.toBeNull();
     expect(match![1].startsWith(PROD_ORIGIN + "/")).toBe(true);
+  });
+});
+
+describe("APP_LOCALE sync (html lang + manifest lang + og:locale)", () => {
+  // BCP47 locale appears at 3 static sites + Card.tsx toLocaleDateString.
+  // A future i18n move (en-US? fr-CA?) should propagate from APP_LOCALE
+  // to all 3 static files in one edit. OG_LOCALE is derived (underscore
+  // variant) so the relationship doesn't drift either.
+
+  it("OG_LOCALE is derived from APP_LOCALE by underscore-substituting the hyphen", () => {
+    expect(OG_LOCALE).toBe(APP_LOCALE.replace("-", "_"));
+  });
+
+  it("<html lang='...'> matches APP_LOCALE", async () => {
+    const html = await readIndexHtml();
+    const match = html.match(/<html lang="([^"]+)"/);
+    expect(match).not.toBeNull();
+    expect(match![1]).toBe(APP_LOCALE);
+  });
+
+  it("manifest.lang matches APP_LOCALE", async () => {
+    const manifest = await readManifest() as { lang: string };
+    expect(manifest.lang).toBe(APP_LOCALE);
+  });
+
+  it("<meta property='og:locale'> matches OG_LOCALE (underscore form)", async () => {
+    const html = await readIndexHtml();
+    const match = html.match(/<meta property="og:locale" content="([^"]+)"/);
+    expect(match).not.toBeNull();
+    expect(match![1]).toBe(OG_LOCALE);
   });
 });
 

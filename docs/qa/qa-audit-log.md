@@ -3023,3 +3023,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `PROD_ORIGIN` src/ tests/ → 6+ résultats
 - [ ] grep `TAGLINE` tests/Cover.test.tsx → 1+ résultat
 - [ ] grep `~568 tests` CLAUDE.md → 0 résultat (aligné sur ~576)
+
+---
+
+## Session 129 — 2026-05-17
+
+### Vérification session 128
+
+- [VERIFIED] 14 occurrences de PROD_ORIGIN dans src/ + tests/
+- [VERIFIED] 5 occurrences de TAGLINE dans tests/Cover.test.tsx
+- [VERIFIED] CLAUDE.md "~576 tests"
+- 576/576 tests verts, typecheck clean
+
+### Bugs fixés (APP_LOCALE + OG_LOCALE derivation + Card date formatting)
+
+- [FIXED] BCP47 locale `"fr-FR"` hardcoded 4× : Card.tsx (2× `toLocaleDateString`), index.html (`<html lang>`), public/manifest.webmanifest (`lang`) · Un futur i18n move (en-US pour diaspora, fr-CA) aurait demandé 4 edits in-lockstep — un site oublié laisserait par exemple les dates Card.tsx en fr-FR pendant que le manifest indique fr-CA, créant des confusions de format. Fix : export `APP_LOCALE = "fr-FR"` depuis src/types. Card.tsx + tests sync utilisent la const. · `src/types/index.ts`, `src/components/Card.tsx`
+- [FIXED] `og:locale` content "fr_FR" (avec underscore) hardcodé dans index.html, parallèle de `<html lang="fr-FR">` (avec hyphen) · OG spec utilise l'underscore mais c'est la MEME semantic locale. Un i18n move qui update APP_LOCALE mais oublie og:locale laisse les social previews stale. Fix : export `OG_LOCALE = APP_LOCALE.replace("-", "_")` — derived for-free. 1 test pin la relationship (`expect(OG_LOCALE).toBe(APP_LOCALE.replace(...))`). · `src/types/index.ts`, `tests/site-metadata.test.ts`
+- [FIXED] 0 test pin la sync entre html lang + manifest lang + og:locale + APP_LOCALE · Sans ces tests, un drift one-sided passe silently. 3 nouveaux tests dans site-metadata : html lang === APP_LOCALE, manifest.lang === APP_LOCALE, og:locale === OG_LOCALE. · `tests/site-metadata.test.ts`
+
+### Vérifications à faire en session 130
+
+- [ ] grep `APP_LOCALE` src/ tests/ → 6+ résultats (déclaration + Card.tsx + 3 sites pinés via tests)
+- [ ] grep `'"fr-FR"'` src/ → 1 résultat seulement (la déclaration APP_LOCALE)
+- [ ] grep `OG_LOCALE` src/ tests/ → 4+ résultats
+- [ ] grep `~576 tests` CLAUDE.md → 0 résultat (aligné sur ~580)

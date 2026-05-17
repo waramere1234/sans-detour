@@ -64,6 +64,21 @@ export const BRAND_NAME = "Sans Détour";
  *  variant for the runtime track() gate). */
 export const PROD_ORIGIN = "https://sansdetour.fr";
 
+/** BCP47 locale used by:
+ *  - index.html (<html lang=...>)
+ *  - public/manifest.webmanifest (lang)
+ *  - Card.tsx scrutin-date rendering (toLocaleDateString)
+ *  Single source of truth so a future i18n move (e.g. en-US for a
+ *  diaspora variant) is a deliberate edit rather than a search-and-
+ *  replace across 4 sites with one inevitably missed. */
+export const APP_LOCALE = "fr-FR";
+
+/** Open Graph locale variant — same semantic as APP_LOCALE but with
+ *  the OG-spec underscore separator (`fr_FR` not `fr-FR`). Derived
+ *  from APP_LOCALE so a future locale change touches both sides via
+ *  one edit. */
+export const OG_LOCALE = APP_LOCALE.replace("-", "_");
+
 /** Official AN open-data portal — both the user-facing reference (Methode
  *  §01 + §06 prose, Legal data-sources block) and the script-side bulk
  *  download (`scripts/ingest-an.ts` builds `${AN_OPEN_DATA_URL}static/...`
