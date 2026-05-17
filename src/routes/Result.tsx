@@ -19,7 +19,8 @@ import {
   TARGET,
   SHARE_LABEL, REFAIRE_LABEL, CONTINUE_REFINE_LABEL, CONTINUE_TEST_LABEL_PREFIX,
   refaireConfirmMessage, PERSONNALITES_TOGGLE_LABEL,
-  resultEyebrowText,
+  resultEyebrowText, resultHeaderBodyLineText,
+  resultPersonnalitesIndexedCountText, continueTestRemainingSuffix,
   type Scrutin, type GroupCode,
 } from "../types";
 
@@ -172,7 +173,7 @@ export default function Result() {
         <p style={{
           fontSize: 13, color: "var(--ink-2)",
           margin: "10px 0 0", letterSpacing: "-0.005em",
-        }}>{total} scrutin{total !== 1 ? "s" : ""} · {top.counted} compté{top.counted !== 1 ? "s" : ""} · {skips} skip{skips !== 1 ? "s" : ""}</p>
+        }}>{resultHeaderBodyLineText(total, top.counted, skips)}</p>
       </header>
 
       <div>
@@ -229,7 +230,7 @@ export default function Result() {
             <span style={{
               fontFamily: "var(--font-mono)", fontSize: 10.5,
               color: "var(--ink-3)", letterSpacing: "0.04em",
-            }}>{personnalitesWithData.length} indexée{personnalitesWithData.length !== 1 ? "s" : ""}</span>
+            }}>{resultPersonnalitesIndexedCountText(personnalitesWithData.length)}</span>
           </button>
 
           {showPersonnalites && (
@@ -266,7 +267,7 @@ export default function Result() {
         {isPartial && (
           <button type="button"
             onClick={() => navigate(ROUTES.play)}
-            style={btnPrimary()}><span aria-hidden="true">→ </span>{CONTINUE_TEST_LABEL_PREFIX} ({remaining} {remaining === 1 ? "vote restant" : "votes restants"})</button>
+            style={btnPrimary()}><span aria-hidden="true">→ </span>{CONTINUE_TEST_LABEL_PREFIX} ({remaining} {continueTestRemainingSuffix(remaining)})</button>
         )}
         <button type="button"
           onClick={share}

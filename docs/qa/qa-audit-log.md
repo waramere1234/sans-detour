@@ -3594,3 +3594,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `aligné{|partiel{|opposé{|divisé{` src/components/AuditTrail.tsx → 0 résultat (toutes les inline templates migrées)
 - [ ] grep `compté{|RÉSULTAT PARTIEL ·|RÉSULTAT · \${LEGISLATURE_LABEL}` src/ → 0 résultat (migrés vers helpers)
 - [ ] grep `~715 tests` CLAUDE.md → 0 résultat (aligné sur ~726)
+
+---
+
+## Session 153 — 2026-05-17
+
+### Vérification session 152
+
+- [VERIFIED] 59 occurrences des 4 nouveaux helpers (auditTrailChipNoun/Text + rankingOverlayHeaderText + resultEyebrowText)
+- [VERIFIED] 0 inline `aligné{`, `partiel{`, `opposé{`, `divisé{` templates dans AuditTrail.tsx
+- [VERIFIED] 0 inline `compté{` ou `RÉSULTAT PARTIEL` dans src/ (toutes migrées vers helpers)
+- [VERIFIED] CLAUDE.md "~726 tests"
+- 726/726 tests verts, typecheck clean
+
+### Bugs fixés (resultHeaderBodyLineText + resultPersonnalitesIndexedCountText + continueTestRemainingSuffix)
+
+- [FIXED] Result.tsx body-line `{total} scrutin{plural} · {top.counted} compté{plural} · {skips} skip{plural}` inline template avec 3 plural rules indépendantes, unpinned par tests · Drift surface : 3 segments × plural rule = 6 décisions in-source sans aucun test pour les guarder. Un rewording silencieux (e.g. drop d'un segment, swap d'ordre) passerait. Fix : export `resultHeaderBodyLineText(total, counted, skips)` helper qui compose le full template avec les 3 plural rules. Result.tsx utilise le helper. 4 nouveaux tests : full-template pin-the-value, all-singular branch (counted=1), all-plural-on-0 (French rule), mixed singular/plural across segments. · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Result.tsx `{personnalitesWithData.length} indexée{plural}` inline (le count à côté de PERSONNALITES_TOGGLE_LABEL) — plural rule féminin sur "indexée" → "indexées" · Drift surface : 1 source + 0 tests. L'agreement féminin est important (le noun référé est "personnalités" féminin) ; une régression vers "indexé" masculin briserait l'agreement. Fix : export `resultPersonnalitesIndexedCountText(count)` helper. 3 nouveaux tests : pin-the-value, plural-on-0 French rule, feminine-not-masculine invariant (le test surface une régression vers "indexé"). · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Result.tsx `${remaining === 1 ? "vote restant" : "votes restants"}` inline ternary dans le bouton CONTINUE_TEST_LABEL_PREFIX · Drift surface : plural rule sur noun + adjective (both must agree), unpinned. Fix : export `continueTestRemainingSuffix(remaining)` helper. Result.tsx utilise le helper. 2 nouveaux tests : singular, plural × 3 cases (0/2/15). · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 154
+
+- [ ] grep `resultHeaderBodyLineText\|resultPersonnalitesIndexedCountText\|continueTestRemainingSuffix` src/ tests/ → 10+ résultats
+- [ ] grep `scrutin\{|compté\{|skip\{|indexée\{|votes? restants?` src/routes/Result.tsx → 0 résultat (toutes les inline templates migrées)
+- [ ] grep `~726 tests` CLAUDE.md → 0 résultat (aligné sur ~735)

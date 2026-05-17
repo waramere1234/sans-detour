@@ -32,7 +32,8 @@ import {
   partyRowAriaLabel, personnaliteRowAriaLabel, personnaliteRowRightColumnText,
   auditTrailChipNoun, auditTrailChipText,
   rankingOverlayHeaderText,
-  resultEyebrowText,
+  resultEyebrowText, resultHeaderBodyLineText,
+  resultPersonnalitesIndexedCountText, continueTestRemainingSuffix,
   LEGISLATURE_LABEL,
 } from "../src/types";
 import { freshnessTotalScrutinsPhrase } from "../src/components/FreshnessBanner";
@@ -746,6 +747,62 @@ describe("resultEyebrowText — Result.tsx page header eyebrow", () => {
   it("partial branch includes 'PARTIEL', complete branch does not", () => {
     expect(resultEyebrowText(true, 7, 20)).toContain("PARTIEL");
     expect(resultEyebrowText(false, 20, 20)).not.toContain("PARTIEL");
+  });
+});
+
+describe("resultHeaderBodyLineText — Result.tsx body line under h1", () => {
+  // 3-segment plural-rule template: "N scrutin(s) · N compté(s) · N skip(s)".
+  // Previously inline ${plural} ternary, unpinned by tests. Helper enables
+  // pin-the-value testing of all 3 plural rules independently.
+  it("composes the canonical 3-segment template", () => {
+    expect(resultHeaderBodyLineText(20, 18, 2)).toBe("20 scrutins · 18 comptés · 2 skips");
+  });
+
+  it("uses singular when each count === 1 (independent plural rules)", () => {
+    expect(resultHeaderBodyLineText(1, 1, 1)).toBe("1 scrutin · 1 compté · 1 skip");
+  });
+
+  it("uses plural when count === 0 (French rule treats 0 as plural)", () => {
+    expect(resultHeaderBodyLineText(0, 0, 0)).toBe("0 scrutins · 0 comptés · 0 skips");
+  });
+
+  it("mixes singular + plural across segments correctly", () => {
+    expect(resultHeaderBodyLineText(20, 1, 19)).toBe("20 scrutins · 1 compté · 19 skips");
+  });
+});
+
+describe("resultPersonnalitesIndexedCountText — Result.tsx personnalités count", () => {
+  // Feminine plural rule ("indexée" → "indexées") on the count beside
+  // the PERSONNALITES_TOGGLE_LABEL button.
+  it("composes 'N indexée(s)' with feminine plural rule", () => {
+    expect(resultPersonnalitesIndexedCountText(8)).toBe("8 indexées");
+    expect(resultPersonnalitesIndexedCountText(1)).toBe("1 indexée");
+  });
+
+  it("uses plural for 0 (French rule)", () => {
+    expect(resultPersonnalitesIndexedCountText(0)).toBe("0 indexées");
+  });
+
+  it("uses feminine agreement (not masculine 'indexé')", () => {
+    // The noun being agreed-with is "personnalités" (feminine plural)
+    // — a regression to masculine "indexé" would break agreement.
+    expect(resultPersonnalitesIndexedCountText(5)).toContain("indexées");
+    expect(resultPersonnalitesIndexedCountText(5)).not.toMatch(/\bindexés\b/);
+  });
+});
+
+describe("continueTestRemainingSuffix — Result.tsx CONTINUE_TEST button suffix", () => {
+  // Plural rule on both noun + adjective ("vote restant" → "votes
+  // restants"). Composes with CONTINUE_TEST_LABEL_PREFIX + the count
+  // to render the full button text.
+  it("composes singular 'vote restant' when remaining === 1", () => {
+    expect(continueTestRemainingSuffix(1)).toBe("vote restant");
+  });
+
+  it("composes plural 'votes restants' when remaining !== 1 (both noun + adj agree)", () => {
+    expect(continueTestRemainingSuffix(0)).toBe("votes restants");
+    expect(continueTestRemainingSuffix(2)).toBe("votes restants");
+    expect(continueTestRemainingSuffix(15)).toBe("votes restants");
   });
 });
 

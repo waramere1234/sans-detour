@@ -394,6 +394,34 @@ export function resultEyebrowText(isPartial: boolean, total: number, target: num
   return `RÉSULTAT · ${LEGISLATURE_LABEL}`;
 }
 
+/** Compose the Result.tsx body-line text rendered below the h1
+ *  ("N scrutin(s) · N compté(s) · N skip(s)"). 3-segment plural-rule
+ *  template pulled out of inline ${plural} ternaries in Result.tsx so
+ *  the rewording + plural rules are testable + drift-proof. */
+export function resultHeaderBodyLineText(total: number, counted: number, skips: number): string {
+  const sT = total !== 1 ? "s" : "";
+  const sC = counted !== 1 ? "s" : "";
+  const sS = skips !== 1 ? "s" : "";
+  return `${total} scrutin${sT} · ${counted} compté${sC} · ${skips} skip${sS}`;
+}
+
+/** Compose the Result.tsx "N indexée(s)" count label rendered next to
+ *  the PERSONNALITES_TOGGLE_LABEL button. Plural-rule on the feminine
+ *  "indexée" → "indexées". Currently 1 source + 0 tests; centralising
+ *  defends against silent rewording and the plural rule. */
+export function resultPersonnalitesIndexedCountText(count: number): string {
+  return `${count} indexée${count !== 1 ? "s" : ""}`;
+}
+
+/** Compose the suffix of the "Continuer le test" CTA — the parenthesised
+ *  "(N vote(s) restant(s))" count of votes still needed to reach TARGET.
+ *  Singular/plural agreement applies to both "vote" + "restant". Pulled
+ *  out of inline `${remaining === 1 ? "vote restant" : "votes restants"}`
+ *  ternary in Result.tsx so the plural rule is testable independently. */
+export function continueTestRemainingSuffix(remaining: number): string {
+  return remaining === 1 ? "vote restant" : "votes restants";
+}
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use
