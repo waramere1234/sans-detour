@@ -10,7 +10,8 @@ import { PartyRow } from "../components/PartyRow";
 import { ResultSkeleton } from "../components/ResultSkeleton";
 import { PersonnaliteRow } from "../components/PersonnaliteRow";
 import { AuditTrail } from "../components/AuditTrail";
-import { getParty, getPartyColorVar } from "../lib/parties";
+import { getPartyColorVar, getParty } from "../lib/parties";
+import { composeShareText } from "../lib/share";
 import { track } from "../lib/analytics";
 import { ROUTES, PLAY_AFFINEMENT } from "../lib/routes";
 import { TARGET, type Scrutin, type GroupCode } from "../types";
@@ -154,14 +155,7 @@ export default function Result() {
 
   async function share() {
     track("share_clicked");
-    const top6 = ranked.slice(0, 6);
-    const summary = top6
-      .map((a, i) => `${i + 1}. ${getParty(a.group).short} ${a.pct}%`)
-      .join(" · ");
-    const lead = isPartial
-      ? `Mes affinités politiques réelles (résultat partiel ${total}/${TARGET}), basées sur les vrais votes de l'AN`
-      : `Mes affinités politiques réelles, basées sur les vrais votes de l'AN`;
-    const text = `${lead} : ${summary}`;
+    const text = composeShareText({ ranked, isPartial, total, target: TARGET });
     // Explicit `window.location.origin` — the bare `location` read used to
     // resolve to the global window.location at runtime, but a future
     // refactor adding `const location = useLocation()` (react-router) would

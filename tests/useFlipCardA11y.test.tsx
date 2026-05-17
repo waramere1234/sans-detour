@@ -124,4 +124,44 @@ describe("useFlipCardA11y — keyboard handler", () => {
     expect(onFlip).not.toHaveBeenCalled();
     expect(onSwipe).not.toHaveBeenCalled();
   });
+
+  // Without this guard, Enter on the embedded ✨IA button on the recto
+  // would BOTH fire the button's onClick (opening MethodeSheet) AND flip
+  // the card — by the time the modal closes the card is on its verso.
+  // Same for arrow keys when focus is on an inner button.
+  it("ignores Enter when the event target is inside an inner <button>", () => {
+    const onFlip = vi.fn();
+    function HarnessWithInnerButton() {
+      const a11y = useFlipCardA11y({
+        flipped: false, topMost: true, scrutin: mkScrutin(),
+        onFlip, onSwipe: vi.fn(),
+      });
+      return (
+        <div {...a11y.rootProps} data-testid="card">
+          <button data-testid="inner-btn">IA</button>
+        </div>
+      );
+    }
+    render(<HarnessWithInnerButton />);
+    fireEvent.keyDown(screen.getByTestId("inner-btn"), { key: "Enter" });
+    expect(onFlip).not.toHaveBeenCalled();
+  });
+
+  it("ignores arrow keys when the event target is inside an inner <a>", () => {
+    const onSwipe = vi.fn();
+    function HarnessWithInnerLink() {
+      const a11y = useFlipCardA11y({
+        flipped: false, topMost: true, scrutin: mkScrutin(),
+        onFlip: vi.fn(), onSwipe,
+      });
+      return (
+        <div {...a11y.rootProps} data-testid="card">
+          <a href="https://an.example/1234" data-testid="inner-link">AN</a>
+        </div>
+      );
+    }
+    render(<HarnessWithInnerLink />);
+    fireEvent.keyDown(screen.getByTestId("inner-link"), { key: "ArrowRight" });
+    expect(onSwipe).not.toHaveBeenCalled();
+  });
 });

@@ -2678,3 +2678,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `cover_result_revisit\|cover_partial_result` tests/Cover.test.tsx → 4+ résultats (les nouveaux tests)
 - [ ] grep `no orphan Section body` tests/Methode.test.tsx → 1 résultat (le commentaire du nouveau test)
 - [ ] grep `~465 tests` CLAUDE.md → 0 résultat (aligné sur ~471)
+
+---
+
+## Session 115 — 2026-05-17
+
+### Vérification session 114
+
+- [VERIFIED] 1 occurrence de `mockRejectedValueOnce` dans `tests/useFreshnessOnce.test.tsx` (le silent-fail test)
+- [VERIFIED] 8 occurrences de `cover_result_revisit|cover_partial_result` dans `tests/Cover.test.tsx`
+- [VERIFIED] le test "no orphan body" (légèrement différent du wording checklist mais same intent) présent dans `tests/Methode.test.tsx`
+- [VERIFIED] CLAUDE.md "~471 tests"
+- 471/471 tests verts, typecheck clean
+
+### Bugs fixés (composeShareText extraction + THRESHOLD export + flip-card a/button guard)
+
+- [FIXED] `share()` text composition inline dans `src/routes/Result.tsx` · La logique pure (top-6 mapping, numérotation `${i+1}.`, séparateur ` · `, partial-vs-complete lead branch) vivait inline dans le handler async. Untestable sans orchestrer le full Result component + navigator.share + clipboard + prompt chain. Fix : extract dans `src/lib/share.ts` avec `composeShareText({ ranked, isPartial, total, target })` + const exporté `SHARE_TOP_N = 6` (anti-magic-number). Result.tsx import + appelle. 10 tests dans `tests/share.test.ts` : numbered format, ` : ` séparateur entre lead et summary, short-label not full-name, partial-vs-complete lead branches, SHARE_TOP_N truncation (11-group ranking → cut à 6), shorter ranked list passes through. · `src/lib/share.ts` (nouveau), `src/routes/Result.tsx`, `tests/share.test.ts` (nouveau)
+- [FIXED] `THRESHOLD = 0.70` private dans `src/lib/compute-positions.ts` · La const documente l'invariant Methode §03 ("≥70% des votants effectifs"), mais les tests hardcodaient `70` / `7` comme valeurs boundary 8 fois. Un futur bump à 0.75 (par exemple "stricter consensus") aurait laissé les tests passer silently : `pour: 70` avec THRESHOLD=0.75 retourne "divisé" (cassant le test "returns pour at threshold") MAIS le boundary test `pour: 7, contre: 2, abstention: 1` (= 70%) aurait CONTINUÉ à retourner "divisé" sans message d'erreur clair sur l'intent ("70% boundary inclusive"). Fix : export `THRESHOLD`, tests dérivent les inputs (par exemple `pour = THRESHOLD * 100`) + 2 tests new : "boundary inclusive (≥, not >)" derived from THRESHOLD + "just below THRESHOLD is divisé" + "THRESHOLD is the canonical 0.70" pin-the-value (déliberate bump via this test edit). · `src/lib/compute-positions.ts`, `tests/compute-positions.test.ts`
+- [FIXED] `useFlipCardA11y` keyboard guard `if (tgt.closest("a, button")) return;` untested · Sans ce guard, Enter sur le bouton ✨IA embarqué dans le recto déclencherait DEUX actions : (1) le onClick du bouton (open MethodeSheet), (2) le onFlip du card (flip to verso). Quand le modal ferme, la card est verso au lieu de recto — bug UX silent. Pareil pour ArrowRight sur le link AN dans le verso. Le guard existe depuis longtemps mais 0 test. 2 tests ajoutés : Enter sur un inner <button> n'appelle PAS onFlip, ArrowRight sur un inner <a> n'appelle PAS onSwipe. · `tests/useFlipCardA11y.test.tsx`
+
+### Vérifications à faire en session 116
+
+- [ ] grep `composeShareText\|SHARE_TOP_N` src/ tests/ → résultats dans share.ts + Result.tsx + share.test.ts
+- [ ] grep `^export const THRESHOLD` src/lib/compute-positions.ts → 1 résultat
+- [ ] grep `inner <button>\|inner <a>` tests/useFlipCardA11y.test.tsx → 2 résultats (les 2 nouveaux tests)
+- [ ] grep `~471 tests` CLAUDE.md → 0 résultat (aligné sur ~482)
