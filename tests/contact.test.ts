@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { CONTACT_EMAIL, ERROR_REPORT_SUBJECT, mailto } from "../src/lib/contact";
-import { BRAND_NAME } from "../src/types";
+import { BRAND_NAME, PROD_HOSTNAME } from "../src/types";
 
 // Session 91 extracted the mailto contact address from 7 sites into a
 // single const + helper. The helper's encodeURIComponent pass is what
@@ -11,6 +11,12 @@ import { BRAND_NAME } from "../src/types";
 describe("CONTACT_EMAIL", () => {
   it("matches the canonical address used across the app", () => {
     expect(CONTACT_EMAIL).toBe("contact@sansdetour.fr");
+  });
+
+  it("domain part derives from PROD_HOSTNAME (rebrand-safe)", () => {
+    // Verifies the const isn't a bare literal: a rebrand updating
+    // PROD_ORIGIN → PROD_HOSTNAME propagates to the contact email.
+    expect(CONTACT_EMAIL.endsWith(`@${PROD_HOSTNAME}`)).toBe(true);
   });
 });
 

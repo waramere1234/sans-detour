@@ -8,7 +8,7 @@ import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE } from "../lib/nav-state";
 import { mailto } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
-import { MIN_FOR_RANKING } from "../types";
+import { MIN_FOR_RANKING, PROD_HOSTNAME } from "../types";
 
 
 /** Top bar shown on every page except the Cover. Wordmark on the left
@@ -243,7 +243,7 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
               fontFamily: "var(--font-mono)", fontSize: 9.5,
               color: "var(--ink-3)", letterSpacing: "0.10em", textTransform: "uppercase",
             }}>
-              <span>sansdetour.fr</span>
+              <span>{PROD_HOSTNAME}</span>
               <span>v2 · données A.N.</span>
             </div>
           </motion.div>

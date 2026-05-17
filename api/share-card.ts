@@ -10,12 +10,12 @@ import { parseTopParam, MAX_SHARE_CARD_BARS } from "./_lib/parse-top";
 import {
   BRAND_BG, BRAND_ACCENT, BRAND_INK, BRAND_INK_2,
 } from "./_lib/brand-colors";
-import { PROD_ORIGIN } from "../src/types";
+import { PROD_HOSTNAME } from "../src/types";
 
-// "sansdetour.fr" footer text on the SVG card, derived from
-// PROD_ORIGIN (strip protocol + trailing slash) so a rebrand updates
-// the visible domain alongside the canonical URL via one edit.
-const FOOTER_HOSTNAME = PROD_ORIGIN.replace(/^https?:\/\//, "").replace(/\/$/, "");
+// "sansdetour.fr" footer text on the SVG card — PROD_HOSTNAME is the
+// canonical apex (derived from PROD_ORIGIN in src/types/index.ts) so
+// a rebrand updates the visible domain alongside the canonical URL
+// via one edit. Previously a stand-alone strip-protocol regex here.
 
 export const config = { runtime: "nodejs" };
 
@@ -93,7 +93,7 @@ export default async function handler(req: Request): Promise<Response> {
               })),
             },
           },
-          { type: "div", props: { style: { marginTop: "auto", fontSize: 28, color: INK_2 }, children: FOOTER_HOSTNAME } },
+          { type: "div", props: { style: { marginTop: "auto", fontSize: 28, color: INK_2 }, children: PROD_HOSTNAME } },
         ],
       },
     };

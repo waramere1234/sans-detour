@@ -59,10 +59,15 @@ export const BRAND_NAME = "Sans Détour";
  *  the canonical URL used by index.html's <link rel="canonical">,
  *  og:url, og:image (with `/icons/...` path appended), and
  *  twitter:image. A rebrand to a different domain edits this const
- *  and the 4 static call sites surface in tests/site-metadata.test.ts.
- *  Distinct from `ANALYTICS_HOSTS` (which also includes the www
- *  variant for the runtime track() gate). */
+ *  and the 4 static call sites surface in tests/site-metadata.test.ts. */
 export const PROD_ORIGIN = "https://sansdetour.fr";
+
+/** Production hostname (no protocol, no trailing slash) — derived from
+ *  PROD_ORIGIN so a rebrand updates the apex once and the share-card
+ *  footer, the TopBar menu-footer label, the contact email domain,
+ *  and the analytics gate's apex entry all follow. Previously a
+ *  literal "sansdetour.fr" duplicated across 4 sites. */
+export const PROD_HOSTNAME = PROD_ORIGIN.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
 /** BCP47 locale used by:
  *  - index.html (<html lang=...>)

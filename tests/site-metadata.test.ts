@@ -3,7 +3,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import {
   TAGLINE, BRAND_NAME, LEGISLATURE_LABEL_LOWERCASE, PROD_ORIGIN,
-  APP_LOCALE, OG_LOCALE,
+  PROD_HOSTNAME, APP_LOCALE, OG_LOCALE,
 } from "../src/types";
 
 // index.html + public/manifest.webmanifest both carry copy that the
@@ -146,6 +146,22 @@ describe("PROD_ORIGIN sync (index.html canonical + og:url + og:image + twitter:i
     const match = html.match(/<meta name="twitter:image" content="([^"]+)"/);
     expect(match).not.toBeNull();
     expect(match![1].startsWith(PROD_ORIGIN + "/")).toBe(true);
+  });
+});
+
+describe("PROD_HOSTNAME derivation + downstream sync", () => {
+  // PROD_HOSTNAME = PROD_ORIGIN with the protocol + trailing slash stripped.
+  // Used by the share-card SVG footer, the TopBar menu footer, the contact
+  // email domain, and the apex entry of ANALYTICS_HOSTS. Pin the derivation
+  // so a future PROD_ORIGIN rebrand propagates atomically.
+
+  it("PROD_HOSTNAME is PROD_ORIGIN minus the https:// protocol and trailing slash", () => {
+    expect(PROD_HOSTNAME).toBe(PROD_ORIGIN.replace(/^https?:\/\//, "").replace(/\/$/, ""));
+  });
+
+  it("PROD_HOSTNAME is a bare hostname (no scheme, no slash)", () => {
+    expect(PROD_HOSTNAME.startsWith("http")).toBe(false);
+    expect(PROD_HOSTNAME.includes("/")).toBe(false);
   });
 });
 

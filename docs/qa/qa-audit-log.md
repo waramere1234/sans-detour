@@ -3072,3 +3072,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `READING_PAGE_MAX_WIDTH` src/ tests/ → 5+ résultats
 - [ ] grep `"sansdetour.fr"` api/ → 0 résultat (literal disparu, derivé via PROD_ORIGIN)
 - [ ] grep `~580 tests` CLAUDE.md → 0 résultat (aligné sur ~582)
+
+---
+
+## Session 131 — 2026-05-17
+
+### Vérification session 130
+
+- [VERIFIED] 7 occurrences de ERROR_REPORT_SUBJECT dans src/ + tests/
+- [VERIFIED] 8 occurrences de READING_PAGE_MAX_WIDTH
+- [VERIFIED] 0 literal `"sansdetour.fr"` dans api/share-card.ts (derivation seulement)
+- [VERIFIED] CLAUDE.md "~582 tests"
+- 582/582 tests verts, typecheck clean
+
+### Bugs fixés (PROD_HOSTNAME extraction + TopBar/ANALYTICS_HOSTS/CONTACT_EMAIL derivation)
+
+- [FIXED] `src/components/TopBar.tsx:246` displaye `<span>sansdetour.fr</span>` inline (menu footer label) · Une rebrand updating PROD_ORIGIN aurait laissé ce visible label stale (user voit "sansdetour.com" sur le canonical URL mais "sansdetour.fr" en haut du menu). Fix : export `PROD_HOSTNAME = PROD_ORIGIN.replace(/^https?:\/\//, "").replace(/\/$/, "")` depuis src/types. TopBar.tsx importe + utilise. · `src/types/index.ts`, `src/components/TopBar.tsx`
+- [FIXED] `ANALYTICS_HOSTS` set hardcodait "sansdetour.fr" + "www.sansdetour.fr" en literals · Drift même surface : rebrand update les sites visibles mais oublie le runtime gate → events émis depuis la nouvelle prod sont bloqués (gate refuse l'apex). Fix : `ANALYTICS_HOSTS = new Set([PROD_HOSTNAME, \`www.${PROD_HOSTNAME}\`])` derived. 1 test analytics pin la derivation depuis PROD_HOSTNAME. · `src/lib/analytics.ts`, `tests/analytics.test.ts`
+- [FIXED] `CONTACT_EMAIL = "contact@sansdetour.fr"` literal hardcoded · La domain part suit le rebrand de PROD_ORIGIN ; seul le local-part ("contact") est stable. Fix : `CONTACT_EMAIL = \`${CONTACT_EMAIL_LOCAL}@${PROD_HOSTNAME}\`` avec CONTACT_EMAIL_LOCAL private. 1 test pin `CONTACT_EMAIL.endsWith(`@${PROD_HOSTNAME}`)` round-trip. Aussi : api/share-card.ts FOOTER_HOSTNAME (session 130 derivation locale) remplacé par PROD_HOSTNAME import direct — single source of truth. · `src/lib/contact.ts`, `tests/contact.test.ts`, `api/share-card.ts`
+
+### Vérifications à faire en session 132
+
+- [ ] grep `PROD_HOSTNAME` src/ api/ tests/ → 12+ résultats
+- [ ] grep `'"sansdetour\.fr"'` src/ api/ → 0 résultat (toutes derivées)
+- [ ] grep `~582 tests` CLAUDE.md → 0 résultat (aligné sur ~586)

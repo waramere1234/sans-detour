@@ -6,9 +6,14 @@
 // changing the address (or fronting a contact form one day) forced six
 // edits with drift risk.
 
-import { BRAND_NAME } from "../types";
+import { BRAND_NAME, PROD_HOSTNAME } from "../types";
 
-export const CONTACT_EMAIL = "contact@sansdetour.fr";
+/** Local-part of the contact mailbox. The full address composes
+ *  `${CONTACT_EMAIL_LOCAL}@${PROD_HOSTNAME}` so a domain rebrand
+ *  updates the email alongside the canonical URL. The local part is
+ *  expected to stay "contact" through brand transitions. */
+const CONTACT_EMAIL_LOCAL = "contact";
+export const CONTACT_EMAIL = `${CONTACT_EMAIL_LOCAL}@${PROD_HOSTNAME}`;
 
 /** Pre-filled subject for the "Signaler une erreur factuelle" mailto in
  *  MethodeSheet. Composed from BRAND_NAME so a rebrand propagates to

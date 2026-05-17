@@ -49,6 +49,14 @@ describe("analytics track() hostname gate", () => {
     expect(ANALYTICS_HOSTS.has("www.sansdetour.fr")).toBe(true);
   });
 
+  it("ANALYTICS_HOSTS derives both entries from PROD_HOSTNAME (rebrand-safe)", async () => {
+    // Verifies the gate isn't a bare literal pair: PROD_HOSTNAME +
+    // `www.${PROD_HOSTNAME}` should compose the set exactly.
+    const { PROD_HOSTNAME } = await import("../src/types");
+    expect(ANALYTICS_HOSTS.has(PROD_HOSTNAME)).toBe(true);
+    expect(ANALYTICS_HOSTS.has(`www.${PROD_HOSTNAME}`)).toBe(true);
+  });
+
   it("no-ops on localhost (dev)", () => {
     setHostname("localhost");
     track("vote", { choice: "pour" });

@@ -1,21 +1,23 @@
+import { PROD_HOSTNAME } from "../types";
+
 declare global {
   interface Window { plausible?: (event: string, options?: { props?: Record<string, string | number> }) => void; }
 }
 
-/** Plausible's <script data-domain="sansdetour.fr"> tag is loaded for every
+/** Plausible's <script data-domain="..."> tag is loaded for every
  *  origin (dev localhost, Vercel preview URLs, prod). Without this hostname
  *  gate, every dev session and every preview deploy would report events
  *  against the prod domain's dashboard. Allowed hostnames are the prod
- *  domain (with or without www) — extend this set if we add real staging
+ *  domain (apex + www variant) — extend this set if we add real staging
  *  later. Other hostnames (localhost, *.vercel.app preview, custom forks)
  *  no-op.
  *
- *  Exported so tests don't re-hardcode the same literals (previously
- *  duplicated 5× in tests/analytics.test.ts; a `sansdetour.fr → sansdetour.com`
- *  rebrand would have left those tests silently asserting the old domain). */
+ *  Derived from PROD_HOSTNAME (src/types) so a rebrand updates the
+ *  canonical URL + the runtime gate atomically — previously the apex
+ *  was duplicated as an inline "sansdetour.fr" literal. */
 export const ANALYTICS_HOSTS: ReadonlySet<string> = new Set([
-  "sansdetour.fr",
-  "www.sansdetour.fr",
+  PROD_HOSTNAME,
+  `www.${PROD_HOSTNAME}`,
 ]);
 
 /** All event names the app fires. Runtime-backed (rather than a type-only
