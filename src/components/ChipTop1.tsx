@@ -14,6 +14,10 @@ export function ChipTop1({ topGroup, pct, onTap }: ChipTop1Props) {
     <button
       type="button"
       onClick={onTap}
+      // The tap opens RankingOverlay (role="dialog" aria-modal). aria-haspopup
+      // tells SR users to expect a popup before they activate — matches the
+      // TopBar trigger's `aria-haspopup="menu"` pattern.
+      aria-haspopup="dialog"
       aria-label={`Top 1 actuel : ${getParty(topGroup).name} à ${pct} %. Toucher pour voir le classement complet.`}
       style={{
         display: "inline-flex",

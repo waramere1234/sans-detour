@@ -116,6 +116,10 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
                   type="button"
                   onClick={(e) => { e.stopPropagation(); onOpenMethode(); }}
                   onPointerDown={(e) => e.stopPropagation()}
+                  // The tap opens MethodeSheet (role="dialog" aria-modal).
+                  // aria-haspopup signals to SR users that a popup is coming
+                  // — same pattern as ChipTop1 and the TopBar trigger.
+                  aria-haspopup="dialog"
                   aria-label="IA — comment ce contenu a été préparé"
                   style={{
                     background: "transparent",

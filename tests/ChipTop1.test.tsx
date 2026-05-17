@@ -34,4 +34,11 @@ describe("ChipTop1", () => {
     render(<ChipTop1 topGroup="SOC" pct={30} onTap={vi.fn()} />);
     expect(screen.getByRole("button")).toHaveAttribute("type", "button");
   });
+
+  it("declares aria-haspopup=dialog so SR users know it opens a modal", () => {
+    // Session 93: ChipTop1 opens RankingOverlay (role="dialog" aria-modal).
+    // Without aria-haspopup, SR users don't know to expect a popup.
+    render(<ChipTop1 topGroup="DR" pct={48} onTap={vi.fn()} />);
+    expect(screen.getByRole("button")).toHaveAttribute("aria-haspopup", "dialog");
+  });
 });

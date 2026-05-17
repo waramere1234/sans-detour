@@ -261,7 +261,11 @@ export default function Result() {
             }}
             style={togglePersonnalitesBtn(showPersonnalites)}
             aria-expanded={showPersonnalites}
-            aria-controls="personnalites-panel"
+            // Only set aria-controls when the panel is mounted (line 283-ish,
+            // gated on `showPersonnalites`). Pointing at a non-existent id is
+            // undefined per WAI-ARIA and triggers warnings in some SR/devtool
+            // combos — same fix session 87 applied to PartyRow.
+            aria-controls={showPersonnalites ? "personnalites-panel" : undefined}
           >
             <span><span aria-hidden="true">{showPersonnalites ? "▾" : "▸"} </span>Voir les personnalités</span>
             <span style={{

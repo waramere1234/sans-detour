@@ -117,6 +117,14 @@ describe("Card a11y", () => {
     expect(onOpenMethode).toHaveBeenCalled();
   });
 
+  it("IA chip declares aria-haspopup=dialog (opens MethodeSheet modal)", () => {
+    // Session 93: the IA chip opens MethodeSheet (role="dialog" aria-modal).
+    // aria-haspopup tells SR users to expect a popup before they activate.
+    render(<Card scrutin={mkScrutin()} topMost={true} onOpenMethode={vi.fn()} />);
+    const chip = screen.getByRole("button", { name: /comment ce contenu a été préparé/i });
+    expect(chip).toHaveAttribute("aria-haspopup", "dialog");
+  });
+
   it("verso shows contexte, separator and intitulé AN in a single unified face", () => {
     render(<Card scrutin={mkScrutin()} topMost={true} />);
     fireEvent.keyDown(screen.getByRole("article"), { key: "Enter" });

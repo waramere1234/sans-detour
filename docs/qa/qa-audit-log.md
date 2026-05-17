@@ -2131,3 +2131,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `stripCitations\|stripVoteResult\|stripBoldMarkers` src/components/ → uniquement les imports depuis text-cleanup, aucun inline copy
 - [ ] `ls tests/contact.test.ts tests/nav-state.test.ts tests/text-cleanup.test.ts` → 3 fichiers présents
 - [ ] grep `~169 tests` CLAUDE.md → 0 résultat (aligné sur ~193)
+
+---
+
+## Session 93 — 2026-05-17
+
+### Vérification session 92
+
+- [VERIFIED] `src/lib/text-cleanup.ts` présent avec 3 exports (stripCitations, stripVoteResult, stripBoldMarkers)
+- [VERIFIED] `src/components/{Card,AuditTrail}.tsx` importent depuis `../lib/text-cleanup` ; aucune copie inline
+- [VERIFIED] 3 nouveaux test files présents
+- [VERIFIED] CLAUDE.md "~193 tests"
+- 193/193 tests verts, typecheck clean
+
+### Bugs fixés (3 a11y patterns invariants — aria-haspopup + aria-controls)
+
+- [FIXED] `ChipTop1` button manquait `aria-haspopup="dialog"` · Le chip ouvre `RankingOverlay` (`role="dialog" aria-modal="true"`). Sans aria-haspopup, les SR users ne savent pas qu'une popup va s'ouvrir avant qu'ils n'activent. TopBar `MenuTrigger` a déjà `aria-haspopup="menu"` — applique le même pattern aux 2 autres triggers modaux. · `src/components/ChipTop1.tsx`, `tests/ChipTop1.test.tsx`
+- [FIXED] `Card.tsx` ✨IA chip manquait `aria-haspopup="dialog"` · Le chip ouvre `MethodeSheet` (`role="dialog" aria-modal="true"`). Même defect que ChipTop1. Ajout de l'attribut + test dans `tests/Card.test.tsx`. · `src/components/Card.tsx`, `tests/Card.test.tsx`
+- [FIXED] `Result.tsx` "Voir les personnalités" toggle aria-controls vers DOM inexistant · Le bouton avait `aria-controls="personnalites-panel"` toujours set, mais le panel `<div id="personnalites-panel">` n'est rendu que sous condition `showPersonnalites === true` (line 273). Quand collapsed, aria-controls pointait vers un id absent du DOM — même defect que session 87 a fixé sur PartyRow. Conditionner sur `showPersonnalites ? "personnalites-panel" : undefined`. · `src/routes/Result.tsx`
+
+### Vérifications à faire en session 94
+
+- [ ] grep `aria-haspopup` src/components/ src/routes/ → 3 résultats (TopBar trigger + ChipTop1 + Card IA chip, tous 3 valides)
+- [ ] grep `aria-controls.*personnalites-panel` src/routes/Result.tsx → 1 résultat (conditionnel sur showPersonnalites)
+- [ ] grep -c "it(" tests/ChipTop1.test.tsx → 5 (était 4)
+- [ ] grep -c "it(" tests/Card.test.tsx → 19 (était 18)
