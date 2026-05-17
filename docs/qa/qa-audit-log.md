@@ -1814,3 +1814,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `partiels\b\|opposés\b\|alignés\b` dans `src/components/AuditTrail.tsx` → 0 résultat (singulier dans le code, plural ajouté via rule)
 - [ ] grep `indexées\b` dans `src/routes/Result.tsx` → 0 résultat (singulier dans le code)
 - [ ] `npm run test:run` → 132 tests verts (était 127)
+
+---
+
+## Session 80 — 2026-05-17
+
+### Vérification session 79
+
+- [VERIFIED] `AuditTrail.tsx` : aligné/partiel/opposé avec plural rule (sweep complet avec session 78)
+- [VERIFIED] `Result.tsx` indexée plural rule
+- [VERIFIED] `tests/themes.test.ts` existe, 5 cas
+- 132/132 tests verts, typecheck clean
+
+### Bugs fixés (3 count drifts + coverage gap)
+
+- [FIXED] CLAUDE.md test count drift · "~127 tests" stale post session 79 (+5 themes.test.ts → 132). Coverage list ne mentionnait pas "themes". Aligné sur ~132 + "themes" ajouté entre `analytics` et `Card`. · `CLAUDE.md`
+- [FIXED] User memory drifts · `MEMORY.md` + `project_sans-detour-v1-shipped.md` disaient "126 tests / 70 sessions / 210+ fixes" — sessions 71-79 ont ajouté 6 tests, 10 sessions, 30+ fixes. Aligné sur 132 / 80 / 240+. Coverage list inclut maintenant "themes". · `~/.claude/.../memory/{MEMORY.md, project_sans-detour-v1-shipped.md}` (hors repo)
+- [FIXED] `tests/parties.test.ts` coverage gap · 3 tests seulement, contre 6 dans `tests/personnalites.test.ts` (pattern symétrique). Manquait : non-empty short label sur chaque entrée, colorVar unique cross-groups, getPartyColorVar wrap pattern. 3 tests ajoutés pour aligner les 2 registries sur le même niveau de coverage. · `tests/parties.test.ts`
+
+### Vérifications à faire en session 81
+
+- [ ] grep `~127 tests` dans `CLAUDE.md` → 0 résultat
+- [ ] cat MEMORY.md → mentionne "132 tests"
+- [ ] grep -c "it(" tests/parties.test.ts → 6 (était 3)
