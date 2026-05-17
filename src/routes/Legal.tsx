@@ -13,6 +13,7 @@ import {
   LEGAL_HEBERGEUR_NAME, LEGAL_HEBERGEUR_ADDRESS,
   LEGAL_ANALYTICS_DESCRIPTION, LEGAL_DATA_LICENSE_LABEL,
   LEGAL_PERSONAL_DATA_BODY,
+  LEGAL_INDEPENDANCE_BODY,
 } from "../types";
 
 export default function Legal() {
@@ -45,7 +46,7 @@ export default function Legal() {
 
         <p><strong>{LEGAL_RGPD_HEADING_ANALYTICS}</strong> — {LEGAL_ANALYTICS_DESCRIPTION}</p>
 
-        <p><strong>{LEGAL_RGPD_HEADING_INDEPENDANCE}</strong> — Sans Détour est un projet indépendant. Aucune affiliation politique, médiatique ou institutionnelle.</p>
+        <p><strong>{LEGAL_RGPD_HEADING_INDEPENDANCE}</strong> — {LEGAL_INDEPENDANCE_BODY}</p>
 
         <p><strong>{LEGAL_RGPD_HEADING_SOURCES_DONNEES}</strong> — Open data officiel de l'Assemblée Nationale (<a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(AN_OPEN_DATA_HOSTNAME)}>{AN_OPEN_DATA_HOSTNAME}</a>), {LEGAL_DATA_LICENSE_LABEL}.</p>
 

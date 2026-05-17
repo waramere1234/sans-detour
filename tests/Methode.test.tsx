@@ -11,6 +11,8 @@ import {
   READING_PAGE_SECTION_PADDING,
   METHODE_SOMMAIRE_NAV_LABEL,
   METHODE_PAGE_H1,
+  METHODE_S06_NO_AFFILIATION_PHRASE,
+  METHODE_S06_HOSTING_FUNDING_BODY,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -81,6 +83,18 @@ describe("Methode — section structure", () => {
     const sectionIds = METHODE_SECTIONS.map(([n]) => n);
     const titleIds = Object.keys(METHODE_SECTION_BODY_TITLES);
     expect(titleIds.sort()).toEqual(sectionIds.slice().sort());
+  });
+
+  it("§06 surfaces METHODE_S06_NO_AFFILIATION_PHRASE (independence claim)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-06")!;
+    expect(section.textContent).toContain(METHODE_S06_NO_AFFILIATION_PHRASE);
+  });
+
+  it("§06 surfaces METHODE_S06_HOSTING_FUNDING_BODY (electoral-independence funding contract)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-06")!;
+    expect(section.textContent).toContain(METHODE_S06_HOSTING_FUNDING_BODY);
   });
 
   it("the number of rendered Section bodies matches METHODE_SECTIONS.length (no orphan body)", () => {

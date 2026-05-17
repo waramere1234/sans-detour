@@ -622,6 +622,30 @@ export const LEGAL_DATA_LICENSE_LABEL = "licence Etalab 2.0";
 export const LEGAL_PERSONAL_DATA_BODY =
   "Sans Détour ne collecte aucune donnée personnelle. Aucune inscription, aucun cookie de tracking. Toutes les interactions sont stockées localement dans le navigateur (localStorage). Aucune donnée n'est transmise à un serveur Sans Détour.";
 
+/** Legal.tsx Indépendance body — the editorial-independence claim
+ *  paired with Methode §06's parallel-but-differently-worded claim
+ *  ("Aucune affiliation parti / média / institution."). Both surfaces
+ *  document the same contract; they're intentionally worded differently
+ *  for Legal RGPD formality vs Methode plain prose. Pin the Legal one
+ *  so its formal wording doesn't drift. */
+export const LEGAL_INDEPENDANCE_BODY =
+  "Sans Détour est un projet indépendant. Aucune affiliation politique, médiatique ou institutionnelle.";
+
+/** Methode §06 "Aucune affiliation parti / média / institution."
+ *  — informal-prose version of the Legal independence claim. The
+ *  slash-separated list reads tighter on prose pages than Legal's
+ *  comma-separated formal version. Pin so the 2 paired claims don't
+ *  silently converge. */
+export const METHODE_S06_NO_AFFILIATION_PHRASE =
+  "Aucune affiliation parti / média / institution.";
+
+/** Methode §06 funding-disclosure prose — documents how Sans Détour is
+ *  funded (or rather not). The "pas de don accepté pendant les 6 mois
+ *  précédant un scrutin national" clause is the load-bearing electoral-
+ *  independence guarantee. Pin so a future weakening surfaces in tests. */
+export const METHODE_S06_HOSTING_FUNDING_BODY =
+  "Hébergement sur fonds personnels. Pas d'annonceur, pas de sponsor, pas de don accepté pendant les 6 mois précédant un scrutin national.";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

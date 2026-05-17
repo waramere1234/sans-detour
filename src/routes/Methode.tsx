@@ -20,6 +20,8 @@ import {
   METHODE_S07_HEADING_CE_QU_IL_NE_FAIT_PAS,
   METHODE_S07_HEADING_CADRE_BIAIS,
   METHODE_S07_HEADING_LIMITES_SIGNALEMENT,
+  METHODE_S06_NO_AFFILIATION_PHRASE,
+  METHODE_S06_HOSTING_FUNDING_BODY,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -180,8 +182,8 @@ export default function Methode() {
       </Section>
 
       <Section n="06" title={METHODE_SECTION_BODY_TITLES["06"]}>
-        <p>Sans Détour est un projet <strong>indépendant</strong>. Aucune affiliation parti / média / institution.</p>
-        <p>Hébergement sur fonds personnels. Pas d'annonceur, pas de sponsor, pas de don accepté pendant les 6 mois précédant un scrutin national.</p>
+        <p>Sans Détour est un projet <strong>indépendant</strong>. {METHODE_S06_NO_AFFILIATION_PHRASE}</p>
+        <p>{METHODE_S06_HOSTING_FUNDING_BODY}</p>
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)" }}>
           <li><a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(AN_OPEN_DATA_HOSTNAME)}>{AN_OPEN_DATA_HOSTNAME}</a> — {METHODE_LINK_ANNOTATION_OPEN_DATA}</li>
           {/* TODO production-blocker · github.com/sansdetour is a 404 today

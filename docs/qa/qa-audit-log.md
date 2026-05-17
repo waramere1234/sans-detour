@@ -3851,3 +3851,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `LEGAL_HEBERGEUR_NAME\|LEGAL_HEBERGEUR_ADDRESS\|LEGAL_ANALYTICS_DESCRIPTION\|LEGAL_DATA_LICENSE_LABEL\|LEGAL_PERSONAL_DATA_BODY` src/ tests/ → 20+ résultats
 - [ ] grep `"Vercel Inc.\|"340 S Lemon\|"Plausible"\|"licence Etalab 2.0"` src/ tests/ → 5-7 résultats (déclarations + pin-the-value)
 - [ ] grep `~820 tests` CLAUDE.md → 0 résultat (aligné sur ~833)
+
+---
+
+## Session 164 — 2026-05-18
+
+### Vérification session 163
+
+- [VERIFIED] 43 occurrences des 5 nouveaux exports (LEGAL_HEBERGEUR_NAME + ADDRESS + LEGAL_ANALYTICS_DESCRIPTION + LEGAL_DATA_LICENSE_LABEL + LEGAL_PERSONAL_DATA_BODY)
+- [VERIFIED] 8 occurrences inline literals = 4 déclarations + 4 pin-the-value tests (pas de drift)
+- [VERIFIED] CLAUDE.md "~833 tests"
+- 833/833 tests verts, typecheck clean
+
+### Bugs fixés (LEGAL_INDEPENDANCE_BODY + METHODE_S06_NO_AFFILIATION_PHRASE + METHODE_S06_HOSTING_FUNDING_BODY)
+
+- [FIXED] Legal.tsx Indépendance body `"Sans Détour est un projet indépendant. Aucune affiliation politique, médiatique ou institutionnelle."` inline + untested · Drift surface : RGPD-formal version of the editorial-independence claim paired with Methode §06's plain-prose variant. Sans pin, le formal wording pourrait silencieusement converger avec la informal version (perte de RGPD-formality). Fix : export `LEGAL_INDEPENDANCE_BODY`. Legal.tsx utilise la const. Legal test : 1 round-trip toContain. Aria-labels tests : 1 pin-the-value + 1 contains "affiliation" load-bearing token. · `src/types/index.ts`, `src/routes/Legal.tsx`, `tests/Legal.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode.tsx §06 phrase `"Aucune affiliation parti / média / institution."` inline + untested · Drift surface : informal-prose version of Legal's independence claim. Same contract, different register (slash-list vs comma-list). Pin so the 2 paired claims don't silently converge. Fix : export `METHODE_S06_NO_AFFILIATION_PHRASE`. Methode.tsx utilise la const inline après le `<strong>indépendant</strong>` token. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + anti-merge guard (LEGAL vs METHODE versions must remain distinct). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode.tsx §06 funding disclosure `"Hébergement sur fonds personnels. Pas d'annonceur, pas de sponsor, pas de don accepté pendant les 6 mois précédant un scrutin national."` inline + untested · Drift surface : électoral-independence load-bearing claim — le "no donations 6 months before an election" clause est le garant principal de l'indépendance électorale. Sans pin, un weakening silencieux (shorter window, drop "scrutin national") affaiblirait le contract documented. Fix : export `METHODE_S06_HOSTING_FUNDING_BODY`. Methode.tsx utilise la const. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + contains "6 mois" load-bearing window + contains "scrutin national" trigger. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 165
+
+- [ ] grep `LEGAL_INDEPENDANCE_BODY\|METHODE_S06_NO_AFFILIATION_PHRASE\|METHODE_S06_HOSTING_FUNDING_BODY` src/ tests/ → 15+ résultats
+- [ ] grep `"Sans Détour est un projet indépendant\|"Aucune affiliation parti\|"Hébergement sur fonds personnels"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~833 tests` CLAUDE.md → 0 résultat (aligné sur ~843)

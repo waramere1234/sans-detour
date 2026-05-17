@@ -15,6 +15,7 @@ import {
   LEGAL_HEBERGEUR_NAME, LEGAL_HEBERGEUR_ADDRESS,
   LEGAL_ANALYTICS_DESCRIPTION, LEGAL_DATA_LICENSE_LABEL,
   LEGAL_PERSONAL_DATA_BODY,
+  LEGAL_INDEPENDANCE_BODY,
 } from "../src/types";
 import { BACK_LINK_LABEL } from "../src/components/ReadingPageHeader";
 
@@ -122,6 +123,12 @@ describe("Legal — RGPD-required content", () => {
     renderLegal();
     const body = document.body.textContent || "";
     expect(body).toContain(LEGAL_PERSONAL_DATA_BODY);
+  });
+
+  it("indépendance block surfaces LEGAL_INDEPENDANCE_BODY verbatim", () => {
+    renderLegal();
+    const body = document.body.textContent || "";
+    expect(body).toContain(LEGAL_INDEPENDANCE_BODY);
   });
 });
 

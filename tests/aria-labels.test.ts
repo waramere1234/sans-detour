@@ -59,6 +59,9 @@ import {
   LEGAL_HEBERGEUR_NAME, LEGAL_HEBERGEUR_ADDRESS,
   LEGAL_ANALYTICS_DESCRIPTION, LEGAL_DATA_LICENSE_LABEL,
   LEGAL_PERSONAL_DATA_BODY,
+  LEGAL_INDEPENDANCE_BODY,
+  METHODE_S06_NO_AFFILIATION_PHRASE,
+  METHODE_S06_HOSTING_FUNDING_BODY,
   COVER_SECONDARY_NAV_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
@@ -1385,6 +1388,54 @@ describe("LEGAL_PERSONAL_DATA_BODY — privacy contract claim", () => {
 
   it("contains 'Aucune donnée n'est transmise à un serveur' (no-server claim)", () => {
     expect(LEGAL_PERSONAL_DATA_BODY).toContain("Aucune donnée n'est transmise à un serveur");
+  });
+});
+
+describe("LEGAL_INDEPENDANCE_BODY + METHODE_S06_NO_AFFILIATION_PHRASE — paired independence claims", () => {
+  // Both surfaces document the same editorial-independence contract
+  // but with intentionally different wording (Legal is RGPD-formal,
+  // Methode is plain prose with slash-separated list).
+  it("LEGAL_INDEPENDANCE_BODY matches the formal RGPD wording", () => {
+    expect(LEGAL_INDEPENDANCE_BODY).toBe(
+      "Sans Détour est un projet indépendant. Aucune affiliation politique, médiatique ou institutionnelle.",
+    );
+  });
+
+  it("METHODE_S06_NO_AFFILIATION_PHRASE matches the slash-list informal wording", () => {
+    expect(METHODE_S06_NO_AFFILIATION_PHRASE).toBe("Aucune affiliation parti / média / institution.");
+  });
+
+  it("both contain 'affiliation' (load-bearing token across both wordings)", () => {
+    // "Affiliation" is the load-bearing legal term — both wordings
+    // must keep it, regardless of which terms follow.
+    expect(LEGAL_INDEPENDANCE_BODY.toLowerCase()).toContain("affiliation");
+    expect(METHODE_S06_NO_AFFILIATION_PHRASE.toLowerCase()).toContain("affiliation");
+  });
+
+  it("the 2 wordings are intentionally distinct (anti-merge guard)", () => {
+    // Legal = comma-separated formal list; Methode = slash-separated
+    // tight list. A future merge to a single string would lose the
+    // RGPD-formal vs plain-prose register distinction.
+    expect(LEGAL_INDEPENDANCE_BODY).not.toBe(METHODE_S06_NO_AFFILIATION_PHRASE);
+  });
+});
+
+describe("METHODE_S06_HOSTING_FUNDING_BODY — Methode §06 funding disclosure", () => {
+  it("matches the canonical electoral-independence wording", () => {
+    expect(METHODE_S06_HOSTING_FUNDING_BODY).toBe(
+      "Hébergement sur fonds personnels. Pas d'annonceur, pas de sponsor, pas de don accepté pendant les 6 mois précédant un scrutin national.",
+    );
+  });
+
+  it("contains '6 mois' (load-bearing electoral-quiet-period clause)", () => {
+    // The "no donations 6 months before an election" clause is the
+    // load-bearing electoral-independence guarantee. A rewording that
+    // drops or shortens the window weakens the contract.
+    expect(METHODE_S06_HOSTING_FUNDING_BODY).toContain("6 mois");
+  });
+
+  it("contains 'scrutin national' (specifies what triggers the quiet period)", () => {
+    expect(METHODE_S06_HOSTING_FUNDING_BODY).toContain("scrutin national");
   });
 });
 
