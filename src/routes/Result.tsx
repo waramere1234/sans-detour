@@ -193,7 +193,7 @@ export default function Result() {
         <p style={{
           fontSize: 13, color: "var(--ink-2)",
           margin: "10px 0 0", letterSpacing: "-0.005em",
-        }}>{total} scrutins · {top.counted} comptés · {skips} skip{skips !== 1 ? "s" : ""}</p>
+        }}>{total} scrutin{total !== 1 ? "s" : ""} · {top.counted} compté{top.counted !== 1 ? "s" : ""} · {skips} skip{skips !== 1 ? "s" : ""}</p>
       </header>
 
       <div>

@@ -1769,3 +1769,25 @@ Format : `[STATUT] type · description · fix commit/file`
 
 - [ ] Modifier temporairement `TARGET = 21` dans `types/index.ts` → `npm run test:run` doit toujours passer (Cover test utilise la constante maintenant)
 - [ ] head des 2 plans dans docs/superpowers/plans/ → banner "SHIPPED" / "MOSTLY SHIPPED" visible
+
+---
+
+## Session 78 — 2026-05-17
+
+### Vérification session 77
+
+- [VERIFIED] `tests/Cover.test.tsx:52` utilise `i <= TARGET` (constante importée)
+- [VERIFIED] V1 plan banner "Status: SHIPPED" + V2.5 plan banner "Status: MOSTLY SHIPPED"
+- 127/127 tests verts, typecheck clean
+
+### Bugs fixés (spec doc obsolete + 2 French plural agreement)
+
+- [FIXED] `docs/superpowers/specs/2026-05-16-transparence-a11y-tests-design.md` plan-pair obsolete · La spec parente du plan V2.5 (session 77) avait elle aussi 18/0 cases cochées mais reflète des features mostly shipped. Future lecteur lirait une spec qui semble pas implémentée. Banner "Status: MOSTLY SHIPPED" ajouté, pointeurs vers plan + qa-log + CLAUDE.md pour l'état réel. · `docs/superpowers/specs/...`
+- [FIXED] French plural mismatch `AuditTrail` · La chip breakdown disait "{N} divisé non comptés" — `divisé` singulier collé à `comptés` pluriel. Avec divided_excluded = 2, render "2 divisé non comptés" — grammaire cassée. Plural rule `!== 1 ? "s" : ""` appliquée aux deux adjectifs : "divisé/divisés" + "compté/comptés". · `src/components/AuditTrail.tsx`
+- [FIXED] French plural mismatch `Result.tsx` header · "{total} scrutins · {top.counted} comptés · {skips} skip{s}" — `skip` avait déjà la règle (session 42), mais `scrutins` et `comptés` étaient hardcodés pluriels. Avec total = 1 (user qui a voté une fois), render "1 scrutins · 1 comptés" — faux. Plural rule appliquée aux 2 mots. · `src/routes/Result.tsx`
+
+### Vérifications à faire en session 79
+
+- [ ] DevTools localStorage : forcer une session à 1 seul vote sur un scrutin où top.counted = 1 → Result header dit "1 scrutin · 1 compté · 0 skips"
+- [ ] AuditTrail breakdown chip avec divided_excluded = 1 → "1 divisé non compté" (singulier sur les 2 adjectifs)
+- [ ] head de la spec V2.5 → banner "MOSTLY SHIPPED" visible

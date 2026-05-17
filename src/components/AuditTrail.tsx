@@ -77,7 +77,7 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
         <span><span style={{ color: "var(--pour)" }}><span aria-hidden="true">✓ </span>{alignment.perfect}</span> alignés</span>
         <span><span style={{ color: "var(--warn)" }}><span aria-hidden="true">≈ </span>{alignment.partial}</span> partiels</span>
         <span><span style={{ color: "var(--contre)" }}><span aria-hidden="true">✕ </span>{alignment.conflict}</span> opposés</span>
-        <span style={{ color: "var(--ink-3)" }}><span aria-hidden="true">÷ </span>{alignment.divided_excluded} divisé non comptés</span>
+        <span style={{ color: "var(--ink-3)" }}><span aria-hidden="true">÷ </span>{alignment.divided_excluded} divisé{alignment.divided_excluded !== 1 ? "s" : ""} non compté{alignment.divided_excluded !== 1 ? "s" : ""}</span>
       </div>
 
       {/* Per-scrutin breakdown */}

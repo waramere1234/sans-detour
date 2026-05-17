@@ -1,5 +1,13 @@
 # Spec — Transparence IA + A11y + Tests (V2.5)
 
+> ⚠ **Status: MOSTLY SHIPPED (historical).** The 18 unchecked boxes
+> below were never ticked as features landed via the plan
+> (`docs/superpowers/plans/2026-05-16-transparence-a11y-tests.md`) and
+> the audit log (`docs/qa/qa-audit-log.md`). The ✨IA chip, MethodeSheet,
+> useFlipCardA11y hook, ErrorBoundary, both Skeletons and the 127-test
+> suite are live. Treat this as an archived design doc, not a tracking
+> list — see CLAUDE.md for current state.
+
 > **Date** : 2026-05-16
 > **Branche cible** : `claude/check-app-access-9Yvx0` (puis merge vers `feat/v1-implementation`)
 > **Effort estimé** : ~7-9 jours dev solo
