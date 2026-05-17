@@ -2305,3 +2305,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] `ls src/hooks/useFreshnessOnce.ts` → présent
 - [ ] grep `fetchedRef` src/routes/ → 0 résultat (les 2 consumers passent par le hook)
 - [ ] grep `~251 tests` CLAUDE.md → 0 résultat (aligné sur ~256)
+
+---
+
+## Session 100 — 2026-05-17
+
+### Vérification session 99
+
+- [VERIFIED] `AnalyticsEvent` exporté + utilisé dans `track()` signature
+- [VERIFIED] `src/hooks/useFreshnessOnce.ts` présent
+- [VERIFIED] 0 résultat pour `fetchedRef` dans src/routes/ (les 2 consumers passent par le hook)
+- [VERIFIED] CLAUDE.md "~256 tests"
+- 256/256 tests verts, typecheck clean
+
+### Bugs fixés (extractConcrete extraction + tests + PartyRow/PersonnaliteRow coverage)
+
+- [FIXED] `extractConcrete` enfoui dans AuditTrail.tsx · 40 lignes de text-processing pur (sentence-boundary regex avec `(?=\.\s+[A-Z]|\.?$)`, comma-fallback pour les drifts LLM `Concrètement, …` au lieu de `Concrètement :`) vivaient inline dans AuditTrail comme fonction non-exportée. Pas le bon home — son cousin stripCitations vit déjà dans `src/lib/text-cleanup.ts`. Déplacé là, AuditTrail importe maintenant `extractConcrete` depuis le lib (et drop les 2 imports stripCitations/stripBoldMarkers individuels — ils sont déjà utilisés par extractConcrete). · `src/lib/text-cleanup.ts`, `src/components/AuditTrail.tsx`
+- [FIXED] `extractConcrete` 0 test coverage · La fonction a plusieurs edge cases non-évidents : sentence-boundary regex (period+space+capital ou fin de string), comma-fallback (LLM drift), citation strip via stripCitations partagé (orphan tags), bold strip, trim de période finale. 10 tests ajoutés dans `tests/text-cleanup.test.ts` couvrant : undefined/empty input, no marker, "Concrètement :" + "Par exemple :", comma-fallback drift, case-insensitive, citation strip, bold strip, trailing period trim, first match wins. · `tests/text-cleanup.test.ts`
+- [FIXED] `PartyRow` + `PersonnaliteRow` 0 dedicated test coverage · Les 2 composants accumulent 8+ sessions d'invariants (SR-friendly aria-label session 25, plural rule session 81, aria-controls gating session 87, LOW_DATA_THRESHOLD path session 86). Refactor silencieux régressait. Ajout `tests/PartyRow.test.tsx` (16 tests : rendering, plural rule, interactive behavior, aria-expanded/aria-controls gating) + `tests/PersonnaliteRow.test.tsx` (7 tests : normal path, tooLittleData path, plural rule pour vote/comparable). · `tests/PartyRow.test.tsx` (nouveau), `tests/PersonnaliteRow.test.tsx` (nouveau)
+
+### Vérifications à faire en session 101
+
+- [ ] `ls tests/PartyRow.test.tsx tests/PersonnaliteRow.test.tsx` → 2 fichiers présents
+- [ ] grep `export function extractConcrete` src/lib/text-cleanup.ts → 1 résultat (moved here)
+- [ ] grep `function extractConcrete` src/components/AuditTrail.tsx → 0 résultat (removed)
+- [ ] grep `~256 tests` CLAUDE.md → 0 résultat (aligné sur ~287)

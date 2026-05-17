@@ -3,6 +3,7 @@ import {
   stripCitations,
   stripVoteResult,
   stripBoldMarkers,
+  extractConcrete,
 } from "../src/lib/text-cleanup";
 
 // Session 92 extracted these from Card.tsx (Card was inline-only) and
@@ -86,5 +87,70 @@ describe("stripBoldMarkers", () => {
 
   it("returns input unchanged with no markers", () => {
     expect(stripBoldMarkers("Texte ordinaire.")).toBe("Texte ordinaire.");
+  });
+});
+
+// Session 100: extractConcrete moved from AuditTrail.tsx into this lib
+// (the natural home — it's pure text processing). Tests pin the
+// sentence-boundary regex + comma-fallback drift handling, which are
+// non-obvious and easy to break in a future refactor.
+describe("extractConcrete", () => {
+  it("returns null when contexte is undefined or empty", () => {
+    expect(extractConcrete(undefined)).toBeNull();
+    expect(extractConcrete("")).toBeNull();
+  });
+
+  it("returns null when neither marker is present", () => {
+    expect(extractConcrete("La loi modifie le code du travail.")).toBeNull();
+  });
+
+  it("extracts the sentence after 'Concrètement :'", () => {
+    expect(extractConcrete(
+      "Première phrase. Concrètement : la TVA monte à 25%. Phrase suivante.",
+    )).toBe("la TVA monte à 25%");
+  });
+
+  it("extracts the sentence after 'Par exemple :'", () => {
+    expect(extractConcrete(
+      "Contexte général. Par exemple : un foyer médian paiera 200€ de plus.",
+    )).toBe("un foyer médian paiera 200€ de plus");
+  });
+
+  it("handles the comma-drift fallback ('Concrètement, …')", () => {
+    // The LLM occasionally drops the colon — extractConcrete falls back
+    // to a comma marker so the bullet doesn't surface with a leading ", ".
+    expect(extractConcrete(
+      "Contexte. Concrètement, la TVA monte à 25%.",
+    )).toBe("la TVA monte à 25%");
+  });
+
+  it("matches the marker case-insensitively", () => {
+    expect(extractConcrete("CONCRÈTEMENT : la loi entre en vigueur en 2027."))
+      .toBe("la loi entre en vigueur en 2027");
+  });
+
+  it("strips Anthropic <cite> citation markup from the bullet", () => {
+    expect(extractConcrete(
+      `Contexte. Concrètement : la <cite index="1">TVA</cite> monte à 25%.`,
+    )).toBe("la TVA monte à 25%");
+  });
+
+  it("strips **bold** markup from the bullet", () => {
+    expect(extractConcrete(
+      "Contexte. Concrètement : la **TVA** monte à **25%**.",
+    )).toBe("la TVA monte à 25%");
+  });
+
+  it("trims the trailing period from the matched sentence", () => {
+    // Implementation does `.replace(/\.$/, "")` after the regex match.
+    expect(extractConcrete(
+      "Concrètement : la mesure prend effet en 2026.",
+    )).toBe("la mesure prend effet en 2026");
+  });
+
+  it("returns the first match when both markers are present", () => {
+    expect(extractConcrete(
+      "Concrètement : la TVA monte. Par exemple : 200€ de plus.",
+    )).toBe("la TVA monte");
   });
 });

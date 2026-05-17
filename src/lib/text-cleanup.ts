@@ -42,3 +42,29 @@ export function stripVoteResult(text: string): string {
 export function stripBoldMarkers(text: string): string {
   return text.replace(/\*\*(.+?)\*\*/g, "$1");
 }
+
+/** Extract the first "Concrètement :" or "Par exemple :" sentence from the
+ *  contexte field, returning a clean one-line bullet (no citations, no
+ *  bold markup, no trailing period). Returns `null` when neither marker is
+ *  present (fallback summaries don't have these).
+ *
+ *  The sentence-boundary regex `(?=\.\s+[A-Z]|\.?$)` matches:
+ *  - a period followed by whitespace then a capital letter (start of next
+ *    sentence), OR
+ *  - end of string (optionally preceded by a period).
+ *
+ *  The optional `[:,]?` after the marker handles the LLM's occasional
+ *  drift from "Concrètement :" to "Concrètement, …" — without the comma
+ *  fallback, the bullet would surface with a leading ", " that the
+ *  later trim can't recover. */
+export function extractConcrete(contexte?: string): string | null {
+  if (!contexte) return null;
+  // stripCitations handles both wrapped `<cite>…</cite>` and orphan
+  // opening/closing tags (LLM mid-token cut).
+  const cleaned = stripCitations(contexte);
+  const m = cleaned.match(/(?:Concrètement|Par exemple)\s*[:,]?\s*([^]+?)(?=\.\s+[A-Z]|\.?$)/i);
+  if (!m) return null;
+  const sentence = m[1].trim().replace(/\.$/, "");
+  // AuditTrail row is dense — bold markup adds noise without emphasis value.
+  return stripBoldMarkers(sentence);
+}

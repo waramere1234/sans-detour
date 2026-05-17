@@ -2,7 +2,7 @@
 import type { GroupAlignment, Scrutin, SessionVote } from "../types";
 import { alignmentScore } from "../lib/matching";
 import { getParty } from "../lib/parties";
-import { stripCitations, stripBoldMarkers } from "../lib/text-cleanup";
+import { extractConcrete } from "../lib/text-cleanup";
 
 export interface AuditTrailProps {
   alignment: GroupAlignment;
@@ -133,26 +133,3 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
   );
 }
 
-/** Extract the first "Concrètement :" or "Par exemple :" sentence from the
- *  contexte field. Returns null if neither marker is present (fallback data
- *  doesn't have these). Strips Anthropic web_search citation tags, **bold**
- *  markup, and trailing punctuation to keep the bullet visually compact. */
-function extractConcrete(contexte?: string): string | null {
-  if (!contexte) return null;
-  // Use the shared stripCitations (session 92): handles wrapped tags AND
-  // orphan opening/closing tags (a model that cut its output mid-token).
-  // The previous inline version was missing the orphan-strip pass, so a
-  // malformed `<cite ...>` without a `</cite>` would leak into the bullet.
-  const cleaned = stripCitations(contexte);
-  // Match "Concrètement :" or "Par exemple :" (or rarely a comma instead of
-  // colon if the LLM drifts from its spec — see ingest-an.ts SYSTEM_PROMPT)
-  // followed by content up to the next sentence boundary (period followed by
-  // space + capital, or end of string). Without the comma fallback, a drifted
-  // contexte "Concrètement, la loi…" would surface in the bullet with a
-  // leading ", " — the trim/punctuation pass can't recover that.
-  const m = cleaned.match(/(?:Concrètement|Par exemple)\s*[:,]?\s*([^]+?)(?=\.\s+[A-Z]|\.?$)/i);
-  if (!m) return null;
-  const sentence = m[1].trim().replace(/\.$/, "");
-  // Strip **bold** markers — the AuditTrail row is dense, no need for emphasis
-  return stripBoldMarkers(sentence);
-}
