@@ -2354,3 +2354,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] `ls tests/useFlipCardA11y.test.tsx tests/Wordmark.test.tsx` → 2 fichiers présents
 - [ ] grep -c "it(" tests/useFlipCardA11y.test.tsx → 13
 - [ ] grep `~287 tests` CLAUDE.md → 0 résultat (aligné sur ~305)
+
+---
+
+## Session 102 — 2026-05-17
+
+### Vérification session 101
+
+- [VERIFIED] 0 résultat pour `{ fromLogo: true }` literal dans tests/ (nav-state.test.ts a juste un comment ref)
+- [VERIFIED] tests/useFlipCardA11y.test.tsx + tests/Wordmark.test.tsx présents
+- [VERIFIED] CLAUDE.md "~305 tests"
+- 305/305 tests verts, typecheck clean
+
+### Bugs fixés (env dedup — Supabase 4× + Anthropic 3× + tests)
+
+- [FIXED] `requireSupabaseEnv` + `requireSupabaseClient` dédupliqués sur 4 scripts · ingest-an.ts, resume-ingest.ts, seed-supabase.ts, ingest-personnalites.ts inlinaient tous le pattern `process.env.SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` + guard + `createClient(URL!, KEY!)`. Le `!` non-null assertion était nécessaire dans 3 des 4 scripts parce que `createClient` était à l'intérieur d'un async `main()` où TS ne carry pas le narrowing depuis le module scope (verified session 89). Extraction dans `scripts/lib/env.ts` : `requireSupabaseEnv()` retourne `{url: string, key: string}` narrowed, `requireSupabaseClient()` enchaîne avec `createClient`. Les 4 scripts simplifiés ; aucun `!` restant. · `scripts/lib/env.ts` (nouveau), `scripts/{ingest-an,resume-ingest,seed-supabase,ingest-personnalites}.ts`
+- [FIXED] `requireAnthropicEnv` dédupliqué sur 3 scripts · `process.env.ANTHROPIC_API_KEY` + guard `if (!ANTHROPIC_KEY) { console.error; process.exit(1) }` dans resume-ingest.ts + debug-batch.ts (ingest-an.ts garde sa lecture top-level parce que la clé est optionnelle — le fallback path sans Anthropic est valide pour ce script). Extraction de `requireAnthropicEnv()` dans le même module env.ts. · `scripts/lib/env.ts`, `scripts/resume-ingest.ts`, `scripts/debug-batch.ts`
+- [FIXED] `env.ts` 0 test à l'extraction · 7 tests dans `tests/env.test.ts` couvrant les 3 helpers : success-path (URL+KEY set → narrowed string return), compile-time narrow assertion (assigning to `string` without `!`), failure paths (URL missing, KEY missing, ANTHROPIC missing → process.exit(1) + console.error contenant la variable manquante), requireSupabaseClient retourne un objet avec `.from()` chainable (smoke test sans network). · `tests/env.test.ts` (nouveau)
+
+### Vérifications à faire en session 103
+
+- [ ] grep `process.env.SUPABASE_URL\\b` scripts/ → uniquement dans lib/env.ts (la déclaration extracted)
+- [ ] grep `createClient(SUPABASE` scripts/ → 0 résultat (tout passe par requireSupabaseClient)
+- [ ] grep `SUPABASE_URL!` scripts/ → 0 résultat (no more `!` assertions)
+- [ ] grep `~305 tests` CLAUDE.md → 0 résultat (aligné sur ~312)

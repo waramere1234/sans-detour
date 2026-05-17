@@ -17,7 +17,6 @@
 //   BATCH_ID=msgbatch_01... \
 //   npx tsx scripts/resume-ingest.ts
 
-import { createClient } from "@supabase/supabase-js";
 import {
   type Summary,
   type BatchResultLine,
@@ -26,16 +25,18 @@ import {
 } from "./lib/parse-summary";
 import { type ParsedScrutinCore } from "./lib/an-parse";
 import { iterEligibleScrutins } from "./lib/an-cache";
+import { requireSupabaseClient, requireAnthropicEnv } from "./lib/env";
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
+// SUPABASE_* + ANTHROPIC_API_KEY are validated lazily via the helpers
+// inside main(); BATCH_ID is script-specific so we still read + guard it
+// here (clearer error than letting requireAnthropicEnv pass and the
+// fetch URL fail).
 const BATCH_ID = process.env.BATCH_ID;
-
-if (!SUPABASE_URL || !SUPABASE_KEY || !ANTHROPIC_KEY || !BATCH_ID) {
-  console.error("Missing env: need SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, ANTHROPIC_API_KEY, BATCH_ID");
+if (!BATCH_ID) {
+  console.error("Missing BATCH_ID env (the msgbatch_… id from a previous ingest:an run)");
   process.exit(1);
 }
+const ANTHROPIC_KEY = requireAnthropicEnv();
 
 // ──────────────────── AN parsing ─────────────────────────────────────────────
 // CACHE_DIR + JSON_DIR + iterEligibleScrutins live in scripts/lib/an-cache.ts
@@ -100,7 +101,7 @@ async function main(): Promise<void> {
     return { ...parsed, ...s, ingere_le: ingestedAt };
   });
 
-  const sb = createClient(SUPABASE_URL!, SUPABASE_KEY!);
+  const sb = requireSupabaseClient();
   console.log(`↑ Upserting ${rows.length} rows in scrutins…`);
   const CHUNK = 100;
   for (let i = 0; i < rows.length; i += CHUNK) {

@@ -21,21 +21,13 @@
 //   SUPABASE_SERVICE_ROLE_KEY=... \
 //   npx tsx scripts/ingest-personnalites.ts
 
-import { createClient } from "@supabase/supabase-js";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { PERSONNALITES } from "../src/lib/personnalites";
 import { PERSONNALITE_CODES } from "../src/types";
 import type { PersonnaliteCode, PersonnaliteVote } from "../src/types";
 import { JSON_DIR } from "./lib/an-cache";
-
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-  console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env");
-  process.exit(1);
-}
+import { requireSupabaseClient } from "./lib/env";
 
 // JSON_DIR lives in scripts/lib/an-cache.ts; this script reads the
 // nominative votes (decompteNominatif) which the shared iterEligibleScrutins
@@ -115,7 +107,7 @@ async function main(): Promise<void> {
     console.log(`  · ${meta.display_name.padEnd(22)} ${meta.acteur_ref}`);
   }
 
-  const sb = createClient(SUPABASE_URL!, SUPABASE_KEY!);
+  const sb = requireSupabaseClient();
   const { data: scrutinsInDb, error: listErr } = await sb.from("scrutins").select("id");
   if (listErr) throw new Error(`Could not list scrutins: ${listErr.message}`);
   const targetIds = new Set((scrutinsInDb ?? []).map((r) => r.id as string));

@@ -1,0 +1,55 @@
+// scripts/lib/env.ts
+//
+// Shared environment-variable readers + Supabase client factory for the
+// ingest scripts. Before this lib, each of the 4 Supabase scripts and 3
+// Anthropic-touching scripts inlined:
+//
+//   const SUPABASE_URL = process.env.SUPABASE_URL;
+//   const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+//   if (!SUPABASE_URL || !SUPABASE_KEY) {
+//     console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env");
+//     process.exit(1);
+//   }
+//   // …
+//   const sb = createClient(SUPABASE_URL!, SUPABASE_KEY!);
+//
+// The `!` was forced because TypeScript narrows the const at module scope
+// after the if-guard, but async main() runs in a new scope without that
+// narrowing (verified in session 89). Centralising the read + validate
+// step lets the caller skip the `!` because the helper returns narrowed
+// `string` values directly.
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+
+/** Read SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY from `process.env` and
+ *  exit the process with a clear message when either is missing. Returns
+ *  the pair as narrowed `string`s for use at any scope (top-level or
+ *  inside async functions) without `!` assertions. */
+export function requireSupabaseEnv(): { url: string; key: string } {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env");
+    process.exit(1);
+  }
+  return { url, key };
+}
+
+/** Read + validate the Supabase env and return a ready-to-use service-
+ *  role client. Convenience wrapper around `requireSupabaseEnv` +
+ *  `createClient` — the most common path. */
+export function requireSupabaseClient(): SupabaseClient {
+  const { url, key } = requireSupabaseEnv();
+  return createClient(url, key);
+}
+
+/** Read ANTHROPIC_API_KEY from `process.env` and exit the process with a
+ *  clear message when missing. Returns the narrowed `string` for callers
+ *  that need to thread it into Anthropic API requests. */
+export function requireAnthropicEnv(): string {
+  const key = process.env.ANTHROPIC_API_KEY;
+  if (!key) {
+    console.error("Missing ANTHROPIC_API_KEY env");
+    process.exit(1);
+  }
+  return key;
+}

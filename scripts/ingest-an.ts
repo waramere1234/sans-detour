@@ -15,7 +15,6 @@
 // truncated form of the raw AN libellé. Re-run later with the key set
 // to upgrade the rows in place.
 
-import { createClient } from "@supabase/supabase-js";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
@@ -28,17 +27,14 @@ import {
 } from "./lib/parse-summary";
 import { type ParsedScrutinCore } from "./lib/an-parse";
 import { CACHE_DIR, JSON_DIR, iterEligibleScrutins } from "./lib/an-cache";
+import { requireSupabaseClient } from "./lib/env";
 
 // ───────────────────────────────────────────────────────────────── config
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY are validated lazily via
+// requireSupabaseClient() in main(); ANTHROPIC_API_KEY is read at module
+// top-level (optional — the fallback path runs without it).
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-  console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env");
-  process.exit(1);
-}
 
 const BULK_URL =
   "https://data.assemblee-nationale.fr/static/openData/repository/17/loi/scrutins/Scrutins.json.zip";
@@ -487,7 +483,7 @@ async function main(): Promise<void> {
   }
 
   console.log(`↑ Upserting ${enriched.length} scrutins to Supabase…`);
-  const sb = createClient(SUPABASE_URL!, SUPABASE_KEY!);
+  const sb = requireSupabaseClient();
   // Wipe demo fixtures first to avoid mixed state. We identify them as the
   // rows whose url_an_officielle is empty (fixture marker).
   const { error: delErr } = await sb.from("scrutins").delete().eq("url_an_officielle", "");

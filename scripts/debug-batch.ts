@@ -9,18 +9,15 @@
 // or
 //   ANTHROPIC_API_KEY=sk-ant-... npx tsx scripts/debug-batch.ts msgbatch_XXX
 
-const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
-const batchId = process.argv[2];
+import { requireAnthropicEnv } from "./lib/env";
 
-if (!ANTHROPIC_KEY) {
-  console.error("Missing ANTHROPIC_API_KEY env var.");
-  process.exit(1);
-}
+const batchId = process.argv[2];
 if (!batchId || !batchId.startsWith("msgbatch_")) {
   console.error("Usage: npm run debug:batch <msgbatch_XXX>");
   console.error("Example: npm run debug:batch msgbatch_016AL9tcWj3SZE5mR6f516bM");
   process.exit(1);
 }
+const ANTHROPIC_KEY = requireAnthropicEnv();
 
 async function main() {
   // First, status of the batch
