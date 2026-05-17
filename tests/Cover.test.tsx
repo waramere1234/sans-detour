@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import Cover from "../src/routes/Cover";
 import { resetSession, recordVote } from "../src/lib/session";
+import { TARGET } from "../src/types";
 
 function renderCover(initialEntries: InitialEntry[] = ["/"]) {
   return render(
@@ -45,8 +46,10 @@ describe("Cover", () => {
 
   it("redirects to /result when hasSeenCover and votes >= TARGET (completed)", () => {
     localStorage.setItem("sd_seen_cover", "true");
-    // Record TARGET votes so the completion branch fires.
-    for (let i = 1; i <= 20; i++) recordVote(`s${i}`, "pour");
+    // Record TARGET votes so the completion branch fires. Loop bound uses
+    // the constant so changing TARGET in types/index.ts doesn't silently
+    // detach this test from the redirect's actual threshold.
+    for (let i = 1; i <= TARGET; i++) recordVote(`s${i}`, "pour");
     renderCover();
     expect(screen.getByText("result page")).toBeInTheDocument();
     expect(screen.queryByText("play page")).not.toBeInTheDocument();

@@ -1,5 +1,11 @@
 # Sans Détour V1 Implementation Plan
 
+> ⚠ **Status: SHIPPED (historical).** V1 has been live since 2026-05-11 on
+> `sans-detour.vercel.app`. The 136 unchecked boxes below were never ticked
+> as the plan executed — treat this as an archived design doc, not a
+> tracking list. For current state see `CLAUDE.md` + the V2 roadmap;
+> for actual progress see `git log` and `docs/qa/qa-audit-log.md`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Ship the Sans Détour V1 — a French web app where users swipe on real Assemblée Nationale votes to discover their actual political alignment by parliamentary group.

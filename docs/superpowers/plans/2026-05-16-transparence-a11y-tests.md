@@ -1,5 +1,14 @@
 # Sans Détour V2.5 — Transparence IA + A11y + Tests Implementation Plan
 
+> ⚠ **Status: MOSTLY SHIPPED (historical).** ~90% of this plan landed in
+> production via small commits over sessions 28-67 — the ✨IA chip,
+> MethodeSheet, useFlipCardA11y hook, ErrorBoundary, both Skeletons, the
+> 127-test suite, and the Methode landmarks all live in the codebase
+> today. The 109 unchecked boxes were never ticked as the plan executed
+> piecemeal — treat this as an archived design doc, not a tracking list.
+> See `CLAUDE.md` for current state and `docs/qa/qa-audit-log.md` for
+> the actual fix-by-fix record.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Rendre visible la nature mixte du contenu (données AN officielles vs résumés IA Claude) sans claim défensif, fixer l'a11y des cartes flippables, et fonder une première couche de tests UI + audit algo.

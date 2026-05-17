@@ -1747,3 +1747,25 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `motions référendaires` dans `src/routes/Methode.tsx` → 1 résultat
 - [ ] grep `pedago_relu: true` dans `tests/` → 0 résultat
 - [ ] grep `~126 tests` dans `CLAUDE.md` → 0 résultat
+
+---
+
+## Session 77 — 2026-05-17
+
+### Vérification session 76
+
+- [VERIFIED] `Methode §02` énumère 5 catégories incluant "motions référendaires"
+- [VERIFIED] Zéro `pedago_relu: true` dans `tests/`
+- [VERIFIED] `CLAUDE.md` "~127 tests"
+- 127/127 tests verts, typecheck clean
+
+### Bugs fixés (test DRY drift + 2 plan docs obsolètes)
+
+- [FIXED] `tests/Cover.test.tsx:49` hardcoded `i <= 20` · Le commentaire et l'`it()` description parlent de "TARGET" mais la boucle utilise le littéral 20. Si TARGET passe à 21 dans `types/index.ts`, le test enregistrerait 20 votes seulement → `votes >= TARGET=21` faux → pas de redirect vers /result → assertion échoue. Drift silencieux. Import `TARGET` + boucle `i <= TARGET`. · `tests/Cover.test.tsx`
+- [FIXED] `docs/superpowers/plans/2026-05-09-sans-detour-v1.md` plan obsolète · 136 cases unchecked, 0 cochées — mais V1 a shippé en prod 2026-05-11 et toutes les features y sont. Le plan était une exploration design, pas un tracker. Un futur dev (humain ou Claude) qui lit ça pense que tout reste à faire. Banner "Status: SHIPPED (historical)" ajouté au-dessus, avec pointeurs vers CLAUDE.md et qa-audit-log pour l'état réel. · `docs/superpowers/plans/2026-05-09-sans-detour-v1.md`
+- [FIXED] `docs/superpowers/plans/2026-05-16-transparence-a11y-tests.md` plan obsolète · Même problème pour le V2.5 plan : 6/115 cases cochées mais ~90% des features (chip IA, MethodeSheet, useFlipCardA11y, ErrorBoundary, Skeletons, 127 tests, Methode landmarks) sont live. Banner "Status: MOSTLY SHIPPED" ajouté avec pointeurs vers le state actuel. · `docs/superpowers/plans/2026-05-16-transparence-a11y-tests.md`
+
+### Vérifications à faire en session 78
+
+- [ ] Modifier temporairement `TARGET = 21` dans `types/index.ts` → `npm run test:run` doit toujours passer (Cover test utilise la constante maintenant)
+- [ ] head des 2 plans dans docs/superpowers/plans/ → banner "SHIPPED" / "MOSTLY SHIPPED" visible
