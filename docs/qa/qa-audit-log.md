@@ -2976,3 +2976,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep "data-domain" tests/analytics.test.ts → 1 résultat (le sync test)
 - [ ] grep "main()\.catch" scripts/seed-supabase.ts → 1 résultat (l'ajout)
 - [ ] grep `~555 tests` CLAUDE.md → 0 résultat (aligné sur ~557)
+
+---
+
+## Session 127 — 2026-05-17
+
+### Vérification session 126
+
+- [VERIFIED] 5 lignes "noscript" dans tests/brand-colors.test.ts (le nouveau pin)
+- [VERIFIED] 5 lignes "data-domain" dans tests/analytics.test.ts (le sync test)
+- [VERIFIED] seed-supabase.ts a main().catch
+- [VERIFIED] CLAUDE.md "~557 tests"
+- 557/557 tests verts, typecheck clean
+
+### Bugs fixés (TAGLINE + BRAND_NAME + LEGISLATURE_LABEL_LOWERCASE sync entre TS + static files)
+
+- [FIXED] Tagline `"Pas les programmes. Les vrais votes."` dupliqué 5× dans static files · sites : `index.html` (meta description + og:description prefix + twitter:description + title compound) + `public/manifest.webmanifest` (description). Plus split dans Cover.tsx pour le hero styling. Une rewording aurait demandé 5 edits aux static files en lockstep, plus le source — sinon l'OG preview + le tab title + la PWA manifest divergent. Fix : export `TAGLINE` depuis src/types/index.ts. Les static files restent inline mais 5 tests dans `tests/site-metadata.test.ts` lisent index.html + manifest et asserts chaque field. og:description teste avec `.startsWith(TAGLINE)` (la string est étendue avec marketing copy). · `src/types/index.ts`, `tests/site-metadata.test.ts` (nouveau)
+- [FIXED] Brand name `"Sans Détour"` dupliqué 5× dans static files (manifest name + short_name + index.html og:title + twitter:title + title compound) · Même drift surface. Fix : export `BRAND_NAME = "Sans Détour"`. 5 tests pin chaque site. · `src/types/index.ts`, `tests/site-metadata.test.ts`
+- [FIXED] `index.html:46` og:description hardcode `"17e législature"` (lowercase) · Drift vs `LEGISLATURE_LABEL = "17e LÉGISLATURE"` (uppercase, exporté session 119). Une V3 transition vers 18e bumperait LEGISLATURE_LABEL mais oublier l'og:description silently laisse les social previews stale (showed dans les WhatsApp/Slack/iMessage thumbnails). Fix : export `LEGISLATURE_LABEL_LOWERCASE = "17e législature"` (sibling const, lowercase variant pour la prose). 1 test pin l'og:description `.toContain(LEGISLATURE_LABEL_LOWERCASE)`. · `src/types/index.ts`, `tests/site-metadata.test.ts`
+
+### Vérifications à faire en session 128
+
+- [ ] `ls tests/site-metadata.test.ts` → présent
+- [ ] grep `TAGLINE\|BRAND_NAME\|LEGISLATURE_LABEL_LOWERCASE` src/ tests/ → 10+ résultats
+- [ ] grep `~557 tests` CLAUDE.md → 0 résultat (aligné sur ~568)

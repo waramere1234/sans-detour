@@ -36,6 +36,25 @@ export const MAX_WORDS_PER_BULLET = 7;
  *  Cover + Result + Methode + Legal scavenger hunt. */
 export const LEGISLATURE_LABEL = "17e LÉGISLATURE";
 
+/** Lowercase variant of the legislature label for prose copy — used in
+ *  index.html og:description ("…de la 17e législature.") and matched
+ *  by tests/site-metadata.test.ts to keep the static HTML in sync with
+ *  the V3 transition. */
+export const LEGISLATURE_LABEL_LOWERCASE = "17e législature";
+
+/** Tagline rendered on the Cover hero (split across JSX nodes for the
+ *  accent color) AND surfaced in 5 static-file sites: index.html meta
+ *  description + og:description prefix + twitter:description + title
+ *  + manifest.webmanifest description. tests/site-metadata.test.ts
+ *  reads each file and asserts the tagline matches this const, so a
+ *  rewording propagates from one edit. */
+export const TAGLINE = "Pas les programmes. Les vrais votes.";
+
+/** Public app name — used by the PWA manifest (name + short_name) and
+ *  surfaced in index.html (og:title + twitter:title + the compound
+ *  <title>). Same sync invariant as TAGLINE. */
+export const BRAND_NAME = "Sans Détour";
+
 /** Official AN open-data portal — both the user-facing reference (Methode
  *  §01 + §06 prose, Legal data-sources block) and the script-side bulk
  *  download (`scripts/ingest-an.ts` builds `${AN_OPEN_DATA_URL}static/...`
