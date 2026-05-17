@@ -28,6 +28,8 @@ import {
   METHODE_S03_DIVIDED_RULE_BODY, METHODE_S03_DIVIDED_RULE_TAIL,
   METHODE_S03_GROUP_INTRO,
   METHODE_S07_MISE_EN_FORME_CLOSER, METHODE_S07_LIBELLE_BRUT_GUARANTEE,
+  METHODE_PAGE_LEAD_INTRO, METHODE_PAGE_LEAD_PURE_MATH,
+  METHODE_S04_OPENER, METHODE_S02_EXCLUSIONS_SUFFIX,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -113,7 +115,7 @@ export default function Methode() {
           lineHeight: 1.15, letterSpacing: "-0.022em", margin: "10px 0 0",
         }}>{METHODE_PAGE_H1}<span style={{ color: "var(--accent)" }}>.</span></h1>
         <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.55, marginTop: 12 }}>
-          Aucune opinion, aucun panel. <strong>Le calcul d'alignement est une formule mathématique pure — l'IA n'y intervient pas.</strong> En revanche, les résumés, les points clés et les synthèses des scrutins sont mis en forme par Claude (voir <a href="#methode-07" style={{ color: "var(--accent)" }}>section 07</a>).
+          {METHODE_PAGE_LEAD_INTRO} <strong>{METHODE_PAGE_LEAD_PURE_MATH}</strong> En revanche, les résumés, les points clés et les synthèses des scrutins sont mis en forme par Claude (voir <a href="#methode-07" style={{ color: "var(--accent)" }}>section 07</a>).
         </p>
       </header>
 
@@ -155,7 +157,7 @@ export default function Methode() {
       </Section>
 
       <Section n="02" title={METHODE_SECTION_BODY_TITLES["02"]}>
-        <p>On garde les <strong>scrutins solennels</strong> (SPS), les <strong>votes finaux sur l'ensemble d'une loi</strong> (SOR), les <strong>motions de censure</strong>, les <strong>motions référendaires</strong> et les <strong>propositions de résolution</strong>. On exclut les amendements, les votes en commission et les motions procédurales (rejet préalable, renvoi).</p>
+        <p>On garde les <strong>scrutins solennels</strong> (SPS), les <strong>votes finaux sur l'ensemble d'une loi</strong> (SOR), les <strong>motions de censure</strong>, les <strong>motions référendaires</strong> et les <strong>propositions de résolution</strong>. {METHODE_S02_EXCLUSIONS_SUFFIX}</p>
         <p>Pour chaque session, on en tire <strong>{TARGET}</strong> en équilibrant les thèmes (santé, immigration, fiscalité…) plutôt qu'au hasard pur, avec deux garde-fous : <strong>jamais plus de {DEFAULT_CAP_PER_DOSSIER} scrutins du même dossier législatif</strong> et <strong>jamais plus de {DEFAULT_CAP_PER_CHAPEAU_PREFIX} scrutins du même sujet</strong> (pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée).</p>
       </Section>
 
@@ -170,7 +172,7 @@ export default function Methode() {
       </Section>
 
       <Section n="04" title={METHODE_SECTION_BODY_TITLES["04"]}>
-        <p>Pour chaque groupe, on compare ce que tu as voté à ce que ce groupe a voté, scrutin par scrutin :</p>
+        <p>{METHODE_S04_OPENER}</p>
         <Formula>
           Score par scrutin :<br/>
           &nbsp;&nbsp;+1 si ton vote = position du groupe<br/>

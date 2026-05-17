@@ -17,6 +17,8 @@ import {
   METHODE_S05_NO_TRACKING_PHRASE,
   METHODE_S03_GROUP_INTRO,
   METHODE_S07_MISE_EN_FORME_CLOSER, METHODE_S07_LIBELLE_BRUT_GUARANTEE,
+  METHODE_PAGE_LEAD_INTRO, METHODE_PAGE_LEAD_PURE_MATH,
+  METHODE_S04_OPENER, METHODE_S02_EXCLUSIONS_SUFFIX,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -129,6 +131,25 @@ describe("Methode — section structure", () => {
     renderMethode();
     const section = document.getElementById("methode-07")!;
     expect(section.textContent).toContain(METHODE_S07_LIBELLE_BRUT_GUARANTEE);
+  });
+
+  it("page-lead surfaces METHODE_PAGE_LEAD_INTRO + METHODE_PAGE_LEAD_PURE_MATH (anti-bias framing)", () => {
+    renderMethode();
+    const body = document.body.textContent || "";
+    expect(body).toContain(METHODE_PAGE_LEAD_INTRO);
+    expect(body).toContain(METHODE_PAGE_LEAD_PURE_MATH);
+  });
+
+  it("§04 surfaces METHODE_S04_OPENER (alignment-calculation lead before <Formula>)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-04")!;
+    expect(section.textContent).toContain(METHODE_S04_OPENER);
+  });
+
+  it("§02 surfaces METHODE_S02_EXCLUSIONS_SUFFIX (excluded scrutin types)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-02")!;
+    expect(section.textContent).toContain(METHODE_S02_EXCLUSIONS_SUFFIX);
   });
 
   it("the number of rendered Section bodies matches METHODE_SECTIONS.length (no orphan body)", () => {

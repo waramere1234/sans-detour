@@ -698,6 +698,28 @@ export const METHODE_S07_MISE_EN_FORME_CLOSER = "Mise en forme, pas commentaire.
 export const METHODE_S07_LIBELLE_BRUT_GUARANTEE =
   "Le libellé officiel brut est affiché sur la face Résumé du verso de chaque carte";
 
+/** Methode page-lead paragraph (under h1, above §01) — opens with an
+ *  anti-bias framing then the strong-tagged "pure math" guarantee.
+ *  Both phrases are load-bearing IA-transparency claims. Splitting
+ *  around the <strong> JSX boundary so each can be pinned separately. */
+export const METHODE_PAGE_LEAD_INTRO = "Aucune opinion, aucun panel.";
+export const METHODE_PAGE_LEAD_PURE_MATH =
+  "Le calcul d'alignement est une formule mathématique pure — l'IA n'y intervient pas.";
+
+/** Methode §04 lead paragraph — opens the alignment-calculation
+ *  section before the <Formula> block. Same ":" anti-orphan-formula
+ *  contract as METHODE_S03_GROUP_INTRO. */
+export const METHODE_S04_OPENER =
+  "Pour chaque groupe, on compare ce que tu as voté à ce que ce groupe a voté, scrutin par scrutin :";
+
+/** Methode §02 closing sentence on excluded scrutin types — the
+ *  symmetric "what we drop" claim paired with the "what we keep"
+ *  strong-tagged list above it. Load-bearing methodology disclosure
+ *  on the filtering rule (paired with `isEligibleScrutin` in
+ *  scripts/lib/an-filter.ts). */
+export const METHODE_S02_EXCLUSIONS_SUFFIX =
+  "On exclut les amendements, les votes en commission et les motions procédurales (rejet préalable, renvoi).";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

@@ -3920,3 +3920,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `METHODE_S03_GROUP_INTRO\|METHODE_S07_MISE_EN_FORME_CLOSER\|METHODE_S07_LIBELLE_BRUT_GUARANTEE` src/ tests/ → 15+ résultats
 - [ ] grep `"Un groupe parlementaire compte\|"Mise en forme, pas commentaire"\|"Le libellé officiel brut est affiché"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~852 tests` CLAUDE.md → 0 résultat (aligné sur ~861)
+
+---
+
+## Session 167 — 2026-05-18
+
+### Vérification session 166
+
+- [VERIFIED] 27 occurrences des 3 nouveaux exports (METHODE_S03_GROUP_INTRO + METHODE_S07_MISE_EN_FORME_CLOSER + METHODE_S07_LIBELLE_BRUT_GUARANTEE)
+- [VERIFIED] 2 occurrences inline literal = 1 déclaration + 1 pin-the-value test (clean)
+- [VERIFIED] CLAUDE.md "~861 tests"
+- 861/861 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_PAGE_LEAD_INTRO/PURE_MATH + METHODE_S04_OPENER + METHODE_S02_EXCLUSIONS_SUFFIX)
+
+- [FIXED] Methode page-lead paragraph (under h1) inline + untested : `"Aucune opinion, aucun panel."` + `"Le calcul d'alignement est une formule mathématique pure — l'IA n'y intervient pas."` · Drift surface : 2 load-bearing IA-transparency claims qui ouvrent la page Méthode — la "no opinion / no panel" framing + la "pure math, not IA" guarantee. Un rewording silencieux affaibrait le contract de transparency IA. Fix : export `METHODE_PAGE_LEAD_INTRO` + `METHODE_PAGE_LEAD_PURE_MATH` (split autour du `<strong>` JSX). Methode test : 1 round-trip toContain × 2. Aria-labels tests : pin-the-value × 2 + contains "formule mathématique" + "l'IA n'y intervient pas" anti-IA-tinting guards. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §04 opener `"Pour chaque groupe, on compare ce que tu as voté à ce que ce groupe a voté, scrutin par scrutin :"` inline + untested · Drift surface : lead paragraph qui introduit le `<Formula>` alignment-calculation block. Le trailing ":" est load-bearing pour l'orphaning visuel du formula (paired avec METHODE_S03_GROUP_INTRO). Fix : export `METHODE_S04_OPENER`. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + ends-with-":" anti-formula-orphan + contains "scrutin par scrutin" per-vote-granularity guard. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §02 closing sentence `"On exclut les amendements, les votes en commission et les motions procédurales (rejet préalable, renvoi)."` inline + untested · Drift surface : load-bearing exclusion claim documenting les 3 filter categories (amendements / commissions / procédurales) qui doivent rester synchronisés avec `isEligibleScrutin` dans scripts/lib/an-filter.ts. Un drift silencieux dans la doc côté Methode tromperait les users. Fix : export `METHODE_S02_EXCLUSIONS_SUFFIX`. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + contains 3 filter-category tokens (amendements + commission + motions procédurales) anti-merge guard. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 168
+
+- [ ] grep `METHODE_PAGE_LEAD_INTRO\|METHODE_PAGE_LEAD_PURE_MATH\|METHODE_S04_OPENER\|METHODE_S02_EXCLUSIONS_SUFFIX` src/ tests/ → 15+ résultats
+- [ ] grep `"Aucune opinion, aucun panel"\|"formule mathématique pure"\|"Pour chaque groupe, on compare"\|"On exclut les amendements"` src/ tests/ → 4-7 résultats (déclarations + pin-the-value)
+- [ ] grep `~861 tests` CLAUDE.md → 0 résultat (aligné sur ~872)

@@ -68,6 +68,8 @@ import {
   METHODE_S03_DIVIDED_RULE_BODY, METHODE_S03_DIVIDED_RULE_TAIL,
   METHODE_S03_GROUP_INTRO,
   METHODE_S07_MISE_EN_FORME_CLOSER, METHODE_S07_LIBELLE_BRUT_GUARANTEE,
+  METHODE_PAGE_LEAD_INTRO, METHODE_PAGE_LEAD_PURE_MATH,
+  METHODE_S04_OPENER, METHODE_S02_EXCLUSIONS_SUFFIX,
   COVER_SECONDARY_NAV_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
@@ -1540,6 +1542,62 @@ describe("METHODE_S07_MISE_EN_FORME_CLOSER + METHODE_S07_LIBELLE_BRUT_GUARANTEE 
     // against the raw AN libellé. A rewording that drops the
     // "officiel" qualifier softens the source-of-truth claim.
     expect(METHODE_S07_LIBELLE_BRUT_GUARANTEE).toContain("libellé officiel");
+  });
+});
+
+describe("METHODE_PAGE_LEAD_INTRO + METHODE_PAGE_LEAD_PURE_MATH — anti-bias page-lead framing", () => {
+  it("INTRO matches 'Aucune opinion, aucun panel.'", () => {
+    expect(METHODE_PAGE_LEAD_INTRO).toBe("Aucune opinion, aucun panel.");
+  });
+
+  it("PURE_MATH matches the 'formule mathématique pure' claim", () => {
+    expect(METHODE_PAGE_LEAD_PURE_MATH).toBe(
+      "Le calcul d'alignement est une formule mathématique pure — l'IA n'y intervient pas.",
+    );
+  });
+
+  it("PURE_MATH contains 'formule mathématique' + 'IA n'y intervient pas' (anti-IA-tinting guards)", () => {
+    // The page-lead promises: scoring is math, not IA. Both tokens
+    // must remain — a regression dropping either softens the contract.
+    expect(METHODE_PAGE_LEAD_PURE_MATH).toContain("formule mathématique");
+    expect(METHODE_PAGE_LEAD_PURE_MATH).toContain("l'IA n'y intervient pas");
+  });
+});
+
+describe("METHODE_S04_OPENER — alignment-calculation formula lead", () => {
+  it("matches the canonical opener", () => {
+    expect(METHODE_S04_OPENER).toBe(
+      "Pour chaque groupe, on compare ce que tu as voté à ce que ce groupe a voté, scrutin par scrutin :",
+    );
+  });
+
+  it("ends with ':' (anti-formula-orphan guard, paired with METHODE_S03_GROUP_INTRO)", () => {
+    expect(METHODE_S04_OPENER.trimEnd().endsWith(":")).toBe(true);
+  });
+
+  it("contains 'scrutin par scrutin' (load-bearing per-vote granularity claim)", () => {
+    // The alignment math operates per-scrutin, not aggregated.
+    // A rewording that drops the "scrutin par scrutin" qualifier
+    // weakens the methodological transparency.
+    expect(METHODE_S04_OPENER).toContain("scrutin par scrutin");
+  });
+});
+
+describe("METHODE_S02_EXCLUSIONS_SUFFIX — §02 excluded scrutin types", () => {
+  it("matches the canonical exclusion claim", () => {
+    expect(METHODE_S02_EXCLUSIONS_SUFFIX).toBe(
+      "On exclut les amendements, les votes en commission et les motions procédurales (rejet préalable, renvoi).",
+    );
+  });
+
+  it("lists 'amendements' + 'commission' + 'motions procédurales' (anti-merge guard)", () => {
+    // The 3 excluded categories are documented in scripts/lib/an-filter.ts
+    // (isEligibleScrutin) — they're the load-bearing filter rules.
+    // A regression that omits one of the 3 would silently desync
+    // the user-facing documentation from the actual filter logic.
+    expect(METHODE_S02_EXCLUSIONS_SUFFIX).toContain("amendements");
+    expect(METHODE_S02_EXCLUSIONS_SUFFIX).toContain("commission");
+    expect(METHODE_S02_EXCLUSIONS_SUFFIX).toContain("motions procédurales");
   });
 });
 
