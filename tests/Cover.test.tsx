@@ -7,15 +7,16 @@ import {
 import Cover from "../src/routes/Cover";
 import { resetSession, recordVote } from "../src/lib/session";
 import { FROM_LOGO_STATE } from "../src/lib/nav-state";
+import { ROUTES } from "../src/lib/routes";
 import { TARGET } from "../src/types";
 
-function renderCover(initialEntries: InitialEntry[] = ["/"]) {
+function renderCover(initialEntries: InitialEntry[] = [ROUTES.cover]) {
   return render(
     <MemoryRouter initialEntries={initialEntries}>
       <Routes>
-        <Route path="/" element={<Cover />} />
-        <Route path="/play" element={<div>play page</div>} />
-        <Route path="/result" element={<div>result page</div>} />
+        <Route path={ROUTES.cover} element={<Cover />} />
+        <Route path={ROUTES.play} element={<div>play page</div>} />
+        <Route path={ROUTES.result} element={<div>result page</div>} />
       </Routes>
     </MemoryRouter>
   );
@@ -59,7 +60,7 @@ describe("Cover", () => {
   it("stays on cover when navigated with state.fromLogo=true (bypass auto-resume)", () => {
     localStorage.setItem("sd_seen_cover", "true");
     recordVote("s1", "pour");
-    renderCover([{ pathname: "/", state: FROM_LOGO_STATE }]);
+    renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
     // votes=1, hasInProgress=true → primary CTA reads "Reprendre", not
     // "Commencer". Match on /reprendre/i so the assertion can't be
     // accidentally satisfied by the secondary "Recommencer à zéro"

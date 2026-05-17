@@ -2427,3 +2427,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `"/?affinement=1"` src/ → 0 résultat (uniquement PLAY_AFFINEMENT const)
 - [ ] grep -c "it(" tests/routes.test.ts → 6
 - [ ] grep `~317 tests` CLAUDE.md → 0 résultat (aligné sur ~323)
+
+---
+
+## Session 105 — 2026-05-17
+
+### Vérification session 104
+
+- [VERIFIED] 0 résultat pour route literals dans src/ (hors lib/routes.ts)
+- [VERIFIED] PLAY_AFFINEMENT utilisé partout (pas de `?affinement=1` literal)
+- [VERIFIED] tests/routes.test.ts a 6 `it()`
+- [VERIFIED] CLAUDE.md "~323 tests"
+- 323/323 tests verts, typecheck clean
+
+### Bugs fixés (2 component test gaps + test-route literal drift)
+
+- [FIXED] `AuditTrail` 0 test coverage · Composant substantiel (per-group breakdown panel sur /result) avec : filtering des votes (skip excluded), mapping score → icon/color/label (4 branches : divisé null, perfect=1, partial=0.5, conflict=0), aria-labelledby region landmark, AN link vs "démo" fallback span pour url_an_officielle empty, breakdown chips avec plural rule (sessions 78-83). 16 tests ajoutés couvrant chacune de ces invariants. · `tests/AuditTrail.test.tsx` (nouveau)
+- [FIXED] `DeckStack` 0 test coverage · Composant petit mais logic-heavy (top-3 slice du deck, swipe direction → UserVote mapping, aria-hidden sur non-top wrappers, onOpenMethode forwarding au top card seulement). 7 tests : empty deck → null, ≤3 cards rendered, aria-hidden patterns, ArrowLeft/Right/Down → contre/pour/skip, IA chip rendered seulement sur top card. · `tests/DeckStack.test.tsx` (nouveau)
+- [FIXED] `tests/Cover.test.tsx:17-18` Route paths hardcodés · Le mock router contenait encore les literals `<Route path="/play">` + `<Route path="/result">` après l'extraction ROUTES en session 104. Même drift que session 101 a fixé pour `{ fromLogo: true }` — un rename `/play` → `/swipe` casserait le mock silencieusement. Imports ROUTES + migration des 3 sites (Route paths + l'initial entry `pathname`). · `tests/Cover.test.tsx`
+
+### Vérifications à faire en session 106
+
+- [ ] `ls tests/AuditTrail.test.tsx tests/DeckStack.test.tsx` → 2 fichiers présents
+- [ ] grep `"/play"\|"/result"` tests/Cover.test.tsx → 0 résultat (ROUTES const partout)
+- [ ] grep `~323 tests` CLAUDE.md → 0 résultat (aligné sur ~344)
+- [ ] grep -c "it(" tests/AuditTrail.test.tsx → 16
