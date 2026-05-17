@@ -18,7 +18,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
-import type { ScrutinAnalyse, Theme } from "../src/types";
+import { AN_OPEN_DATA_URL, type ScrutinAnalyse, type Theme } from "../src/types";
 import {
   type Summary,
   type BatchResultLine,
@@ -30,6 +30,7 @@ import { CACHE_DIR, JSON_DIR, iterEligibleScrutins } from "./lib/an-cache";
 import {
   requireSupabaseClient,
   ANTHROPIC_BATCHES_URL, anthropicBatchUrl, anthropicBatchResultsUrl,
+  anthropicHeaders,
 } from "./lib/env";
 
 // ───────────────────────────────────────────────────────────────── config
@@ -39,8 +40,11 @@ import {
 // top-level (optional — the fallback path runs without it).
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
 
+// Built from AN_OPEN_DATA_URL (src/types) so a domain change updates
+// both the user-facing references on Methode/Legal AND this ingest base
+// in one edit.
 const BULK_URL =
-  "https://data.assemblee-nationale.fr/static/openData/repository/17/loi/scrutins/Scrutins.json.zip";
+  `${AN_OPEN_DATA_URL}static/openData/repository/17/loi/scrutins/Scrutins.json.zip`;
 // CACHE_DIR + JSON_DIR live in scripts/lib/an-cache.ts (shared with
 // resume-ingest.ts + ingest-personnalites.ts). ZIP_PATH is local since
 // only this script downloads the bulk archive.
@@ -337,11 +341,13 @@ function buildRequestParams(scrutin: { titre_brut: string; dossier_titre: string
 
 // ─────────────────────────────────────────────────────── Batches API client
 
-const COMMON_HEADERS = () => ({
-  "content-type": "application/json",
-  "x-api-key": ANTHROPIC_KEY!,
-  "anthropic-version": "2023-06-01",
-});
+// COMMON_HEADERS is only invoked from submitBatch / pollBatch /
+// fetchBatchResults, all reached AFTER the `if (!ANTHROPIC_KEY)` guard
+// in main() — so the `!` is intentional (ANTHROPIC_KEY is optional at
+// module scope for the fallback-summary path; once we enter the LLM
+// path it's narrowed). anthropicHeaders centralises the api-key +
+// version + content-type triple so a version bump is a single edit.
+const COMMON_HEADERS = () => anthropicHeaders(ANTHROPIC_KEY!);
 
 async function submitBatch(scrutins: ParsedScrutin[]): Promise<string> {
   const requests = scrutins.map((s) => ({

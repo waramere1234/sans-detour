@@ -12,6 +12,7 @@
 import {
   requireAnthropicEnv,
   anthropicBatchUrl, anthropicBatchResultsUrl,
+  anthropicHeaders,
 } from "./lib/env";
 
 const batchId = process.argv[2];
@@ -26,10 +27,7 @@ async function main() {
   // First, status of the batch
   console.log(`→ Fetching status of ${batchId}…\n`);
   const statusR = await fetch(anthropicBatchUrl(batchId), {
-    headers: {
-      "x-api-key": ANTHROPIC_KEY,
-      "anthropic-version": "2023-06-01",
-    },
+    headers: anthropicHeaders(ANTHROPIC_KEY),
   });
   if (!statusR.ok) {
     console.error(`Status fetch failed: ${statusR.status} ${await statusR.text()}`);
@@ -40,10 +38,7 @@ async function main() {
   // Then fetch the JSONL results
   console.log(`\n→ Fetching results…\n`);
   const resultsR = await fetch(anthropicBatchResultsUrl(batchId), {
-    headers: {
-      "x-api-key": ANTHROPIC_KEY,
-      "anthropic-version": "2023-06-01",
-    },
+    headers: anthropicHeaders(ANTHROPIC_KEY),
   });
   if (!resultsR.ok) {
     console.error(`Results fetch failed: ${resultsR.status} ${await resultsR.text()}`);

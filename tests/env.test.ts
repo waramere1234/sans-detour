@@ -4,8 +4,10 @@ import {
   requireSupabaseClient,
   requireAnthropicEnv,
   ANTHROPIC_BATCHES_URL,
+  ANTHROPIC_API_VERSION,
   anthropicBatchUrl,
   anthropicBatchResultsUrl,
+  anthropicHeaders,
 } from "../scripts/lib/env";
 
 // Session 102 extracted these helpers from 4 ingest scripts. The
@@ -161,5 +163,38 @@ describe("ANTHROPIC_BATCHES_URL + anthropicBatchUrl / anthropicBatchResultsUrl",
     const fakeBase = ANTHROPIC_BATCHES_URL;
     expect(anthropicBatchUrl("ID").startsWith(fakeBase + "/")).toBe(true);
     expect(anthropicBatchResultsUrl("ID").endsWith("/results")).toBe(true);
+  });
+});
+
+describe("ANTHROPIC_API_VERSION + anthropicHeaders", () => {
+  // Previously 4 inline `"anthropic-version": "2023-06-01"` headers across
+  // 3 scripts (ingest-an, debug-batch × 2, resume-ingest). A version bump
+  // (e.g. 2024-...) would mean 4 edits with drift risk. Centralised here.
+
+  it("pins the API version date documented in Anthropic's versioning guide", () => {
+    expect(ANTHROPIC_API_VERSION).toBe("2023-06-01");
+  });
+
+  it("anthropicHeaders threads the api key + version + content-type", () => {
+    const h = anthropicHeaders("sk-ant-test");
+    expect(h["x-api-key"]).toBe("sk-ant-test");
+    expect(h["anthropic-version"]).toBe(ANTHROPIC_API_VERSION);
+    expect(h["content-type"]).toBe("application/json");
+  });
+
+  it("anthropicHeaders accepts any string (the optional-key context too)", () => {
+    // ingest-an's fallback path passes `ANTHROPIC_KEY!` after a runtime
+    // guard, not a narrowed string from requireAnthropicEnv. Pin that
+    // anthropicHeaders doesn't add an extra constraint beyond `string`.
+    const h = anthropicHeaders("");
+    expect(h["x-api-key"]).toBe("");
+  });
+
+  it("returns a fresh object each call (no shared-reference contamination)", () => {
+    const a = anthropicHeaders("k1");
+    const b = anthropicHeaders("k2");
+    expect(a).not.toBe(b);
+    expect(a["x-api-key"]).toBe("k1");
+    expect(b["x-api-key"]).toBe("k2");
   });
 });

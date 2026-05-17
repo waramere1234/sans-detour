@@ -36,6 +36,14 @@ export const MAX_WORDS_PER_BULLET = 7;
  *  Cover + Result + Methode + Legal scavenger hunt. */
 export const LEGISLATURE_LABEL = "17e LÉGISLATURE";
 
+/** Official AN open-data portal — both the user-facing reference (Methode
+ *  §01 + §06 prose, Legal data-sources block) and the script-side bulk
+ *  download (`scripts/ingest-an.ts` builds `${AN_OPEN_DATA_URL}static/...`
+ *  off this root). A future AN domain change touches 4 sites; one const
+ *  keeps them in lockstep. Trailing slash kept so concatenated paths
+ *  don't double-up. */
+export const AN_OPEN_DATA_URL = "https://data.assemblee-nationale.fr/";
+
 /** All parliamentary group codes for the 17e legislature. */
 export const GROUP_CODES = [
   "LFI", "GDR", "ECO", "SOC", "LIOT",

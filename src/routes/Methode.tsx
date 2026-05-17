@@ -10,7 +10,7 @@ import { CONTACT_EMAIL, mailto } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
 import { DEFAULT_CAP_PER_DOSSIER, DEFAULT_CAP_PER_CHAPEAU_PREFIX } from "../lib/deck";
 import { THRESHOLD } from "../lib/compute-positions";
-import { TARGET, MIN_FOR_RANKING, MAX_POINTS_CLES_BULLETS } from "../types";
+import { TARGET, MIN_FOR_RANKING, MAX_POINTS_CLES_BULLETS, AN_OPEN_DATA_URL } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
  *  inline Sommaire above and the test suite (which iterates over this
@@ -166,7 +166,7 @@ export default function Methode() {
         <p>Sans Détour est un projet <strong>indépendant</strong>. Aucune affiliation parti / média / institution.</p>
         <p>Hébergement sur fonds personnels. Pas d'annonceur, pas de sponsor, pas de don accepté pendant les 6 mois précédant un scrutin national.</p>
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)" }}>
-          <li><a href="https://data.assemblee-nationale.fr/" target="_blank" rel="noopener noreferrer" aria-label="data.assemblee-nationale.fr (nouvel onglet)">data.assemblee-nationale.fr</a> — open data officiel</li>
+          <li><a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label="data.assemblee-nationale.fr (nouvel onglet)">data.assemblee-nationale.fr</a> — open data officiel</li>
           {/* TODO production-blocker · github.com/sansdetour is a 404 today
               (real repo is private at waramere1234/sans-detour per CLAUDE.md)
               AND no LICENSE file exists despite the "MIT" claim. Either

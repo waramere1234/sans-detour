@@ -25,7 +25,10 @@ import {
 } from "./lib/parse-summary";
 import { type ParsedScrutinCore } from "./lib/an-parse";
 import { iterEligibleScrutins } from "./lib/an-cache";
-import { requireSupabaseClient, requireAnthropicEnv, anthropicBatchResultsUrl } from "./lib/env";
+import {
+  requireSupabaseClient, requireAnthropicEnv,
+  anthropicBatchResultsUrl, anthropicHeaders,
+} from "./lib/env";
 
 // SUPABASE_* + ANTHROPIC_API_KEY are validated lazily via the helpers
 // inside main(); BATCH_ID is script-specific so we still read + guard it
@@ -64,10 +67,7 @@ async function main(): Promise<void> {
   // the narrowing inside async main(); same pattern as the ANTHROPIC_KEY
   // narrowing dance noted in scripts/lib/env.ts comments.
   const r = await fetch(anthropicBatchResultsUrl(BATCH_ID!), {
-    headers: {
-      "x-api-key": ANTHROPIC_KEY,
-      "anthropic-version": "2023-06-01",
-    },
+    headers: anthropicHeaders(ANTHROPIC_KEY),
   });
   if (!r.ok) throw new Error(`Batch results fetch failed: ${r.status} ${await r.text()}`);
   const text = await r.text();

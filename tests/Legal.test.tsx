@@ -4,6 +4,7 @@ import { MemoryRouter, Routes, Route } from "react-router-dom";
 import Legal from "../src/routes/Legal";
 import { ROUTES } from "../src/lib/routes";
 import { CONTACT_EMAIL } from "../src/lib/contact";
+import { AN_OPEN_DATA_URL } from "../src/types";
 
 // Legal.tsx is the sibling of Methode.tsx (which got dedicated tests in
 // session 106). It owns:
@@ -72,10 +73,12 @@ describe("Legal — RGPD-required content", () => {
     expect(mailtoLink).toHaveAttribute("href", expect.stringContaining(`mailto:${CONTACT_EMAIL}`));
   });
 
-  it("links to data.assemblee-nationale.fr (Etalab licence source)", () => {
+  it("links to AN_OPEN_DATA_URL (Etalab licence source)", () => {
+    // Derive the href from the const so a future AN domain change
+    // updates both this test and the source via the single edit.
     renderLegal();
     const anLink = screen.getByRole("link", { name: /data\.assemblee-nationale\.fr/ });
-    expect(anLink).toHaveAttribute("href", "https://data.assemblee-nationale.fr/");
+    expect(anLink).toHaveAttribute("href", AN_OPEN_DATA_URL);
     expect(anLink).toHaveAttribute("target", "_blank");
     expect(anLink).toHaveAttribute("rel", expect.stringContaining("noopener"));
   });

@@ -5,6 +5,7 @@ import { CardSkeleton } from "../components/CardSkeleton";
 import { ChipTop1 } from "../components/ChipTop1";
 import { RankingOverlay } from "../components/RankingOverlay";
 import { MethodeSheet } from "../components/MethodeSheet";
+import { RetryError } from "../components/RetryError";
 import { fetchScrutins } from "../lib/scrutins";
 import {
   composeDeck, drawNext, chapeauPrefix,
@@ -212,44 +213,19 @@ export default function Play() {
 
   if (loadError) {
     return (
-      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: "var(--max-content)", margin: "0 auto" }}>
-        <p style={{ color: "var(--ink)", fontSize: 15, lineHeight: 1.5 }}>
-          Impossible de charger les scrutins. Vérifie ta connexion puis réessaie.
-        </p>
-        <button
-          type="button"
-          onClick={() => setLoadTick((t) => t + 1)}
-          style={{
-            alignSelf: "flex-start",
-            background: "var(--accent)", color: "var(--bg)", border: "none",
-            padding: "10px 16px", borderRadius: 6,
-            fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 14, cursor: "pointer",
-          }}
-        >
-          Réessayer
-        </button>
-      </div>
+      <RetryError
+        message="Impossible de charger les scrutins. Vérifie ta connexion puis réessaie."
+        onRetry={() => setLoadTick((t) => t + 1)}
+      />
     );
   }
   if (deck.length === 0 && pool.length > 0) {
     return (
-      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: "var(--max-content)", margin: "0 auto" }}>
-        <p style={{ color: "var(--ink)", fontSize: 15, lineHeight: 1.5 }}>
-          Plus de scrutins disponibles à voter dans ton deck.
-        </p>
-        <button
-          type="button"
-          onClick={() => navigate(ROUTES.result)}
-          style={{
-            alignSelf: "flex-start",
-            background: "var(--accent)", color: "var(--bg)", border: "none",
-            padding: "10px 16px", borderRadius: 6,
-            fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 14, cursor: "pointer",
-          }}
-        >
-          Voir mon résultat
-        </button>
-      </div>
+      <RetryError
+        message="Plus de scrutins disponibles à voter dans ton deck."
+        onRetry={() => navigate(ROUTES.result)}
+        retryLabel="Voir mon résultat"
+      />
     );
   }
   // `loaded === true` here means fetchScrutins resolved with an empty array
@@ -258,23 +234,10 @@ export default function Play() {
   // recourse — so we surface a real message and let them retry.
   if (deck.length === 0 && poolLoaded) {
     return (
-      <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12, maxWidth: "var(--max-content)", margin: "0 auto" }}>
-        <p style={{ color: "var(--ink)", fontSize: 15, lineHeight: 1.5 }}>
-          Aucun scrutin disponible pour le moment. Réessaie dans quelques minutes.
-        </p>
-        <button
-          type="button"
-          onClick={() => setLoadTick((t) => t + 1)}
-          style={{
-            alignSelf: "flex-start",
-            background: "var(--accent)", color: "var(--bg)", border: "none",
-            padding: "10px 16px", borderRadius: 6,
-            fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 14, cursor: "pointer",
-          }}
-        >
-          Réessayer
-        </button>
-      </div>
+      <RetryError
+        message="Aucun scrutin disponible pour le moment. Réessaie dans quelques minutes."
+        onRetry={() => setLoadTick((t) => t + 1)}
+      />
     );
   }
   if (deck.length === 0) {

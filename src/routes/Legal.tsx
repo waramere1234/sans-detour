@@ -4,6 +4,7 @@ import { Wordmark } from "../components/Wordmark";
 import { FROM_LOGO_STATE } from "../lib/nav-state";
 import { CONTACT_EMAIL, mailto } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
+import { AN_OPEN_DATA_URL } from "../types";
 
 export default function Legal() {
   return (
@@ -52,7 +53,7 @@ export default function Legal() {
 
         <p><strong>Indépendance</strong> — Sans Détour est un projet indépendant. Aucune affiliation politique, médiatique ou institutionnelle.</p>
 
-        <p><strong>Sources des données</strong> — Open data officiel de l'Assemblée Nationale (<a href="https://data.assemblee-nationale.fr/" target="_blank" rel="noopener noreferrer" aria-label="data.assemblee-nationale.fr (nouvel onglet)">data.assemblee-nationale.fr</a>), licence Etalab 2.0.</p>
+        <p><strong>Sources des données</strong> — Open data officiel de l'Assemblée Nationale (<a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label="data.assemblee-nationale.fr (nouvel onglet)">data.assemblee-nationale.fr</a>), licence Etalab 2.0.</p>
 
         {/* TODO production-blocker · same broken github.com/sansdetour
             link as Methode §06 + §07 (real repo is private at

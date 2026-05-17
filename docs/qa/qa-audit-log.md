@@ -2828,3 +2828,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep "ANTHROPIC_BATCHES_URL\|anthropicBatchUrl\|anthropicBatchResultsUrl" scripts/ tests/ → 8+ résultats
 - [ ] `ls tests/an-cache.test.ts` → présent
 - [ ] grep `~513 tests` CLAUDE.md → 0 résultat (aligné sur ~522)
+
+---
+
+## Session 121 — 2026-05-17
+
+### Vérification session 120
+
+- [VERIFIED] 1 occurrence seulement de l'URL Batches dans scripts/ (la déclaration env.ts:63)
+- [VERIFIED] 27 occurrences des helpers `ANTHROPIC_BATCHES_URL|anthropicBatchUrl|anthropicBatchResultsUrl` dans scripts/ + tests/
+- [VERIFIED] tests/an-cache.test.ts présent
+- [VERIFIED] CLAUDE.md "~522 tests"
+- 522/522 tests verts, typecheck clean
+
+### Bugs fixés (ANTHROPIC_API_VERSION + AN_OPEN_DATA_URL + RetryError extraction)
+
+- [FIXED] `"anthropic-version": "2023-06-01"` dupliqué 4× sur 3 scripts (ingest-an, debug-batch × 2, resume-ingest) · Même drift pattern que la session 120 sur ANTHROPIC_BATCHES_URL. Un bump à 2024-... aurait demandé 4 edits avec drift possible. Fix : export `ANTHROPIC_API_VERSION = "2023-06-01"` + helper `anthropicHeaders(apiKey)` depuis env.ts qui retourne `{ content-type, x-api-key, anthropic-version }`. Les 3 scripts importent + appellent. ingest-an's COMMON_HEADERS devient `() => anthropicHeaders(ANTHROPIC_KEY!)` avec un comment explicatif sur le `!` (intentional : optional key au module scope, narrowed au call site après la guard). 4 tests : version pin-the-value, headers contiennent les 3 fields, accepte string vide (fallback path), retourne fresh object pas shared ref. · `scripts/lib/env.ts`, `scripts/ingest-an.ts`, `scripts/debug-batch.ts`, `scripts/resume-ingest.ts`, `tests/env.test.ts`
+- [FIXED] `https://data.assemblee-nationale.fr/` URL inline 3× dans src/routes (Legal + Methode × 2) + 1× dans scripts/ingest-an.ts (base de l'URL ZIP) · Un futur changement de domaine AN aurait touché 4 sites. Fix : export `AN_OPEN_DATA_URL` depuis `src/types/index.ts`. Legal.tsx + Methode.tsx (2 sites) utilisent `href={AN_OPEN_DATA_URL}`. scripts/ingest-an.ts construit `BULK_URL = ${AN_OPEN_DATA_URL}static/...` au lieu d'inliner. Cross-project import direction respectée : scripts → src/types (jamais inverse). Test Legal.tsx existant migré pour dériver `expect(anLink).toHaveAttribute("href", AN_OPEN_DATA_URL)` au lieu du literal. · `src/types/index.ts`, `src/routes/Legal.tsx`, `src/routes/Methode.tsx`, `scripts/ingest-an.ts`, `tests/Legal.test.tsx`
+- [FIXED] Bloc `<div><p>{message}</p><button onClick={retry}>Réessayer</button></div>` dupliqué 4× (Play.tsx 3 branches d'erreur + Result.tsx 2 branches) · 22 lignes de styles identiques répétés avec la même copy "Réessayer" — un changement de background button ou padding devait être édité 4× en lockstep. Fix : extract `src/components/RetryError.tsx` avec props `{ message, onRetry, retryLabel? }`. Le `retryLabel` optionnel sert au cas Play.tsx "Plus de scrutins disponibles" qui navigate au lieu de retry et utilise "Voir mon résultat" comme label. Play.tsx + Result.tsx remplacent les 5 sites par `<RetryError ... />`. 5 tests : message rendered, default "Réessayer", retryLabel override, onClick fires once, type="button". · `src/components/RetryError.tsx` (nouveau), `src/routes/Play.tsx`, `src/routes/Result.tsx`, `tests/RetryError.test.tsx` (nouveau)
+
+### Vérifications à faire en session 122
+
+- [ ] grep `"anthropic-version": "2023-06-01"` scripts/ → 1 résultat seulement (la déclaration env.ts)
+- [ ] grep `"https://data\.assemblee-nationale\.fr/"` src/ scripts/ → 1 résultat seulement (la déclaration src/types/index.ts)
+- [ ] grep `Impossible de charger les scrutins\|Réessayer` src/routes/ → 0 occurrence des strings literal dans Play.tsx + Result.tsx (toutes passent par RetryError)
+- [ ] grep `~522 tests` CLAUDE.md → 0 résultat (aligné sur ~531)

@@ -71,3 +71,20 @@ export function anthropicBatchUrl(batchId: string): string {
 export function anthropicBatchResultsUrl(batchId: string): string {
   return `${ANTHROPIC_BATCHES_URL}/${batchId}/results`;
 }
+
+/** Anthropic API version header value. Pinned to a known-stable date
+ *  per the Versioning docs. Previously inlined 4× across the 3 scripts
+ *  (ingest-an, resume-ingest, debug-batch × 2). */
+export const ANTHROPIC_API_VERSION = "2023-06-01";
+
+/** Build the common headers every Anthropic Batches API request needs:
+ *  api-key, version, and content-type. Pass the key explicitly so the
+ *  helper is usable from both narrowed (`requireAnthropicEnv`) and
+ *  optional-key (`ingest-an` fallback path) contexts. */
+export function anthropicHeaders(apiKey: string): Record<string, string> {
+  return {
+    "content-type": "application/json",
+    "x-api-key": apiKey,
+    "anthropic-version": ANTHROPIC_API_VERSION,
+  };
+}
