@@ -1,28 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Wordmark } from "../components/Wordmark";
 import { FreshnessBanner } from "../components/FreshnessBanner";
-import { fetchFreshness } from "../lib/scrutins";
+import { useFreshnessOnce } from "../hooks/useFreshnessOnce";
 import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE } from "../lib/nav-state";
 import { CONTACT_EMAIL, mailto } from "../lib/contact";
-import { TARGET, MIN_FOR_RANKING, type FreshnessInfo } from "../types";
+import { TARGET, MIN_FOR_RANKING } from "../types";
 
 export default function Methode() {
-  const [info, setInfo] = useState<FreshnessInfo | null>(null);
+  // Freshness fetch + once-per-mount guard live in the useFreshnessOnce
+  // hook (session 99), shared with Cover.tsx.
+  const info = useFreshnessOnce();
   const location = useLocation();
-  // Match Cover.tsx's fetchedRef pattern (session 70): only mark fetched
-  // on success so a transient failure doesn't kill the banner for the
-  // rest of the session, and so React StrictMode's intentional double-
-  // invoke in dev doesn't fire two redundant Supabase round-trips.
-  const fetchedRef = useRef(false);
-  useEffect(() => {
-    if (fetchedRef.current) return;
-    fetchFreshness()
-      .then((freshness) => { fetchedRef.current = true; setInfo(freshness); })
-      .catch(() => {});
-  }, []);
 
   // SPA hash scroll : when user lands on `/methode#methode-07` directly,
   // the browser's native anchor jump happens BEFORE React mounts the

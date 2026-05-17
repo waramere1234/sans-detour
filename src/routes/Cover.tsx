@@ -1,22 +1,24 @@
 // src/routes/Cover.tsx
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { Wordmark } from "../components/Wordmark";
 import { FreshnessBanner } from "../components/FreshnessBanner";
-import { fetchFreshness } from "../lib/scrutins";
+import { useFreshnessOnce } from "../hooks/useFreshnessOnce";
 import { hasSeenCover, loadSession, markCoverSeen, resetSession } from "../lib/session";
 import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE, type LocationStateFromLogo } from "../lib/nav-state";
 import { mailto } from "../lib/contact";
-import { TARGET, MIN_FOR_RANKING, type FreshnessInfo } from "../types";
+import { TARGET, MIN_FOR_RANKING } from "../types";
 
 export default function Cover() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [info, setInfo] = useState<FreshnessInfo | null>(null);
-  // Guard so a wordmark re-click (which mutates location.state and re-runs
-  // this effect) doesn't fire a fresh Supabase round-trip every time.
-  const fetchedRef = useRef(false);
+  // Freshness fetch + once-per-mount guard live in the useFreshnessOnce
+  // hook (session 99). The hook fires unconditionally on mount; if the
+  // useEffect below decides to redirect, the in-flight fetch lands on an
+  // unmounted component (React 18+ no-warn, no-leak) — wasted call but
+  // negligible cost compared to the dedup with Methode.tsx.
+  const info = useFreshnessOnce();
 
   useEffect(() => {
     // Explicit nav from the TopBar wordmark passes { fromLogo: true } so
@@ -29,21 +31,7 @@ export default function Cover() {
       const votes = s?.votes.length ?? 0;
       if (votes >= TARGET) navigate("/result", { replace: true });
       else navigate("/play", { replace: true });
-      return;
     }
-    if (fetchedRef.current) return;
-    // Mark fetched only on success: if the call fails (transient Supabase
-    // blip, offline tick), leaving the ref false lets a subsequent effect
-    // run (e.g., user clicks the wordmark to come back to /, which mutates
-    // location.state and re-fires the effect) try again. Previous code set
-    // the flag unconditionally before awaiting, so one early failure killed
-    // the banner for the rest of the session.
-    fetchFreshness()
-      .then((freshness) => {
-        fetchedRef.current = true;
-        setInfo(freshness);
-      })
-      .catch(() => {});
   }, [navigate, location.state]);
 
   const session = loadSession();

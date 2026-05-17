@@ -2280,3 +2280,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `useModalA11y` src/components/ → 2 résultats (MethodeSheet + RankingOverlay imports + uses)
 - [ ] grep `'a, button, \\[tabindex\\]:not' src/ → 0 résultat (vieux selector éliminé)
 - [ ] grep `~240 tests` CLAUDE.md → 0 résultat (aligné sur ~251)
+
+---
+
+## Session 99 — 2026-05-17
+
+### Vérification session 98
+
+- [VERIFIED] `src/hooks/useModalA11y.ts` présent
+- [VERIFIED] `useModalA11y` consommé dans MethodeSheet + RankingOverlay (6 grep hits : imports + uses + comments)
+- [VERIFIED] 0 résultat pour `'a, button, [tabindex]:not'` (vieux selector éliminé)
+- [VERIFIED] CLAUDE.md "~251 tests"
+- 251/251 tests verts, typecheck clean
+
+### Bugs fixés (typed event union + useFreshnessOnce + tests)
+
+- [FIXED] `track(event: string, ...)` signature trop permissive · Une typo `track("vote_clicked")` au lieu de `track("vote")` compilerait sans erreur (string accepte tout), et Plausible recevrait un événement mal orthographié — métrique silencieusement cassée jusqu'à ce qu'on regarde le dashboard. Remplacement de `string` par une union `AnalyticsEvent` listant les 15 événements existants. TS catche maintenant les typos au call site. 18 call sites compilent toujours (toutes les chaînes existantes sont dans l'union). · `src/lib/analytics.ts`
+- [FIXED] `useFreshnessOnce` hook extraction · Cover.tsx + Methode.tsx dupliquaient le même pattern : `useState<FreshnessInfo | null>(null)` + `useRef(false)` (fetchedRef) + useEffect qui fire fetchFreshness une fois et set ref sur succès. ~12 lignes × 2 fichiers. Extraction `src/hooks/useFreshnessOnce.ts` qui retourne `FreshnessInfo | null`. Methode passe de 12 lignes à 1 appel ; Cover garde son useEffect de redirect mais déplace le fetch hors de l'effet (trade-off : 1 fetch redondant quand la redirection auto-fire, harmless mais wasted Supabase call dans cet edge case). · `src/hooks/useFreshnessOnce.ts` (nouveau), `src/routes/Cover.tsx`, `src/routes/Methode.tsx`
+- [FIXED] `useFreshnessOnce` + `AnalyticsEvent` zero test coverage · 3 nouveaux tests dans `tests/useFreshnessOnce.test.tsx` (initial null, resolves to FreshnessInfo shape, stable reference sur re-render — proxy pour StrictMode double-invoke guard) + 2 tests dans `tests/analytics.test.ts` (accepts all 15 documented events without cast, rejects typo at compile time via `@ts-expect-error`). Le test `@ts-expect-error` est lui-même la garde : si la signature widens back to `string`, l'unused-directive ferait fail le build vitest. · `tests/useFreshnessOnce.test.tsx` (nouveau), `tests/analytics.test.ts`
+
+### Vérifications à faire en session 100
+
+- [ ] grep `AnalyticsEvent` src/ → exports + 1 usage dans `track()` signature
+- [ ] `ls src/hooks/useFreshnessOnce.ts` → présent
+- [ ] grep `fetchedRef` src/routes/ → 0 résultat (les 2 consumers passent par le hook)
+- [ ] grep `~251 tests` CLAUDE.md → 0 résultat (aligné sur ~256)
