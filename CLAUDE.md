@@ -188,7 +188,7 @@ Pas de mention du modèle dans les commits/PR (Claude Code 1M context, etc.).
 
 ### Tests
 
-`npm run test:run` (Vitest, ~163 tests aujourd'hui couvrant matching / deck / session / parties / personnalites / analytics / themes / Card / Cover / MethodeSheet / ErrorBoundary / FreshnessBanner / compute-positions / sanity / deck-invariants / parse-summary, doivent rester verts à chaque commit).
+`npm run test:run` (Vitest, ~165 tests aujourd'hui couvrant matching / deck / session / parties / personnalites / analytics / themes / Card / Cover / MethodeSheet / ErrorBoundary / FreshnessBanner / compute-positions / sanity / deck-invariants / parse-summary, doivent rester verts à chaque commit).
 
 ### Commandes utiles
 
@@ -198,8 +198,8 @@ npm run build                     # build de prod
 npm run test:run                  # tests Vitest
 npm run seed                      # seed Supabase locale avec supabase/seed/dev-fixtures.json (20 scrutins V1)
 npm run ingest:an                 # ingestion AN (Haiku 4.5 + Batches API, ~$0.20-0.30, 2-10min)
-npx tsx scripts/resume-ingest.ts  # récupération d'un batch failed (env BATCH_ID requis)
-npx tsx scripts/ingest-personnalites.ts  # injection votes personnalités (V2 P2, parse cache local)
+npm run ingest:resume             # récupération d'un batch failed (env BATCH_ID requis)
+npm run ingest:personnalites      # injection votes personnalités (V2 P2, parse cache local)
 ```
 
 ## Roadmap

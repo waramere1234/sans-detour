@@ -12,6 +12,8 @@
     "test:ui": "vitest --ui",
     "seed": "tsx scripts/seed-supabase.ts",
     "ingest:an": "tsx scripts/ingest-an.ts",
+    "ingest:resume": "tsx scripts/resume-ingest.ts",
+    "ingest:personnalites": "tsx scripts/ingest-personnalites.ts",
     "debug:batch": "tsx scripts/debug-batch.ts"
   },
   "dependencies": {

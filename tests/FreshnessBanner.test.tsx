@@ -77,4 +77,19 @@ describe("FreshnessBanner", () => {
     expect(screen.queryByText(/NaN/)).not.toBeInTheDocument();
     expect(screen.getByText(/MAJ aujourd'hui/)).toBeInTheDocument();
   });
+
+  it("falls back to 0 (not NaN) when next_sync_eta is malformed", () => {
+    // Symmetric defense for the diffDays path. Session 83 covered the
+    // pastDays/last_sync_at side; the diffDays/next_sync_eta side has the
+    // same NaN guard in FreshnessBanner — without a test, removing it
+    // would slip past CI silently.
+    const info: FreshnessInfo = {
+      total_scrutins: 100,
+      last_sync_at: new Date().toISOString(),
+      next_sync_eta: "not-a-date",
+    };
+    render(<FreshnessBanner info={info} />);
+    expect(screen.queryByText(/NaN/)).not.toBeInTheDocument();
+    expect(screen.getByText(/sync imminente/)).toBeInTheDocument();
+  });
 });

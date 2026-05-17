@@ -40,6 +40,16 @@ describe("session (localStorage state)", () => {
     expect(loaded.cards_seen).toEqual(["s1"]);
   });
 
+  it("recordVote returns true on fresh insert, false on duplicate", () => {
+    // Session 88: handleVote in Play.tsx gates track() and aria-live on
+    // the return value so a double-click doesn't double-count analytics
+    // or re-announce "voté pour" twice.
+    saveSession(newSession());
+    expect(recordVote("s1", "pour")).toBe(true);
+    expect(recordVote("s1", "contre")).toBe(false); // duplicate
+    expect(recordVote("s2", "skip")).toBe(true);    // fresh again
+  });
+
   it("resetSession clears storage", () => {
     saveSession(newSession());
     resetSession();

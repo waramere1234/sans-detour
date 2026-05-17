@@ -152,7 +152,12 @@ export default function Play() {
   const top1 = ranked[0];
 
   function handleVote(scrutinId: string, choice: UserVote) {
-    recordVote(scrutinId, choice);
+    // recordVote returns false on a duplicate (fast double-click / swipe-
+    // then-click). Gate the rest of the handler so a stray second event
+    // doesn't double-fire analytics, re-trigger the aria-live announcement,
+    // or short-circuit the deck advance against stale state.
+    const recorded = recordVote(scrutinId, choice);
+    if (!recorded) return;
     track("vote", { choice });
 
     // Append a zero-width space so identical consecutive votes (e.g. two

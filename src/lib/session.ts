@@ -69,16 +69,21 @@ export function saveSession(s: SessionState): void {
   }
 }
 
-export function recordVote(scrutinId: string, choice: UserVote): void {
+/** Returns true if the vote was newly recorded, false if the scrutin was
+ *  already in cards_seen (fast double-click / swipe+click race). Callers
+ *  use the return value to gate side effects like analytics that should
+ *  fire once per actual vote, not once per click event. */
+export function recordVote(scrutinId: string, choice: UserVote): boolean {
   const s = loadSession() ?? newSession();
   // Guard against fast double-clicks / swipe+click races: if this scrutin
   // is already recorded, ignore the new event. Without this, `votes` would
   // accumulate duplicate entries and computeAlignment would count the
   // same scrutin multiple times, inflating the score.
-  if (s.cards_seen.includes(scrutinId)) return;
+  if (s.cards_seen.includes(scrutinId)) return false;
   s.cards_seen.push(scrutinId);
   s.votes.push({ scrutin_id: scrutinId, choice, voted_at: Date.now() });
   saveSession(s);
+  return true;
 }
 
 export function resetSession(): void {

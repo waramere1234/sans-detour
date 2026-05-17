@@ -2006,3 +2006,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep -c "it(" tests/parse-summary.test.ts → 24
 - [ ] grep `~139 tests` CLAUDE.md → 0 résultat (aligné sur ~163)
 - [ ] DevTools : sur Result, inspect une PartyRow collapsée → pas d'`aria-controls` ; tap pour expand → `aria-controls="audit-trail-XXX"` apparaît, et l'AuditTrail panel existe bien avec cet id
+
+---
+
+## Session 88 — 2026-05-17
+
+### Vérification session 87
+
+- [VERIFIED] `Result.tsx:140-141` : `window.confirm()` avec plural rule sur "vote" pour `refaire()`
+- [VERIFIED] `tests/parse-summary.test.ts` : 24 `it()` tests
+- [VERIFIED] `src/components/PartyRow.tsx:40` : `aria-controls={interactive && expanded ? controlsId : undefined}`
+- [VERIFIED] CLAUDE.md ligne 191 : "~163 tests"
+- 163/163 tests verts, typecheck clean
+
+### Bugs fixés (test coverage gap + npm script consistency + analytics double-fire)
+
+- [FIXED] `tests/FreshnessBanner.test.tsx` missing symmetric test pour next_sync_eta malformé · Session 83 a ajouté un test pour `last_sync_at` malformé (validating `pastDays` returns 0 sur NaN). Mais le sibling `next_sync_eta` (via `diffDays`, même guard NaN) était untested. Si un futur refactor retire le `isNaN()` dans `diffDays`, la régression slipperait. Test symétrique ajouté pour `next_sync_eta = "not-a-date"` → expect "sync imminente" (diffDays → 0 → promotion). · `tests/FreshnessBanner.test.tsx`
+- [FIXED] `package.json` aliases manquants pour 2/5 scripts · `seed`, `ingest:an`, `debug:batch` ont des aliases npm ; `resume-ingest` et `ingest-personnalites` n'en avaient pas, documentés en `npx tsx scripts/...` dans CLAUDE.md. Inconsistance dev-experience : un dev qui copie-colle une commande entre scripts a 2 patterns à mémoriser. Aliases ajoutés (`ingest:resume`, `ingest:personnalites`) + CLAUDE.md mis à jour vers la forme npm run. · `package.json`, `CLAUDE.md`
+- [FIXED] `Play.tsx handleVote` fire analytics + side effects sur double-tap · `recordVote` était idempotent (guard à session.ts:78 sur `cards_seen.includes`) MAIS retournait void — donc `handleVote` continuait à fire `track("vote")`, `setLastVoteLabel` (re-announce), et `setDeck(deck.slice(1))` même sur un double-tap où aucun nouveau vote n'a été enregistré. Refactor : `recordVote` retourne `boolean` (true = nouveau, false = doublon). `handleVote` gate le reste sur la return value. Effets : pas de double-track, pas de re-announce aria-live, pas de re-trigger des side effects de deck advance. Test ajouté pour le retour bool. · `src/lib/session.ts`, `src/routes/Play.tsx`, `tests/session.test.ts`
+
+### Vérifications à faire en session 89
+
+- [ ] grep -c "it(" tests/FreshnessBanner.test.tsx → 10 (était 9)
+- [ ] grep `ingest:resume\|ingest:personnalites` package.json → 2 résultats
+- [ ] grep `npx tsx scripts/resume-ingest\|npx tsx scripts/ingest-personnalites` CLAUDE.md → 0 résultat (remplacé par `npm run ingest:*`)
+- [ ] grep `recordVote.*boolean\|recordVote.*: boolean` src/lib/session.ts → 1 résultat (signature avec return type)
