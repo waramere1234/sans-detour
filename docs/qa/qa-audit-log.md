@@ -1562,3 +1562,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `Pas urgent\|optionnel.*sansdetour` dans `SHIP-V1.md` → 0 résultat
 - [ ] grep `favicon` dans `SHIP-V1.md` `public/manifest.webmanifest` → 1+ résultat chacun (la mention dans l'enum)
 - [ ] node -e "JSON.parse(require('fs').readFileSync('public/manifest.webmanifest','utf8'))" → pas d'erreur (JSON valide)
+
+---
+
+## Session 69 — 2026-05-17
+
+### Vérification session 68
+
+- [VERIFIED] `SHIP-V1.md §5` reframé en "prérequis pour SEO + analytics" avec énumération des fichiers concernés
+- [VERIFIED] `SHIP-V1.md §2` et `manifest._comment` listent maintenant favicon avec apple-touch-icon / og:image / twitter:image
+- [VERIFIED] `node -e JSON.parse(manifest.webmanifest)` valide
+- 123/123 tests verts, typecheck clean
+
+### Bugs fixés (robots.txt /api/ + dead padding override + localStorage throw defense)
+
+- [FIXED] robots.txt stale + /api/ exposed · Le comment disait "no API endpoints today" mais `/api/share-card` existe + servit (vercel.json rewrites + api/share-card.ts). Crawlers indexaient cette URL → compute waste (Satori regenerate SVG à chaque hit) + indexation polluante. Ajout `Disallow: /api/` + comment réécrit pour expliquer que share-card est on-demand SVG. · `public/robots.txt`
+- [FIXED] CSS shorthand property collision · `TopBar.tsx` `MenuPopover` footer div avait `paddingTop: 8` (line 232) suivi de `padding: "10px 10px 4px"` (line 235). En CSS-in-JS comme en CSS plain, la shorthand `padding` déclarée APRÈS écrase les longhand individuels — le `paddingTop: 8` ne rendait jamais (10px du shorthand gagnait). Drop le longhand mort + commentaire qui explique pourquoi 10px est la valeur réelle. · `src/components/TopBar.tsx`
+- [FIXED] localStorage throw defense · `loadSession` et `hasSeenCover` faisaient `localStorage.getItem(...)` sans try/catch. localStorage peut throw au READ (pas que au write) dans : iframes sandboxés, Safari blocked-storage privacy mode pré-iOS 17, sandboxes site-isolation, certains browser extensions. Sans guard, App + Cover crash à first render dans ces contextes. saveSession avait déjà un try/catch — pair les read avec un try/catch retournant null/false pour symétrie. · `src/lib/session.ts`
+
+### Vérifications à faire en session 70
+
+- [ ] curl https://sansdetour.fr/robots.txt | grep "Disallow: /api/" → présent
+- [ ] grep `paddingTop: 8` dans `src/components/TopBar.tsx` → 0 résultat
+- [ ] DevTools console : `Object.defineProperty(window, "localStorage", { get() { throw new Error("blocked") } })` puis recharger `/` → app rend la Cover (loadSession + hasSeenCover catch et retournent null/false)

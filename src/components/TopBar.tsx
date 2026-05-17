@@ -229,9 +229,13 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
             </nav>
 
             <div style={{
-              marginTop: 6, paddingTop: 8,
+              marginTop: 6,
               borderTop: "1px solid var(--line)",
               display: "flex", justifyContent: "space-between", alignItems: "center",
+              // shorthand `padding` declared once — the previous `paddingTop: 8`
+              // here was silently overridden by the shorthand below and never
+              // applied. The 10px top in the shorthand is the value that
+              // actually rendered.
               padding: "10px 10px 4px",
               fontFamily: "var(--font-mono)", fontSize: 9.5,
               color: "var(--ink-3)", letterSpacing: "0.10em", textTransform: "uppercase",

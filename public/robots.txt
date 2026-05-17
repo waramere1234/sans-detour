@@ -1,9 +1,11 @@
 # Sans Détour — robots policy
-# The app's public-facing pages (Cover, Méthode, Légal) are crawlable.
-# Future API endpoints under /api/ would not be — none today.
+# Public-facing pages (Cover, Méthode, Légal) are crawlable.
+# /api/share-card generates SVG share-card images on-demand via Satori;
+# crawlers don't need it and indexing those URLs would waste compute.
 
 User-agent: *
 Allow: /
+Disallow: /api/
 
 # TODO production-blocker: re-enable when public/sitemap.xml is generated
 # at build time. Previously declared but the file never existed, so every

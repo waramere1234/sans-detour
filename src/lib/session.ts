@@ -21,7 +21,17 @@ export function newSession(): SessionState {
 }
 
 export function loadSession(): SessionState | null {
-  const raw = localStorage.getItem(KEY);
+  // localStorage access can THROW (not just write — read too) in sandboxed
+  // iframes, certain Safari privacy modes, and when the browser blocks
+  // storage for the origin. Without this guard, App + Cover would crash
+  // on first render in those contexts. saveSession already had a similar
+  // guard; pair them so read/write are symmetric.
+  let raw: string | null;
+  try {
+    raw = localStorage.getItem(KEY);
+  } catch {
+    return null;
+  }
   if (!raw) return null;
   let parsed: unknown;
   try {
@@ -84,7 +94,13 @@ export function getOrCreateSession(): SessionState {
 }
 
 export function hasSeenCover(): boolean {
-  return localStorage.getItem(COVER_KEY) === "true";
+  // Same throw-on-read defense as loadSession — return false (= treat as
+  // not seen) when storage is unavailable so the Cover keeps rendering.
+  try {
+    return localStorage.getItem(COVER_KEY) === "true";
+  } catch {
+    return false;
+  }
 }
 
 export function markCoverSeen(): void {
