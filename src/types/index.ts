@@ -94,6 +94,21 @@ export const OG_LOCALE = APP_LOCALE.replace("-", "_");
  *  old width during the Methode lazy-load flash. */
 export const READING_PAGE_MAX_WIDTH = 720;
 
+/** "Voir mon résultat" — the user-facing CTA label shown when the
+ *  user has a completed session. Appears as the Cover primary CTA
+ *  (when hasCompleted=true) AND as the Play.tsx RetryError fallback
+ *  retryLabel (when the deck is exhausted and the user should jump
+ *  to /result). Same wording in both contexts; a rewording (e.g.
+ *  "Voir ton classement") propagates from one edit. */
+export const VIEW_RESULT_LABEL = "Voir mon résultat";
+
+/** Canonical "data source" tagline appended to the share text and
+ *  shown as a sub-header on the SVG share card (api/share-card.ts).
+ *  Lives in src/types (DOM-free) so api/share-card can import it
+ *  without dragging in src/lib/share.ts's navigator/window globals.
+ *  A rewording propagates from one edit to both surfaces. */
+export const SHARE_SOURCE_LINE = "basées sur les vrais votes de l'AN";
+
 /** Official AN open-data portal — both the user-facing reference (Methode
  *  §01 + §06 prose, Legal data-sources block) and the script-side bulk
  *  download (`scripts/ingest-an.ts` builds `${AN_OPEN_DATA_URL}static/...`

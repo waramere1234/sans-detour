@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { composeShareText, performShare, SHARE_TOP_N } from "../src/lib/share";
 import type { GroupAlignment, GroupCode } from "../src/types";
-import { GROUP_CODES } from "../src/types";
+import { GROUP_CODES, SHARE_SOURCE_LINE } from "../src/types";
 import { getParty } from "../src/lib/parties";
 
 // src/lib/share.ts is the pure text-composition pulled out of Result.tsx
@@ -17,6 +17,21 @@ function mk(group: GroupCode, pct: number): GroupAlignment {
 }
 
 describe("composeShareText — happy path (complete session)", () => {
+  it("lead ends with SHARE_SOURCE_LINE (rename-safe — same source line shown on SVG card)", () => {
+    // A rewording of the source line should propagate from src/types
+    // to both the text share AND the SVG card (api/share-card.ts).
+    // Pin the linkage by deriving the expected tail.
+    const out = composeShareText({
+      ranked: [mk("RN", 50)],
+      isPartial: false,
+      total: 20,
+      target: 20,
+    });
+    // The lead segment is everything before " : " (the summary separator).
+    const lead = out.split(" : ")[0];
+    expect(lead.endsWith(SHARE_SOURCE_LINE)).toBe(true);
+  });
+
   it("includes a lead followed by ' : ' and the numbered summary", () => {
     const out = composeShareText({
       ranked: [mk("RN", 57), mk("EPR", 42), mk("LFI", 30)],

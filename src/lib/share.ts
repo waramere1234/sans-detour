@@ -5,8 +5,14 @@
 // lead + numbered separator) is fully testable; the action's
 // navigator.share / clipboard / prompt branches mock cleanly in jsdom.
 
-import type { GroupAlignment } from "../types";
+import { SHARE_SOURCE_LINE, type GroupAlignment } from "../types";
 import { getParty } from "./parties";
+
+// SHARE_SOURCE_LINE lives in src/types (DOM-free) so api/share-card.ts
+// can import it without dragging in the navigator/window globals this
+// file references via performShare. Re-exported below for ergonomic
+// consumer access — same module surface as before.
+export { SHARE_SOURCE_LINE };
 
 /** Max number of groups included in the share text. Keep small enough
  *  to fit a tweet/iMessage preview without truncation; the SVG share
@@ -14,7 +20,6 @@ import { getParty } from "./parties";
 export const SHARE_TOP_N = 6;
 
 const LEAD_PREFIX = "Mes affinités politiques réelles";
-const LEAD_SUFFIX = "basées sur les vrais votes de l'AN";
 
 /** Compose the share message. Result.tsx feeds the post-rank alignment
  *  list straight in — we slice locally so callers can't accidentally
@@ -34,7 +39,7 @@ export function composeShareText(args: {
   const partialParen = args.isPartial
     ? ` (résultat partiel ${args.total}/${args.target})`
     : "";
-  const lead = `${LEAD_PREFIX}${partialParen}, ${LEAD_SUFFIX}`;
+  const lead = `${LEAD_PREFIX}${partialParen}, ${SHARE_SOURCE_LINE}`;
   return `${lead} : ${summary}`;
 }
 

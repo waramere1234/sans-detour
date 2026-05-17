@@ -97,7 +97,7 @@ describe("Plausible data-domain (index.html) sync with ANALYTICS_HOSTS", () => {
   // rebrand changing one and not the other splits analytics between
   // a dead dashboard and a stale gate. Pin the linkage here.
 
-  it("data-domain in index.html is a member of ANALYTICS_HOSTS", async () => {
+  it("data-domain in index.html is the apex PROD_HOSTNAME (not the www variant)", async () => {
     const html = await fs.readFile(
       path.join(process.cwd(), "index.html"),
       "utf-8",
@@ -105,9 +105,13 @@ describe("Plausible data-domain (index.html) sync with ANALYTICS_HOSTS", () => {
     const match = html.match(/data-domain="([^"]+)"/);
     expect(match).not.toBeNull();
     const plausibleDomain = match![1];
-    // The data-domain typically points at the apex (no www). It MUST
-    // appear in ANALYTICS_HOSTS so track() emits events that the
-    // dashboard actually receives.
+    // Plausible's data-domain is the dashboard target — must be the apex
+    // (no www). A `www.${PROD_HOSTNAME}` value would still be member of
+    // ANALYTICS_HOSTS (the runtime gate accepts both for the track()
+    // host-allow-list) but would split stats across two dashboards.
+    const { PROD_HOSTNAME } = await import("../src/types");
+    expect(plausibleDomain).toBe(PROD_HOSTNAME);
+    // And it remains a valid ANALYTICS_HOSTS member by definition.
     expect(ANALYTICS_HOSTS.has(plausibleDomain)).toBe(true);
   });
 });

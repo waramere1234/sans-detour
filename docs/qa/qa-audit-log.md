@@ -3119,3 +3119,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `performShare` src/ tests/ → 4+ résultats
 - [ ] grep `"AbortError"` src/ tests/ → 2+ résultats (la check + le test)
 - [ ] grep `~586 tests` CLAUDE.md → 0 résultat (aligné sur ~592)
+
+---
+
+## Session 133 — 2026-05-17
+
+### Vérification session 132
+
+- [VERIFIED] 13 occurrences de performShare dans src/ + tests/
+- [VERIFIED] 2 occurrences de "AbortError" (la check dans share.ts + le test pin dans share.test.ts)
+- [VERIFIED] CLAUDE.md "~592 tests"
+- 592/592 tests verts, typecheck clean
+
+### Bugs fixés (data-domain apex pin + SHARE_SOURCE_LINE + VIEW_RESULT_LABEL)
+
+- [FIXED] `tests/analytics.test.ts` data-domain test asserted `ANALYTICS_HOSTS.has(...)` — passing pour apex OR www variant · Plausible's data-domain doit être l'apex specifically (sinon les events sont split entre 2 dashboards). Le test laissait passer la confusion. Fix : assert `data-domain === PROD_HOSTNAME` (apex only) + maintenir l'assertion ANALYTICS_HOSTS membership comme defense secondaire. · `tests/analytics.test.ts`
+- [FIXED] `"basées sur les vrais votes de l'AN"` brand line dupliquée entre src/lib/share.ts (private LEAD_SUFFIX) et api/share-card.ts:81 (SVG card body inline) · Rewording aurait demandé 2 edits in-lockstep. Fix : export `SHARE_SOURCE_LINE` depuis src/types/index.ts (DOM-free pour que api/share-card puisse importer sans pull les navigator/window globals de share.ts). share.ts re-exporte pour ergonomic consumer access. share-card.ts importe + utilise. 1 test pin lead.endsWith(SHARE_SOURCE_LINE). · `src/types/index.ts`, `src/lib/share.ts`, `api/share-card.ts`, `tests/share.test.ts`
+- [FIXED] `"Voir mon résultat"` CTA label dupliqué entre `src/routes/Cover.tsx:217` (Cover primary CTA quand hasCompleted) et `src/routes/Play.tsx:227` (RetryError retryLabel quand deck exhausted) · Même user-facing string, drift surface si rewording. Fix : export `VIEW_RESULT_LABEL` depuis src/types. Cover.tsx + Play.tsx importent. 1 test Cover pin la CTA primary === VIEW_RESULT_LABEL. · `src/types/index.ts`, `src/routes/Cover.tsx`, `src/routes/Play.tsx`, `tests/Cover.test.tsx`
+
+### Vérifications à faire en session 134
+
+- [ ] grep `SHARE_SOURCE_LINE\|VIEW_RESULT_LABEL` src/ api/ tests/ → 10+ résultats
+- [ ] grep "basées sur les vrais votes" src/ api/ → 1 résultat seulement (la déclaration SHARE_SOURCE_LINE)
+- [ ] grep `~592 tests` CLAUDE.md → 0 résultat (aligné sur ~594)

@@ -9,7 +9,7 @@ import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE, type LocationStateFromLogo } from "../lib/nav-state";
 import { mailto } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
-import { TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL } from "../types";
+import { TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL, VIEW_RESULT_LABEL } from "../types";
 
 export default function Cover() {
   const navigate = useNavigate();
@@ -214,7 +214,7 @@ export default function Cover() {
               gap: 8,
             }}
           >
-            <span>{hasCompleted ? "Voir mon résultat" : hasInProgress ? "Reprendre" : "Commencer"}</span>
+            <span>{hasCompleted ? VIEW_RESULT_LABEL : hasInProgress ? "Reprendre" : "Commencer"}</span>
             <span style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}>
               {hasCompleted
                 ? `${votesCount}/${TARGET} terminés`

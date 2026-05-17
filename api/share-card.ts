@@ -10,7 +10,7 @@ import { parseTopParam, MAX_SHARE_CARD_BARS } from "./_lib/parse-top";
 import {
   BRAND_BG, BRAND_ACCENT, BRAND_INK, BRAND_INK_2,
 } from "./_lib/brand-colors";
-import { PROD_HOSTNAME } from "../src/types";
+import { PROD_HOSTNAME, SHARE_SOURCE_LINE } from "../src/types";
 
 // "sansdetour.fr" footer text on the SVG card — PROD_HOSTNAME is the
 // canonical apex (derived from PROD_ORIGIN in src/types/index.ts) so
@@ -78,7 +78,7 @@ export default async function handler(req: Request): Promise<Response> {
         },
         children: [
           { type: "div", props: { style: { fontSize: 24, color: INK_2, letterSpacing: 4 }, children: "MES AFFINITÉS RÉELLES" } },
-          { type: "div", props: { style: { fontSize: 28, color: INK_2, marginTop: 8 }, children: `basées sur les vrais votes de l'AN` } },
+          { type: "div", props: { style: { fontSize: 28, color: INK_2, marginTop: 8 }, children: SHARE_SOURCE_LINE } },
           { type: "div", props: { style: { fontSize: 96, fontWeight: 700, marginTop: 64, color: ACCENT }, children: `${top.code} · ${top.pct}%` } },
           { type: "div", props: {
               style: { marginTop: 64, display: "flex", flexDirection: "column", gap: 16 },

@@ -17,7 +17,7 @@ import { track } from "../lib/analytics";
 import { nextVoteLabel } from "../lib/vote-feedback";
 import { ROUTES, isAffinementMode } from "../lib/routes";
 import {
-  GROUP_CODES, TARGET, MIN_FOR_RANKING,
+  GROUP_CODES, TARGET, MIN_FOR_RANKING, VIEW_RESULT_LABEL,
   type Scrutin, type UserVote, type GroupCode, type GroupAlignment,
 } from "../types";
 
@@ -224,7 +224,7 @@ export default function Play() {
       <RetryError
         message="Plus de scrutins disponibles à voter dans ton deck."
         onRetry={() => navigate(ROUTES.result)}
-        retryLabel="Voir mon résultat"
+        retryLabel={VIEW_RESULT_LABEL}
       />
     );
   }
