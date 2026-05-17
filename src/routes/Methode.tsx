@@ -30,6 +30,9 @@ import {
   METHODE_S07_MISE_EN_FORME_CLOSER, METHODE_S07_LIBELLE_BRUT_GUARANTEE,
   METHODE_PAGE_LEAD_INTRO, METHODE_PAGE_LEAD_PURE_MATH,
   METHODE_S04_OPENER, METHODE_S02_EXCLUSIONS_SUFFIX,
+  METHODE_S07_MODEL_DISCLOSURE,
+  METHODE_S07_CLAUDE_TASKS_PREFIX, METHODE_S07_CLAUDE_TASKS_SUFFIX,
+  METHODE_S07_LIMITES_DISCLAIMER_PREFIX, METHODE_S07_LIMITES_DISCLAIMER_SUFFIX,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -206,20 +209,20 @@ export default function Methode() {
       </Section>
 
       <Section n="07" title={METHODE_SECTION_BODY_TITLES["07"]}>
-        <p><strong>{METHODE_S07_HEADING_CE_QUE_FAIT_CLAUDE}</strong> Reformuler le titre brut du scrutin en 12 mots, condenser le projet de loi en {MAX_POINTS_CLES_BULLETS} points clés, rédiger un résumé contextuel de 30 à 50 mots, structurer une synthèse détaillée (mesures, concernés, calendrier, exceptions), et taguer le scrutin par thème. <strong>{METHODE_S07_MISE_EN_FORME_CLOSER}</strong></p>
+        <p><strong>{METHODE_S07_HEADING_CE_QUE_FAIT_CLAUDE}</strong> {METHODE_S07_CLAUDE_TASKS_PREFIX}{MAX_POINTS_CLES_BULLETS}{METHODE_S07_CLAUDE_TASKS_SUFFIX} <strong>{METHODE_S07_MISE_EN_FORME_CLOSER}</strong></p>
 
         <p><strong>{METHODE_S07_HEADING_CE_QU_IL_NE_FAIT_PAS}</strong> Le calcul d'alignement (formule mathématique pure), la composition du deck (round-robin algorithmique par thème), l'extraction des votes individuels (parsing des XML officiels AN). Sur ces trois plans, Claude n'intervient à aucun moment.</p>
 
         <p><strong>{METHODE_S07_HEADING_CADRE_BIAIS}</strong> Le prompt envoyé à Claude est neutre par construction. Sa source : le libellé brut AN + des résultats de recherche web pour le contexte. <strong>{METHODE_S07_LIBELLE_BRUT_GUARANTEE}</strong> (et la page AN complète est toujours accessible via « {AN_LINK_VISIBLE_LABEL} ») — tu peux comparer directement.</p>
 
-        <p><strong>{METHODE_S07_HEADING_LIMITES_SIGNALEMENT}</strong> Claude peut se tromper sur les nuances : un mot mal choisi, une mesure oubliée, un thème mal taggué. Pour l'instant, aucune relecture humaine systématique (V3 prévue). Si tu repères une erreur factuelle : <a href={mailto()}>{CONTACT_EMAIL}</a> — on corrige.</p>
+        <p><strong>{METHODE_S07_HEADING_LIMITES_SIGNALEMENT}</strong> {METHODE_S07_LIMITES_DISCLAIMER_PREFIX}<a href={mailto()}>{CONTACT_EMAIL}</a>{METHODE_S07_LIMITES_DISCLAIMER_SUFFIX}</p>
 
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)", marginTop: 12 }}>
           {/* TODO production-blocker · same broken github.com/sansdetour
               link as §06 above. The "prompt et code source publics" claim
               is aspirational until the repo is published. */}
           <li><a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a> — {METHODE_LINK_ANNOTATION_PROMPT_CODE_PUBLIC}</li>
-          <li>Modèle : Claude Haiku 4.5 d'Anthropic, via Batches API + web_search</li>
+          <li>{METHODE_S07_MODEL_DISCLOSURE}</li>
         </ul>
       </Section>
     </section>

@@ -19,6 +19,9 @@ import {
   METHODE_S07_MISE_EN_FORME_CLOSER, METHODE_S07_LIBELLE_BRUT_GUARANTEE,
   METHODE_PAGE_LEAD_INTRO, METHODE_PAGE_LEAD_PURE_MATH,
   METHODE_S04_OPENER, METHODE_S02_EXCLUSIONS_SUFFIX,
+  METHODE_S07_MODEL_DISCLOSURE,
+  METHODE_S07_CLAUDE_TASKS_PREFIX, METHODE_S07_CLAUDE_TASKS_SUFFIX,
+  METHODE_S07_LIMITES_DISCLAIMER_PREFIX, METHODE_S07_LIMITES_DISCLAIMER_SUFFIX,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -150,6 +153,26 @@ describe("Methode — section structure", () => {
     renderMethode();
     const section = document.getElementById("methode-02")!;
     expect(section.textContent).toContain(METHODE_S02_EXCLUSIONS_SUFFIX);
+  });
+
+  it("§07 surfaces METHODE_S07_MODEL_DISCLOSURE (LLM model + API)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-07")!;
+    expect(section.textContent).toContain(METHODE_S07_MODEL_DISCLOSURE);
+  });
+
+  it("§07 surfaces METHODE_S07_CLAUDE_TASKS_PREFIX + SUFFIX (5-task IA disclosure)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-07")!;
+    expect(section.textContent).toContain(METHODE_S07_CLAUDE_TASKS_PREFIX.trim());
+    expect(section.textContent).toContain(METHODE_S07_CLAUDE_TASKS_SUFFIX.trim());
+  });
+
+  it("§07 surfaces METHODE_S07_LIMITES_DISCLAIMER_PREFIX + SUFFIX (V3 roadmap + signalement)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-07")!;
+    expect(section.textContent).toContain(METHODE_S07_LIMITES_DISCLAIMER_PREFIX.trim());
+    expect(section.textContent).toContain(METHODE_S07_LIMITES_DISCLAIMER_SUFFIX.trim());
   });
 
   it("the number of rendered Section bodies matches METHODE_SECTIONS.length (no orphan body)", () => {

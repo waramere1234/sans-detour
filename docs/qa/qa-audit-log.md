@@ -3943,3 +3943,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `METHODE_PAGE_LEAD_INTRO\|METHODE_PAGE_LEAD_PURE_MATH\|METHODE_S04_OPENER\|METHODE_S02_EXCLUSIONS_SUFFIX` src/ tests/ → 15+ résultats
 - [ ] grep `"Aucune opinion, aucun panel"\|"formule mathématique pure"\|"Pour chaque groupe, on compare"\|"On exclut les amendements"` src/ tests/ → 4-7 résultats (déclarations + pin-the-value)
 - [ ] grep `~861 tests` CLAUDE.md → 0 résultat (aligné sur ~872)
+
+---
+
+## Session 168 — 2026-05-18
+
+### Vérification session 167
+
+- [VERIFIED] 34 occurrences des 4 nouveaux exports (METHODE_PAGE_LEAD_INTRO + METHODE_PAGE_LEAD_PURE_MATH + METHODE_S04_OPENER + METHODE_S02_EXCLUSIONS_SUFFIX)
+- [VERIFIED] 0 inline literal matches (tous migrés vers consts)
+- [VERIFIED] CLAUDE.md "~872 tests"
+- 872/872 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_S07_MODEL_DISCLOSURE + METHODE_S07_CLAUDE_TASKS_PREFIX/SUFFIX + METHODE_S07_LIMITES_DISCLAIMER_PREFIX/SUFFIX)
+
+- [FIXED] Methode §07 model disclosure `"Modèle : Claude Haiku 4.5 d'Anthropic, via Batches API + web_search"` inline + untested · Drift surface : un future model bump (Haiku 5, Sonnet) devrait propager du `ANTHROPIC_MODEL` env config (scripts/ingest-an.ts) au CLAUDE.md stack section ET à la doc user-side. Sans pin, le user-side desync silencieusement. Fix : export `METHODE_S07_MODEL_DISCLOSURE`. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + contains "Claude"/"Haiku"/"Anthropic" brand+model+vendor guard + contains "Batches API"/"web_search" pipeline-tooling guard. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §07 "Ce que fait Claude." body : long task-list paragraph split autour du `{MAX_POINTS_CLES_BULLETS}` interpolation. Contains 5 IA tasks + "12 mots" titre constraint + "30 à 50 mots" résumé length + 4 analyse_loi categories disclosure · Drift surface : 4 load-bearing numerical/categorical constraints documenting le LLM contract. Sans pin, un drift entre la doc user-side et le prompt ingestion réel laisserait users avec des claims faux. Fix : export `METHODE_S07_CLAUDE_TASKS_PREFIX` + `METHODE_S07_CLAUDE_TASKS_SUFFIX` (split autour de l'interpolation). Methode test : 1 round-trip toContain × 2. Aria-labels tests : full-composed PREFIX+SUFFIX pin + contains "12 mots" + "30 à 50 mots" + 4-analyse-categories anti-drop guards. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §07 "Limites & signalement." body : long disclaimer + V3 roadmap mention + signalement CTA. Split autour du mailto-link JSX. Contains "V3 prévue" roadmap promise + "aucune relecture humaine systématique" honesty disclosure · Drift surface : load-bearing limitation disclosure + V3 roadmap promise. Un weakening (drop "systématique", remove V3 mention) hideerait les limitations actuelles. Fix : export `METHODE_S07_LIMITES_DISCLAIMER_PREFIX` + `METHODE_S07_LIMITES_DISCLAIMER_SUFFIX`. Methode test : 1 round-trip toContain × 2. Aria-labels tests : pin-the-value × 2 + contains "V3 prévue" + "aucune relecture humaine systématique" load-bearing guards. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 169
+
+- [ ] grep `METHODE_S07_MODEL_DISCLOSURE\|METHODE_S07_CLAUDE_TASKS_PREFIX\|METHODE_S07_LIMITES_DISCLAIMER_PREFIX` src/ tests/ → 15+ résultats
+- [ ] grep `"Modèle : Claude Haiku\|"V3 prévue"\|"aucune relecture humaine"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~872 tests` CLAUDE.md → 0 résultat (aligné sur ~886)

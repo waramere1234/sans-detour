@@ -720,6 +720,30 @@ export const METHODE_S04_OPENER =
 export const METHODE_S02_EXCLUSIONS_SUFFIX =
   "On exclut les amendements, les votes en commission et les motions procédurales (rejet préalable, renvoi).";
 
+/** Methode §07 model disclosure — names the LLM model + the API used
+ *  for ingestion. Pin so a future model bump (Haiku 5, Sonnet, etc.)
+ *  surfaces in tests AND the user-facing doc stays in sync with the
+ *  ANTHROPIC_MODEL env config in scripts/ingest-an.ts. */
+export const METHODE_S07_MODEL_DISCLOSURE =
+  "Modèle : Claude Haiku 4.5 d'Anthropic, via Batches API + web_search";
+
+/** Methode §07 "Ce que fait Claude" task-list body — describes the 5
+ *  things the LLM does during ingestion. Split into prefix + suffix
+ *  around the inline {MAX_POINTS_CLES_BULLETS} interpolation so each
+ *  half can be pinned independently. */
+export const METHODE_S07_CLAUDE_TASKS_PREFIX =
+  "Reformuler le titre brut du scrutin en 12 mots, condenser le projet de loi en ";
+export const METHODE_S07_CLAUDE_TASKS_SUFFIX =
+  " points clés, rédiger un résumé contextuel de 30 à 50 mots, structurer une synthèse détaillée (mesures, concernés, calendrier, exceptions), et taguer le scrutin par thème.";
+
+/** Methode §07 "Limites & signalement" disclaimer body. Split into
+ *  prefix + suffix around the inline mailto-link JSX. Contains the
+ *  V3 roadmap mention (relecture humaine systématique) which doubles
+ *  as a load-bearing limitation disclosure. */
+export const METHODE_S07_LIMITES_DISCLAIMER_PREFIX =
+  "Claude peut se tromper sur les nuances : un mot mal choisi, une mesure oubliée, un thème mal taggué. Pour l'instant, aucune relecture humaine systématique (V3 prévue). Si tu repères une erreur factuelle : ";
+export const METHODE_S07_LIMITES_DISCLAIMER_SUFFIX = " — on corrige.";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

@@ -70,6 +70,9 @@ import {
   METHODE_S07_MISE_EN_FORME_CLOSER, METHODE_S07_LIBELLE_BRUT_GUARANTEE,
   METHODE_PAGE_LEAD_INTRO, METHODE_PAGE_LEAD_PURE_MATH,
   METHODE_S04_OPENER, METHODE_S02_EXCLUSIONS_SUFFIX,
+  METHODE_S07_MODEL_DISCLOSURE,
+  METHODE_S07_CLAUDE_TASKS_PREFIX, METHODE_S07_CLAUDE_TASKS_SUFFIX,
+  METHODE_S07_LIMITES_DISCLAIMER_PREFIX, METHODE_S07_LIMITES_DISCLAIMER_SUFFIX,
   COVER_SECONDARY_NAV_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
@@ -1598,6 +1601,91 @@ describe("METHODE_S02_EXCLUSIONS_SUFFIX — §02 excluded scrutin types", () => 
     expect(METHODE_S02_EXCLUSIONS_SUFFIX).toContain("amendements");
     expect(METHODE_S02_EXCLUSIONS_SUFFIX).toContain("commission");
     expect(METHODE_S02_EXCLUSIONS_SUFFIX).toContain("motions procédurales");
+  });
+});
+
+describe("METHODE_S07_MODEL_DISCLOSURE — LLM model + API disclosure", () => {
+  it("matches the canonical model + API line", () => {
+    expect(METHODE_S07_MODEL_DISCLOSURE).toBe(
+      "Modèle : Claude Haiku 4.5 d'Anthropic, via Batches API + web_search",
+    );
+  });
+
+  it("contains 'Claude' + 'Haiku' + 'Anthropic' (load-bearing brand+model tokens)", () => {
+    // A future model bump should update all 3 of: this const, the
+    // ANTHROPIC_MODEL env config, and CLAUDE.md's stack section.
+    // Pinning the brand+model+vendor surfaces a deliberate bump.
+    expect(METHODE_S07_MODEL_DISCLOSURE).toContain("Claude");
+    expect(METHODE_S07_MODEL_DISCLOSURE).toContain("Haiku");
+    expect(METHODE_S07_MODEL_DISCLOSURE).toContain("Anthropic");
+  });
+
+  it("contains 'Batches API' + 'web_search' (load-bearing pipeline tooling)", () => {
+    // The Batches API is what makes ingestion cheap (~$0.20-0.30 per
+    // run, cf. CLAUDE.md); web_search is what provides context. Both
+    // tokens are documented contracts to the user — pin them.
+    expect(METHODE_S07_MODEL_DISCLOSURE).toContain("Batches API");
+    expect(METHODE_S07_MODEL_DISCLOSURE).toContain("web_search");
+  });
+});
+
+describe("METHODE_S07_CLAUDE_TASKS_* — 5-task IA-role disclosure", () => {
+  it("PREFIX + N + SUFFIX composes the canonical task list", () => {
+    // The JSX interpolates {MAX_POINTS_CLES_BULLETS} between the
+    // prefix and suffix. Composed, this reads as a comma-separated
+    // list of the 5 IA tasks.
+    const composed = METHODE_S07_CLAUDE_TASKS_PREFIX + "3" + METHODE_S07_CLAUDE_TASKS_SUFFIX;
+    expect(composed).toBe(
+      "Reformuler le titre brut du scrutin en 12 mots, condenser le projet de loi en 3 points clés, rédiger un résumé contextuel de 30 à 50 mots, structurer une synthèse détaillée (mesures, concernés, calendrier, exceptions), et taguer le scrutin par thème.",
+    );
+  });
+
+  it("PREFIX contains the 12-mots claim (anti-shortening guard for title reformulation)", () => {
+    // The "12 mots" upper bound is documented in CLAUDE.md as the
+    // contract for titre_pedago. A regression that drops or changes
+    // the count desyncs the doc from the ingestion prompt.
+    expect(METHODE_S07_CLAUDE_TASKS_PREFIX).toContain("12 mots");
+  });
+
+  it("SUFFIX contains '30 à 50 mots' (resumé length range)", () => {
+    // Same drift guard for the contextual-resumé word count.
+    expect(METHODE_S07_CLAUDE_TASKS_SUFFIX).toContain("30 à 50 mots");
+  });
+
+  it("SUFFIX lists the 4 analyse_loi categories (mesures/concernés/calendrier/exceptions)", () => {
+    // The 4 ScrutinAnalyse scalar-field categories must remain
+    // documented — a regression that drops one would silently
+    // weaken the synthesis transparency disclosure.
+    expect(METHODE_S07_CLAUDE_TASKS_SUFFIX).toContain("mesures");
+    expect(METHODE_S07_CLAUDE_TASKS_SUFFIX).toContain("concernés");
+    expect(METHODE_S07_CLAUDE_TASKS_SUFFIX).toContain("calendrier");
+    expect(METHODE_S07_CLAUDE_TASKS_SUFFIX).toContain("exceptions");
+  });
+});
+
+describe("METHODE_S07_LIMITES_DISCLAIMER_* — V3 roadmap + signalement disclaimer", () => {
+  it("PREFIX matches the canonical disclaimer opener", () => {
+    expect(METHODE_S07_LIMITES_DISCLAIMER_PREFIX).toBe(
+      "Claude peut se tromper sur les nuances : un mot mal choisi, une mesure oubliée, un thème mal taggué. Pour l'instant, aucune relecture humaine systématique (V3 prévue). Si tu repères une erreur factuelle : ",
+    );
+  });
+
+  it("SUFFIX matches the closing ' — on corrige.'", () => {
+    expect(METHODE_S07_LIMITES_DISCLAIMER_SUFFIX).toBe(" — on corrige.");
+  });
+
+  it("PREFIX contains 'V3 prévue' (V3-roadmap mention guard)", () => {
+    // The "V3 prévue" mention is the user-facing roadmap promise
+    // for systematic human review. A regression that drops it
+    // would weaken the future-improvement commitment.
+    expect(METHODE_S07_LIMITES_DISCLAIMER_PREFIX).toContain("V3 prévue");
+  });
+
+  it("PREFIX contains 'aucune relecture humaine systématique' (honesty contract)", () => {
+    // The current limitation must be explicitly disclosed — Claude
+    // can be wrong, no human review yet. Dropping this clause hides
+    // the limitation.
+    expect(METHODE_S07_LIMITES_DISCLAIMER_PREFIX).toContain("aucune relecture humaine systématique");
   });
 });
 
