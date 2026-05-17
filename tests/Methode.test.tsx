@@ -25,6 +25,8 @@ import {
   METHODE_S07_NE_FAIT_PAS_BODY,
   METHODE_S07_CADRE_BIAIS_PREFIX, METHODE_S07_CADRE_BIAIS_SUFFIX,
   METHODE_S02_CAPS_EXAMPLE,
+  METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
+  METHODE_S04_RANK_NOISE_EXPLANATION,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -195,6 +197,19 @@ describe("Methode — section structure", () => {
     renderMethode();
     const section = document.getElementById("methode-02")!;
     expect(section.textContent).toContain(METHODE_S02_CAPS_EXAMPLE);
+  });
+
+  it("§01 surfaces METHODE_S01_DATA_SOURCE_STRONG + QUALITY_CLAIM", () => {
+    renderMethode();
+    const section = document.getElementById("methode-01")!;
+    expect(section.textContent).toContain(METHODE_S01_DATA_SOURCE_STRONG);
+    expect(section.textContent).toContain(METHODE_S01_DATA_SOURCE_QUALITY_CLAIM);
+  });
+
+  it("§04 surfaces METHODE_S04_RANK_NOISE_EXPLANATION (why rank requires MIN_FOR_RANKING+)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-04")!;
+    expect(section.textContent).toContain(METHODE_S04_RANK_NOISE_EXPLANATION);
   });
 
   it("the number of rendered Section bodies matches METHODE_SECTIONS.length (no orphan body)", () => {

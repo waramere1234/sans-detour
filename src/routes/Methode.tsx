@@ -36,6 +36,8 @@ import {
   METHODE_S07_NE_FAIT_PAS_BODY,
   METHODE_S07_CADRE_BIAIS_PREFIX, METHODE_S07_CADRE_BIAIS_SUFFIX,
   METHODE_S02_CAPS_EXAMPLE,
+  METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
+  METHODE_S04_RANK_NOISE_EXPLANATION,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -158,7 +160,7 @@ export default function Methode() {
       </nav>
 
       <Section n="01" title={METHODE_SECTION_BODY_TITLES["01"]}>
-        <p>Les votes proviennent de <strong>l'open data officiel de l'Assemblée Nationale</strong>, exposé sur <code>{AN_OPEN_DATA_HOSTNAME}</code>. Ce sont les mêmes fichiers que ceux utilisés par les médias de référence et le service interne de l'AN. Aucune retranscription manuelle, aucune source secondaire.</p>
+        <p>Les votes proviennent de <strong>{METHODE_S01_DATA_SOURCE_STRONG}</strong>, exposé sur <code>{AN_OPEN_DATA_HOSTNAME}</code>. Ce sont les mêmes fichiers que ceux utilisés par les médias de référence et le service interne de l'AN. {METHODE_S01_DATA_SOURCE_QUALITY_CLAIM}</p>
         <p>{METHODE_S01_UPDATE_CADENCE}</p>
       </Section>
 
@@ -187,7 +189,7 @@ export default function Methode() {
           <br/>
           Somme des scores ÷ nombre de scrutins comptés × 100 = % affiché
         </Formula>
-        <p>Le ranking apparaît à partir du <strong>{MIN_FOR_RANKING}<sup>e</sup> scrutin compté</strong> — en dessous, les pourcentages bougent trop pour signifier quoi que ce soit.</p>
+        <p>Le ranking apparaît à partir du <strong>{MIN_FOR_RANKING}<sup>e</sup> scrutin compté</strong> — {METHODE_S04_RANK_NOISE_EXPLANATION}.</p>
       </Section>
 
       <Section n="05" title={METHODE_SECTION_BODY_TITLES["05"]}>

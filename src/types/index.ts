@@ -768,6 +768,26 @@ export const METHODE_S07_CADRE_BIAIS_SUFFIX = " — tu peux comparer directement
 export const METHODE_S02_CAPS_EXAMPLE =
   "pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée";
 
+/** Methode §01 strong-tagged data-source identity. Names the official
+ *  AN open-data portal as the canonical source — paired with the
+ *  AN_OPEN_DATA_HOSTNAME `<code>` element rendered immediately after. */
+export const METHODE_S01_DATA_SOURCE_STRONG =
+  "l'open data officiel de l'Assemblée Nationale";
+
+/** Methode §01 data-source quality claim — the load-bearing "no
+ *  manual transcription, no secondary source" disclosure. Centralised
+ *  so a rewording that softens the quality contract surfaces in tests. */
+export const METHODE_S01_DATA_SOURCE_QUALITY_CLAIM =
+  "Aucune retranscription manuelle, aucune source secondaire.";
+
+/** Methode §04 rank-threshold noise explanation — explains *why* the
+ *  ranking only appears at MIN_FOR_RANKING+ scrutins (below that,
+ *  percentages are too noisy to interpret). Load-bearing because it
+ *  justifies the threshold gate to users. The text after the strong-
+ *  tagged threshold phrase. */
+export const METHODE_S04_RANK_NOISE_EXPLANATION =
+  "en dessous, les pourcentages bougent trop pour signifier quoi que ce soit";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

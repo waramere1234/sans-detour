@@ -76,6 +76,8 @@ import {
   METHODE_S07_NE_FAIT_PAS_BODY,
   METHODE_S07_CADRE_BIAIS_PREFIX, METHODE_S07_CADRE_BIAIS_SUFFIX,
   METHODE_S02_CAPS_EXAMPLE,
+  METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
+  METHODE_S04_RANK_NOISE_EXPLANATION,
   COVER_SECONDARY_NAV_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
@@ -1769,6 +1771,48 @@ describe("METHODE_S02_CAPS_EXAMPLE — concrete cap-effect illustration", () => 
     // anchors weakens the cap-effect explanation.
     expect(METHODE_S02_CAPS_EXAMPLE).toContain("8 votes");
     expect(METHODE_S02_CAPS_EXAMPLE).toContain("3 votes");
+  });
+});
+
+describe("METHODE_S01_DATA_SOURCE_STRONG + QUALITY_CLAIM — §01 data-source disclosure", () => {
+  it("STRONG matches 'l'open data officiel de l'Assemblée Nationale'", () => {
+    expect(METHODE_S01_DATA_SOURCE_STRONG).toBe("l'open data officiel de l'Assemblée Nationale");
+  });
+
+  it("STRONG contains 'open data officiel' (official-source qualifier)", () => {
+    // The "officiel" qualifier is load-bearing — distinguishes this
+    // from any third-party data scraper. A rewording that drops it
+    // weakens the source-authority claim.
+    expect(METHODE_S01_DATA_SOURCE_STRONG).toContain("open data officiel");
+  });
+
+  it("QUALITY_CLAIM matches 'Aucune retranscription manuelle, aucune source secondaire.'", () => {
+    expect(METHODE_S01_DATA_SOURCE_QUALITY_CLAIM).toBe(
+      "Aucune retranscription manuelle, aucune source secondaire.",
+    );
+  });
+
+  it("QUALITY_CLAIM contains 'Aucune' twice (anti-merge guard on the 2 negations)", () => {
+    // The 2 negations are intentionally paired: "no manual rewriting"
+    // + "no secondary source". A regression that merges them into a
+    // single weaker claim would weaken the data-quality contract.
+    const matches = (METHODE_S01_DATA_SOURCE_QUALITY_CLAIM.match(/aucune/gi) || []).length;
+    expect(matches).toBe(2);
+  });
+});
+
+describe("METHODE_S04_RANK_NOISE_EXPLANATION — rank threshold justification", () => {
+  it("matches the canonical noise-floor justification", () => {
+    expect(METHODE_S04_RANK_NOISE_EXPLANATION).toBe(
+      "en dessous, les pourcentages bougent trop pour signifier quoi que ce soit",
+    );
+  });
+
+  it("contains 'pourcentages' + 'signifier' (load-bearing math + meaning tokens)", () => {
+    // The justification: below MIN_FOR_RANKING, percentages move
+    // too much to mean anything. Both tokens carry the explanation.
+    expect(METHODE_S04_RANK_NOISE_EXPLANATION).toContain("pourcentages");
+    expect(METHODE_S04_RANK_NOISE_EXPLANATION).toContain("signifier");
   });
 });
 

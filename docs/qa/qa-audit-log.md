@@ -3989,3 +3989,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `METHODE_S07_NE_FAIT_PAS_BODY\|METHODE_S07_CADRE_BIAIS_PREFIX\|METHODE_S02_CAPS_EXAMPLE` src/ tests/ → 15+ résultats
 - [ ] grep `"calcul d.alignement (formule mathématique pure)"\|"neutre par construction"\|"8 votes retraite"` src/ tests/ → 3-6 résultats (déclarations + pin-the-value)
 - [ ] grep `~886 tests` CLAUDE.md → 0 résultat (aligné sur ~900)
+
+---
+
+## Session 170 — 2026-05-18
+
+### Vérification session 169
+
+- [VERIFIED] 37 occurrences des 3 nouveaux exports (METHODE_S07_NE_FAIT_PAS_BODY + METHODE_S07_CADRE_BIAIS_PREFIX + METHODE_S02_CAPS_EXAMPLE)
+- [VERIFIED] 1 occurrence inline literal (pin-the-value test pour "neutre par construction")
+- [VERIFIED] CLAUDE.md "~900 tests"
+- 900/900 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_S01_DATA_SOURCE_STRONG + METHODE_S01_DATA_SOURCE_QUALITY_CLAIM + METHODE_S04_RANK_NOISE_EXPLANATION)
+
+- [FIXED] Methode §01 strong-tagged data-source identity `"l'open data officiel de l'Assemblée Nationale"` inline + untested · Drift surface : load-bearing claim qui nomme la canonical AN open-data source. Le "officiel" qualifier distingue cette source d'un third-party scraper — un rewording silencieux qui drop "officiel" affaibrait l'authority claim. Fix : export `METHODE_S01_DATA_SOURCE_STRONG`. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + contains "open data officiel" load-bearing-qualifier guard. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §01 data-source quality claim `"Aucune retranscription manuelle, aucune source secondaire."` inline + untested · Drift surface : load-bearing 2-negation "no manual rewriting, no secondary source" disclosure. Un merge silencieux des 2 negations en un single weaker claim affaibrait le data-quality contract. Fix : export `METHODE_S01_DATA_SOURCE_QUALITY_CLAIM`. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + 2-"aucune"-count anti-merge guard (case-insensitive regex). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §04 rank-threshold noise explanation `"en dessous, les pourcentages bougent trop pour signifier quoi que ce soit"` inline + untested · Drift surface : justifie le MIN_FOR_RANKING threshold gate user-facing. Sans pin, un rewording silencieux qui soften l'explanation pourrait confuser les users sur why le ranking apparaît avec un délai. Fix : export `METHODE_S04_RANK_NOISE_EXPLANATION`. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + contains "pourcentages" + "signifier" load-bearing math+meaning tokens. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 171
+
+- [ ] grep `METHODE_S01_DATA_SOURCE_STRONG\|METHODE_S01_DATA_SOURCE_QUALITY_CLAIM\|METHODE_S04_RANK_NOISE_EXPLANATION` src/ tests/ → 15+ résultats
+- [ ] grep `"open data officiel de l.Assemblée Nationale"\|"Aucune retranscription manuelle"\|"pourcentages bougent trop"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~900 tests` CLAUDE.md → 0 résultat (aligné sur ~908)
