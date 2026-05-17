@@ -31,6 +31,7 @@ import {
   sanitizeJsonControlChars,
   fallbackSummary,
 } from "./lib/parse-summary";
+import { isEligibleScrutin } from "./lib/an-filter";
 
 // ───────────────────────────────────────────────────────────────── config
 
@@ -159,40 +160,6 @@ interface ParsedScrutin {
 }
 
 // ───────────────────────────── corpus filter (V2: SPS + SOR/MOC selected)
-
-/** Keep a scrutin if it's a final vote on a whole text the user can clearly
- *  position on. Drops amendments (sub-clause votes) and procedural motions
- *  (rejet préalable, renvoi en commission) which discriminate
- *  "majorité vs opposition" rather than left vs right.
- *
- *  IMPORTANT: this rule MUST stay in sync with scripts/resume-ingest.ts —
- *  the recovery script applies the same eligibility check when patching
- *  the DB from a previous batch. */
-function isEligibleScrutin(raw: ANScrutinRaw): boolean {
-  const code = raw.typeVote?.codeTypeVote;
-  const titre = raw.objet?.libelle ?? "";
-
-  // Drop amendments first — even SPS ones, they're not deck-friendly.
-  if (/\bamendements?\b/i.test(titre)) return false;
-  if (/\bà l'article\b/i.test(titre)) return false;
-
-  // SPS that aren't amendments: always keep.
-  if (code === "SPS") return true;
-
-  // Final vote on a whole text.
-  if (/sur l'ensemble/i.test(titre)) return true;
-
-  // Censure / référendaire motions — politically meaningful signal.
-  // Procedural motions (rejet préalable, renvoi en commission) are out.
-  if (/\bmotion de censure\b/i.test(titre)) return true;
-  if (/\bmotion référendaire\b/i.test(titre)) return true;
-
-  // Final votes on propositions de résolution (the amendment check above
-  // already excludes the noisy amendment-on-resolution variants).
-  if (/proposition de résolution/i.test(titre)) return true;
-
-  return false;
-}
 
 function n(s: string | null | undefined): number {
   return parseInt(s ?? "0", 10) || 0;

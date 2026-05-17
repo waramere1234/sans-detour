@@ -2156,3 +2156,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `aria-controls.*personnalites-panel` src/routes/Result.tsx → 1 résultat (conditionnel sur showPersonnalites)
 - [ ] grep -c "it(" tests/ChipTop1.test.tsx → 5 (était 4)
 - [ ] grep -c "it(" tests/Card.test.tsx → 19 (était 18)
+
+---
+
+## Session 94 — 2026-05-17
+
+### Vérification session 93
+
+- [VERIFIED] 3 `aria-haspopup` dans src/components/ (TopBar `menu`, ChipTop1 `dialog`, Card IA chip `dialog`)
+- [VERIFIED] `Result.tsx:268` aria-controls conditionnel sur showPersonnalites
+- [VERIFIED] tests/ChipTop1.test.tsx 5 `it()`, tests/Card.test.tsx 19 `it()`
+- 195/195 tests verts, typecheck clean
+
+### Bugs fixés (drift-risk extraction + 18 test cases + doc realign)
+
+- [FIXED] `isEligibleScrutin` dupliqué entre `scripts/ingest-an.ts` + `scripts/resume-ingest.ts` · Le commentaire dans resume-ingest.ts disait littéralement "MUST stay in sync with scripts/ingest-an.ts isEligibleScrutin" — admission explicite du risk de drift. Cette fonction décide quels scrutins entrent dans le deck (et donc combien on paie Anthropic). Une divergence silencieuse changerait le coût de l'ingestion ET le contenu vu par l'utilisateur. Extraction dans `scripts/lib/an-filter.ts` avec interface minimale `ANScrutinForFilter` (juste `typeVote.codeTypeVote` + `objet.libelle` — pas besoin du full ANScrutinRaw). 2 scripts importent depuis là. · `scripts/lib/an-filter.ts` (nouveau), `scripts/ingest-an.ts`, `scripts/resume-ingest.ts`
+- [FIXED] `isEligibleScrutin` zero test coverage · La fonction couvre 6 branches : drop amendements, drop "à l'article", keep SPS, keep "sur l'ensemble", keep motions (censure + référendaire seulement), keep propositions de résolution. Une régression sur n'importe quelle branche slipperait par CI. Ajout de `tests/an-filter.test.ts` avec 18 tests organisés par branche : amendment exclusions (5 cases incl. amendement-on-SPS, case-insensitive, à l'article), SPS auto-keep, sur-l'ensemble, motion censure/référendaire (incl. rejet/renvoi en commission stay out), proposition de résolution (incl. amendment-on-proposition wins), defaults (no rule, missing fields). · `tests/an-filter.test.ts` (nouveau)
+- [FIXED] `CLAUDE.md` ligne 88 référence stale `scripts/ingest-an.ts — isEligibleScrutin` · Après l'extraction, la doc pointait toujours vers l'ancien location. Mise à jour vers `scripts/lib/an-filter.ts — isEligibleScrutin`. · `CLAUDE.md`
+
+### Vérifications à faire en session 95
+
+- [ ] grep `function isEligibleScrutin` scripts/ → 1 résultat (scripts/lib/an-filter.ts seulement)
+- [ ] `ls tests/an-filter.test.ts` → présent, 18 tests
+- [ ] grep `scripts/lib/an-filter` CLAUDE.md → 1 résultat (ligne 88 mise à jour)
+- [ ] grep `~195 tests` CLAUDE.md → 0 résultat (aligné sur ~213)

@@ -85,7 +85,7 @@ Migrations dans `supabase/migrations/0001..0006_*.sql`. Toutes appliquées sur l
 siège), Tondelier (jamais députée), Darmanin (ministre 95% du temps,
 3 votes effectifs uniquement).
 
-## Filtre d'ingestion (`scripts/ingest-an.ts` — `isEligibleScrutin`)
+## Filtre d'ingestion (`scripts/lib/an-filter.ts` — `isEligibleScrutin`)
 
 **Garde** :
 - SPS qui ne sont pas des amendements
@@ -188,7 +188,7 @@ Pas de mention du modèle dans les commits/PR (Claude Code 1M context, etc.).
 
 ### Tests
 
-`npm run test:run` (Vitest, ~195 tests aujourd'hui couvrant matching / deck / session / parties / personnalites / analytics / themes / Card / ChipTop1 / Cover / MethodeSheet / ErrorBoundary / FreshnessBanner / compute-positions / sanity / deck-invariants / parse-summary / contact / nav-state / text-cleanup, doivent rester verts à chaque commit).
+`npm run test:run` (Vitest, ~213 tests aujourd'hui couvrant matching / deck / session / parties / personnalites / analytics / themes / Card / ChipTop1 / Cover / MethodeSheet / ErrorBoundary / FreshnessBanner / compute-positions / sanity / deck-invariants / parse-summary / contact / nav-state / text-cleanup / an-filter, doivent rester verts à chaque commit).
 
 ### Commandes utiles
 

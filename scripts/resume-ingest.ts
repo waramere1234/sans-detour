@@ -32,6 +32,7 @@ import {
   sanitizeJsonControlChars,
   fallbackSummary,
 } from "./lib/parse-summary";
+import { isEligibleScrutin } from "./lib/an-filter";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -133,20 +134,6 @@ function parseRaw(raw: ANScrutinRaw): ParsedRaw {
     url_an_officielle: `https://www.assemblee-nationale.fr/dyn/17/scrutins/${raw.numero}`,
     pedago_relu: false,
   };
-}
-
-// MUST stay in sync with scripts/ingest-an.ts isEligibleScrutin.
-function isEligibleScrutin(raw: ANScrutinRaw): boolean {
-  const code = raw.typeVote?.codeTypeVote;
-  const titre = raw.objet?.libelle ?? "";
-  if (/\bamendements?\b/i.test(titre)) return false;
-  if (/\bà l'article\b/i.test(titre)) return false;
-  if (code === "SPS") return true;
-  if (/sur l'ensemble/i.test(titre)) return true;
-  if (/\bmotion de censure\b/i.test(titre)) return true;
-  if (/\bmotion référendaire\b/i.test(titre)) return true;
-  if (/proposition de résolution/i.test(titre)) return true;
-  return false;
 }
 
 // ──────────────────────────── LLM summary parsing ────────────────────────────
