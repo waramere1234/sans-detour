@@ -3618,3 +3618,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `resultHeaderBodyLineText\|resultPersonnalitesIndexedCountText\|continueTestRemainingSuffix` src/ tests/ → 10+ résultats
 - [ ] grep `scrutin\{|compté\{|skip\{|indexée\{|votes? restants?` src/routes/Result.tsx → 0 résultat (toutes les inline templates migrées)
 - [ ] grep `~726 tests` CLAUDE.md → 0 résultat (aligné sur ~735)
+
+---
+
+## Session 154 — 2026-05-17
+
+### Vérification session 153
+
+- [VERIFIED] 26 occurrences des 3 nouveaux helpers (resultHeaderBodyLineText + resultPersonnalitesIndexedCountText + continueTestRemainingSuffix)
+- [VERIFIED] 0 inline templates `scrutin{`, `compté{`, `skip{`, `indexée{`, "vote(s) restant(s)" dans Result.tsx
+- [VERIFIED] CLAUDE.md "~735 tests"
+- 735/735 tests verts, typecheck clean
+
+### Bugs fixés (coverProgressChipText + RESULT_TOP_LEAD + WORDMARK_TEXT)
+
+- [FIXED] Cover.tsx start-button progress-chip 3-branch ternary (fresh: `"≈ 5 min · ${TARGET} votes"` ; inProgress: `"${votesCount}/${TARGET} · ${remainingVotes} restant${plural}"` ; completed: `"${votesCount}/${TARGET} terminés"`) inline, unpinned par tests · Drift surface : 4 templates in-source sans tests pour les guarder. La inProgress branch a aussi un plural rule sur "restant". Fix : export `CoverProgressState` union type + `coverProgressChipText(state, votesCount, target, remainingVotes)` helper. Cover.tsx utilise le helper en passant un state computed depuis (hasCompleted, hasInProgress). 5 nouveaux tests dans aria-labels.test.ts : fresh branch pin, completed branch pin, inProgress branch × 2 (singular + plural), 0-as-plural French rule, fresh branch ignore-extra-args invariant. · `src/types/index.ts`, `src/routes/Cover.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Result.tsx h1 lead phrase `"Tu es surtout aligné avec"` inline (avant le span coloré du party name), untested · Drift surface : la phrase d'ouverture du h1 — un rewording silencieux changerait l'ouverture du résultat sans qu'aucun test ne ping. Fix : export `RESULT_TOP_LEAD = "Tu es surtout aligné avec"` depuis src/types. Result.tsx utilise `{RESULT_TOP_LEAD}{" "}` (le JSX ajoute l'espace, donc la const doit pas se terminer par espace). 2 nouveaux tests : pin-the-value, no-trailing-space contract (sinon double-space avant le party name span). · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Wordmark.tsx visible text `"sans/détour"` inline + pinné par 1 test (`.toBe("sans/détour")`) · Drift surface : 2 sites in-lockstep. Distinct from BRAND_NAME (`"Sans Détour"` capitalized + space form, used in titres pages/share text/contact subject). Fix : export `WORDMARK_TEXT = "sans/détour"` depuis src/types. Test migre vers `expect(container.textContent).toBe(WORDMARK_TEXT)`. Wordmark.tsx source garde son JSX split sur le `/` (3 fragments avec le slash dans son propre span pour theming), mais le textContent égale WORDMARK_TEXT. 2 nouveaux tests dans aria-labels.test.ts : pin-the-value + lowercase-with-slash invariant vs BRAND_NAME (distinct semantic). · `src/types/index.ts`, `tests/Wordmark.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 155
+
+- [ ] grep `coverProgressChipText\|RESULT_TOP_LEAD\|WORDMARK_TEXT` src/ tests/ → 15+ résultats
+- [ ] grep `"≈ 5 min ·\|terminés\|Tu es surtout aligné\|sans/détour"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~735 tests` CLAUDE.md → 0 résultat (aligné sur ~744)

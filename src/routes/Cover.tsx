@@ -17,6 +17,7 @@ import {
   VOTE_LABEL_CONTRE, VOTE_LABEL_SKIP, VOTE_LABEL_POUR,
   MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
   COVER_SOURCE_ATTRIBUTION_AN, COVER_SOURCE_ATTRIBUTION_CLAUDE,
+  coverProgressChipText,
 } from "../types";
 
 export default function Cover() {
@@ -220,11 +221,10 @@ export default function Cover() {
           >
             <span>{hasCompleted ? VIEW_RESULT_LABEL : hasInProgress ? RESUME_LABEL : START_LABEL}</span>
             <span style={{ fontFamily: "var(--font-mono)", fontWeight: 500 }}>
-              {hasCompleted
-                ? `${votesCount}/${TARGET} terminés`
-                : hasInProgress
-                  ? `${votesCount}/${TARGET} · ${remainingVotes} restant${remainingVotes !== 1 ? "s" : ""}`
-                  : `≈ 5 min · ${TARGET} votes`}
+              {coverProgressChipText(
+                hasCompleted ? "completed" : hasInProgress ? "inProgress" : "fresh",
+                votesCount, TARGET, remainingVotes,
+              )}
               <span aria-hidden="true"> →</span>
             </span>
           </button>

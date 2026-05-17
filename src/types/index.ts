@@ -422,6 +422,48 @@ export function continueTestRemainingSuffix(remaining: number): string {
   return remaining === 1 ? "vote restant" : "votes restants";
 }
 
+/** Cover.tsx start-button progress-chip state. Drives the right-hand
+ *  text rendered next to the CTA label (Commencer/Reprendre/Voir mon
+ *  résultat). The 3 states map to the 3 user-visible scenarios:
+ *    - "fresh":      first visit, no session → "≈ 5 min · N votes"
+ *    - "inProgress": session started, not yet at TARGET → "N/M · K restant(s)"
+ *    - "completed":  session reached TARGET → "N/M terminés" */
+export type CoverProgressState = "fresh" | "inProgress" | "completed";
+
+/** Compose the Cover.tsx progress-chip text. Pulled out of the inline
+ *  3-branch ternary in Cover.tsx so the per-branch wording + the
+ *  plural rule on "restant" are testable. Currently unpinned by tests
+ *  — the helper enables a new round-trip test surface. */
+export function coverProgressChipText(
+  state: CoverProgressState,
+  votesCount: number,
+  target: number,
+  remainingVotes: number,
+): string {
+  switch (state) {
+    case "fresh":      return `≈ 5 min · ${target} votes`;
+    case "completed":  return `${votesCount}/${target} terminés`;
+    case "inProgress": {
+      const s = remainingVotes !== 1 ? "s" : "";
+      return `${votesCount}/${target} · ${remainingVotes} restant${s}`;
+    }
+  }
+}
+
+/** Result.tsx h1 lead phrase "Tu es surtout aligné avec" — the
+ *  invariant opener before the colored party-name span. The JSX
+ *  splits the sentence across 3 spans for accent styling on the
+ *  party name + the final period; this const pins the lead text
+ *  so a silent rewording surfaces at test time. */
+export const RESULT_TOP_LEAD = "Tu es surtout aligné avec";
+
+/** Wordmark visible text "sans/détour" — the lowercase brand mark
+ *  rendered on Cover hero + TopBar + reading-page headers. Distinct
+ *  from BRAND_NAME (which is "Sans Détour", capitalized with space —
+ *  used in share text, contact subject, page <title>). 1 source +
+ *  1 test pin; centralising defends against a silent rebrand. */
+export const WORDMARK_TEXT = "sans/détour";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

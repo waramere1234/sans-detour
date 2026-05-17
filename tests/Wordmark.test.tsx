@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { Wordmark } from "../src/components/Wordmark";
+import { WORDMARK_TEXT } from "../src/types";
 
 // Wordmark is small but appears on every secondary header (TopBar trigger,
 // Cover hero, Methode + Legal page headers). Session 81 stripped the unused
@@ -11,7 +12,7 @@ import { Wordmark } from "../src/components/Wordmark";
 describe("Wordmark", () => {
   it("renders the 'sans/détour' wordmark text", () => {
     const { container } = render(<Wordmark />);
-    expect(container.textContent).toBe("sans/détour");
+    expect(container.textContent).toBe(WORDMARK_TEXT);
   });
 
   it("uses the default 14px font size when size is omitted", () => {

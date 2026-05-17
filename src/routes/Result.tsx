@@ -21,6 +21,7 @@ import {
   refaireConfirmMessage, PERSONNALITES_TOGGLE_LABEL,
   resultEyebrowText, resultHeaderBodyLineText,
   resultPersonnalitesIndexedCountText, continueTestRemainingSuffix,
+  RESULT_TOP_LEAD,
   type Scrutin, type GroupCode,
 } from "../types";
 
@@ -165,7 +166,7 @@ export default function Result() {
           fontSize: 28, lineHeight: 1.15, letterSpacing: "-0.022em",
           margin: "10px 0 0", color: "var(--ink)",
         }}>
-          Tu es surtout aligné avec{" "}
+          {RESULT_TOP_LEAD}{" "}
           <span style={{ color: getPartyColorVar(top.group) }}>{getParty(top.group).name}</span>
           {" "}({top.pct}%)
           <span style={{ color: "var(--accent)" }}>.</span>

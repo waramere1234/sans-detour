@@ -34,6 +34,7 @@ import {
   rankingOverlayHeaderText,
   resultEyebrowText, resultHeaderBodyLineText,
   resultPersonnalitesIndexedCountText, continueTestRemainingSuffix,
+  coverProgressChipText, RESULT_TOP_LEAD, WORDMARK_TEXT,
   LEGISLATURE_LABEL,
 } from "../src/types";
 import { freshnessTotalScrutinsPhrase } from "../src/components/FreshnessBanner";
@@ -803,6 +804,60 @@ describe("continueTestRemainingSuffix — Result.tsx CONTINUE_TEST button suffix
     expect(continueTestRemainingSuffix(0)).toBe("votes restants");
     expect(continueTestRemainingSuffix(2)).toBe("votes restants");
     expect(continueTestRemainingSuffix(15)).toBe("votes restants");
+  });
+});
+
+describe("coverProgressChipText — Cover.tsx start-button progress chip", () => {
+  // 3-branch helper (fresh / inProgress / completed). The fresh branch
+  // is invariant; the inProgress branch has a plural rule on "restant";
+  // the completed branch shows the final fraction.
+  it("fresh branch composes '≈ 5 min · {TARGET} votes'", () => {
+    expect(coverProgressChipText("fresh", 0, 20, 0)).toBe("≈ 5 min · 20 votes");
+  });
+
+  it("completed branch composes '{N}/{TARGET} terminés'", () => {
+    expect(coverProgressChipText("completed", 20, 20, 0)).toBe("20/20 terminés");
+  });
+
+  it("inProgress branch composes '{N}/{TARGET} · {K} restant(s)' with plural rule", () => {
+    expect(coverProgressChipText("inProgress", 19, 20, 1)).toBe("19/20 · 1 restant");
+    expect(coverProgressChipText("inProgress", 5, 20, 15)).toBe("5/20 · 15 restants");
+  });
+
+  it("inProgress branch uses plural 'restants' for 0 (French rule)", () => {
+    expect(coverProgressChipText("inProgress", 20, 20, 0)).toBe("20/20 · 0 restants");
+  });
+
+  it("fresh branch ignores votesCount + remainingVotes (only target matters)", () => {
+    // The fresh branch fires when no session exists; passing non-zero
+    // votesCount/remaining shouldn't bleed into the output.
+    expect(coverProgressChipText("fresh", 5, 20, 15)).toBe("≈ 5 min · 20 votes");
+  });
+});
+
+describe("RESULT_TOP_LEAD + WORDMARK_TEXT — Result h1 + brand visible text", () => {
+  it("RESULT_TOP_LEAD matches the canonical 'Tu es surtout aligné avec' wording", () => {
+    expect(RESULT_TOP_LEAD).toBe("Tu es surtout aligné avec");
+  });
+
+  it("RESULT_TOP_LEAD has no trailing space (JSX adds {' '} after)", () => {
+    // The h1 renders `{RESULT_TOP_LEAD}{" "}` — if the const included
+    // a trailing space, the output would have a double space before
+    // the party name. Pin the no-trailing-space contract.
+    expect(RESULT_TOP_LEAD.endsWith(" ")).toBe(false);
+  });
+
+  it("WORDMARK_TEXT matches the canonical 'sans/détour' wordmark", () => {
+    expect(WORDMARK_TEXT).toBe("sans/détour");
+  });
+
+  it("WORDMARK_TEXT is distinct from BRAND_NAME (lowercase + slash, not capitalized + space)", () => {
+    // Pin the contract: wordmark = lowercase typographic mark with
+    // slash separator; BRAND_NAME = capitalised display form with
+    // space. A future "rebrand" that flattens them would surface here.
+    expect(WORDMARK_TEXT).toBe(WORDMARK_TEXT.toLowerCase());
+    expect(WORDMARK_TEXT).toContain("/");
+    expect(WORDMARK_TEXT).not.toContain(" ");
   });
 });
 
