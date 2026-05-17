@@ -2330,3 +2330,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `export function extractConcrete` src/lib/text-cleanup.ts → 1 résultat (moved here)
 - [ ] grep `function extractConcrete` src/components/AuditTrail.tsx → 0 résultat (removed)
 - [ ] grep `~256 tests` CLAUDE.md → 0 résultat (aligné sur ~287)
+
+---
+
+## Session 101 — 2026-05-17
+
+### Vérification session 100
+
+- [VERIFIED] `tests/PartyRow.test.tsx` + `tests/PersonnaliteRow.test.tsx` présents
+- [VERIFIED] `extractConcrete` exporté depuis `src/lib/text-cleanup.ts`, absent de AuditTrail.tsx
+- [VERIFIED] CLAUDE.md "~287 tests"
+- 287/287 tests verts, typecheck clean
+
+### Bugs fixés (test drift cleanup — fromLogo literal + 2 missing test files)
+
+- [FIXED] `tests/Cover.test.tsx:61` literal `{ fromLogo: true }` au lieu de `FROM_LOGO_STATE` · Session 90 a extrait le const dans `src/lib/nav-state.ts` ; les 4 call sites src/ utilisent le const. Mais le test Cover, écrit avant session 90, gardait le literal. Un futur rename du field (e.g. `fromLogo` → `fromHome`) casserait silencieusement le test (literal stale, le runtime n'aurait plus de match). Replace par l'import + usage du const → maintenant un rename casse le test ET la prod ensemble. · `tests/Cover.test.tsx`
+- [FIXED] `useFlipCardA11y` hook 0 test direct · Les 2 autres hooks (useModalA11y session 98, useFreshnessOnce session 99) ont des fichiers de test dédiés. useFlipCardA11y était couvert uniquement indirectement via Card.test.tsx (où le hook est passé via Card component). Ajout `tests/useFlipCardA11y.test.tsx` avec 13 tests directs : rootProps (role/aria-label/tabIndex topMost vs !topMost), aria-hidden faces (flipped flag), keyboard handler (Enter/Space → onFlip, Arrow*→onSwipe avec direction, Arrow ignored on flipped, all ignored on !topMost). · `tests/useFlipCardA11y.test.tsx` (nouveau)
+- [FIXED] `Wordmark` 0 test · Composant petit mais render-critical (every secondary route header — TopBar, Cover hero, Methode + Legal page headers). Session 81 a stripped le prop `className` mort ; sans test, une régression (réintroduction du prop, casser le `size`→`fontSize` conversion, casse du `.sd-slash` ou `.sd-caret` selector hook) slipperait. 7 tests : text content, default size 14px, custom size, `.sd-wordmark` class, `.sd-slash` span, aria-hidden `.sd-caret`, no interactive role. · `tests/Wordmark.test.tsx` (nouveau)
+
+### Vérifications à faire en session 102
+
+- [ ] grep `{ fromLogo: true }` tests/ → 0 résultat (literal éliminé du test)
+- [ ] `ls tests/useFlipCardA11y.test.tsx tests/Wordmark.test.tsx` → 2 fichiers présents
+- [ ] grep -c "it(" tests/useFlipCardA11y.test.tsx → 13
+- [ ] grep `~287 tests` CLAUDE.md → 0 résultat (aligné sur ~305)

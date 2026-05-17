@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import Cover from "../src/routes/Cover";
 import { resetSession, recordVote } from "../src/lib/session";
+import { FROM_LOGO_STATE } from "../src/lib/nav-state";
 import { TARGET } from "../src/types";
 
 function renderCover(initialEntries: InitialEntry[] = ["/"]) {
@@ -58,7 +59,7 @@ describe("Cover", () => {
   it("stays on cover when navigated with state.fromLogo=true (bypass auto-resume)", () => {
     localStorage.setItem("sd_seen_cover", "true");
     recordVote("s1", "pour");
-    renderCover([{ pathname: "/", state: { fromLogo: true } }]);
+    renderCover([{ pathname: "/", state: FROM_LOGO_STATE }]);
     // votes=1, hasInProgress=true → primary CTA reads "Reprendre", not
     // "Commencer". Match on /reprendre/i so the assertion can't be
     // accidentally satisfied by the secondary "Recommencer à zéro"
