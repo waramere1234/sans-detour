@@ -2,6 +2,11 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { MethodeSheet } from "../src/components/MethodeSheet";
+import {
+  MODAL_CLOSE_LABEL,
+  METHODESHEET_FULL_METHODE_LINK_LABEL,
+  METHODESHEET_REPORT_ERROR_LINK_LABEL,
+} from "../src/types";
 
 function renderSheet(open: boolean, onClose = vi.fn()) {
   return render(
@@ -28,7 +33,7 @@ describe("MethodeSheet", () => {
 
   it("focuses the close button on mount", async () => {
     renderSheet(true);
-    const closeBtn = screen.getByRole("button", { name: /fermer/i });
+    const closeBtn = screen.getByRole("button", { name: new RegExp(MODAL_CLOSE_LABEL, "i") });
     await new Promise((r) => setTimeout(r, 0));
     expect(closeBtn).toHaveFocus();
   });
@@ -49,8 +54,8 @@ describe("MethodeSheet", () => {
 
   it("includes mailto and methode link", () => {
     renderSheet(true);
-    const mailLink = screen.getByRole("link", { name: /signaler/i });
+    const mailLink = screen.getByRole("link", { name: new RegExp(METHODESHEET_REPORT_ERROR_LINK_LABEL, "i") });
     expect(mailLink).toHaveAttribute("href", expect.stringContaining("mailto:"));
-    expect(screen.getByRole("link", { name: /méthode complète/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: new RegExp(METHODESHEET_FULL_METHODE_LINK_LABEL, "i") })).toBeInTheDocument();
   });
 });

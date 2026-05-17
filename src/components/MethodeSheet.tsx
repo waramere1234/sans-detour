@@ -5,6 +5,8 @@ import { ROUTES } from "../lib/routes";
 import {
   MODAL_CLOSE_LABEL,
   METHODESHEET_AN_BLOCK_TITLE, METHODESHEET_CLAUDE_BLOCK_TITLE,
+  METHODESHEET_TITLE,
+  METHODESHEET_FULL_METHODE_LINK_LABEL, METHODESHEET_REPORT_ERROR_LINK_LABEL,
 } from "../types";
 import { useModalA11y } from "../hooks/useModalA11y";
 
@@ -78,7 +80,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
                 fontFamily: "var(--font-mono)", fontSize: 11,
                 letterSpacing: "0.14em", textTransform: "uppercase",
                 color: "var(--ink-3)", fontWeight: 500,
-              }}>Comment c'est fait ?</h2>
+              }}>{METHODESHEET_TITLE}</h2>
               <button
                 ref={closeBtnRef}
                 type="button"
@@ -122,12 +124,12 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
                 to={ROUTES.methode}
                 onClick={onClose}
                 style={btnPrimary()}
-              ><span aria-hidden="true">→ </span>Méthode complète</Link>
+              ><span aria-hidden="true">→ </span>{METHODESHEET_FULL_METHODE_LINK_LABEL}</Link>
               <a
                 href={mailto(ERROR_REPORT_SUBJECT)}
                 onClick={onClose}
                 style={btnSecondary()}
-              ><span aria-hidden="true">✉ </span>Signaler une erreur factuelle</a>
+              ><span aria-hidden="true">✉ </span>{METHODESHEET_REPORT_ERROR_LINK_LABEL}</a>
             </div>
           </motion.div>
         </>

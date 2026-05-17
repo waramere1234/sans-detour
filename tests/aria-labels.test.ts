@@ -35,6 +35,8 @@ import {
   resultEyebrowText, resultHeaderBodyLineText,
   resultPersonnalitesIndexedCountText, continueTestRemainingSuffix,
   coverProgressChipText, RESULT_TOP_LEAD, WORDMARK_TEXT,
+  METHODESHEET_TITLE,
+  METHODESHEET_FULL_METHODE_LINK_LABEL, METHODESHEET_REPORT_ERROR_LINK_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
 import { freshnessTotalScrutinsPhrase } from "../src/components/FreshnessBanner";
@@ -858,6 +860,35 @@ describe("RESULT_TOP_LEAD + WORDMARK_TEXT — Result h1 + brand visible text", (
     expect(WORDMARK_TEXT).toBe(WORDMARK_TEXT.toLowerCase());
     expect(WORDMARK_TEXT).toContain("/");
     expect(WORDMARK_TEXT).not.toContain(" ");
+  });
+});
+
+describe("METHODESHEET_TITLE + METHODESHEET_*_LINK_LABEL — MethodeSheet bottom-sheet copy", () => {
+  // The h2 title doubles as the dialog's accessible name (aria-labelledby).
+  // The 2 link labels are pinned by 2 test regex partial-matches.
+  it("METHODESHEET_TITLE matches the canonical 'Comment c'est fait ?' wording", () => {
+    expect(METHODESHEET_TITLE).toBe("Comment c'est fait ?");
+  });
+
+  it("METHODESHEET_TITLE ends with '?' (interrogative form, SR-friendly framing)", () => {
+    // The sheet poses a question; the user activates it for the answer.
+    // A rewording that drops the question mark would lose the framing.
+    expect(METHODESHEET_TITLE.endsWith("?")).toBe(true);
+  });
+
+  it("METHODESHEET_FULL_METHODE_LINK_LABEL matches 'Méthode complète'", () => {
+    expect(METHODESHEET_FULL_METHODE_LINK_LABEL).toBe("Méthode complète");
+  });
+
+  it("METHODESHEET_REPORT_ERROR_LINK_LABEL matches 'Signaler une erreur factuelle'", () => {
+    expect(METHODESHEET_REPORT_ERROR_LINK_LABEL).toBe("Signaler une erreur factuelle");
+  });
+
+  it("REPORT_ERROR_LINK_LABEL starts with 'Signaler' (action verb, primary affordance)", () => {
+    // The button-like link is the user's report-an-error CTA. A
+    // rewording to a noun phrase ("Erreur factuelle") would change
+    // the affordance from action to label.
+    expect(METHODESHEET_REPORT_ERROR_LINK_LABEL.startsWith("Signaler")).toBe(true);
   });
 });
 

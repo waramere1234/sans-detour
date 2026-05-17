@@ -464,6 +464,21 @@ export const RESULT_TOP_LEAD = "Tu es surtout aligné avec";
  *  1 test pin; centralising defends against a silent rebrand. */
 export const WORDMARK_TEXT = "sans/détour";
 
+/** MethodeSheet bottom-sheet h2 title — "Comment c'est fait ?". This
+ *  is the dialog's accessible name (referenced via aria-labelledby).
+ *  Single source today + 0 test pins; centralising defends against
+ *  silent rewording and gives the test surface a const to assert. */
+export const METHODESHEET_TITLE = "Comment c'est fait ?";
+
+/** MethodeSheet 2 footer link labels:
+ *    - "Méthode complète" — navigates to /methode for the full page
+ *    - "Signaler une erreur factuelle" — opens mailto with
+ *      ERROR_REPORT_SUBJECT
+ *  Each pinned by 1 test regex partial-match (`/méthode complète/i`,
+ *  `/signaler/i`). Centralising lets tests round-trip via the const. */
+export const METHODESHEET_FULL_METHODE_LINK_LABEL = "Méthode complète";
+export const METHODESHEET_REPORT_ERROR_LINK_LABEL = "Signaler une erreur factuelle";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

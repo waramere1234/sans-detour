@@ -3641,3 +3641,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `coverProgressChipText\|RESULT_TOP_LEAD\|WORDMARK_TEXT` src/ tests/ → 15+ résultats
 - [ ] grep `"≈ 5 min ·\|terminés\|Tu es surtout aligné\|sans/détour"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~735 tests` CLAUDE.md → 0 résultat (aligné sur ~744)
+
+---
+
+## Session 155 — 2026-05-17
+
+### Vérification session 154
+
+- [VERIFIED] 29 occurrences des 3 nouveaux exports (coverProgressChipText + RESULT_TOP_LEAD + WORDMARK_TEXT)
+- [VERIFIED] 6 occurrences inline literals = 2 comments + 1 déclaration + 3 pin-the-value tests (pas de drift)
+- [VERIFIED] CLAUDE.md "~744 tests"
+- 744/744 tests verts, typecheck clean
+
+### Bugs fixés (METHODESHEET_TITLE + METHODESHEET_FULL_METHODE/REPORT_ERROR_LINK_LABEL + MethodeSheet test regex cleanup)
+
+- [FIXED] MethodeSheet.tsx h2 title `"Comment c'est fait ?"` inline (visible heading + dialog's accessible name via aria-labelledby), untested · Drift surface : le title est le SR-announcement primaire du bottom-sheet quand il s'ouvre. Sans test, un rewording silencieux changerait l'accessible name. Fix : export `METHODESHEET_TITLE = "Comment c'est fait ?"` depuis src/types. MethodeSheet utilise la const. 2 nouveaux tests : pin-the-value + endsWith "?" invariant (forme interrogative — le sheet pose une question, le user clique pour la réponse). · `src/types/index.ts`, `src/components/MethodeSheet.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] MethodeSheet.tsx 2 footer link labels (`"Méthode complète"` Link → /methode + `"Signaler une erreur factuelle"` mailto avec ERROR_REPORT_SUBJECT) inline + dupliqués comme loose regex literals dans tests/MethodeSheet.test.tsx (`/méthode complète/i` + `/signaler/i`) · Drift surface : 4 sites in-lockstep + le regex `/signaler/i` est très loose (matche n'importe quel "signaler"). Fix : export `METHODESHEET_FULL_METHODE_LINK_LABEL` + `METHODESHEET_REPORT_ERROR_LINK_LABEL` depuis src/types. MethodeSheet utilise les 2 consts ; tests migrent vers `new RegExp(CONST, "i")`. 3 nouveaux tests : pin-the-value × 2 + startsWith "Signaler" action-verb invariant (anti-régression vers noun phrase). · `src/types/index.ts`, `src/components/MethodeSheet.tsx`, `tests/MethodeSheet.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] tests/MethodeSheet.test.tsx `name: /fermer/i` regex literal stale alors que `MODAL_CLOSE_LABEL = "Fermer"` existait depuis session 143 · Cleanup : symétrique aux migrations de sessions 146 + 150 où on a chassé les loose regex parallèles aux consts existantes. Fix : test migre vers `new RegExp(MODAL_CLOSE_LABEL, "i")`. · `tests/MethodeSheet.test.tsx`
+
+### Vérifications à faire en session 156
+
+- [ ] grep `METHODESHEET_TITLE\|METHODESHEET_FULL_METHODE_LINK_LABEL\|METHODESHEET_REPORT_ERROR_LINK_LABEL` src/ tests/ → 10+ résultats
+- [ ] grep `"Comment c.est fait ?"\|"Méthode complète"\|"Signaler une erreur factuelle"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `/fermer/i\|/signaler/i\|/méthode complète/i` tests/ → 0 résultats (toutes migrées vers consts)
+- [ ] grep `~744 tests` CLAUDE.md → 0 résultat (aligné sur ~749)
