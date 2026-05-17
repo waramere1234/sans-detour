@@ -2,6 +2,7 @@
 import { Link } from "react-router-dom";
 import { Wordmark } from "../components/Wordmark";
 import { FROM_LOGO_STATE } from "../lib/nav-state";
+import { CONTACT_EMAIL, mailto } from "../lib/contact";
 
 export default function Legal() {
   return (
@@ -39,7 +40,7 @@ export default function Legal() {
           this file so it can't drift again.) */}
         <p><strong>Éditeur</strong> — [Nom complet · à compléter]<br/>
         Adresse : [adresse postale]<br/>
-        Email : <a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a></p>
+        Email : <a href={mailto()}>{CONTACT_EMAIL}</a></p>
 
         <p><strong>Hébergeur</strong> — Vercel Inc.<br/>
         340 S Lemon Ave #4133, Walnut, CA 91789, USA</p>

@@ -657,7 +657,10 @@ async function main(): Promise<void> {
 
   // Cost-controlled test mode: INGEST_LIMIT=N processes only the first N
   // scrutins. Useful to validate prompt/UI changes for a few cents instead of
-  // the full batch. Drops to "all" when unset or invalid.
+  // the full batch. Unset (or empty) → "all" (no limit). Set but invalid
+  // (non-numeric, "0", negative) → falls back to 1, NOT "all": the safer
+  // interpretation of a typo like `INGEST_LIMIT=abcd` is to keep cost near
+  // zero, not silently run the full batch on a user who typed wrong.
   const limitRaw = process.env.INGEST_LIMIT;
   const limit = limitRaw ? Math.max(1, parseInt(limitRaw, 10) || 0) : undefined;
   const solennels = limit ? allEligible.slice(0, limit) : allEligible;

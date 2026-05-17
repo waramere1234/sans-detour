@@ -7,6 +7,7 @@ import { fetchFreshness } from "../lib/scrutins";
 import { hasSeenCover, loadSession, markCoverSeen, resetSession } from "../lib/session";
 import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE, type LocationStateFromLogo } from "../lib/nav-state";
+import { mailto } from "../lib/contact";
 import { TARGET, MIN_FOR_RANKING, type FreshnessInfo } from "../types";
 
 export default function Cover() {
@@ -312,7 +313,7 @@ export default function Cover() {
               <>
                 <Link to="/methode" onClick={() => track("cover_footer_nav", { target: "methode" })} style={linkStyle}>Méthode &amp; sources</Link>
                 <Link to="/legal" onClick={() => track("cover_footer_nav", { target: "legal" })} style={linkStyle}>Mentions légales</Link>
-                <a href="mailto:contact@sansdetour.fr" onClick={() => track("cover_footer_nav", { target: "contact" })} style={linkStyle}>Contact</a>
+                <a href={mailto()} onClick={() => track("cover_footer_nav", { target: "contact" })} style={linkStyle}>Contact</a>
               </>
             );
           })()}

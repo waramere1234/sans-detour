@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { mailto } from "../lib/contact";
 
 export interface MethodeSheetProps {
   open: boolean;
@@ -169,7 +170,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
                 style={btnPrimary()}
               ><span aria-hidden="true">→ </span>Méthode complète</Link>
               <a
-                href="mailto:contact@sansdetour.fr?subject=Sans%20D%C3%A9tour%20%E2%80%94%20Signalement%20d%27une%20erreur%20factuelle"
+                href={mailto("Sans Détour — Signalement d'une erreur factuelle")}
                 onClick={onClose}
                 style={btnSecondary()}
               ><span aria-hidden="true">✉ </span>Signaler une erreur factuelle</a>

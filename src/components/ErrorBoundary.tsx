@@ -1,5 +1,6 @@
 import React, { type ReactNode } from "react";
 import { track } from "../lib/analytics";
+import { CONTACT_EMAIL, mailto } from "../lib/contact";
 
 interface State { hasError: boolean; }
 
@@ -49,7 +50,7 @@ function ErrorFallback() {
         }}
       >Recharger</button>
       <p style={{ fontSize: 12, color: "var(--ink-3)", marginTop: 8 }}>
-        Si ça persiste : <a href="mailto:contact@sansdetour.fr" style={{ color: "var(--accent)" }}>contact@sansdetour.fr</a>
+        Si ça persiste : <a href={mailto()} style={{ color: "var(--accent)" }}>{CONTACT_EMAIL}</a>
       </p>
     </section>
   );

@@ -2081,3 +2081,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `^// scripts/seed-supabase.ts` scripts/seed-supabase.ts → 1 résultat (header présent)
 - [ ] grep `{ fromLogo: true }` src/ → 0 résultat (literal retiré, remplacé par FROM_LOGO_STATE)
 - [ ] grep `FROM_LOGO_STATE` src/ → ≥5 résultats (4 sets + 1 def)
+
+---
+
+## Session 91 — 2026-05-17
+
+### Vérification session 90
+
+- [VERIFIED] `npx tsc -b` clean
+- [VERIFIED] `scripts/seed-supabase.ts` ligne 1 : `// scripts/seed-supabase.ts` header
+- [VERIFIED] `{ fromLogo: true }` literal seulement dans `src/lib/nav-state.ts` (const def + comment)
+- [VERIFIED] 10 résultats `FROM_LOGO_STATE` (def + type + 4 sets + 4 imports)
+- 169/169 tests verts, typecheck clean
+
+### Bugs fixés (doc drift + spec recommendation + DRY)
+
+- [FIXED] `scripts/ingest-an.ts` INGEST_LIMIT comment dérive · Le commentaire disait `Drops to "all" when unset or invalid`. Mais le code `limit = limitRaw ? Math.max(1, parseInt(limitRaw, 10) || 0) : undefined` fait : unset → undefined (= "all"), MAIS invalid → Math.max(1, NaN||0) = 1 (pas "all"). Le code's behavior est la fail-safe correcte (un typo `INGEST_LIMIT=abcd` ne devrait PAS lancer le full batch et brûler $0.30 silencieusement). Donc le doc est faux, pas le code. Re-écriture du commentaire pour expliciter : unset → all, set+invalid → 1 (safer interpretation of typo). · `scripts/ingest-an.ts`
+- [FIXED] `public/manifest.webmanifest` icons sans `purpose: "any"` explicite · Spec PWA recommande l'attribut purpose sur chaque icon ; quand omis, default vaut "any" mais certains validators/installers (PWABuilder, Lighthouse PWA audit) signalent warning. Les 2 icons non-maskable (icon-192, icon-512) avaient purpose implicit ; le 3e (maskable-512) l'avait explicit. Maintenant les 3 ont purpose explicit. · `public/manifest.webmanifest`
+- [FIXED] `mailto:contact@sansdetour.fr` literal dupliqué 7 sites · ErrorBoundary, TopBar, Cover footer, Legal éditeur, Methode §06 + §07, MethodeSheet — 7 références hardcodées au même email. Un changement d'adresse (ou switch vers contact form un jour) forcerait 7 edits. MethodeSheet en plus avait le subject pre-rempli `%20%C3%A9...` (URL-encoded à la main) — fragile et illisible. Extraction dans `src/lib/contact.ts` : `CONTACT_EMAIL` const + helper `mailto(subject?)` qui gère l'encodeURIComponent du subject. 7 sites migrés vers `mailto()` ou `mailto("subject text")`. · `src/lib/contact.ts` (nouveau), 6 fichiers modifiés
+
+### Vérifications à faire en session 92
+
+- [ ] grep `unset or invalid` scripts/ingest-an.ts → 0 résultat (wording corrigé)
+- [ ] grep `purpose` public/manifest.webmanifest → 3 résultats (1 par icon)
+- [ ] grep `mailto:contact@sansdetour.fr` src/ → 0 résultat (literal éliminé)
+- [ ] grep `mailto(` src/ → ≥7 résultats (1 def + 1 helper + 6+ call sites)

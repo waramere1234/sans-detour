@@ -6,6 +6,7 @@ import { FreshnessBanner } from "../components/FreshnessBanner";
 import { fetchFreshness } from "../lib/scrutins";
 import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE } from "../lib/nav-state";
+import { CONTACT_EMAIL, mailto } from "../lib/contact";
 import { TARGET, MIN_FOR_RANKING, type FreshnessInfo } from "../types";
 
 export default function Methode() {
@@ -168,7 +169,7 @@ export default function Methode() {
               this bullet until the repo is public. Same TODO in §07 below
               and in Legal.tsx — keep them in sync. */}
           <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label="github.com/sansdetour (nouvel onglet)">github.com/sansdetour</a> — code source MIT</li>
-          <li><a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a> — signaler une erreur</li>
+          <li><a href={mailto()}>{CONTACT_EMAIL}</a> — signaler une erreur</li>
         </ul>
       </Section>
 
@@ -179,7 +180,7 @@ export default function Methode() {
 
         <p><strong>Comment on cadre les biais.</strong> Le prompt envoyé à Claude est neutre par construction. Sa source : le libellé brut AN + des résultats de recherche web pour le contexte. <strong>Le libellé officiel brut est affiché sur la face Résumé du verso de chaque carte</strong> (et la page AN complète est toujours accessible via « Voir sur AN ↗ ») — tu peux comparer directement.</p>
 
-        <p><strong>Limites & signalement.</strong> Claude peut se tromper sur les nuances : un mot mal choisi, une mesure oubliée, un thème mal taggué. Pour l'instant, aucune relecture humaine systématique (V3 prévue). Si tu repères une erreur factuelle : <a href="mailto:contact@sansdetour.fr">contact@sansdetour.fr</a> — on corrige.</p>
+        <p><strong>Limites & signalement.</strong> Claude peut se tromper sur les nuances : un mot mal choisi, une mesure oubliée, un thème mal taggué. Pour l'instant, aucune relecture humaine systématique (V3 prévue). Si tu repères une erreur factuelle : <a href={mailto()}>{CONTACT_EMAIL}</a> — on corrige.</p>
 
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)", marginTop: 12 }}>
           {/* TODO production-blocker · same broken github.com/sansdetour

@@ -6,6 +6,7 @@ import { Wordmark } from "./Wordmark";
 import { loadSession } from "../lib/session";
 import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE } from "../lib/nav-state";
+import { mailto } from "../lib/contact";
 import { MIN_FOR_RANKING } from "../types";
 
 
@@ -222,7 +223,7 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
                 onNavigate={() => { track("topbar_nav", { target: "legal" }); onClose(); }}
               />
               <MenuLink
-                href="mailto:contact@sansdetour.fr"
+                href={mailto()}
                 label="Contact"
                 external
                 onNavigate={() => { track("topbar_nav", { target: "contact" }); onClose(); }}
