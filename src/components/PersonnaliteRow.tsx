@@ -16,7 +16,7 @@ export function PersonnaliteRow({ alignment }: PersonnaliteRowProps) {
   // The low-data path drops the percent to avoid implying a real score
   // on a 1-2 vote sample.
   const rowLabel = tooLittleData
-    ? `${meta.display_name}, trop peu de données : ${alignment.counted} vote${alignment.counted === 1 ? "" : "s"} comparable${alignment.counted === 1 ? "" : "s"}`
+    ? `${meta.display_name}, trop peu de données : ${alignment.counted} vote${alignment.counted !== 1 ? "s" : ""} comparable${alignment.counted !== 1 ? "s" : ""}`
     : `${meta.display_name}, ${alignment.pct} % d'alignement sur ${alignment.counted} votes`;
 
   return (
@@ -56,7 +56,7 @@ export function PersonnaliteRow({ alignment }: PersonnaliteRowProps) {
         minWidth: 64,
       }}>
         {tooLittleData
-          ? `— · ${alignment.counted} vote${alignment.counted === 1 ? "" : "s"}`
+          ? `— · ${alignment.counted} vote${alignment.counted !== 1 ? "s" : ""}`
           : `${alignment.pct}% · ${alignment.counted}`}
       </span>
     </div>

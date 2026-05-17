@@ -106,6 +106,12 @@ export default async function handler(req: Request): Promise<Response> {
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    return new Response(`share-card error: ${msg}`, { status: 500 });
+    // Explicit Content-Type so the response is interpreted as plain text
+    // regardless of Vercel's platform-default for 500s — otherwise a
+    // curl / scraper might treat the body as octet-stream or HTML.
+    return new Response(`share-card error: ${msg}`, {
+      status: 500,
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
   }
 }

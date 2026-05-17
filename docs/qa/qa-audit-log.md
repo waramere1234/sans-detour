@@ -1837,3 +1837,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `~127 tests` dans `CLAUDE.md` → 0 résultat
 - [ ] cat MEMORY.md → mentionne "132 tests"
 - [ ] grep -c "it(" tests/parties.test.ts → 6 (était 3)
+
+---
+
+## Session 81 — 2026-05-17
+
+### Vérification session 80
+
+- [VERIFIED] `CLAUDE.md` "~132 tests" + "themes" dans coverage
+- [VERIFIED] User memory "132 tests"
+- [VERIFIED] `tests/parties.test.ts` 6 cas
+- 135/135 tests verts, typecheck clean
+
+### Bugs fixés (3 stale items)
+
+- [FIXED] `SHIP-V1.md §1` "ne recharge pas les rows déjà à jour" stale post session 70 · L'ingere_le est maintenant stampé à chaque upsert (chaque row touchée même si autres colonnes inchangées). Le wording disait "ne recharge pas" — faux. Reformulé en "idempotent sur le contenu — chaque row est touchée pour rafraîchir `ingere_le`, mais les autres colonnes ne changent que si le LLM produit du contenu différent". · `SHIP-V1.md`
+- [FIXED] Plural rule pattern drift · 2 patterns équivalents coexistaient : `=== 1 ? "" : "s"` (ancien, PartyRow + PersonnaliteRow) vs `!== 1 ? "s" : ""` (nouveau, sessions 42+, dans FreshnessBanner, AuditTrail, Cover, Result). Normalisé sur le nouveau pattern partout pour cohérence. · `src/components/PartyRow.tsx`, `src/components/PersonnaliteRow.tsx`
+- [FIXED] `api/share-card.ts` 500 error sans Content-Type explicite · Le success path set `image/svg+xml`, mais le catch block return `new Response(body, { status: 500 })` sans Content-Type → défaut platform-dependant (octet-stream sur certains, text/html sur d'autres). Ajout explicite `Content-Type: text/plain; charset=utf-8` pour cohérence cross-platform et interprétation correcte par curl/scrapers. · `api/share-card.ts`
+
+### Vérifications à faire en session 82
+
+- [ ] grep `=== 1 ? ""` dans `src/components/` → 0 résultat (tout normalisé sur `!== 1 ? "s" : ""`)
+- [ ] grep `ne recharge pas` dans `SHIP-V1.md` → 0 résultat
+- [ ] curl -I `/api/share-card?t=invalid` retournant 500 → Content-Type: text/plain

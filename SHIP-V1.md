@@ -17,7 +17,7 @@ export ANTHROPIC_API_KEY="sk-ant-api03-..."
 npm run ingest:an
 ```
 
-**Attendu** : ~2-10 min de batch, ~$0.20-0.30 de coût Anthropic, ~100 cartes rafraîchies (upsert idempotent, ne recharge pas les rows déjà à jour).
+**Attendu** : ~2-10 min de batch, ~$0.20-0.30 de coût Anthropic, ~100 cartes rafraîchies (upsert idempotent sur le contenu — chaque row est touchée pour rafraîchir `ingere_le`, mais les autres colonnes ne changent que si le LLM produit du contenu différent).
 
 **Vérification** : `npm run dev`, ouvre `/play`, tap sur une carte pour voir le flip 3D et les détails. Le contexte doit être concret (chiffres / dates / mécanismes), pas de "définit les règles" / "événement majeur".
 
