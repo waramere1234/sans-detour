@@ -1631,3 +1631,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `~115 tests\|123 tests` dans `CLAUDE.md` + memory/ → 0 résultat
 - [ ] grep `any\[\]` dans `tests/Cover.test.tsx` → 0 résultat
 - [ ] cat MEMORY.md → mentionne "126 tests" (pas 123)
+
+---
+
+## Session 72 — 2026-05-17
+
+### Vérification session 71
+
+- [VERIFIED] `CLAUDE.md` "~126 tests" + coverage list complète (FreshnessBanner, compute-positions, sanity, deck-invariants ajoutés)
+- [VERIFIED] User memory : 126 tests, 70 sessions, 210+ fixes
+- [VERIFIED] `tests/Cover.test.tsx initialEntries: InitialEntry[]` (importé de react-router-dom)
+- 126/126 tests verts, typecheck clean
+
+### Bugs fixés (env var docs + 2 ingere_le sweep siblings ratés session 70)
+
+- [FIXED] `.env.local.example` undocumented env vars · `INGEST_LIMIT` (test mode pour ingest-an.ts) et `BATCH_ID` (requis par resume-ingest.ts) étaient utilisés dans les scripts mais absents de l'example. Un dev qui veut tester ingest sur quelques scrutins ou récupérer un batch failed devait lire le code script. 2 sections commentées ajoutées avec exemples de valeurs. · `.env.local.example`
+- [FIXED] `ingest-personnalites.ts` ingere_le sibling raté · Session 70 a fixé `ingere_le: ingestedAt` sur ingest-an.ts + resume-ingest.ts (les 2 sites upsert principaux), mais `ingest-personnalites.ts` UPDATE-only (V2 P2 patch column) avait le même bug : update `votes_personnalites` ne refresh pas `ingere_le` → FreshnessBanner ment après un patch personnalites. Fix : ajouter `ingere_le: patchedAt` au payload UPDATE. · `scripts/ingest-personnalites.ts`
+- [FIXED] `seed-supabase.ts` ingere_le sibling raté · Même pattern manqué session 70. seed-supabase upsert les dev-fixtures.json mais ne stamp pas `ingere_le` — un dev qui seed sa Supabase locale et regarde FreshnessBanner verrait une date originale (du JSON, qui n'existe pas) au lieu de l'instant du seed. Fix : map les rows avec `ingere_le: seededAt` avant l'upsert + cast typed (au lieu de `as any[]`). · `scripts/seed-supabase.ts`
+
+### Vérifications à faire en session 73
+
+- [ ] grep `INGEST_LIMIT` dans `.env.local.example` → 1 résultat
+- [ ] grep `ingere_le` dans `scripts/` → 4 sites (ingest-an, resume-ingest, ingest-personnalites, seed-supabase) tous avec stamping explicite
+- [ ] Mock un re-run de `npx tsx scripts/ingest-personnalites.ts` → FreshnessBanner doit afficher la date du jour

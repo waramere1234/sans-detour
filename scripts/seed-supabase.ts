@@ -11,11 +11,19 @@ if (!url || !key) {
 const sb = createClient(url, key);
 
 async function main() {
-  const { error } = await sb.from("scrutins").upsert(fixtures as any[]);
+  // Stamp ingere_le on every fixture so FreshnessBanner reports today's
+  // date after a seed. The column has `default now()` (migration 0001)
+  // but the default only applies on INSERT — on UPSERT/UPDATE Postgres
+  // keeps the old value. Same fix pattern as ingest-an.ts (session 70).
+  const seededAt = new Date().toISOString();
+  const rows = (fixtures as Array<Record<string, unknown>>).map(
+    (f) => ({ ...f, ingere_le: seededAt }),
+  );
+  const { error } = await sb.from("scrutins").upsert(rows);
   if (error) {
     console.error(error);
     process.exit(1);
   }
-  console.log(`Seeded ${(fixtures as any[]).length} scrutins.`);
+  console.log(`Seeded ${rows.length} scrutins.`);
 }
 main();

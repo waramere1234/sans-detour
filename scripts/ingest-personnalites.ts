@@ -140,7 +140,12 @@ async function main(): Promise<void> {
   //
   // Le UPDATE explicite n'a pas ce problème : il ne touche que la colonne
   // patché, les autres restent ce qu'elles sont en base.
+  //
+  // ingere_le est aussi stamped : sans ça, FreshnessBanner rapporte la
+  // date d'ingestion ORIGINALE alors que la table a été patchée à
+  // l'instant (même fix que session 70 pour ingest-an.ts + resume-ingest.ts).
   console.log(`↑ Patching ${updates.length} rows via UPDATE …`);
+  const patchedAt = new Date().toISOString();
   const BATCH = 20;
   let patched = 0;
   for (let i = 0; i < updates.length; i += BATCH) {
@@ -148,7 +153,7 @@ async function main(): Promise<void> {
     const results = await Promise.all(
       batch.map((u) =>
         sb.from("scrutins")
-          .update({ votes_personnalites: u.votes_personnalites })
+          .update({ votes_personnalites: u.votes_personnalites, ingere_le: patchedAt })
           .eq("id", u.id),
       ),
     );
