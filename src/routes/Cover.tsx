@@ -15,6 +15,7 @@ import {
   RESTART_LABEL, VIEW_PARTIAL_RESULT_LABEL,
   WORDMARK_HOME_LABEL, restartConfirmMessage,
   VOTE_LABEL_CONTRE, VOTE_LABEL_SKIP, VOTE_LABEL_POUR,
+  MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
 } from "../types";
 
 export default function Cover() {
@@ -302,9 +303,9 @@ export default function Cover() {
             };
             return (
               <>
-                <Link to={ROUTES.methode} onClick={() => track("cover_footer_nav", { target: "methode" })} style={linkStyle}>Méthode &amp; sources</Link>
-                <Link to={ROUTES.legal} onClick={() => track("cover_footer_nav", { target: "legal" })} style={linkStyle}>Mentions légales</Link>
-                <a href={mailto()} onClick={() => track("cover_footer_nav", { target: "contact" })} style={linkStyle}>Contact</a>
+                <Link to={ROUTES.methode} onClick={() => track("cover_footer_nav", { target: "methode" })} style={linkStyle}>{MENU_METHODE_LABEL}</Link>
+                <Link to={ROUTES.legal} onClick={() => track("cover_footer_nav", { target: "legal" })} style={linkStyle}>{MENU_LEGAL_LABEL}</Link>
+                <a href={mailto()} onClick={() => track("cover_footer_nav", { target: "contact" })} style={linkStyle}>{MENU_CONTACT_LABEL}</a>
               </>
             );
           })()}

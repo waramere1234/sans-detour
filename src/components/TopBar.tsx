@@ -11,6 +11,7 @@ import { ROUTES } from "../lib/routes";
 import {
   MIN_FOR_RANKING, PROD_HOSTNAME, WORDMARK_HOME_LABEL,
   MENU_RESULT_LABEL, MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
+  MENU_OPEN_LABEL, MENU_CLOSE_LABEL, MAIN_MENU_LABEL,
 } from "../types";
 
 
@@ -100,7 +101,7 @@ function MenuTrigger({
       ref={triggerRef}
       type="button"
       onClick={onToggle}
-      aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+      aria-label={open ? MENU_CLOSE_LABEL : MENU_OPEN_LABEL}
       aria-haspopup="menu"
       aria-expanded={open}
       style={{
@@ -158,7 +159,7 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
           />
           <motion.div
             role="menu"
-            aria-label="Menu principal"
+            aria-label={MAIN_MENU_LABEL}
             initial={{ opacity: 0, y: -4, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.97 }}

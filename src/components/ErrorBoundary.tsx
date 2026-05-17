@@ -1,6 +1,11 @@
 import React, { type ReactNode } from "react";
 import { track } from "../lib/analytics";
 import { CONTACT_EMAIL, mailto } from "../lib/contact";
+import {
+  ERROR_FALLBACK_HEADING,
+  ERROR_FALLBACK_MESSAGE,
+  ERROR_FALLBACK_RELOAD_LABEL,
+} from "../types";
 
 interface State { hasError: boolean; }
 
@@ -34,9 +39,9 @@ function ErrorFallback() {
       {/* Visually-hidden h1 so the fallback page has a landmark in the SR
         heading rotor — without it, SR users hit the boundary with no
         indication that they're on an error screen. */}
-      <h1 className="sr-only">Erreur</h1>
+      <h1 className="sr-only">{ERROR_FALLBACK_HEADING}</h1>
       <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.5 }}>
-        Quelque chose s'est cassé de notre côté.
+        {ERROR_FALLBACK_MESSAGE}
       </p>
       <button
         type="button"
@@ -48,7 +53,7 @@ function ErrorFallback() {
           fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 14,
           cursor: "pointer",
         }}
-      >Recharger</button>
+      >{ERROR_FALLBACK_RELOAD_LABEL}</button>
       <p style={{ fontSize: 12, color: "var(--ink-3)", marginTop: 8 }}>
         Si ça persiste : <a href={mailto()} style={{ color: "var(--accent)" }}>{CONTACT_EMAIL}</a>
       </p>

@@ -182,6 +182,26 @@ export const CARD_VERSO_SEPARATOR_LABEL = "↑ Synthèse IA  ·  ↓ texte offic
  *  Exporting the const enforces the round-trip. */
 export const AN_LINK_VISIBLE_LABEL = "Voir sur AN ↗";
 
+/** TopBar menu trigger aria-labels — the same `<button>` swaps its
+ *  aria-label between MENU_OPEN_LABEL and MENU_CLOSE_LABEL based on
+ *  the `open` state. Tests pin these via `getByRole("button", { name:
+ *  /Ouvrir le menu/ })` 18× and /Fermer le menu/ once — exporting the
+ *  consts keeps source + 19 test sites in sync. MAIN_MENU_LABEL is
+ *  the aria-label on the popover `<nav>` landmark. */
+export const MENU_OPEN_LABEL = "Ouvrir le menu";
+export const MENU_CLOSE_LABEL = "Fermer le menu";
+export const MAIN_MENU_LABEL = "Menu principal";
+
+/** ErrorBoundary fallback copy — rendered when a React error escapes
+ *  to the root boundary. 3 user-visible strings pinned by tests via
+ *  case-insensitive regex (.getByText /quelque chose s'est cassé/i,
+ *  .getByRole("button", { name: /recharger/i })). Exporting them
+ *  keeps source + tests in sync; the sr-only h1 wording stays here
+ *  so an i18n flip propagates to all 3 strings together. */
+export const ERROR_FALLBACK_HEADING = "Erreur";
+export const ERROR_FALLBACK_MESSAGE = "Quelque chose s'est cassé de notre côté.";
+export const ERROR_FALLBACK_RELOAD_LABEL = "Recharger";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

@@ -3400,3 +3400,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `"↑ Synthèse IA"\|"Voir sur AN ↗"` src/ tests/ → 2-3 résultats seulement (déclarations + pin-the-value)
 - [ ] grep `VOTE_LABEL_CONTRE` src/routes/Cover.tsx → 1 résultat (Cover utilise la const)
 - [ ] grep `~654 tests` CLAUDE.md → 0 résultat (aligné sur ~658)
+
+---
+
+## Session 145 — 2026-05-17
+
+### Vérification session 144
+
+- [VERIFIED] 23 occurrences de CARD_VERSO_SEPARATOR_LABEL|AN_LINK_VISIBLE_LABEL dans src/ + tests/
+- [VERIFIED] 4 occurrences "Voir sur AN ↗" = 1 déclaration + 2 comments + 1 pin-the-value test ; 0 inline literal hors déclaration
+- [VERIFIED] Cover.tsx utilise VOTE_LABEL_CONTRE + import + array entry (2 mentions attendues)
+- [VERIFIED] CLAUDE.md "~658 tests"
+- 658/658 tests verts, typecheck clean
+
+### Bugs fixés (TopBar menu labels × 3 + ErrorBoundary copy × 3 + Cover footer reuse MENU_*_LABEL × 3)
+
+- [FIXED] TopBar.tsx menu trigger aria-labels `"Ouvrir le menu"` + `"Fermer le menu"` dans inline ternary `aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}` + nav aria-label `"Menu principal"`, dupliqués dans tests/TopBar.test.tsx 19× pour /Ouvrir le menu/ + 1× pour /Fermer le menu/ · Drift surface ÉNORME : un rewording aurait demandé 20+ edits in-lockstep. Fix : export `MENU_OPEN_LABEL` + `MENU_CLOSE_LABEL` + `MAIN_MENU_LABEL` depuis src/types. TopBar utilise les 3 consts. tests migrent les 20 sites vers `new RegExp(MENU_OPEN_LABEL)` / `new RegExp(MENU_CLOSE_LABEL)` (replace_all). 5 nouveaux tests dans aria-labels.test.ts : pin-the-value × 3, distinct, common-suffix invariant. · `src/types/index.ts`, `src/components/TopBar.tsx`, `tests/TopBar.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] ErrorBoundary fallback copy : `"Erreur"` (sr-only h1), `"Quelque chose s'est cassé de notre côté."` (visible p), `"Recharger"` (button) source + 2 test regex literals (`/quelque chose s'est cassé/i`, `/recharger/i`) · Drift surface : rewording = 5 edits in-lockstep (source 3 + tests 2). Fix : export `ERROR_FALLBACK_HEADING` + `ERROR_FALLBACK_MESSAGE` + `ERROR_FALLBACK_RELOAD_LABEL` depuis src/types. ErrorBoundary utilise les 3 consts. Tests round-trip via `new RegExp(ERROR_FALLBACK_MESSAGE.slice(0,30), "i")` + `new RegExp(ERROR_FALLBACK_RELOAD_LABEL, "i")`. 4 nouveaux tests : pin-the-value × 3 + sentence-completion invariant. · `src/types/index.ts`, `src/components/ErrorBoundary.tsx`, `tests/ErrorBoundary.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Cover.tsx footer 3 link labels `"Méthode & sources"`, `"Mentions légales"`, `"Contact"` inline alors que `MENU_METHODE_LABEL` + `MENU_LEGAL_LABEL` + `MENU_CONTACT_LABEL` existaient depuis session 138 pour TopBar · Drift surface : symétrique de session 144's Cover vote-preview fix — un rewording session 138 aurait laissé Cover stale. Fix : Cover.tsx importe les 3 MENU_*_LABEL consts + utilise comme link text (drop l'entité `&amp;` JSX, devient `{MENU_METHODE_LABEL}` qui contient le `&` plain). Pas de nouveau test (TopBar tests pinnent déjà les consts). · `src/routes/Cover.tsx`
+
+### Vérifications à faire en session 146
+
+- [ ] grep `MENU_OPEN_LABEL\|MENU_CLOSE_LABEL\|MAIN_MENU_LABEL\|ERROR_FALLBACK_HEADING\|ERROR_FALLBACK_MESSAGE\|ERROR_FALLBACK_RELOAD_LABEL` src/ tests/ → 35+ résultats
+- [ ] grep `"Ouvrir le menu"\|"Fermer le menu"\|"Menu principal"\|"Quelque chose s.est cassé"\|"Recharger"` src/ tests/ → 5-7 résultats seulement (déclarations + pin-the-value tests)
+- [ ] grep `MENU_METHODE_LABEL` src/routes/Cover.tsx → 1 résultat (Cover utilise la const)
+- [ ] grep `~658 tests` CLAUDE.md → 0 résultat (aligné sur ~667)

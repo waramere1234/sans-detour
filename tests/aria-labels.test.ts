@@ -16,6 +16,8 @@ import {
   REFAIRE_LABEL, refaireConfirmMessage,
   RANKING_OVERLAY_LABEL, MODAL_CLOSE_LABEL,
   CARD_VERSO_SEPARATOR_LABEL, AN_LINK_VISIBLE_LABEL,
+  MENU_OPEN_LABEL, MENU_CLOSE_LABEL, MAIN_MENU_LABEL,
+  ERROR_FALLBACK_HEADING, ERROR_FALLBACK_MESSAGE, ERROR_FALLBACK_RELOAD_LABEL,
 } from "../src/types";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
@@ -300,6 +302,58 @@ describe("CARD_VERSO_SEPARATOR_LABEL + AN_LINK_VISIBLE_LABEL — Card verso copy
     // future change that drops the arrow should be deliberate, not
     // accidental.
     expect(AN_LINK_VISIBLE_LABEL.endsWith("↗")).toBe(true);
+  });
+});
+
+describe("MENU_OPEN_LABEL + MENU_CLOSE_LABEL + MAIN_MENU_LABEL — TopBar menu trigger a11y", () => {
+  // 18 test sites in tests/TopBar.test.tsx pin MENU_OPEN_LABEL via
+  // `getByRole("button", { name: /Ouvrir le menu/ })`; 1 site pins
+  // MENU_CLOSE_LABEL. MAIN_MENU_LABEL is the nav-landmark aria-label
+  // inside the open popover. A rewording without const-based pins
+  // would silently desync 20 sites.
+
+  it("MENU_OPEN_LABEL is the canonical 'Ouvrir le menu' wording", () => {
+    expect(MENU_OPEN_LABEL).toBe("Ouvrir le menu");
+  });
+
+  it("MENU_CLOSE_LABEL is the canonical 'Fermer le menu' wording", () => {
+    expect(MENU_CLOSE_LABEL).toBe("Fermer le menu");
+  });
+
+  it("MAIN_MENU_LABEL is the canonical 'Menu principal' wording", () => {
+    expect(MAIN_MENU_LABEL).toBe("Menu principal");
+  });
+
+  it("open + close labels are distinct (anti-clone)", () => {
+    expect(MENU_OPEN_LABEL).not.toBe(MENU_CLOSE_LABEL);
+  });
+
+  it("open + close labels both end with 'menu' (consistent suffix for SR skim)", () => {
+    // The trigger toggles between these two labels on the same button.
+    // Both should end with the same noun ("menu") so the SR announcement
+    // reads naturally on open AND close.
+    expect(MENU_OPEN_LABEL.endsWith("menu")).toBe(true);
+    expect(MENU_CLOSE_LABEL.endsWith("menu")).toBe(true);
+  });
+});
+
+describe("ERROR_FALLBACK_HEADING + _MESSAGE + _RELOAD_LABEL — ErrorBoundary copy", () => {
+  it("ERROR_FALLBACK_HEADING is the canonical 'Erreur' sr-only h1", () => {
+    expect(ERROR_FALLBACK_HEADING).toBe("Erreur");
+  });
+
+  it("ERROR_FALLBACK_MESSAGE matches the canonical 'Quelque chose s'est cassé...' wording", () => {
+    expect(ERROR_FALLBACK_MESSAGE).toBe("Quelque chose s'est cassé de notre côté.");
+  });
+
+  it("ERROR_FALLBACK_RELOAD_LABEL is the canonical 'Recharger' button label", () => {
+    expect(ERROR_FALLBACK_RELOAD_LABEL).toBe("Recharger");
+  });
+
+  it("ERROR_FALLBACK_MESSAGE is a complete sentence (period termination)", () => {
+    // ErrorBoundary renders this as a standalone <p>; if a future
+    // rewording drops the period, the prose reads truncated.
+    expect(ERROR_FALLBACK_MESSAGE.endsWith(".")).toBe(true);
   });
 });
 

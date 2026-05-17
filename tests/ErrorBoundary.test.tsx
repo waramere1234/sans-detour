@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ErrorBoundary } from "../src/components/ErrorBoundary";
+import {
+  ERROR_FALLBACK_MESSAGE,
+  ERROR_FALLBACK_RELOAD_LABEL,
+} from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
 function ChildThatThrows(): never {
@@ -36,8 +40,8 @@ describe("ErrorBoundary", () => {
         <ChildThatThrows />
       </ErrorBoundary>
     );
-    expect(screen.getByText(/quelque chose s'est cassé/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /recharger/i })).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(ERROR_FALLBACK_MESSAGE.slice(0, 30), "i"))).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: new RegExp(ERROR_FALLBACK_RELOAD_LABEL, "i") })).toBeInTheDocument();
   });
 
   it("calls track('error', ...) when a child throws", () => {
