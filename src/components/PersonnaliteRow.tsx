@@ -17,7 +17,7 @@ export function PersonnaliteRow({ alignment }: PersonnaliteRowProps) {
   // on a 1-2 vote sample.
   const rowLabel = tooLittleData
     ? `${meta.display_name}, trop peu de données : ${alignment.counted} vote${alignment.counted !== 1 ? "s" : ""} comparable${alignment.counted !== 1 ? "s" : ""}`
-    : `${meta.display_name}, ${alignment.pct} % d'alignement sur ${alignment.counted} votes`;
+    : `${meta.display_name}, ${alignment.pct} % d'alignement sur ${alignment.counted} vote${alignment.counted !== 1 ? "s" : ""}`;
 
   return (
     <div

@@ -100,7 +100,10 @@ export interface Scrutin {
                                // in migration 0002 — see that file's comment for the
                                // full spec, which was widened from the original
                                // "one sentence ≤ 25 words" pre-V1)
-  analyse_loi?: ScrutinAnalyse;  // structured 4-axis breakdown (migration 0003).
+  analyse_loi?: ScrutinAnalyse;  // structured 6-list breakdown (mesures,
+                                 // concernés +/–/neutres, calendrier,
+                                 // exceptions — migration 0003 + the
+                                 // ScrutinAnalyse interface below).
                                  // Column named `analyse_loi` because ANALYSE
                                  // is a PostgreSQL reserved word.
   points_cles?: string[];        // exactly 3 short factual bullets, 7 words

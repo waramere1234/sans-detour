@@ -1958,3 +1958,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep -c "it(" tests/session.test.ts → 14 (était 11)
 - [ ] grep `~136 tests` CLAUDE.md → 0 résultat (aligné sur ~139)
 - [ ] DevTools : injecter scrutin avec `analyse_loi.mesures_principales = [""]` → Card verso n'affiche pas la section "Mesures" (length filtered to 0)
+
+---
+
+## Session 86 — 2026-05-17
+
+### Vérification session 85
+
+- [VERIFIED] `src/components/ResultSkeleton.tsx` : `length: GROUP_CODES.length` (anchored sur 11)
+- [VERIFIED] `tests/session.test.ts` : 17 `it()` total (était 14, +3 throw defense tests)
+- [VERIFIED] `scripts/lib/parse-summary.ts` `asStringArray` : 2 `.filter((s) => s.length > 0)` (lignes 27 + 50)
+- [VERIFIED] CLAUDE.md ligne 191 : "~139 tests"
+- 139/139 tests verts, typecheck clean
+
+### Bugs fixés (plural defensive + script env consistency + doc drift)
+
+- [FIXED] `PersonnaliteRow.tsx:20` aria-label hardcoded "votes" plural · Le label SR disait `${alignment.pct} % d'alignement sur ${alignment.counted} votes` — pluriel hardcodé. Bug défensif : avec `LOW_DATA_THRESHOLD = 3` actuel, ce branche n'est atteinte que si `counted >= 3` (toujours pluriel correct), mais si un futur PR baisse le seuil (LOW_DATA_THRESHOLD=1 pour exposer les votes ultra-rares), `counted === 1` rendrait "1 votes" — agreement cassé. Application de la règle `vote${counted !== 1 ? "s" : ""}` pour cohérence avec les 6 autres occurrences déjà fixées sessions 78-84. · `src/components/PersonnaliteRow.tsx`
+- [FIXED] `scripts/seed-supabase.ts` env handling inconsistent · 4 scripts ingest dans `scripts/` ; 3 utilisent `const SUPABASE_URL = process.env.SUPABASE_URL;` (typage honnête `string | undefined`, narrowed après la garde), mais `seed-supabase.ts` utilisait `const url = process.env.SUPABASE_URL!;` (non-null assertion misleading + lowercase identifier). Alignement sur la convention SHOUTY_CASE + sans `!` pour cohérence cross-scripts (un dev qui copie-colle entre scripts ne devrait pas avoir à choisir entre 2 patterns). · `scripts/seed-supabase.ts`
+- [FIXED] `src/types/index.ts:103` commentaire "4-axis breakdown" stale · Le commentaire datait du design original pre-V1 (4 sections : mesures + concernés [3] = 4 axes). La structure actuelle (migration 0003 + interface `ScrutinAnalyse` ligne 144-151) a 6 listes : mesures_principales, concernes_positifs/negatifs/neutres, calendrier, exceptions. CLAUDE.md ligne 52 dit "6 listes" (correct), 0003.sql dit "Six string[]" (correct) — types/index.ts:103 était l'outlier. Comment réécrit avec énumération explicite des 6 listes. · `src/types/index.ts`
+
+### Vérifications à faire en session 87
+
+- [ ] grep `${alignment.counted} votes\b` src/components/PersonnaliteRow.tsx → 0 résultat (toutes les occurrences passent par la règle plural)
+- [ ] grep `process.env.SUPABASE_URL!` scripts/ → 0 résultat (les 4 scripts utilisent la même forme sans `!`)
+- [ ] grep `4-axis breakdown` src/types/index.ts → 0 résultat (remplacé par "6-list breakdown")
