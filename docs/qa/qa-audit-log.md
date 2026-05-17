@@ -2475,3 +2475,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] `ls tests/TopBar.test.tsx tests/RankingOverlay.test.tsx tests/Methode.test.tsx` → 3 fichiers présents
 - [ ] grep `~344 tests` CLAUDE.md → 0 résultat (aligné sur ~374)
 - [ ] grep "useModalA11y" tests/RankingOverlay.test.tsx → 1 résultat (comment qui pointe vers le hook test)
+
+---
+
+## Session 107 — 2026-05-17
+
+### Vérification session 106
+
+- [VERIFIED] `tests/TopBar.test.tsx` + `tests/RankingOverlay.test.tsx` + `tests/Methode.test.tsx` présents
+- [VERIFIED] CLAUDE.md "~374 tests"
+- [VERIFIED] `tests/RankingOverlay.test.tsx` contient le comment pointant vers useModalA11y (session 98)
+- 374/374 tests verts, typecheck clean
+
+### Bugs fixés (extractVotesFromScrutin → lib/an-personnalites + 0 test → 15 tests)
+
+- [FIXED] `extractVotesFromScrutin` + `asArr` + types AN nominatifs inline dans `scripts/ingest-personnalites.ts` · La fonction critique du pipeline V2 personnalités (qui transforme l'arbre `decompteNominatif` AN en un record `{ le_pen: "pour", panot: "contre", ... }`) vivait inline aux lignes 39-97 du script, non exportable, non testable. Même refactor que sessions 94-97 ont fait pour `isEligibleScrutin` / `parseRaw` / `iterEligibleScrutins`. Extraction dans `scripts/lib/an-personnalites.ts` avec les interfaces `ANVotant` / `ANNominatif` / `ANGroup` / `ANScrutinForPersonnalites` exportées, `asArr<T>` exporté, `extractVotesFromScrutin` exporté. Le script consume-side passe à `import { extractVotesFromScrutin, type ANScrutinForPersonnalites } from "./lib/an-personnalites"` et drop les 60 lignes inline. · `scripts/lib/an-personnalites.ts` (nouveau), `scripts/ingest-personnalites.ts`
+- [FIXED] `extractVotesFromScrutin` 0 test coverage · La fonction gère 5 catégories de votes (`pours` / `contres` / `abstentions` / `nonVotants` / `nonVotantsVolontaires`) + un défaut `non_dispo` pour les personnalités absentes du scrutin + la coercion `asArr` qui normalise les listes serialisées en bare-object par l'AN bulk download. Aucun test ne pinait ces invariants — un refactor LLM aurait pu silently mapper `nonVotantsVolontaires` à autre chose que "absent" sans détection. 15 tests ajoutés couvrant : `asArr` (undefined → [], array → unchanged, bare object → wrapped, empty array), défaut `non_dispo` (scrutin vide + scrutin avec decompteNominatif absent), les 5 buckets mappés (pours→pour, contres→contre, abstentions→abstention, nonVotants→absent, nonVotantsVolontaires→absent), acteurRef inconnu silently skippé, single-voter coercion (votant + groupe en bare-object), merge multi-groupes. · `tests/an-personnalites.test.ts` (nouveau)
+- [FIXED] Comportement `nonVotants` vs `nonVotantsVolontaires` non documenté · Les deux buckets représentent en réalité deux états différents côté AN : `nonVotants` (absent pour raison médicale/personnelle) vs `nonVotantsVolontaires` (refus délibéré de voter / abstention par refus). Le code les collapse tous les deux en `"absent"` car le matching algorithm de l'app les traite identiquement (exclus du denominator). C'était un fact-of-life du code non écrit nulle part — un futur dev pourrait penser que c'est un bug et tenter de splitter. Documenté dans le JSDoc de `extractVotesFromScrutin` (raison du collapse) + dans le comment du test (`nonVotantsVolontaires → "absent" (same as nonVotants)`). · `scripts/lib/an-personnalites.ts`, `tests/an-personnalites.test.ts`
+
+### Vérifications à faire en session 108
+
+- [ ] `ls scripts/lib/an-personnalites.ts tests/an-personnalites.test.ts` → 2 fichiers présents
+- [ ] grep "interface ANVotant\|interface ANNominatif\|interface ANGroup\|interface ANScrutin\b\|function asArr\|function extractVotesFromScrutin" scripts/ingest-personnalites.ts → 0 résultat (toutes les définitions sont parties dans lib/)
+- [ ] grep `~374 tests` CLAUDE.md → 0 résultat (aligné sur ~389)
+- [ ] grep -c "it(" tests/an-personnalites.test.ts → 15

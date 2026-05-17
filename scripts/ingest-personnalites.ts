@@ -28,73 +28,17 @@ import { PERSONNALITE_CODES } from "../src/types";
 import type { PersonnaliteCode, PersonnaliteVote } from "../src/types";
 import { JSON_DIR } from "./lib/an-cache";
 import { requireSupabaseClient } from "./lib/env";
+import {
+  extractVotesFromScrutin,
+  type ANScrutinForPersonnalites,
+} from "./lib/an-personnalites";
 
 // JSON_DIR lives in scripts/lib/an-cache.ts; this script reads the
 // nominative votes (decompteNominatif) which the shared iterEligibleScrutins
 // doesn't expose — so we do our own directory walk below, but on the same
-// path as the other two scripts.
-
-// ──────────── scan local scrutins for nominative votes ──────────────────
-
-interface ANVotant { acteurRef: string }
-interface ANNominatif {
-  pours?: { votant?: ANVotant[] | ANVotant };
-  contres?: { votant?: ANVotant[] | ANVotant };
-  abstentions?: { votant?: ANVotant[] | ANVotant };
-  nonVotants?: { votant?: ANVotant[] | ANVotant };
-  nonVotantsVolontaires?: { votant?: ANVotant[] | ANVotant };
-}
-interface ANGroup {
-  vote?: { decompteNominatif?: ANNominatif };
-}
-interface ANScrutin {
-  uid: string;
-  dateScrutin: string;
-  ventilationVotes?: { organe?: { groupes?: { groupe?: ANGroup[] | ANGroup } } };
-}
-
-function asArr<T>(v: T[] | T | undefined): T[] {
-  if (!v) return [];
-  return Array.isArray(v) ? v : [v];
-}
-
-/** Extract per-personality vote for one scrutin given the acteurRef map.
- *  Defaults to "non_dispo" for every personality, then upgrades to a real
- *  vote when found in any group's decompteNominatif. */
-function extractVotesFromScrutin(
-  scrutin: ANScrutin,
-  refToCode: Map<string, PersonnaliteCode>,
-): Partial<Record<PersonnaliteCode, PersonnaliteVote>> {
-  const out: Partial<Record<PersonnaliteCode, PersonnaliteVote>> = {};
-  for (const code of PERSONNALITE_CODES) out[code] = "non_dispo";
-
-  const groupes = asArr(scrutin.ventilationVotes?.organe?.groupes?.groupe);
-  for (const g of groupes) {
-    const dn = g.vote?.decompteNominatif;
-    if (!dn) continue;
-    for (const v of asArr(dn.pours?.votant)) {
-      const code = refToCode.get(v.acteurRef);
-      if (code) out[code] = "pour";
-    }
-    for (const v of asArr(dn.contres?.votant)) {
-      const code = refToCode.get(v.acteurRef);
-      if (code) out[code] = "contre";
-    }
-    for (const v of asArr(dn.abstentions?.votant)) {
-      const code = refToCode.get(v.acteurRef);
-      if (code) out[code] = "abstention";
-    }
-    for (const v of asArr(dn.nonVotants?.votant)) {
-      const code = refToCode.get(v.acteurRef);
-      if (code) out[code] = "absent";
-    }
-    for (const v of asArr(dn.nonVotantsVolontaires?.votant)) {
-      const code = refToCode.get(v.acteurRef);
-      if (code) out[code] = "absent";
-    }
-  }
-  return out;
-}
+// path as the other two scripts. The vote-extraction logic + AN nominative
+// types live in scripts/lib/an-personnalites.ts so the test suite can pin
+// the 5 vote categories + the non_dispo default + the asArr coercion.
 
 // ───────────────────────────────────────────────────── orchestrate
 
@@ -119,7 +63,7 @@ async function main(): Promise<void> {
   const updates: Array<{ id: string; votes_personnalites: Partial<Record<PersonnaliteCode, PersonnaliteVote>> }> = [];
   for (const f of files) {
     const raw = JSON.parse(await fs.readFile(path.join(JSON_DIR, f), "utf-8"));
-    const scrutin: ANScrutin = raw.scrutin ?? raw;
+    const scrutin: ANScrutinForPersonnalites = raw.scrutin ?? raw;
     if (!targetIds.has(scrutin.uid)) continue;
     const votes = extractVotesFromScrutin(scrutin, refToCode);
     updates.push({ id: scrutin.uid, votes_personnalites: votes });
