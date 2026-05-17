@@ -4,6 +4,7 @@ import path from "node:path";
 import {
   TAGLINE, BRAND_NAME, LEGISLATURE_LABEL_LOWERCASE, PROD_ORIGIN,
   PROD_HOSTNAME, APP_LOCALE, OG_LOCALE,
+  NOSCRIPT_HEADING, NOSCRIPT_MESSAGE,
 } from "../src/types";
 
 // index.html + public/manifest.webmanifest both carry copy that the
@@ -232,5 +233,27 @@ describe("Icon paths sync (manifest ↔ index.html)", () => {
     const pathOnly = match![1].replace(PROD_ORIGIN, "");
     const srcs = await manifestIconSrcs();
     expect(srcs).toContain(pathOnly);
+  });
+});
+
+describe("NOSCRIPT_HEADING + NOSCRIPT_MESSAGE sync (index.html no-JS fallback)", () => {
+  it("index.html <noscript> contains NOSCRIPT_HEADING verbatim", async () => {
+    const html = await readIndexHtml();
+    expect(html).toContain(NOSCRIPT_HEADING);
+  });
+
+  it("index.html <noscript> contains NOSCRIPT_MESSAGE verbatim", async () => {
+    // Drift defence: a rewording in the const must propagate to
+    // index.html (or vice versa). Without this sync test, the const
+    // and the static HTML could diverge silently and no-JS users
+    // would read whichever version got updated last.
+    const html = await readIndexHtml();
+    expect(html).toContain(NOSCRIPT_MESSAGE);
+  });
+
+  it("NOSCRIPT_MESSAGE contains BRAND_NAME (brand opener)", () => {
+    // Round-trip via BRAND_NAME — a future rebrand updates BRAND_NAME +
+    // NOSCRIPT_MESSAGE together. This test catches a half-edit.
+    expect(NOSCRIPT_MESSAGE).toContain(BRAND_NAME);
   });
 });

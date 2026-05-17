@@ -42,6 +42,9 @@ import {
   PLAY_DECK_EXHAUSTED_MESSAGE, PLAY_EMPTY_POOL_MESSAGE,
   COVER_HERO_PARAGRAPH,
   CARD_FLIP_ROLE_DESCRIPTION, cardAriaLabel,
+  AN_LINK_SHORT_LABEL,
+  NOSCRIPT_HEADING, NOSCRIPT_MESSAGE,
+  ROUTE_LOADER_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
 import { VOTE_FEEDBACK_LABELS } from "../src/lib/vote-feedback";
@@ -1056,6 +1059,63 @@ describe("VOTE_FEEDBACK_LABELS — Play.tsx aria-live announcements per vote", (
   it("the 3 labels are distinct (anti-clone)", () => {
     const set = new Set(Object.values(VOTE_FEEDBACK_LABELS));
     expect(set.size).toBe(3);
+  });
+});
+
+describe("AN_LINK_SHORT_LABEL — AuditTrail compact AN link", () => {
+  // Distinct from AN_LINK_VISIBLE_LABEL ("Voir sur AN ↗") — the
+  // AuditTrail per-row variant is shorter for the dense mono-font layout.
+  it("matches the canonical 'AN ↗' wording", () => {
+    expect(AN_LINK_SHORT_LABEL).toBe("AN ↗");
+  });
+
+  it("is shorter than AN_LINK_VISIBLE_LABEL (compact-vs-verbose contract)", () => {
+    // The 2 labels surface the same target but with different
+    // verbosity. A future flattening that merges them would lose the
+    // dense-row footprint distinction.
+    expect(AN_LINK_SHORT_LABEL.length).toBeLessThan(AN_LINK_VISIBLE_LABEL.length);
+  });
+
+  it("ends with the same '↗' arrow indicator as the long form (consistent affordance)", () => {
+    expect(AN_LINK_SHORT_LABEL.endsWith("↗")).toBe(true);
+    expect(AN_LINK_VISIBLE_LABEL.endsWith("↗")).toBe(true);
+  });
+});
+
+describe("NOSCRIPT_HEADING + NOSCRIPT_MESSAGE — index.html no-JS fallback", () => {
+  // Pinned via consts so a sync test (read index.html, assert it
+  // contains these strings) catches silent rewording in the static
+  // HTML against the const declaration.
+  it("NOSCRIPT_HEADING matches 'JavaScript requis'", () => {
+    expect(NOSCRIPT_HEADING).toBe("JavaScript requis");
+  });
+
+  it("NOSCRIPT_MESSAGE starts with brand name (Sans Détour ...)", () => {
+    // Brand name + the privacy contract ("Aucune donnée n'est envoyée
+    // à un serveur") are the 2 load-bearing pieces of this message.
+    // Pin the brand opener so a future rewording doesn't drop it.
+    expect(NOSCRIPT_MESSAGE.startsWith("Sans Détour")).toBe(true);
+  });
+
+  it("NOSCRIPT_MESSAGE contains the privacy contract clause", () => {
+    // Without this clause, the no-JS fallback misses an opportunity
+    // to reassure on privacy (which is part of the product framing
+    // documented in Methode §05).
+    expect(NOSCRIPT_MESSAGE).toContain("Aucune donnée n'est envoyée à un serveur");
+  });
+});
+
+describe("ROUTE_LOADER_LABEL — main.tsx <Suspense> placeholder", () => {
+  it("matches the canonical 'Chargement…' wording", () => {
+    expect(ROUTE_LOADER_LABEL).toBe("Chargement…");
+  });
+
+  it("uses the typographic ellipsis (single char '…'), not three dots ('...')", () => {
+    // The typographic ellipsis is one character; "..." is three.
+    // A regression that types 3 dots would render visually similar
+    // but the codepoint differs — pin the contract.
+    expect(ROUTE_LOADER_LABEL).toContain("…");
+    expect(ROUTE_LOADER_LABEL).not.toContain("...");
   });
 });
 

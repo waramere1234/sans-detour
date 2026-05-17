@@ -6,7 +6,7 @@ import Cover from "./routes/Cover";
 import Play from "./routes/Play";
 import Result from "./routes/Result";
 import { ROUTES } from "./lib/routes";
-import { READING_PAGE_MAX_WIDTH } from "./types";
+import { READING_PAGE_MAX_WIDTH, ROUTE_LOADER_LABEL } from "./types";
 import "./index.css";
 
 // Methode and Legal are reading-only secondary pages (TOC + paragraphs)
@@ -31,7 +31,7 @@ function RouteLoader() {
         letterSpacing: "0.08em", textTransform: "uppercase",
       }}
     >
-      Chargement…
+      {ROUTE_LOADER_LABEL}
     </section>
   );
 }

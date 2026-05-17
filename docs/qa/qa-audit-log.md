@@ -3734,3 +3734,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `CARD_FLIP_ROLE_DESCRIPTION\|cardAriaLabel\|VOTE_FEEDBACK_LABELS` src/ tests/ → 15+ résultats
 - [ ] grep `"carte de scrutin — glissez"\|"Voté pour. Carte suivante"\|"Voté contre. Carte suivante"\|"Passé. Carte suivante"` src/ tests/ → 4-6 résultats (déclarations + pin-the-value)
 - [ ] grep `~766 tests` CLAUDE.md → 0 résultat (aligné sur ~775)
+
+---
+
+## Session 159 — 2026-05-17
+
+### Vérification session 158
+
+- [VERIFIED] 47 occurrences des 3 nouveaux exports (CARD_FLIP_ROLE_DESCRIPTION + cardAriaLabel + VOTE_FEEDBACK_LABELS)
+- [VERIFIED] 0 inline literal matches (tous migrés vers consts)
+- [VERIFIED] CLAUDE.md "~775 tests"
+- 775/775 tests verts, typecheck clean
+
+### Bugs fixés (AN_LINK_SHORT_LABEL + NOSCRIPT_HEADING/MESSAGE + ROUTE_LOADER_LABEL)
+
+- [FIXED] AuditTrail.tsx visible AN-link text `"AN ↗"` inline (compact form distinct du long-form AN_LINK_VISIBLE_LABEL = "Voir sur AN ↗" session 144), untested · Drift surface : single source + 0 tests ; un rewording aurait silencieusement passé. Fix : export `AN_LINK_SHORT_LABEL = "AN ↗"` depuis src/types. AuditTrail utilise la const. 3 nouveaux tests dans aria-labels.test.ts : pin-the-value, shorter-than-AN_LINK_VISIBLE_LABEL compact-vs-verbose contract, endsWith "↗" consistent-affordance-with-long-form. · `src/types/index.ts`, `src/components/AuditTrail.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] index.html `<noscript>` h1 `"JavaScript requis"` + paragraph `"Sans Détour calcule ton alignement politique localement dans le navigateur — il faut activer JavaScript pour que l'app fonctionne. Aucune donnée n'est envoyée à un serveur."` inline + untested · Drift surface : c'est ce que les users sans JS voient. La phrase contient le privacy contract critique ("Aucune donnée n'est envoyée à un serveur") qui est aligné avec Methode §05. Sans sync-test, un rewording silencieux pourrait drop la clause privacy. Fix : export `NOSCRIPT_HEADING` + `NOSCRIPT_MESSAGE` depuis src/types. 3 nouveaux tests aria-labels.test.ts : pin-the-value heading, startsWith BRAND_NAME, contains privacy-contract clause. 3 nouveaux tests site-metadata.test.ts : sync read-index.html-and-assert × 2 (contains heading + message), round-trip via BRAND_NAME guard. · `src/types/index.ts`, `tests/aria-labels.test.ts`, `tests/site-metadata.test.ts`
+- [FIXED] main.tsx RouteLoader `<Suspense fallback>` text `"Chargement…"` inline + untested · Drift surface : visible pendant que les lazy Methode/Legal chunks chargent. Distinct des SKELETON_*_LOADING_LABEL (qui sont aria-labels de composants au sein d'une route déjà chargée). Fix : export `ROUTE_LOADER_LABEL = "Chargement…"` depuis src/types. main.tsx utilise la const. 2 nouveaux tests : pin-the-value, typographic-ellipsis-vs-three-dots invariant (le codepoint "…" doit pas dériver vers "..."). · `src/types/index.ts`, `src/main.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 160
+
+- [ ] grep `AN_LINK_SHORT_LABEL\|NOSCRIPT_HEADING\|NOSCRIPT_MESSAGE\|ROUTE_LOADER_LABEL` src/ tests/ → 15+ résultats
+- [ ] grep `>AN ↗<\|>Chargement…<\|"JavaScript requis"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~775 tests` CLAUDE.md → 0 résultat (aligné sur ~786)

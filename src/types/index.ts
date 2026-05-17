@@ -528,6 +528,29 @@ export function cardAriaLabel(numero: number, titrePedago: string): string {
   return `Scrutin n°${numero} : ${titrePedago}`;
 }
 
+/** Compact "AN ↗" link text rendered by AuditTrail per-row (different
+ *  from the long-form `AN_LINK_VISIBLE_LABEL = "Voir sur AN ↗"` on
+ *  the Card verso footer). The mono-font row is tight, so the link
+ *  shrinks to just the AN abbreviation + the external-link arrow.
+ *  Untested today; centralising pins the contract. */
+export const AN_LINK_SHORT_LABEL = "AN ↗";
+
+/** `<noscript>` fallback heading + message rendered in index.html for
+ *  users without JavaScript. Untested today; the consts let a sync
+ *  test (read index.html, assert it contains these strings) catch
+ *  silent drift. The message documents the privacy contract ("Aucune
+ *  donnée n'est envoyée à un serveur") so a regression that drops
+ *  that clause silently would surface as a test failure. */
+export const NOSCRIPT_HEADING = "JavaScript requis";
+export const NOSCRIPT_MESSAGE = "Sans Détour calcule ton alignement politique localement dans le navigateur — il faut activer JavaScript pour que l'app fonctionne. Aucune donnée n'est envoyée à un serveur.";
+
+/** Visible text inside the `<Suspense fallback>` element for lazy
+ *  routes (main.tsx RouteLoader). Single source today; centralising
+ *  defends against silent rewording. Note: distinct from
+ *  SKELETON_CARD/RESULT_LOADING_LABEL — those are component-level
+ *  loading aria-labels; this is the route-level chunk-loading placeholder. */
+export const ROUTE_LOADER_LABEL = "Chargement…";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

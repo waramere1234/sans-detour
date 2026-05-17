@@ -4,7 +4,7 @@ import {
   DEMO_DATA_LABEL_PREFIX, DEMO_FALLBACK_SHORT_LABEL,
   AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
   AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
-  auditTrailChipNoun,
+  auditTrailChipNoun, AN_LINK_SHORT_LABEL,
   type GroupAlignment, type Scrutin, type SessionVote,
 } from "../types";
 import { alignmentScore } from "../lib/matching";
@@ -123,7 +123,7 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
                 style={{
                   fontFamily: "var(--font-mono)", fontSize: 10,
                   color: "var(--ink-3)", letterSpacing: "0.04em", textDecoration: "none",
-                }}><span aria-hidden="true">AN ↗</span></a>
+                }}><span aria-hidden="true">{AN_LINK_SHORT_LABEL}</span></a>
             ) : (
               <span
                 title={`${DEMO_DATA_LABEL_PREFIX} — sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production`}
