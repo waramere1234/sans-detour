@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
   loadSession, saveSession, recordVote, resetSession, newSession,
-  hasSeenCover,
+  hasSeenCover, markCoverSeen, forgetCover,
 } from "../src/lib/session";
 
 describe("session (localStorage state)", () => {
@@ -90,10 +90,14 @@ describe("session (localStorage state)", () => {
   // "Recommencer" button click.
   describe("localStorage throw defenses", () => {
     let getItem: ReturnType<typeof vi.spyOn>;
+    let setItem: ReturnType<typeof vi.spyOn>;
     let removeItem: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
       getItem = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+        throw new Error("blocked");
+      });
+      setItem = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
         throw new Error("blocked");
       });
       removeItem = vi.spyOn(Storage.prototype, "removeItem").mockImplementation(() => {
@@ -103,6 +107,7 @@ describe("session (localStorage state)", () => {
 
     afterEach(() => {
       getItem.mockRestore();
+      setItem.mockRestore();
       removeItem.mockRestore();
     });
 
@@ -116,6 +121,23 @@ describe("session (localStorage state)", () => {
 
     it("resetSession swallows localStorage.removeItem throws", () => {
       expect(() => resetSession()).not.toThrow();
+    });
+
+    // Symmetric setItem / removeItem guards: saveSession + markCoverSeen
+    // use setItem (Safari private mode quota=0, low-storage devices), and
+    // forgetCover uses removeItem. Without these tests, dropping the
+    // try/catch in any of them would slip past CI silently — same risk
+    // class as the loadSession defense above.
+    it("saveSession swallows localStorage.setItem throws", () => {
+      expect(() => saveSession(newSession())).not.toThrow();
+    });
+
+    it("markCoverSeen swallows localStorage.setItem throws", () => {
+      expect(() => markCoverSeen()).not.toThrow();
+    });
+
+    it("forgetCover swallows localStorage.removeItem throws", () => {
+      expect(() => forgetCover()).not.toThrow();
     });
   });
 });

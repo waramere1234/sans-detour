@@ -1933,3 +1933,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `\blocation\.origin\b` src/routes/Result.tsx → 1 résultat (avec `window.` préfixe)
 - [ ] curl `/api/share-card.svg?t=RN:-50,LFI:200` → SVG avec "0%" et "100%" rendus (pcts clampés), pas "-50%" / "200%"
 - [ ] grep `comptés\b` src/components/RankingOverlay.tsx → 0 résultat (singulier ou avec plural rule, jamais hardcoded)
+
+---
+
+## Session 85 — 2026-05-17
+
+### Vérification session 84
+
+- [VERIFIED] `src/routes/Result.tsx:155` : `window.location.origin` (préfixé explicitement)
+- [VERIFIED] `api/share-card.ts:24` : `Math.max(0, Math.min(100, pct))` clamp en place
+- [VERIFIED] `src/components/RankingOverlay.tsx:118` : `compté{countedTotal !== 1 ? "s" : ""}` plural rule
+- 136/136 tests verts (avant les fixes de cette session), typecheck clean
+
+### Bugs fixés (skeleton layout shift + test coverage gap + empty-string filter)
+
+- [FIXED] `ResultSkeleton.tsx:18` hardcoded `length: 6` rows · Le squelette de chargement de /result rendait 6 placeholder rows alors que `Result.tsx` ligne 212 fait `ranked.map()` sur tous les `GROUP_CODES` (11). Lors du remplissage, 5 nouvelles rows apparaissaient et poussaient les boutons "Refaire", "Partager", "Continuer à affiner" ~250px vers le bas — CLS visible. Aligné sur `GROUP_CODES.length` (11) pour que le skeleton occupe la même hauteur que le rendu final. · `src/components/ResultSkeleton.tsx`
+- [FIXED] `tests/session.test.ts` coverage gap symétrique · Le bloc "localStorage throw defenses" testait 3 chemins (loadSession getItem, hasSeenCover getItem, resetSession removeItem) mais pas les 3 siblings : `saveSession` (setItem, Safari private mode quota=0), `markCoverSeen` (setItem), `forgetCover` (removeItem). Sans tests, supprimer le try/catch dans n'importe lequel de ces 3 wrappers slipperait silencieusement par CI — même risk class que la session 46 (la première à attraper ce throw défense). Ajout de 3 tests symétriques + mock `Storage.prototype.setItem`. · `tests/session.test.ts`
+- [FIXED] `scripts/lib/parse-summary.ts` `asStringArray` ne filtrait pas les chaînes vides · Si le LLM émet `mesures_principales: [""]` ou `["mesure 1", "  ", "mesure 2"]` (rare mais observé sur Haiku 4.5 quand un sous-thème ne s'applique pas), Card.tsx ColoredSection rendait un `<li>` vide ou whitespace-only. `normalizePointsCles` (siblng dans le même fichier) filtre déjà `.filter((s) => s.length > 0)` après `trim()` — alignement des 2 helpers pour cohérence. Bloque aussi les chaînes whitespace-only via le double filter `trim()` + `length > 0`. · `scripts/lib/parse-summary.ts`
+
+### Vérifications à faire en session 86
+
+- [ ] grep `length: 6` src/components/ResultSkeleton.tsx → 0 résultat
+- [ ] grep `length: GROUP_CODES.length` src/components/ResultSkeleton.tsx → 1 résultat
+- [ ] grep -c "it(" tests/session.test.ts → 14 (était 11)
+- [ ] grep `~136 tests` CLAUDE.md → 0 résultat (aligné sur ~139)
+- [ ] DevTools : injecter scrutin avec `analyse_loi.mesures_principales = [""]` → Card verso n'affiche pas la section "Mesures" (length filtered to 0)

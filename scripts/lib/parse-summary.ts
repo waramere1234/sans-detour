@@ -16,7 +16,15 @@ export interface Summary {
 }
 
 export function asStringArray(v: unknown): string[] {
-  return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
+  // Also drop empty / whitespace-only strings so Card.tsx ColoredSection
+  // doesn't render blank <li> bullets when the LLM emits an empty key
+  // (rare but observed). normalizePointsCles already does the same filter
+  // for points_cles — keeping the two analyse-loi siblings consistent.
+  if (!Array.isArray(v)) return [];
+  return v
+    .filter((x): x is string => typeof x === "string")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
 }
 
 export function normalizeAnalyse(a: unknown): ScrutinAnalyse | undefined {

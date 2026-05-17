@@ -1,3 +1,9 @@
+import { GROUP_CODES } from "../types";
+
+// Row count anchored on GROUP_CODES.length so the skeleton renders as many
+// placeholders as the real Result page (which maps `ranked.map(...)` over all
+// 11 groups). Hardcoded 6 used to ship a layout shift of ~5 rows when the
+// real list took over — ~250px CLS push on the buttons below.
 export function ResultSkeleton() {
   return (
     <section
@@ -15,7 +21,7 @@ export function ResultSkeleton() {
         <div className="skeleton-shimmer" style={{ width: "50%", height: 12 }} />
       </header>
 
-      {Array.from({ length: 6 }).map((_, i) => (
+      {Array.from({ length: GROUP_CODES.length }).map((_, i) => (
         <div key={i} style={{
           display: "flex", alignItems: "center", gap: 10,
           padding: "12px 14px",
