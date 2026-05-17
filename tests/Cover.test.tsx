@@ -1,14 +1,15 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
 import {
   MemoryRouter, Route, Routes,
   type InitialEntry,
 } from "react-router-dom";
 import Cover from "../src/routes/Cover";
-import { resetSession, recordVote, COVER_STORAGE_KEY } from "../src/lib/session";
+import { resetSession, recordVote, COVER_STORAGE_KEY, loadSession } from "../src/lib/session";
 import { FROM_LOGO_STATE } from "../src/lib/nav-state";
 import { ROUTES } from "../src/lib/routes";
 import { TARGET } from "../src/types";
+import * as analytics from "../src/lib/analytics";
 
 function renderCover(initialEntries: InitialEntry[] = [ROUTES.cover]) {
   return render(
@@ -66,5 +67,141 @@ describe("Cover", () => {
     // accidentally satisfied by the secondary "Recommencer à zéro"
     // button (which contains "commencer" as a substring).
     expect(screen.getByRole("button", { name: /reprendre/i })).toBeInTheDocument();
+  });
+});
+
+// All cover.tsx side effects (track + resetSession + navigate) live in
+// the `start()` / `restart()` handlers + Link onClick handlers. Below
+// describes pin those behaviors so a refactor that drops the track call
+// (or fires it before the user confirms a destructive action) surfaces.
+
+describe("Cover — start() analytics + side effects", () => {
+  let trackSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    localStorage.clear();
+    resetSession();
+    trackSpy = vi.spyOn(analytics, "track").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    trackSpy.mockRestore();
+  });
+
+  it("fires 'cover_started' on a fresh visit (no in-progress session)", () => {
+    renderCover();
+    fireEvent.click(screen.getByRole("button", { name: /commencer/i }));
+    expect(trackSpy).toHaveBeenCalledWith("cover_started");
+    expect(trackSpy).not.toHaveBeenCalledWith("cover_resumed");
+  });
+
+  it("fires 'cover_resumed' instead when the user has an in-progress session", () => {
+    // hasSeenCover=true so auto-resume would fire — pass fromLogo=true to
+    // *bypass* the auto-resume effect and reach the Reprendre button.
+    localStorage.setItem(COVER_STORAGE_KEY, "true");
+    recordVote("s1", "pour");
+    renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
+    fireEvent.click(screen.getByRole("button", { name: /reprendre/i }));
+    expect(trackSpy).toHaveBeenCalledWith("cover_resumed");
+    expect(trackSpy).not.toHaveBeenCalledWith("cover_started");
+  });
+});
+
+describe("Cover — restart() flow (confirm + reset + analytics)", () => {
+  let trackSpy: ReturnType<typeof vi.spyOn>;
+  let confirmSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    localStorage.clear();
+    resetSession();
+    trackSpy = vi.spyOn(analytics, "track").mockImplementation(() => {});
+    confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    // hasSeenCover=true + 1 vote so the "Recommencer à zéro" button is
+    // rendered (it's gated on hasInProgress). fromLogo bypasses the
+    // auto-resume so the user actually sees the Cover.
+    localStorage.setItem(COVER_STORAGE_KEY, "true");
+    recordVote("s1", "pour");
+  });
+
+  afterEach(() => {
+    trackSpy.mockRestore();
+    confirmSpy.mockRestore();
+  });
+
+  it("renders the 'Recommencer à zéro' button when hasInProgress", () => {
+    renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
+    expect(screen.getByRole("button", { name: /Recommencer à zéro/ })).toBeInTheDocument();
+  });
+
+  it("prompts the user before wiping the session (no silent destroy)", () => {
+    renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
+    fireEvent.click(screen.getByRole("button", { name: /Recommencer à zéro/ }));
+    expect(confirmSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses the singular phrasing when votesCount === 1", () => {
+    renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
+    fireEvent.click(screen.getByRole("button", { name: /Recommencer à zéro/ }));
+    // The confirm message embeds the count: "...Ton vote en cours sera perdu."
+    // (singular branch — votesCount === 1). Match the singular literal so a
+    // regression to the plural branch on count=1 surfaces here.
+    expect(confirmSpy).toHaveBeenCalledWith(expect.stringMatching(/Ton vote en cours sera perdu/));
+  });
+
+  it("uses the plural phrasing with the vote count when votesCount >= 2", () => {
+    // Add 2 more votes (total = 3).
+    recordVote("s2", "pour");
+    recordVote("s3", "contre");
+    renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
+    fireEvent.click(screen.getByRole("button", { name: /Recommencer à zéro/ }));
+    expect(confirmSpy).toHaveBeenCalledWith(expect.stringMatching(/Tes 3 votes en cours seront perdus/));
+  });
+
+  it("clears the session and fires 'cover_restarted' when the user confirms", () => {
+    expect(loadSession()?.votes).toHaveLength(1); // sanity pre-state
+    renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
+    fireEvent.click(screen.getByRole("button", { name: /Recommencer à zéro/ }));
+    expect(loadSession()).toBeNull();
+    expect(trackSpy).toHaveBeenCalledWith("cover_restarted");
+  });
+
+  it("does NOTHING when the user cancels the confirm (session preserved, no analytics)", () => {
+    confirmSpy.mockReturnValueOnce(false);
+    renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
+    fireEvent.click(screen.getByRole("button", { name: /Recommencer à zéro/ }));
+    expect(loadSession()?.votes).toHaveLength(1); // preserved
+    expect(trackSpy).not.toHaveBeenCalledWith("cover_restarted");
+  });
+});
+
+describe("Cover — footer nav analytics (cover_footer_nav × 3 targets)", () => {
+  let trackSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    localStorage.clear();
+    resetSession();
+    trackSpy = vi.spyOn(analytics, "track").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    trackSpy.mockRestore();
+  });
+
+  it("fires cover_footer_nav with target=methode on the Méthode link click", () => {
+    renderCover();
+    fireEvent.click(screen.getByRole("link", { name: /Méthode/ }));
+    expect(trackSpy).toHaveBeenCalledWith("cover_footer_nav", { target: "methode" });
+  });
+
+  it("fires cover_footer_nav with target=legal on the Mentions link click", () => {
+    renderCover();
+    fireEvent.click(screen.getByRole("link", { name: /Mentions légales/ }));
+    expect(trackSpy).toHaveBeenCalledWith("cover_footer_nav", { target: "legal" });
+  });
+
+  it("fires cover_footer_nav with target=contact on the Contact mailto click", () => {
+    renderCover();
+    fireEvent.click(screen.getByRole("link", { name: /Contact/ }));
+    expect(trackSpy).toHaveBeenCalledWith("cover_footer_nav", { target: "contact" });
   });
 });

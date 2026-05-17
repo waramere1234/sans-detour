@@ -2599,3 +2599,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `STALE_AFTER_DAYS` src/ tests/ → résultats dans FreshnessBanner.tsx (déclaration export) + FreshnessBanner.test.tsx (import + 2 usages)
 - [ ] grep -c "PO[0-9]\{6\}" tests/an-groups.test.ts → 13 (toutes les entrées pinées)
 - [ ] grep `~424 tests` CLAUDE.md → 0 résultat (aligné sur ~444)
+
+---
+
+## Session 112 — 2026-05-17
+
+### Vérification session 111
+
+- [VERIFIED] tests/App.test.tsx + tests/an-groups.test.ts présents
+- [VERIFIED] STALE_AFTER_DAYS diffused 7× (export, comment, usage source, import test, 2 boundary usages)
+- [VERIFIED] 16 occurrences PO… dans an-groups test (13 entries pinées + 3 mentions dans comments)
+- [VERIFIED] CLAUDE.md "~444 tests"
+- 444/444 tests verts, typecheck clean
+
+### Bugs fixés (affinement query param drift + Cover restart() + Cover analytics)
+
+- [FIXED] `?affinement=1` query param strings dupliqués 3× · `"affinement"` (param name) + `"1"` (value) dans `src/lib/routes.ts` (composition `PLAY_AFFINEMENT`) + `src/routes/Play.tsx` (deux reads `params.get("affinement") === "1"` aux lignes 72 et 125). Un rename à `?refinement=1` aurait propagé via PLAY_AFFINEMENT (la nav cible Result→Play) mais laissé les reads de Play.tsx sur l'ancien nom — résultat : la nav vers refinement passe MAIS Play.tsx ne reconnaît plus le flag et redirect immédiatement au Result vide. Bug silencieux jusqu'au runtime. Fix : export `AFFINEMENT_PARAM = "affinement"` + `AFFINEMENT_VALUE = "1"` + helper `isAffinementMode(params: URLSearchParams): boolean` depuis routes.ts. PLAY_AFFINEMENT composé via les consts. Play.tsx migre les 2 reads vers `isAffinementMode(params)`. 5 nouveaux tests dans `tests/routes.test.ts` qui pinent la composition + le contrat de l'helper (true sur ?affinement=1, false sur ?affinement=0/=true/=vide/absent, rename-safe via const-built URLSearchParams). · `src/lib/routes.ts`, `src/routes/Play.tsx`, `tests/routes.test.ts`
+- [FIXED] Cover.tsx `restart()` flow 0 test coverage · Le flow critique "Recommencer à zéro" (visible quand hasInProgress=true) faisait : window.confirm(plural-rule) → if cancel return → resetSession + track("cover_restarted") + navigate(ROUTES.play). 0 test. Un refactor qui (a) drop le confirm, (b) inverse l'ordre track-avant-confirm, (c) casse la plural rule sur votesCount===1, (d) skip resetSession en cas de cancel → tous silencieux. 6 tests ajoutés : bouton rendu si hasInProgress, confirm appelé avant destroy, singulier ("Ton vote en cours") sur 1 vote, pluriel ("Tes 3 votes en cours") sur N votes, confirm OK → session wiped + analytics fired, confirm cancel → session preserved + 0 analytics. · `tests/Cover.test.tsx`
+- [FIXED] Cover.tsx analytics events `cover_started` / `cover_resumed` / `cover_footer_nav × 3` 0 verifications · Cover fire 6+ events (cover_started, cover_resumed, cover_result_revisit, cover_partial_result, cover_footer_nav avec 3 targets distincts, cover_restarted), tous lus par le dashboard Plausible — une régression silencieuse qui change la chaine d'événement (par exemple un refactor qui renomme `cover_started` → `start_clicked` pour cohérence) casserait le funnel sans test. 5 tests ajoutés : start() fresh fires `cover_started` (et NON `cover_resumed`), start() resume fires `cover_resumed`, cover_footer_nav avec target=methode/legal/contact sur les 3 liens du footer. · `tests/Cover.test.tsx`
+
+### Vérifications à faire en session 113
+
+- [ ] grep `params.get("affinement")` src/ → 0 résultat (tous migrés vers isAffinementMode)
+- [ ] grep `isAffinementMode\|AFFINEMENT_PARAM\|AFFINEMENT_VALUE` src/ tests/ → résultats dans routes.ts + Play.tsx + routes.test.ts
+- [ ] grep -c "describe" tests/Cover.test.tsx → 4 describes (Cover original + 3 nouveaux ajoutés)
+- [ ] grep `~444 tests` CLAUDE.md → 0 résultat (aligné sur ~459)

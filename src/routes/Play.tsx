@@ -13,7 +13,7 @@ import {
 import { computeAlignment, rankByAlignment } from "../lib/matching";
 import { getOrCreateSession, recordVote, loadSession } from "../lib/session";
 import { track } from "../lib/analytics";
-import { ROUTES } from "../lib/routes";
+import { ROUTES, isAffinementMode } from "../lib/routes";
 import {
   GROUP_CODES, TARGET, MIN_FOR_RANKING,
   type Scrutin, type UserVote, type GroupCode, type GroupAlignment,
@@ -69,7 +69,7 @@ export default function Play() {
     // Guard: if user lands on /play with a complete session and isn't in
     // refinement mode, send them to /result rather than starting a fresh deck.
     const existing = loadSession();
-    const isAffinement = params.get("affinement") === "1";
+    const isAffinement = isAffinementMode(params);
     if (existing && existing.votes.length >= TARGET && !isAffinement) {
       navigate(ROUTES.result, { replace: true });
       return;
@@ -122,7 +122,7 @@ export default function Play() {
     // Sync both ways: dropping ?affinement=1 must also flip the mode off,
     // otherwise the refinement flag sticks across navigations and the
     // header drops the " / TARGET" suffix even in normal play.
-    setRefinementMode(params.get("affinement") === "1");
+    setRefinementMode(isAffinementMode(params));
   }, [params]);
 
   const session = loadSession();
