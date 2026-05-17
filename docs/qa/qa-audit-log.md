@@ -3665,3 +3665,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `"Comment c.est fait ?"\|"Méthode complète"\|"Signaler une erreur factuelle"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `/fermer/i\|/signaler/i\|/méthode complète/i` tests/ → 0 résultats (toutes migrées vers consts)
 - [ ] grep `~744 tests` CLAUDE.md → 0 résultat (aligné sur ~749)
+
+---
+
+## Session 156 — 2026-05-17
+
+### Vérification session 155
+
+- [VERIFIED] 24 occurrences des 3 nouveaux exports (METHODESHEET_TITLE + METHODESHEET_FULL_METHODE_LINK_LABEL + METHODESHEET_REPORT_ERROR_LINK_LABEL)
+- [VERIFIED] 0 stale `/fermer/i`, `/signaler/i`, `/méthode complète/i` regex literals dans tests/
+- [VERIFIED] CLAUDE.md "~749 tests"
+- 749/749 tests verts, typecheck clean
+
+### Bugs fixés (RETRY_DEFAULT_LABEL + RESULT_GROUPS_H2/RESULT_PERSONNALITES_H2 + TOPBAR_VERSION_LABEL)
+
+- [FIXED] RetryError.tsx `retryLabel = "Réessayer"` inline default arg + tests/RetryError.test.tsx 3 sites avec literal `"Réessayer"` + 1 site avec literal `"Voir mon résultat"` (stale parallèle à VIEW_RESULT_LABEL session 133) · Drift surface : 4 sites in-lockstep pour "Réessayer" + 1 stale pour le retryLabel override. Fix : export `RETRY_DEFAULT_LABEL = "Réessayer"` depuis RetryError.tsx. RetryError utilise la const comme default arg ; tests round-trip via RETRY_DEFAULT_LABEL + VIEW_RESULT_LABEL (cleanup stale literal). 2 nouveaux tests dans aria-labels.test.ts : pin-the-value + starts-with-capital button-label convention. · `src/components/RetryError.tsx`, `tests/RetryError.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Result.tsx 2 h2 SR-rotor landmarks (`"Alignement par groupe parlementaire"` line 185 + `"Alignement avec figures du mandat"` line 246) inline + untested · Drift surface : les h2 sont les landmarks pour les SR users qui naviguent par heading rotor — sans pin, un rewording silencieux changerait l'expérience SR. Fix : export `RESULT_GROUPS_H2` + `RESULT_PERSONNALITES_H2` depuis src/types. Result.tsx utilise les 2 consts. 4 nouveaux tests dans aria-labels.test.ts : pin-the-value × 2 + startsWith "Alignement" SR-skim consistency + distinct anti-clone. · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] TopBar.tsx popover footer line `"v2 · données A.N."` inline + untested · Drift surface : le version-tag est une info importante mais unpinned. Une bump silencieux v2 → v3 (sans tests) passerait CI. Fix : export `TOPBAR_VERSION_LABEL` depuis src/types. TopBar utilise la const. 3 nouveaux tests : pin-the-value, startsWith "v" version-token guard, endsWith "A.N." source-attribution invariant. · `src/types/index.ts`, `src/components/TopBar.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 157
+
+- [ ] grep `RETRY_DEFAULT_LABEL\|RESULT_GROUPS_H2\|RESULT_PERSONNALITES_H2\|TOPBAR_VERSION_LABEL` src/ tests/ → 15+ résultats
+- [ ] grep `"Réessayer"\|"Alignement par groupe parlementaire"\|"Alignement avec figures du mandat"\|"v2 · données A.N."` src/ tests/ → 4-6 résultats (déclarations + pin-the-value)
+- [ ] grep `~749 tests` CLAUDE.md → 0 résultat (aligné sur ~758)

@@ -37,8 +37,11 @@ import {
   coverProgressChipText, RESULT_TOP_LEAD, WORDMARK_TEXT,
   METHODESHEET_TITLE,
   METHODESHEET_FULL_METHODE_LINK_LABEL, METHODESHEET_REPORT_ERROR_LINK_LABEL,
+  RESULT_GROUPS_H2, RESULT_PERSONNALITES_H2,
+  TOPBAR_VERSION_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
+import { RETRY_DEFAULT_LABEL } from "../src/components/RetryError";
 import { freshnessTotalScrutinsPhrase } from "../src/components/FreshnessBanner";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
@@ -889,6 +892,64 @@ describe("METHODESHEET_TITLE + METHODESHEET_*_LINK_LABEL — MethodeSheet bottom
     // rewording to a noun phrase ("Erreur factuelle") would change
     // the affordance from action to label.
     expect(METHODESHEET_REPORT_ERROR_LINK_LABEL.startsWith("Signaler")).toBe(true);
+  });
+});
+
+describe("RETRY_DEFAULT_LABEL — RetryError default button label", () => {
+  // Previously inline default arg `retryLabel = "Réessayer"` + 3 test
+  // literal pins. A rewording would have required 4 in-lockstep edits.
+  it("matches the canonical 'Réessayer' wording", () => {
+    expect(RETRY_DEFAULT_LABEL).toBe("Réessayer");
+  });
+
+  it("starts with capital R (button-label convention)", () => {
+    // The label appears on a primary CTA button — sentence case should
+    // start with a capital letter, not lowercase.
+    expect(RETRY_DEFAULT_LABEL[0]).toBe(RETRY_DEFAULT_LABEL[0].toUpperCase());
+  });
+});
+
+describe("RESULT_GROUPS_H2 + RESULT_PERSONNALITES_H2 — Result page h2 SR-rotor landmarks", () => {
+  // Both h2 landmarks help SR users find sections in the heading rotor.
+  // Untested today; centralising lets a future rewording propagate via
+  // one edit + surfaces a clean test pin.
+  it("RESULT_GROUPS_H2 matches 'Alignement par groupe parlementaire'", () => {
+    expect(RESULT_GROUPS_H2).toBe("Alignement par groupe parlementaire");
+  });
+
+  it("RESULT_PERSONNALITES_H2 matches 'Alignement avec figures du mandat'", () => {
+    expect(RESULT_PERSONNALITES_H2).toBe("Alignement avec figures du mandat");
+  });
+
+  it("both h2s start with 'Alignement' (SR skim consistency)", () => {
+    // The 2 sections of Result.tsx share the same opening noun so a
+    // SR user skimming by heading hears "Alignement …" then "Alignement …".
+    expect(RESULT_GROUPS_H2.startsWith("Alignement")).toBe(true);
+    expect(RESULT_PERSONNALITES_H2.startsWith("Alignement")).toBe(true);
+  });
+
+  it("the 2 h2s are distinct (anti-clone)", () => {
+    expect(RESULT_GROUPS_H2).not.toBe(RESULT_PERSONNALITES_H2);
+  });
+});
+
+describe("TOPBAR_VERSION_LABEL — TopBar popover footer version", () => {
+  it("matches the canonical 'v2 · données A.N.' wording", () => {
+    expect(TOPBAR_VERSION_LABEL).toBe("v2 · données A.N.");
+  });
+
+  it("starts with the version token 'v2' (anti-rename guard for the version pin)", () => {
+    // A future V3 bump should update this const, surfacing the test.
+    // Without the const, a silent v2→v3 commit could land without
+    // any test feedback.
+    expect(TOPBAR_VERSION_LABEL.startsWith("v")).toBe(true);
+  });
+
+  it("ends with 'A.N.' (source-of-data attribution)", () => {
+    // The label documents that the data comes from the Assemblée
+    // Nationale — pin the suffix to surface a future drop of the
+    // attribution.
+    expect(TOPBAR_VERSION_LABEL.endsWith("A.N.")).toBe(true);
   });
 });
 

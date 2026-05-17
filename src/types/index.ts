@@ -479,6 +479,19 @@ export const METHODESHEET_TITLE = "Comment c'est fait ?";
 export const METHODESHEET_FULL_METHODE_LINK_LABEL = "Méthode complète";
 export const METHODESHEET_REPORT_ERROR_LINK_LABEL = "Signaler une erreur factuelle";
 
+/** Result.tsx 2 visible h2 headings — SR-rotor landmarks that help
+ *  navigating-by-heading users find the parties list vs the
+ *  personnalités section. Both untested today; centralising defends
+ *  against silent rewording. */
+export const RESULT_GROUPS_H2 = "Alignement par groupe parlementaire";
+export const RESULT_PERSONNALITES_H2 = "Alignement avec figures du mandat";
+
+/** TopBar bottom popover footer line — small uppercase metadata
+ *  "{PROD_HOSTNAME}  ·  v2 · données A.N.". The right-half ("v2 ·
+ *  données A.N.") is currently inline + untested. Centralising
+ *  defends against silent rewording (e.g. v2 → v3 with no test pin). */
+export const TOPBAR_VERSION_LABEL = "v2 · données A.N.";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

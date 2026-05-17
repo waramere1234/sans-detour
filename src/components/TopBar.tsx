@@ -12,6 +12,7 @@ import {
   MIN_FOR_RANKING, PROD_HOSTNAME, WORDMARK_HOME_LABEL,
   MENU_RESULT_LABEL, MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
   MENU_OPEN_LABEL, MENU_CLOSE_LABEL, MAIN_MENU_LABEL,
+  TOPBAR_VERSION_LABEL,
 } from "../types";
 
 
@@ -248,7 +249,7 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
               color: "var(--ink-3)", letterSpacing: "0.10em", textTransform: "uppercase",
             }}>
               <span>{PROD_HOSTNAME}</span>
-              <span>v2 · données A.N.</span>
+              <span>{TOPBAR_VERSION_LABEL}</span>
             </div>
           </motion.div>
         </>

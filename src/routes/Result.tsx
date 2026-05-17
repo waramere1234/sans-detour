@@ -21,7 +21,7 @@ import {
   refaireConfirmMessage, PERSONNALITES_TOGGLE_LABEL,
   resultEyebrowText, resultHeaderBodyLineText,
   resultPersonnalitesIndexedCountText, continueTestRemainingSuffix,
-  RESULT_TOP_LEAD,
+  RESULT_TOP_LEAD, RESULT_GROUPS_H2, RESULT_PERSONNALITES_H2,
   type Scrutin, type GroupCode,
 } from "../types";
 
@@ -182,7 +182,7 @@ export default function Result() {
           parties list (otherwise h1 → h2 personnalités jumps over the
           main content of the page). */}
         <h2 className="sr-only">
-          Alignement par groupe parlementaire
+          {RESULT_GROUPS_H2}
         </h2>
         {ranked.map(a => {
           const panelId = `audit-trail-${a.group}`;
@@ -243,7 +243,7 @@ export default function Result() {
                 textTransform: "uppercase",
                 fontWeight: 500,
               }}>
-                Alignement avec figures du mandat
+                {RESULT_PERSONNALITES_H2}
               </h2>
               {personnalitesWithData.map((p) => (
                 <PersonnaliteRow key={p.personnalite} alignment={p} />

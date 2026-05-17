@@ -15,16 +15,22 @@ import type { CSSProperties } from "react";
 export const RETRY_FETCH_FAILED_MESSAGE =
   "Impossible de charger les scrutins. Vérifie ta connexion puis réessaie.";
 
+/** Default label for the retry button. Used as the inline default
+ *  arg of `RetryError` + pinned by 3 tests in tests/RetryError.test.tsx
+ *  via `name: "Réessayer"`. Centralised so a rewording propagates to
+ *  source + tests in one edit. */
+export const RETRY_DEFAULT_LABEL = "Réessayer";
+
 export interface RetryErrorProps {
   message: string;
   onRetry: () => void;
-  /** Override the default "Réessayer" label — used by Play.tsx's
+  /** Override the default RETRY_DEFAULT_LABEL — used by Play.tsx's
    *  "Aucun scrutin disponible" branch which actually navigates to
    *  /result rather than retrying. */
   retryLabel?: string;
 }
 
-export function RetryError({ message, onRetry, retryLabel = "Réessayer" }: RetryErrorProps) {
+export function RetryError({ message, onRetry, retryLabel = RETRY_DEFAULT_LABEL }: RetryErrorProps) {
   return (
     <div style={containerStyle}>
       <p style={messageStyle}>{message}</p>
