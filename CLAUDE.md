@@ -58,6 +58,7 @@ Une seule table. Colonnes :
 | `url_an_officielle` | text | URL `assemblee-nationale.fr/dyn/17/scrutins/N` |
 | `est_solennel` | bool | true si SPS, info factuelle uniquement |
 | `pedago_relu` | bool | toujours false pour l'instant (V3 : audit humain) |
+| `ingere_le` | timestamptz | timestamp d'ingestion stampé explicitement à chaque upsert (le `default now()` ne se déclenche qu'à l'INSERT, pas à l'UPDATE). Lu par `FreshnessBanner` pour afficher « dernière mise à jour il y a N jours ». |
 
 Migrations dans `supabase/migrations/0001..0006_*.sql`. Toutes appliquées sur le projet `sans-detour-prod` (ref `rnhkvzqerbrvrlpstxgx`).
 

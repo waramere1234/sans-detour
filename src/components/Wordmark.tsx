@@ -3,13 +3,12 @@ import type { CSSProperties } from "react";
 
 export interface WordmarkProps {
   size?: number;        // px
-  className?: string;
 }
 
-export function Wordmark({ size = 14, className = "" }: WordmarkProps) {
+export function Wordmark({ size = 14 }: WordmarkProps) {
   const style: CSSProperties = { fontSize: `${size}px` };
   return (
-    <span className={`sd-wordmark ${className}`} style={style}>
+    <span className="sd-wordmark" style={style}>
       sans<span className="sd-slash">/</span>détour
       <span className="sd-caret" aria-hidden="true" />
     </span>

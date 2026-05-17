@@ -1860,3 +1860,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `=== 1 ? ""` dans `src/components/` → 0 résultat (tout normalisé sur `!== 1 ? "s" : ""`)
 - [ ] grep `ne recharge pas` dans `SHIP-V1.md` → 0 résultat
 - [ ] curl -I `/api/share-card?t=invalid` retournant 500 → Content-Type: text/plain
+
+---
+
+## Session 82 — 2026-05-17
+
+### Vérification session 81
+
+- [VERIFIED] `grep '=== 1 ? ""' src/` → 0 résultat (plural pattern normalisé sur `!== 1 ? "s" : ""`)
+- [VERIFIED] `grep "ne recharge pas" SHIP-V1.md` → 0 résultat (wording corrigé)
+- [VERIFIED] `api/share-card.ts` 500 path a `Content-Type: text/plain; charset=utf-8` explicite
+- 135/135 tests verts, typecheck clean
+
+### Bugs fixés (script dedup + schema doc drift + dead prop)
+
+- [FIXED] `scripts/ingest-an.ts` + `scripts/resume-ingest.ts` dupliquent 5 helpers · `Summary`, `asStringArray`, `normalizeAnalyse`, `normalizePointsCles`, `sanitizeJsonControlChars`, `fallbackSummary` étaient copiés byte-for-byte entre les 2 scripts (session 75 avait dedup `normalizeTheme` uniquement). Divergence risk déjà réalisé session 70 : un fix dans ingest-an a laissé silencieusement resume-ingest cassé sur `ingere_le`, il a fallu 2 commits pour rattraper. Extraction dans `scripts/lib/parse-summary.ts` (nouveau, ~85 lignes), les 2 scripts importent depuis là. La signature `normalizeAnalyse(unknown)` (resume-ingest) remplace `(Partial<ScrutinAnalyse>)` (ingest-an) — plus défensive, équivalente en sortie. · `scripts/lib/parse-summary.ts` (nouveau), `scripts/ingest-an.ts`, `scripts/resume-ingest.ts`
+- [FIXED] `CLAUDE.md` schema table manque `ingere_le` · La colonne existe depuis migration 0001 (`ingere_le timestamptz not null default now()`), est stampée explicitement à chaque upsert par les 4 scripts (ingest-an, resume-ingest, ingest-personnalites, seed-supabase — cf. sessions 70+72), et est lue par `FreshnessBanner` pour afficher la fraîcheur. Mais le tableau Schema Supabase listait 17 colonnes sans elle → un futur lecteur (humain ou Claude) se demande d'où vient ce timestamp. Row ajoutée avec note sur le pattern stamp-explicite (le default ne fire qu'à l'INSERT). · `CLAUDE.md`
+- [FIXED] `Wordmark.tsx` prop `className` morte · La prop était déclarée dans `WordmarkProps` et destructurée (`className = ""`), composée dans le template (`'sd-wordmark ${className}'`), mais aucun des 4 call sites (TopBar, Cover, Legal, Methode) ne la passe. Dead API surface depuis le début. Drop : prop retirée du type, destructuring simplifié, className figé sur `"sd-wordmark"`. · `src/components/Wordmark.tsx`
+
+### Vérifications à faire en session 83
+
+- [ ] `ls scripts/lib/` → `parse-summary.ts` présent
+- [ ] grep `^function (asStringArray|normalizeAnalyse|fallbackSummary|sanitizeJsonControlChars)` scripts/ingest-an.ts scripts/resume-ingest.ts → 0 résultat (toutes import depuis lib)
+- [ ] grep `ingere_le` CLAUDE.md → row présente dans tableau Schema
+- [ ] grep `className\?` src/components/Wordmark.tsx → 0 résultat (prop morte retirée)

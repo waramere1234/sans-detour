@@ -44,23 +44,43 @@
   @media(min-width:1100px){.dir-grid{grid-template-columns:1fr 1fr 1fr}}
 
   .dir{
-    --accent: oklch(0.72 0.14 55);
+    --accent: oklch(0.76 0.16 55);
     background:var(--bg-2);
     border:1px solid var(--line);
     border-radius:6px;
     overflow:hidden;
     display:flex;flex-direction:column;
+    transition: opacity 200ms ease, filter 200ms ease;
   }
-  .dir.D1{ --accent: oklch(0.66 0.16 28); }    /* rouge encre */
-  .dir.D2{ --accent: oklch(0.78 0.14 230); }   /* bleu république, tuned dark */
-  .dir.D3{ --accent: oklch(0.86 0.17 95); }    /* jaune signal */
+  .dir.D1{ --accent: oklch(0.66 0.16 28); }    /* rouge encre — archivé */
+  .dir.D2{ --accent: oklch(0.78 0.14 230); }   /* bleu république — archivé */
+  .dir.D3{ --accent: oklch(0.76 0.16 55); }    /* orange signal — RETENU */
+
+  /* Archived directions: dimmed, slightly desaturated. Hover/focus lifts
+   * them back for inspection so the board still works as a reference. */
+  .dir.archived{ opacity: 0.55; filter: saturate(0.85); }
+  .dir.archived:hover, .dir.archived:focus-within{ opacity: 1; filter: none; }
 
   .dir h2.dir-title{
     font-family:var(--sans);font-weight:600;font-size:18px;margin:0;
     padding:18px 22px;border-bottom:1px solid var(--line);
-    display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+    display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;
   }
   .dir h2 .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+
+  /* State pills on direction titles — replace the bare tag with a marker
+   * pill so the retained vs archived decision is unambiguous. */
+  .state{
+    font-family:var(--mono);font-size:10px;letter-spacing:0.10em;text-transform:uppercase;font-weight:600;
+    padding:4px 9px;border-radius:3px;line-height:1.3;display:inline-flex;align-items:center;gap:6px;
+  }
+  .state .dot{width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block}
+  .state-archived{color:var(--ink-3);background:var(--bg-3);border:1px solid var(--line)}
+  .state-retenu{
+    color:var(--accent);
+    background:color-mix(in oklab, var(--accent) 14%, transparent);
+    border:1px solid color-mix(in oklab, var(--accent) 45%, transparent);
+  }
 
   .dir .stage{padding:24px 22px;background:var(--bg);border-bottom:1px solid var(--line)}
   .dir .desc{padding:14px 22px;font-size:13px;color:var(--ink-2);line-height:1.55;border-bottom:1px solid var(--line)}
@@ -139,9 +159,12 @@
 
 <div class="dir-grid">
 
-  <!-- ============== D1 ROUGE ENCRE ============== -->
-  <article class="dir D1">
-    <h2 class="dir-title">D1 · Rouge encre <span class="tag">accent · oklch(0.66 0.16 28)</span></h2>
+  <!-- ============== D1 ROUGE ENCRE — ARCHIVÉ ============== -->
+  <article class="dir D1 archived">
+    <h2 class="dir-title">
+      D1 · Rouge encre
+      <span class="state state-archived"><span class="dot"></span>Archivé · oklch(0.66 0.16 28)</span>
+    </h2>
 
     <div class="stage">
       <div class="sd-wordmark" style="font-size:34px">sans<span class="sd-slash">/</span>détour<span class="sd-caret"></span></div>
@@ -196,9 +219,12 @@
     </div>
   </article>
 
-  <!-- ============== D2 BLEU RÉPUBLIQUE ============== -->
-  <article class="dir D2">
-    <h2 class="dir-title">D2 · Bleu République <span class="tag">accent · oklch(0.78 0.14 230)</span></h2>
+  <!-- ============== D2 BLEU RÉPUBLIQUE — ARCHIVÉ ============== -->
+  <article class="dir D2 archived">
+    <h2 class="dir-title">
+      D2 · Bleu République
+      <span class="state state-archived"><span class="dot"></span>Archivé · oklch(0.78 0.14 230)</span>
+    </h2>
 
     <div class="stage">
       <div class="sd-wordmark" style="font-size:34px">sans<span class="sd-slash">/</span>détour<span class="sd-caret"></span></div>
@@ -252,17 +278,20 @@
     </div>
   </article>
 
-  <!-- ============== D3 JAUNE SIGNAL ============== -->
+  <!-- ============== D3 ORANGE SIGNAL — RETENU ============== -->
   <article class="dir D3">
-    <h2 class="dir-title">D3 · Jaune signal <span class="tag">accent · oklch(0.86 0.17 95)</span></h2>
+    <h2 class="dir-title">
+      D3 · Orange signal
+      <span class="state state-retenu"><span class="dot"></span>Retenu · oklch(0.76 0.16 55)</span>
+    </h2>
 
     <div class="stage">
       <div class="sd-wordmark" style="font-size:34px">sans<span class="sd-slash">/</span>détour<span class="sd-caret"></span></div>
     </div>
 
     <div class="desc">
-      Référence : <b>marqueurs hi-vis, code source en mode dark, surligneur d'audit</b>. Aucune surcharge politique : le jaune n'est revendiqué par aucun groupe parlementaire en couleur primaire (Renaissance tend vers l'orange-jaune mais on désature et on vire orange). <br><br>
-      <b>+</b> Lisibilité maximale sur fond anthracite, accent visible sans saturer. <b>−</b> Plus "outil/IDE" que "média", peut sembler froid.
+      Référence : <b>marqueurs hi-vis, surligneur d'audit, signalétique civique</b>. Direction <b>retenue</b> : on quitte le jaune pur pour un orange plus chaud (hue 55), qui garde la lisibilité hi-vis sans tomber dans le registre "warning". DEM (orange MoDem, hue 60) est désaturée vers <code>oklch(0.70 0.10 40)</code> pour ne pas se confondre avec l'accent du chrome. <br><br>
+      <b>+</b> Aucun parti ne revendique ce shade. Lecture longue moins fatigante qu'un jaune saturé. <b>−</b> Plus chaud que la tradition civique française — assumé, on est en posture "outil d'enquête", pas formulaire administratif.
     </div>
 
     <div class="scale">
@@ -272,7 +301,7 @@
       <div class="row"><span class="sw" style="background:oklch(0.96 0.005 250)"></span><span class="key">ink</span><span class="val">oklch 0.96</span></div>
       <div class="row"><span class="sw" style="background:oklch(0.72 0.01 250)"></span><span class="key">ink-2</span><span class="val">oklch 0.72</span></div>
       <div class="row"><span class="sw" style="background:oklch(0.50 0.01 250)"></span><span class="key">ink-3</span><span class="val">oklch 0.50</span></div>
-      <div class="row"><span class="sw" style="background:oklch(0.86 0.17 95)"></span><span class="key">accent</span><span class="val">oklch 0.86 / 0.17 / 95</span></div>
+      <div class="row"><span class="sw" style="background:oklch(0.76 0.16 55)"></span><span class="key">accent</span><span class="val">oklch 0.76 / 0.16 / 55</span></div>
     </div>
 
     <div class="mini-app">
@@ -293,13 +322,13 @@
     </div>
 
     <div class="parti-row">
-      <h3 class="sub" style="margin-top:0">Ranking — D3 (chrome jaune, partis libres de garder leurs couleurs sans clash)</h3>
+      <h3 class="sub" style="margin-top:0">Ranking — D3 (chrome orange · DEM décalée pour éviter le clash de hue)</h3>
       <div class="parti"><span class="nm">LFI</span><span class="bar"><i style="width:71%;background:oklch(0.55 0.16 24)"></i></span><span class="pct">71%</span></div>
       <div class="parti"><span class="nm">ECO</span><span class="bar"><i style="width:68%;background:oklch(0.66 0.14 145)"></i></span><span class="pct">68%</span></div>
       <div class="parti"><span class="nm">SOC</span><span class="bar"><i style="width:62%;background:oklch(0.72 0.14 0)"></i></span><span class="pct">62%</span></div>
       <div class="parti"><span class="nm">GDR</span><span class="bar"><i style="width:54%;background:oklch(0.55 0.10 18)"></i></span><span class="pct">54%</span></div>
       <div class="parti"><span class="nm">LIOT</span><span class="bar"><i style="width:48%;background:oklch(0.62 0.07 285)"></i></span><span class="pct">48%</span></div>
-      <div class="parti"><span class="nm">DEM</span><span class="bar"><i style="width:42%;background:oklch(0.74 0.14 60)"></i></span><span class="pct">42%</span></div>
+      <div class="parti"><span class="nm">DEM</span><span class="bar"><i style="width:42%;background:oklch(0.70 0.10 40)"></i></span><span class="pct">42%</span></div>
       <div class="parti"><span class="nm">HOR</span><span class="bar"><i style="width:40%;background:oklch(0.78 0.12 220)"></i></span><span class="pct">40%</span></div>
       <div class="parti"><span class="nm">EPR</span><span class="bar"><i style="width:38%;background:oklch(0.75 0.13 80)"></i></span><span class="pct">38%</span></div>
       <div class="parti"><span class="nm">DR</span><span class="bar"><i style="width:24%;background:oklch(0.55 0.10 250)"></i></span><span class="pct">24%</span></div>
@@ -313,7 +342,7 @@
 <!-- ================ PARTY COLORS REFERENCE ================ -->
 <h2 class="section">Couleurs des partis · 11 groupes 17e légis · accordées pour fond sombre</h2>
 
-<div class="parti-table" style="--accent: oklch(0.86 0.17 95)">
+<div class="parti-table" style="--accent: oklch(0.76 0.16 55)">
   <div class="parti-cell">
     <div class="swrow"><span class="sw" style="background:oklch(0.55 0.16 24)"></span><div><div class="nm">LFI</div><div class="ko">La France insoumise</div></div></div>
     <div class="full">officiel : rouge bordeaux<br>oklch <code>0.55 / 0.16 / 24</code></div>
@@ -339,8 +368,8 @@
     <div class="full">officiel : jaune-orangé<br>oklch <code>0.75 / 0.13 / 80</code></div>
   </div>
   <div class="parti-cell">
-    <div class="swrow"><span class="sw" style="background:oklch(0.74 0.14 60)"></span><div><div class="nm">DEM</div><div class="ko">Démocrate (MoDem)</div></div></div>
-    <div class="full">officiel : orange<br>oklch <code>0.74 / 0.14 / 60</code></div>
+    <div class="swrow"><span class="sw" style="background:oklch(0.70 0.10 40)"></span><div><div class="nm">DEM</div><div class="ko">Démocrate (MoDem)</div></div></div>
+    <div class="full">officiel : orange — désaturée (hue 40, C 0.10) pour ne pas se confondre avec l'accent chrome<br>oklch <code>0.70 / 0.10 / 40</code></div>
   </div>
   <div class="parti-cell">
     <div class="swrow"><span class="sw" style="background:oklch(0.78 0.12 220)"></span><div><div class="nm">HOR</div><div class="ko">Horizons</div></div></div>
@@ -360,14 +389,17 @@
   </div>
 </div>
 
-<h2 class="section">Recommandation</h2>
+<h2 class="section">Décision</h2>
 <p style="color:var(--ink-2);font-size:14px;line-height:1.6;max-width:64ch">
-  Mon vote : <b style="color:oklch(0.86 0.17 95)">D3 · Jaune signal</b>. Trois raisons : (1) il ne rentre en collision avec aucune couleur de parti, donc le top 1 reste lisible quel que soit le parti gagnant ; (2) il signe fortement la posture "outil de transparence / surligneur d'audit" ; (3) sur le fond anthracite, c'est la couleur qui demande le moins de saturation pour ressortir, donc la moins fatigante en lecture longue. <b>D1</b> est le plus médiatique-classique mais entre en conflit direct avec LFI. <b>D2</b> est le plus civic-traditionnel mais confond chrome et bleus partis. À toi.
+  Direction retenue : <b style="color:oklch(0.76 0.16 55)">D3 · Orange signal</b> · <code style="font-family:var(--mono);font-size:12px;color:var(--ink)">oklch(0.76 0.16 55)</code>. On glisse du jaune pur (hue 95) vers un orange chaud (hue 55) qui garde la lisibilité hi-vis sans tomber dans le registre "warning/erreur" et sans hériter de la connotation marqueur fluo. Le seul parti dans la même famille de hue est <b>DEM</b> (orange MoDem, hue 60) — on la décale à <code>oklch(0.70 0.10 40)</code> pour qu'aucune barre de groupe ne se confonde avec l'accent du chrome.
+</p>
+<p style="color:var(--ink-3);font-size:13px;line-height:1.6;max-width:64ch;margin-top:14px">
+  Archivés : <b>D1 · Rouge encre</b> (conflit direct avec LFI, posture trop médiatique-éditoriale) · <b>D2 · Bleu République</b> (se confond avec les bleus partis Horizons / DR / RN, lisible mais peu distinctif).
 </p>
 
 <footer>
   <span>SANS DÉTOUR · DESIGN BOARD 04</span>
-  <span>RECO — D3 (jaune signal)</span>
+  <span>RETENU — D3 (orange signal)</span>
   <span>NEXT — écrans hi-fi (cover, deck, result, share card)</span>
 </footer>
 

@@ -22,8 +22,15 @@ import { execSync } from "node:child_process";
 import { computeGroupPosition } from "../src/lib/compute-positions";
 import { normalizeTheme } from "../src/types";
 import type {
-  GroupCode, GroupPosition, GroupVoteBreakdown, Theme, ScrutinAnalyse,
+  GroupCode, GroupPosition, GroupVoteBreakdown, ScrutinAnalyse,
 } from "../src/types";
+import {
+  type Summary,
+  normalizeAnalyse,
+  normalizePointsCles,
+  sanitizeJsonControlChars,
+  fallbackSummary,
+} from "./lib/parse-summary";
 
 // ───────────────────────────────────────────────────────────────── config
 
@@ -425,15 +432,6 @@ Tu réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans texte avan
   }
 }`;
 
-interface Summary {
-  chapeau: string;
-  titre_pedago: string;
-  contexte: string;
-  analyse_loi?: ScrutinAnalyse;
-  points_cles?: string[];
-  theme?: Theme;
-}
-
 interface AnthropicResponse {
   content: Array<
     | { type: "text"; text: string }
@@ -525,80 +523,9 @@ function extractSummaryFromMessage(message: AnthropicResponse): Summary {
     chapeau,
     titre_pedago,
     contexte,
-    analyse_loi: raw.analyse_loi ? normalizeAnalyse(raw.analyse_loi as Partial<ScrutinAnalyse>) : undefined,
+    analyse_loi: normalizeAnalyse(raw.analyse_loi),
     points_cles: normalizePointsCles(raw.points_cles),
     theme: normalizeTheme(raw.theme),
-  };
-}
-
-// Cap each bullet at 7 words and keep at most 3. Drop empties and trims.
-// Hard cap defends the UI from a model that ignored the prompt constraint.
-function normalizePointsCles(v: unknown): string[] | undefined {
-  if (!Array.isArray(v)) return undefined;
-  const cleaned = v
-    .filter((x): x is string => typeof x === "string")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0)
-    .slice(0, 3)
-    .map((s) => {
-      const words = s.split(/\s+/);
-      return words.length <= 7 ? s : words.slice(0, 7).join(" ") + "…";
-    });
-  return cleaned.length > 0 ? cleaned : undefined;
-}
-
-/** Walk the JSON text byte-by-byte; when inside a string literal, escape any
- *  literal control char (\n, \t, \r, etc.) so JSON.parse won't reject. */
-function sanitizeJsonControlChars(json: string): string {
-  let out = "";
-  let inString = false;
-  let escapeNext = false;
-  for (let i = 0; i < json.length; i++) {
-    const c = json[i];
-    if (escapeNext) {
-      out += c;
-      escapeNext = false;
-      continue;
-    }
-    if (c === "\\") {
-      out += c;
-      escapeNext = true;
-      continue;
-    }
-    if (c === '"') {
-      inString = !inString;
-      out += c;
-      continue;
-    }
-    if (inString) {
-      const code = c.charCodeAt(0);
-      if (code === 0x0a) { out += "\\n"; continue; }
-      if (code === 0x0d) { out += "\\r"; continue; }
-      if (code === 0x09) { out += "\\t"; continue; }
-      if (code < 0x20) {
-        out += "\\u" + code.toString(16).padStart(4, "0");
-        continue;
-      }
-    }
-    out += c;
-  }
-  return out;
-}
-
-function asStringArray(v: unknown): string[] {
-  if (!Array.isArray(v)) return [];
-  return v.filter((x): x is string => typeof x === "string");
-}
-
-function normalizeAnalyse(a: Partial<ScrutinAnalyse> | undefined | null): ScrutinAnalyse | undefined {
-  if (!a || typeof a !== "object") return undefined;
-  return {
-    mesures_principales: asStringArray(a.mesures_principales),
-    concernes_positifs: asStringArray(a.concernes_positifs),
-    concernes_negatifs: asStringArray(a.concernes_negatifs),
-    concernes_neutres: asStringArray(a.concernes_neutres),
-    calendrier: asStringArray(a.calendrier),
-    exceptions: asStringArray(a.exceptions),
   };
 }
 
@@ -706,21 +633,6 @@ async function fetchBatchResults(batchId: string): Promise<Map<string, Summary>>
     console.error(firstErrorLine);
   }
   return out;
-}
-
-function fallbackSummary(titreBrut: string, dossierTitre: string): Summary {
-  // Truncate to ~12 words for titre_pedago, derive a 3-word eyebrow from dossier,
-  // and use the trimmed dossier title as a best-effort context line.
-  const words = titreBrut.split(/\s+/).filter(Boolean);
-  const titre_pedago = words.slice(0, 14).join(" ") + (words.length > 14 ? "…" : "");
-  const dossierWords = (dossierTitre || "scrutin").split(/\s+/).filter(Boolean).slice(0, 3);
-  const chapeau = dossierWords.join(" ").toUpperCase().replace(/[.,;:!?]+$/, "");
-  // Fallback context: the dossier title trimmed to 25 words, or empty.
-  const ctxWords = (dossierTitre || "").split(/\s+/).filter(Boolean);
-  const contexte = ctxWords.length > 0
-    ? ctxWords.slice(0, 25).join(" ") + (ctxWords.length > 25 ? "…" : "")
-    : "";
-  return { chapeau, titre_pedago, contexte };
 }
 
 // ─────────────────────────────────────────────────────────────── orchestrator
