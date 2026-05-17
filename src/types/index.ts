@@ -108,6 +108,28 @@ export const START_LABEL = "Commencer";
 export const RESUME_LABEL = "Reprendre";
 export const VIEW_RESULT_LABEL = "Voir mon résultat";
 
+/** Cover secondary-CTA labels (visible only when hasInProgress=true).
+ *  - RESTART_LABEL: destructive "wipe session, start over" link. The
+ *    string is also the prefix of the window.confirm prompt — Cover
+ *    builds the confirm message as `${RESTART_LABEL} ? Tes N votes…`.
+ *  - VIEW_PARTIAL_RESULT_LABEL: link to /result before TARGET is
+ *    reached, gated on canSeePartialResult = votes >= MIN_FOR_RANKING.
+ *    Centralised so a rewording propagates from one edit to the
+ *    visible text + tests + the parallel Result.tsx REFAIRE_LABEL
+ *    semantic (different CTA, different copy, different route). */
+export const RESTART_LABEL = "Recommencer à zéro";
+export const VIEW_PARTIAL_RESULT_LABEL = "Voir mon résultat partiel";
+
+/** TopBar menu item labels — passed as `label=` prop to MenuLink for
+ *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
+ *  and the analytics `target` props (track("topbar_nav", { target })) use
+ *  a different "result"/"methode"/"legal"/"contact" slug. The visible
+ *  labels live here; the analytics slugs live next to their call sites. */
+export const MENU_RESULT_LABEL = "Mon résultat";
+export const MENU_METHODE_LABEL = "Méthode & sources";
+export const MENU_LEGAL_LABEL = "Mentions légales";
+export const MENU_CONTACT_LABEL = "Contact";
+
 /** Result.tsx CTA labels. Each is pinned by regex in tests/Result.test.tsx;
  *  centralising the strings keeps the source + the tests + the confirm
  *  prompt (refaire) on Result.tsx in sync.

@@ -3235,3 +3235,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `READING_PAGE_SECTION_PADDING` src/ tests/ → 5+ résultats
 - [ ] grep `"24px var..--gutter.. 48px"` src/ → 1 résultat seulement (la déclaration)
 - [ ] grep `~613 tests` CLAUDE.md → 0 résultat (aligné sur ~616)
+
+---
+
+## Session 138 — 2026-05-17
+
+### Vérification session 137
+
+- [VERIFIED] 37 occurrences des 4 Result CTA labels dans src/ + tests/
+- [VERIFIED] 8 occurrences de READING_PAGE_SECTION_PADDING
+- [VERIFIED] 1 résultat seulement du padding literal (la déclaration)
+- [VERIFIED] CLAUDE.md "~616 tests"
+- 616/616 tests verts, typecheck clean
+
+### Bugs fixés (RESTART_LABEL + VIEW_PARTIAL_RESULT_LABEL + MENU_*_LABEL × 4)
+
+- [FIXED] `"Recommencer à zéro"` Cover restart label dupliqué 3× dans Cover.tsx (button + 2 confirm-prompt branches) + 6× dans tests/Cover.test.tsx (regex literals) · Rewording aurait demandé d'updater source + 2 confirm branches + 6 tests in lockstep. Fix : export `RESTART_LABEL` depuis src/types. Cover.tsx button + confirm template literals utilisent la const ; tests migrent vers `new RegExp(RESTART_LABEL)`. 1 nouveau test confirm prompt `.toMatch(new RegExp(`^${RESTART_LABEL}`))` round-trip. · `src/types/index.ts`, `src/routes/Cover.tsx`, `tests/Cover.test.tsx`
+- [FIXED] `"Voir mon résultat partiel"` Cover link label inline + 3 test regex literals · Même drift surface. Fix : export `VIEW_PARTIAL_RESULT_LABEL`. Cover.tsx + tests migrent. · `src/types/index.ts`, `src/routes/Cover.tsx`, `tests/Cover.test.tsx`
+- [FIXED] TopBar 4 menu labels (`"Mon résultat"`, `"Méthode & sources"`, `"Mentions légales"`, `"Contact"`) inline comme `label={...}` props + 9+ regex literals dans tests/TopBar.test.tsx · Drift surface notable. Fix : export `MENU_RESULT_LABEL`, `MENU_METHODE_LABEL`, `MENU_LEGAL_LABEL`, `MENU_CONTACT_LABEL` depuis src/types. TopBar utilise les 4 consts. tests migrent vers `new RegExp(LABEL)`. · `src/types/index.ts`, `src/components/TopBar.tsx`, `tests/TopBar.test.tsx`
+
+### Vérifications à faire en session 139
+
+- [ ] grep `RESTART_LABEL\|VIEW_PARTIAL_RESULT_LABEL` src/ tests/ → 10+ résultats
+- [ ] grep `MENU_RESULT_LABEL\|MENU_METHODE_LABEL\|MENU_LEGAL_LABEL\|MENU_CONTACT_LABEL` src/ tests/ → 15+ résultats
+- [ ] grep `"Recommencer à zéro"\|"Voir mon résultat partiel"` src/ tests/ → 0 inline literals (sauf comments + déclarations)
+- [ ] grep `~616 tests` CLAUDE.md → 0 résultat (aligné sur ~617)

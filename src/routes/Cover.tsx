@@ -12,6 +12,7 @@ import { ROUTES } from "../lib/routes";
 import {
   TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL,
   START_LABEL, RESUME_LABEL, VIEW_RESULT_LABEL,
+  RESTART_LABEL, VIEW_PARTIAL_RESULT_LABEL,
   WORDMARK_HOME_LABEL,
 } from "../types";
 
@@ -64,8 +65,8 @@ export default function Cover() {
   function restart() {
     const ok = window.confirm(
       votesCount === 1
-        ? "Recommencer à zéro ? Ton vote en cours sera perdu."
-        : `Recommencer à zéro ? Tes ${votesCount} votes en cours seront perdus.`,
+        ? `${RESTART_LABEL} ? Ton vote en cours sera perdu.`
+        : `${RESTART_LABEL} ? Tes ${votesCount} votes en cours seront perdus.`,
     );
     if (!ok) return;
     // resetSession only clears the session key — the cover-seen flag is
@@ -253,7 +254,7 @@ export default function Cover() {
                     textUnderlineOffset: 3,
                   }}
                 >
-                  Voir mon résultat partiel
+                  {VIEW_PARTIAL_RESULT_LABEL}
                 </Link>
               )}
               <button
@@ -268,7 +269,7 @@ export default function Cover() {
                   textUnderlineOffset: 3,
                 }}
               >
-                Recommencer à zéro
+                {RESTART_LABEL}
               </button>
             </div>
           )}

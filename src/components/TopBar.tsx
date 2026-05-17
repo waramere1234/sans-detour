@@ -8,7 +8,10 @@ import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE } from "../lib/nav-state";
 import { mailto } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
-import { MIN_FOR_RANKING, PROD_HOSTNAME, WORDMARK_HOME_LABEL } from "../types";
+import {
+  MIN_FOR_RANKING, PROD_HOSTNAME, WORDMARK_HOME_LABEL,
+  MENU_RESULT_LABEL, MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
+} from "../types";
 
 
 /** Top bar shown on every page except the Cover. Wordmark on the left
@@ -205,7 +208,7 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
               {showResultLink && (
                 <MenuLink
                   to={ROUTES.result}
-                  label="Mon résultat"
+                  label={MENU_RESULT_LABEL}
                   badge={String(votes)}
                   accent
                   onNavigate={() => { track("topbar_nav", { target: "result" }); onClose(); }}
@@ -213,19 +216,19 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
               )}
               <MenuLink
                 to={ROUTES.methode}
-                label="Méthode & sources"
+                label={MENU_METHODE_LABEL}
                 current={location.pathname === ROUTES.methode}
                 onNavigate={() => { track("topbar_nav", { target: "methode" }); onClose(); }}
               />
               <MenuLink
                 to={ROUTES.legal}
-                label="Mentions légales"
+                label={MENU_LEGAL_LABEL}
                 current={location.pathname === ROUTES.legal}
                 onNavigate={() => { track("topbar_nav", { target: "legal" }); onClose(); }}
               />
               <MenuLink
                 href={mailto()}
-                label="Contact"
+                label={MENU_CONTACT_LABEL}
                 external
                 onNavigate={() => { track("topbar_nav", { target: "contact" }); onClose(); }}
               />

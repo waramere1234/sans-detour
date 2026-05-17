@@ -11,6 +11,7 @@ import { ROUTES } from "../src/lib/routes";
 import {
   TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL, TAGLINE,
   START_LABEL, RESUME_LABEL, VIEW_RESULT_LABEL,
+  RESTART_LABEL, VIEW_PARTIAL_RESULT_LABEL,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -162,18 +163,24 @@ describe("Cover — restart() flow (confirm + reset + analytics)", () => {
 
   it("renders the 'Recommencer à zéro' button when hasInProgress", () => {
     renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
-    expect(screen.getByRole("button", { name: /Recommencer à zéro/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: new RegExp(RESTART_LABEL) })).toBeInTheDocument();
   });
 
   it("prompts the user before wiping the session (no silent destroy)", () => {
     renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
-    fireEvent.click(screen.getByRole("button", { name: /Recommencer à zéro/ }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(RESTART_LABEL) }));
     expect(confirmSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("confirm prompt begins with RESTART_LABEL (re-uses the button copy)", () => {
+    renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(RESTART_LABEL) }));
+    expect(confirmSpy).toHaveBeenCalledWith(expect.stringMatching(new RegExp(`^${RESTART_LABEL}`)));
   });
 
   it("uses the singular phrasing when votesCount === 1", () => {
     renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
-    fireEvent.click(screen.getByRole("button", { name: /Recommencer à zéro/ }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(RESTART_LABEL) }));
     // The confirm message embeds the count: "...Ton vote en cours sera perdu."
     // (singular branch — votesCount === 1). Match the singular literal so a
     // regression to the plural branch on count=1 surfaces here.
@@ -185,14 +192,14 @@ describe("Cover — restart() flow (confirm + reset + analytics)", () => {
     recordVote("s2", "pour");
     recordVote("s3", "contre");
     renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
-    fireEvent.click(screen.getByRole("button", { name: /Recommencer à zéro/ }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(RESTART_LABEL) }));
     expect(confirmSpy).toHaveBeenCalledWith(expect.stringMatching(/Tes 3 votes en cours seront perdus/));
   });
 
   it("clears the session and fires 'cover_restarted' when the user confirms", () => {
     expect(loadSession()?.votes).toHaveLength(1); // sanity pre-state
     renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
-    fireEvent.click(screen.getByRole("button", { name: /Recommencer à zéro/ }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(RESTART_LABEL) }));
     expect(loadSession()).toBeNull();
     expect(trackSpy).toHaveBeenCalledWith("cover_restarted");
   });
@@ -200,7 +207,7 @@ describe("Cover — restart() flow (confirm + reset + analytics)", () => {
   it("does NOTHING when the user cancels the confirm (session preserved, no analytics)", () => {
     confirmSpy.mockReturnValueOnce(false);
     renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
-    fireEvent.click(screen.getByRole("button", { name: /Recommencer à zéro/ }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(RESTART_LABEL) }));
     expect(loadSession()?.votes).toHaveLength(1); // preserved
     expect(trackSpy).not.toHaveBeenCalledWith("cover_restarted");
   });
@@ -268,7 +275,7 @@ describe("Cover — auto-resume analytics (cover_result_revisit + cover_partial_
     // the auto-resume effect so we reach the rendered Cover.
     for (let i = 1; i <= MIN_FOR_RANKING; i++) recordVote(`s${i}`, "pour");
     renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
-    const link = screen.getByRole("link", { name: /Voir mon résultat partiel/ });
+    const link = screen.getByRole("link", { name: new RegExp(VIEW_PARTIAL_RESULT_LABEL) });
     fireEvent.click(link);
     expect(trackSpy).toHaveBeenCalledWith("cover_partial_result");
   });
@@ -278,7 +285,7 @@ describe("Cover — auto-resume analytics (cover_result_revisit + cover_partial_
     // 1 vote — below MIN_FOR_RANKING=5.
     recordVote("s1", "pour");
     renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
-    expect(screen.queryByRole("link", { name: /Voir mon résultat partiel/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: new RegExp(VIEW_PARTIAL_RESULT_LABEL) })).not.toBeInTheDocument();
   });
 });
 

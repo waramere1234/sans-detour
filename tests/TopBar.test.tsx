@@ -4,7 +4,10 @@ import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { TopBar } from "../src/components/TopBar";
 import { resetSession, recordVote } from "../src/lib/session";
 import { ROUTES } from "../src/lib/routes";
-import { MIN_FOR_RANKING } from "../src/types";
+import {
+  MIN_FOR_RANKING,
+  MENU_RESULT_LABEL, MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
+} from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
 // TopBar owns:
@@ -109,21 +112,21 @@ describe("TopBar — Mon résultat gate (MIN_FOR_RANKING threshold)", () => {
     recordVote("s1", "pour");
     renderTopBar(ROUTES.play);
     fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
-    expect(screen.queryByRole("menuitem", { name: /Mon résultat/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: new RegExp(MENU_RESULT_LABEL) })).not.toBeInTheDocument();
   });
 
   it("shows 'Mon résultat' once MIN_FOR_RANKING is reached", () => {
     for (let i = 1; i <= MIN_FOR_RANKING; i++) recordVote(`s${i}`, "pour");
     renderTopBar(ROUTES.play);
     fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
-    expect(screen.getByRole("menuitem", { name: /Mon résultat/ })).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: new RegExp(MENU_RESULT_LABEL) })).toBeInTheDocument();
   });
 
   it("hides 'Mon résultat' while ALREADY on /result (avoids self-link)", () => {
     for (let i = 1; i <= MIN_FOR_RANKING; i++) recordVote(`s${i}`, "pour");
     renderTopBar(ROUTES.result);
     fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
-    expect(screen.queryByRole("menuitem", { name: /Mon résultat/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: new RegExp(MENU_RESULT_LABEL) })).not.toBeInTheDocument();
   });
 });
 
@@ -136,21 +139,21 @@ describe("TopBar — aria-current on the link matching the current route", () =>
   it("marks the Methode link as current when on /methode", () => {
     renderTopBar(ROUTES.methode);
     fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
-    const methodeLink = screen.getByRole("menuitem", { name: /Méthode & sources/ });
+    const methodeLink = screen.getByRole("menuitem", { name: new RegExp(MENU_METHODE_LABEL) });
     expect(methodeLink).toHaveAttribute("aria-current", "page");
   });
 
   it("does NOT mark Methode as current when on /play", () => {
     renderTopBar(ROUTES.play);
     fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
-    const methodeLink = screen.getByRole("menuitem", { name: /Méthode & sources/ });
+    const methodeLink = screen.getByRole("menuitem", { name: new RegExp(MENU_METHODE_LABEL) });
     expect(methodeLink).not.toHaveAttribute("aria-current");
   });
 
   it("marks the Legal link as current when on /legal", () => {
     renderTopBar(ROUTES.legal);
     fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
-    const legalLink = screen.getByRole("menuitem", { name: /Mentions légales/ });
+    const legalLink = screen.getByRole("menuitem", { name: new RegExp(MENU_LEGAL_LABEL) });
     expect(legalLink).toHaveAttribute("aria-current", "page");
   });
 });
@@ -171,21 +174,21 @@ describe("TopBar — topbar_nav analytics (target = result/methode/legal/contact
   it("fires topbar_nav with target=methode on the Méthode menuitem click", () => {
     renderTopBar(ROUTES.play);
     fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
-    fireEvent.click(screen.getByRole("menuitem", { name: /Méthode & sources/ }));
+    fireEvent.click(screen.getByRole("menuitem", { name: new RegExp(MENU_METHODE_LABEL) }));
     expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: "methode" });
   });
 
   it("fires topbar_nav with target=legal on the Mentions menuitem click", () => {
     renderTopBar(ROUTES.play);
     fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
-    fireEvent.click(screen.getByRole("menuitem", { name: /Mentions légales/ }));
+    fireEvent.click(screen.getByRole("menuitem", { name: new RegExp(MENU_LEGAL_LABEL) }));
     expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: "legal" });
   });
 
   it("fires topbar_nav with target=contact on the Contact menuitem click", () => {
     renderTopBar(ROUTES.play);
     fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
-    fireEvent.click(screen.getByRole("menuitem", { name: /Contact/ }));
+    fireEvent.click(screen.getByRole("menuitem", { name: new RegExp(MENU_CONTACT_LABEL) }));
     expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: "contact" });
   });
 
@@ -194,7 +197,7 @@ describe("TopBar — topbar_nav analytics (target = result/methode/legal/contact
     for (let i = 1; i <= MIN_FOR_RANKING; i++) recordVote(`s${i}`, "pour");
     renderTopBar(ROUTES.play);
     fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
-    fireEvent.click(screen.getByRole("menuitem", { name: /Mon résultat/ }));
+    fireEvent.click(screen.getByRole("menuitem", { name: new RegExp(MENU_RESULT_LABEL) }));
     expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: "result" });
   });
 });
