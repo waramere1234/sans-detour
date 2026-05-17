@@ -131,6 +131,16 @@ export default function Result() {
   }
 
   function refaire() {
+    // Confirm before wiping: refaire clears both the session AND the
+    // cover-seen flag, so a tap on this tertiary button below 19 other
+    // ones loses 20 votes and forces the user back through the Cover.
+    // The Cover restart() (src/routes/Cover.tsx) has the same guard for
+    // the in-progress case; this is the symmetric guard for the
+    // completed/post-result case.
+    const ok = window.confirm(
+      `Refaire depuis le début ? Tes ${total} vote${total !== 1 ? "s" : ""} et ton résultat seront perdus.`,
+    );
+    if (!ok) return;
     resetSession();
     forgetCover();
     navigate("/");

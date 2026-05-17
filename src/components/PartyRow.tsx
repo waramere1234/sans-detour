@@ -32,7 +32,12 @@ export function PartyRow({ alignment, expanded, onClick, controlsId }: PartyRowP
         }
       } : undefined}
       aria-expanded={interactive ? expanded : undefined}
-      aria-controls={interactive ? controlsId : undefined}
+      // Only set aria-controls when the panel is actually in the DOM.
+      // Result.tsx mounts the AuditTrail (`id={panelId}`) conditionally on
+      // `expandedGroup === a.group`; pointing aria-controls at a panel id
+      // that doesn't exist is undefined per WAI-ARIA and triggers warnings
+      // in some SR/devtool combos.
+      aria-controls={interactive && expanded ? controlsId : undefined}
       aria-label={rowLabel}
       style={{
         display: "grid",

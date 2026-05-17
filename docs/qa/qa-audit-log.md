@@ -1982,3 +1982,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `${alignment.counted} votes\b` src/components/PersonnaliteRow.tsx → 0 résultat (toutes les occurrences passent par la règle plural)
 - [ ] grep `process.env.SUPABASE_URL!` scripts/ → 0 résultat (les 4 scripts utilisent la même forme sans `!`)
 - [ ] grep `4-axis breakdown` src/types/index.ts → 0 résultat (remplacé par "6-list breakdown")
+
+---
+
+## Session 87 — 2026-05-17
+
+### Vérification session 86
+
+- [VERIFIED] `src/components/PersonnaliteRow.tsx` : 3 occurrences avec règle plural `vote${counted !== 1 ? "s" : ""}` (lignes 19, 20, 59) ; aucune hardcoded "votes"
+- [VERIFIED] `scripts/` : 4 scripts utilisent `const SUPABASE_URL = process.env.SUPABASE_URL;` (sans `!`) — pattern uniforme
+- [VERIFIED] `src/types/index.ts:103` : "structured 6-list breakdown" avec énumération explicite des 6 listes
+- 139/139 tests verts, typecheck clean
+
+### Bugs fixés (no-confirm data loss + zero test coverage + invalid aria-controls)
+
+- [FIXED] `Result.tsx refaire()` data loss sans confirmation · Le bouton "Refaire depuis le début" (tertiaire, en bas de Result) appelait `resetSession() + forgetCover() + navigate("/")` directement, sans `window.confirm()`. Un tap accidentel après 20 votes effaçait toute la session + forçait le retour à Cover. Cover.tsx restart() a déjà ce guard pour le cas in-progress (sessions 1-19 votes) — ajout du guard symétrique pour le cas completed (20 votes + résultat). Message confirm utilise `total` + règle plural sur "vote". · `src/routes/Result.tsx`
+- [FIXED] `scripts/lib/parse-summary.ts` zero test coverage · Les 5 helpers (asStringArray, normalizeAnalyse, normalizePointsCles, sanitizeJsonControlChars, fallbackSummary) sont critiques : utilisés par les 2 scripts ingest pour parser les sorties LLM avant upsert Supabase. Une régression silencieuse (loosening du filter empty-strings session 85, retrait de la propagation NaN session 84) slipperait par CI. Fichier `tests/parse-summary.test.ts` ajouté avec 24 tests couvrant : array vs non-array, empty filter, trim, 6-list normalization, points_cles cap-à-3 + ellipsis-à-7-mots, control char escape (newline/tab/CR/u0001), fallback chapeau/titre/contexte. · `tests/parse-summary.test.ts` (nouveau)
+- [FIXED] `PartyRow.tsx` aria-controls vers DOM inexistant · `aria-controls={interactive ? controlsId : undefined}` set l'attribut DÈS que la row est interactive, même quand `expanded = false`. Mais le panel AuditTrail (id={panelId}) n'est rendu dans `Result.tsx` que sous condition `expandedGroup === a.group`. Donc aria-controls pointait vers un id absent du DOM 90% du temps. Per WAI-ARIA c'est undefined behavior (browsers tolèrent, mais devtools/SR peuvent warning). Fix : conditionner sur `interactive && expanded`. Quand collapsed, aria-expanded suffit ; quand expanded, aria-controls renvoie vers le panel qui existe alors. · `src/components/PartyRow.tsx`
+
+### Vérifications à faire en session 88
+
+- [ ] DevTools : tap sur "Refaire depuis le début" → confirm dialog "Tes 20 votes et ton résultat seront perdus." ; cancel → reste sur Result, vote intact ; OK → retour Cover propre
+- [ ] grep -c "it(" tests/parse-summary.test.ts → 24
+- [ ] grep `~139 tests` CLAUDE.md → 0 résultat (aligné sur ~163)
+- [ ] DevTools : sur Result, inspect une PartyRow collapsée → pas d'`aria-controls` ; tap pour expand → `aria-controls="audit-trail-XXX"` apparaît, et l'AuditTrail panel existe bien avec cet id
