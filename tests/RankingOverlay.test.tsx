@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { RankingOverlay } from "../src/components/RankingOverlay";
 import type { GroupAlignment, GroupCode } from "../src/types";
-import { GROUP_CODES } from "../src/types";
+import { GROUP_CODES, RANKING_OVERLAY_LABEL, MODAL_CLOSE_LABEL } from "../src/types";
 
 // RankingOverlay's modal-a11y plumbing comes from useModalA11y (already
 // tested directly in session 98). These tests cover the component-level
@@ -39,7 +39,7 @@ describe("RankingOverlay — visibility", () => {
     render(<RankingOverlay open={true} alignments={emptyAlignments()} countedTotal={8} onClose={vi.fn()} />);
     const dialog = screen.getByRole("dialog");
     expect(dialog).toHaveAttribute("aria-modal", "true");
-    expect(dialog).toHaveAttribute("aria-label", "Classement partiel");
+    expect(dialog).toHaveAttribute("aria-label", RANKING_OVERLAY_LABEL);
   });
 });
 
@@ -48,12 +48,12 @@ describe("RankingOverlay — header chip (plural rule on 'compté')", () => {
     render(<RankingOverlay open={true} alignments={emptyAlignments()} countedTotal={1} onClose={vi.fn()} />);
     // The header text is split across spans inside the dialog; use text-content
     // matching on the dialog rather than getByText on a single node.
-    expect(screen.getByRole("dialog")).toHaveTextContent(/Classement partiel · 1 compté(?!s)/);
+    expect(screen.getByRole("dialog")).toHaveTextContent(new RegExp(`${RANKING_OVERLAY_LABEL} · 1 compté(?!s)`));
   });
 
   it("pluralises 'comptés' when countedTotal >= 2 (and on 0 too, French rule)", () => {
     render(<RankingOverlay open={true} alignments={emptyAlignments()} countedTotal={12} onClose={vi.fn()} />);
-    expect(screen.getByRole("dialog")).toHaveTextContent(/Classement partiel · 12 comptés/);
+    expect(screen.getByRole("dialog")).toHaveTextContent(new RegExp(`${RANKING_OVERLAY_LABEL} · 12 comptés`));
   });
 });
 
@@ -88,7 +88,7 @@ describe("RankingOverlay — close interactions", () => {
   it("clicking the close button calls onClose", () => {
     const onClose = vi.fn();
     render(<RankingOverlay open={true} alignments={emptyAlignments()} countedTotal={0} onClose={onClose} />);
-    fireEvent.click(screen.getByRole("button", { name: /Fermer/ }));
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(MODAL_CLOSE_LABEL) }));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 

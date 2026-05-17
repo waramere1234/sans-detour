@@ -1,9 +1,11 @@
 // src/components/RankingOverlay.tsx
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import type { GroupAlignment } from "../types";
+import {
+  RANKING_OVERLAY_LABEL, MODAL_CLOSE_LABEL,
+  type GroupAlignment, type GroupCode,
+} from "../types";
 import { PartyRow } from "./PartyRow";
 import { rankByAlignment } from "../lib/matching";
-import type { GroupCode } from "../types";
 import { useModalA11y } from "../hooks/useModalA11y";
 
 export interface RankingOverlayProps {
@@ -38,7 +40,7 @@ export function RankingOverlay({ open, alignments, countedTotal, onClose }: Rank
           />
           <motion.div
             ref={dialogRef}
-            role="dialog" aria-modal="true" aria-label="Classement partiel"
+            role="dialog" aria-modal="true" aria-label={RANKING_OVERLAY_LABEL}
             initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
             transition={reducedMotion
               ? { duration: 0 }
@@ -61,7 +63,7 @@ export function RankingOverlay({ open, alignments, countedTotal, onClose }: Rank
               <span style={{
                 fontFamily: "var(--font-mono)", fontSize: 11,
                 color: "var(--ink-3)", letterSpacing: "0.12em", textTransform: "uppercase",
-              }}>Classement partiel · {countedTotal} compté{countedTotal !== 1 ? "s" : ""}</span>
+              }}>{RANKING_OVERLAY_LABEL} · {countedTotal} compté{countedTotal !== 1 ? "s" : ""}</span>
               <button
                 ref={closeBtnRef}
                 type="button"
@@ -70,7 +72,7 @@ export function RankingOverlay({ open, alignments, countedTotal, onClose }: Rank
                   background: "transparent", border: "1px solid var(--line)",
                   color: "var(--ink-2)", fontFamily: "var(--font-mono)",
                   fontSize: 11, padding: "4px 10px", borderRadius: 3, cursor: "pointer",
-                }}>Fermer</button>
+                }}>{MODAL_CLOSE_LABEL}</button>
             </div>
             {ranked.map(a => (
               <PartyRow key={a.group} alignment={a} />

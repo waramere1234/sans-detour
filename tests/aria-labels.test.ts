@@ -13,6 +13,8 @@ import {
   SKELETON_CARD_LOADING_LABEL, SKELETON_RESULT_LOADING_LABEL,
   DEMO_DATA_LABEL_PREFIX,
   RESTART_LABEL, restartConfirmMessage,
+  REFAIRE_LABEL, refaireConfirmMessage,
+  RANKING_OVERLAY_LABEL, MODAL_CLOSE_LABEL,
 } from "../src/types";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
@@ -209,6 +211,59 @@ describe("restartConfirmMessage — Cover.tsx restart confirm prompt", () => {
   it("ends with a period (sentence completion, consistent with confirm prompt convention)", () => {
     expect(restartConfirmMessage(1).endsWith(".")).toBe(true);
     expect(restartConfirmMessage(2).endsWith(".")).toBe(true);
+  });
+});
+
+describe("refaireConfirmMessage — Result.tsx refaire confirm prompt", () => {
+  // Symmetric to restartConfirmMessage (Cover): same singular/plural
+  // French agreement + REFAIRE_LABEL prefix. The loss-phrase differs —
+  // here the user has completed a result, so the message names both
+  // the votes AND the result as lost.
+  it("starts with REFAIRE_LABEL on both branches", () => {
+    expect(refaireConfirmMessage(1).startsWith(REFAIRE_LABEL)).toBe(true);
+    expect(refaireConfirmMessage(20).startsWith(REFAIRE_LABEL)).toBe(true);
+  });
+
+  it("uses singular 'Ton vote et ton résultat seront perdus.' when total === 1", () => {
+    expect(refaireConfirmMessage(1)).toContain("Ton vote et ton résultat seront perdus.");
+  });
+
+  it("uses plural 'Tes N votes et ton résultat seront perdus.' when total !== 1", () => {
+    expect(refaireConfirmMessage(20)).toContain("Tes 20 votes et ton résultat seront perdus.");
+    expect(refaireConfirmMessage(3)).toContain("Tes 3 votes et ton résultat seront perdus.");
+  });
+
+  it("names both the votes AND the résultat as lost (distinct from restartConfirmMessage which loses only votes)", () => {
+    // Anti-drift guard: if a future refactor unifies the two helpers
+    // into one shared restart-style template, this test surfaces it.
+    expect(refaireConfirmMessage(1)).toContain("résultat");
+    expect(restartConfirmMessage(1)).not.toContain("résultat");
+  });
+
+  it("ends with a period (sentence completion)", () => {
+    expect(refaireConfirmMessage(1).endsWith(".")).toBe(true);
+    expect(refaireConfirmMessage(20).endsWith(".")).toBe(true);
+  });
+});
+
+describe("RANKING_OVERLAY_LABEL + MODAL_CLOSE_LABEL — modal a11y consts", () => {
+  // RANKING_OVERLAY_LABEL is the aria-label + visible-header prefix
+  // for RankingOverlay (5 sites: 2 source + 3 tests). MODAL_CLOSE_LABEL
+  // is the shared close-button wording for MethodeSheet (aria-label,
+  // with visible "✕" icon) + RankingOverlay (visible button text).
+  it("RANKING_OVERLAY_LABEL matches the canonical 'Classement partiel' wording", () => {
+    expect(RANKING_OVERLAY_LABEL).toBe("Classement partiel");
+  });
+
+  it("MODAL_CLOSE_LABEL matches the canonical 'Fermer' wording", () => {
+    expect(MODAL_CLOSE_LABEL).toBe("Fermer");
+  });
+
+  it("MODAL_CLOSE_LABEL is a single word (icon-button aria-label expects compact wording)", () => {
+    // The MethodeSheet close button shows just "✕" with this aria-label;
+    // a 2-3 word aria-label here would read awkwardly when paired with
+    // the visible icon. Pin the constraint to surface a future drift.
+    expect(MODAL_CLOSE_LABEL.split(" ")).toHaveLength(1);
   });
 });
 

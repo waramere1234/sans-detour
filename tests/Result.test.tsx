@@ -18,6 +18,7 @@ import type { Scrutin } from "../src/types";
 import {
   TARGET, LEGISLATURE_LABEL,
   SHARE_LABEL, REFAIRE_LABEL, CONTINUE_REFINE_LABEL, CONTINUE_TEST_LABEL_PREFIX,
+  refaireConfirmMessage,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -93,13 +94,11 @@ describe("Result — refaire() flow (confirm + reset + forgetCover + navigate + 
     expect(confirmSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("uses the plural phrasing with the TARGET count", async () => {
+  it("uses the plural phrasing with the TARGET count (round-trip via refaireConfirmMessage)", async () => {
     renderResult();
     await waitFor(() => screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) }));
     fireEvent.click(screen.getByRole("button", { name: new RegExp(REFAIRE_LABEL) }));
-    expect(confirmSpy).toHaveBeenCalledWith(
-      expect.stringMatching(new RegExp(`Tes ${TARGET} votes et ton résultat`)),
-    );
+    expect(confirmSpy).toHaveBeenCalledWith(refaireConfirmMessage(TARGET));
   });
 
   it("clears the session AND the cover-seen flag on confirm OK + fires result_refaire", async () => {

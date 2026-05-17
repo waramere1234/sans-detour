@@ -135,6 +135,37 @@ export function restartConfirmMessage(votesCount: number): string {
   return `${RESTART_LABEL} ? ${lossPhrase}`;
 }
 
+/** Compose the `window.confirm(...)` message body for Result.tsx's
+ *  refaire (restart-from-result) action. Symmetric to
+ *  restartConfirmMessage (Cover) — the loss-phrase differs because
+ *  the user has completed the session and reached a result, so the
+ *  message names both the votes AND the result as what will be lost.
+ *  tests/Result.test.tsx pin the plural branch via stringMatching;
+ *  the helper round-trips so a rewording propagates from one edit. */
+export function refaireConfirmMessage(total: number): string {
+  const lossPhrase = total === 1
+    ? "Ton vote et ton résultat seront perdus."
+    : `Tes ${total} votes et ton résultat seront perdus.`;
+  return `${REFAIRE_LABEL} ? ${lossPhrase}`;
+}
+
+/** aria-label + visible-header prefix for the RankingOverlay modal
+ *  ("Classement partiel · N comptés"). The same string appears 5×:
+ *    - aria-label on the role="dialog" container
+ *    - visible header prefix before the · N comptés count
+ *    - aria-label test assertion (.toHaveAttribute)
+ *    - visible-header test assertions × 2 (regex with the count suffix)
+ *  A rewording would have required 5 in-lockstep edits; centralising
+ *  the const keeps source + tests in sync. */
+export const RANKING_OVERLAY_LABEL = "Classement partiel";
+
+/** Close-button label used by 2 modals — MethodeSheet (as aria-label,
+ *  with visible "✕" icon) + RankingOverlay (as visible button text,
+ *  no aria-label needed because the visible text is the accessible
+ *  name). Centralising means a future i18n flip ("Close") propagates
+ *  to both modals + the RankingOverlay test regex via one edit. */
+export const MODAL_CLOSE_LABEL = "Fermer";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

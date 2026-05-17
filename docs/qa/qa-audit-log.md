@@ -3353,3 +3353,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `FRESHNESS_OK_TITLE\|FRESHNESS_STALE_TITLE\|FRESHNESS_TODAY_PHRASE\|FRESHNESS_IMMINENT_PHRASE\|freshnessPastPhrase\|freshnessNextPhrase\|restartConfirmMessage` src/ tests/ → 25+ résultats
 - [ ] grep `"Synchronisation en retard"\|"Données à jour"\|"MAJ aujourd.hui"\|"sync imminente"\|"Ton vote en cours sera perdu"` src/ tests/ → 5 résultats seulement (déclarations dans les modules)
 - [ ] grep `~635 tests` CLAUDE.md → 0 résultat (aligné sur ~646)
+
+---
+
+## Session 143 — 2026-05-17
+
+### Vérification session 142
+
+- [VERIFIED] 63 occurrences des 7 nouveaux exports (FRESHNESS_OK/STALE_TITLE + FRESHNESS_TODAY/IMMINENT_PHRASE + freshnessPastPhrase/NextPhrase + restartConfirmMessage)
+- [VERIFIED] 11 occurrences des 5 strings = 4 déclarations + 4 pin-the-value tests + 3 comments (pas de drift)
+- [VERIFIED] CLAUDE.md "~646 tests"
+- 646/646 tests verts, typecheck clean
+
+### Bugs fixés (refaireConfirmMessage + RANKING_OVERLAY_LABEL + MODAL_CLOSE_LABEL)
+
+- [FIXED] Result.tsx refaire() confirm prompt avait inline template `${REFAIRE_LABEL} ? Tes ${total} vote${total !== 1 ? "s" : ""} et ton résultat seront perdus.` + test assertait `stringMatching(new RegExp(\`Tes ${TARGET} votes et ton résultat\`))` · Drift surface : rewording = source ternary + test regex in lockstep, asymétrique avec restartConfirmMessage (Cover) extrait session 142. Fix : export `refaireConfirmMessage(total)` helper depuis src/types, symétrique à restartConfirmMessage mais avec la loss-phrase qui nomme aussi le résultat ("Ton/Tes vote(s) ET ton résultat seront perdus"). Result.tsx utilise `window.confirm(refaireConfirmMessage(total))`. Test passe `refaireConfirmMessage(TARGET)` directement. 5 nouveaux tests : starts-with-REFAIRE_LABEL invariant, singular branch, plural branch, anti-drift guard "loss-phrase contient 'résultat' contrairement à restartConfirmMessage", ends-with-period. · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/Result.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] `"Classement partiel"` dupliqué 5× : RankingOverlay aria-label sur le dialog + visible-header prefix avant le `· N comptés` + 3 sites dans tests/RankingOverlay.test.tsx (1 toHaveAttribute + 2 textContent regex literals) · Drift surface : un rewording (ou un i18n flip EN-US) aurait demandé 5 edits in-lockstep. Fix : export `RANKING_OVERLAY_LABEL = "Classement partiel"` depuis src/types. Source + tests utilisent la const ; les regex tests construisent leur RegExp via `new RegExp(\`${RANKING_OVERLAY_LABEL}\`)`. 1 nouveau test pin-the-value dans aria-labels.test.ts. · `src/types/index.ts`, `src/components/RankingOverlay.tsx`, `tests/RankingOverlay.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] `"Fermer"` close-button label dupliqué 3× : MethodeSheet aria-label (icon button avec "✕" visible) + RankingOverlay visible button text (sans aria-label car le texte est l'accessible name) + tests/RankingOverlay.test.tsx regex match · Drift surface : 2 modals partagent la même semantic "close" mais utilisaient 2 patterns différents (aria-label vs visible text) avec la même string ; un i18n flip aurait demandé 3 edits in-lockstep. Fix : export `MODAL_CLOSE_LABEL = "Fermer"` depuis src/types. MethodeSheet `aria-label={MODAL_CLOSE_LABEL}`, RankingOverlay `>{MODAL_CLOSE_LABEL}<`. Test passe `new RegExp(MODAL_CLOSE_LABEL)`. 2 nouveaux tests : pin-the-value + single-word invariant (l'aria-label de l'icon button doit rester compact). · `src/types/index.ts`, `src/components/MethodeSheet.tsx`, `src/components/RankingOverlay.tsx`, `tests/RankingOverlay.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 144
+
+- [ ] grep `refaireConfirmMessage\|RANKING_OVERLAY_LABEL\|MODAL_CLOSE_LABEL` src/ tests/ → 15+ résultats
+- [ ] grep `"Classement partiel"\|>Fermer<\|aria-label="Fermer"\|"Tes .* votes et ton résultat"` src/ tests/ → 1-3 résultats seulement (déclarations dans src/types)
+- [ ] grep `~646 tests` CLAUDE.md → 0 résultat (aligné sur ~654)

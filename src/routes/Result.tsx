@@ -18,6 +18,7 @@ import { ROUTES, PLAY_AFFINEMENT } from "../lib/routes";
 import {
   TARGET, LEGISLATURE_LABEL,
   SHARE_LABEL, REFAIRE_LABEL, CONTINUE_REFINE_LABEL, CONTINUE_TEST_LABEL_PREFIX,
+  refaireConfirmMessage,
   type Scrutin, type GroupCode,
 } from "../types";
 
@@ -118,9 +119,7 @@ export default function Result() {
     // The Cover restart() (src/routes/Cover.tsx) has the same guard for
     // the in-progress case; this is the symmetric guard for the
     // completed/post-result case.
-    const ok = window.confirm(
-      `${REFAIRE_LABEL} ? Tes ${total} vote${total !== 1 ? "s" : ""} et ton résultat seront perdus.`,
-    );
+    const ok = window.confirm(refaireConfirmMessage(total));
     if (!ok) return;
     // Track AFTER the confirm passes so a cancelled confirm doesn't
     // inflate the metric. Mirrors Cover.tsx restart() which fires

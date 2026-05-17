@@ -2,6 +2,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { mailto, ERROR_REPORT_SUBJECT } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
+import { MODAL_CLOSE_LABEL } from "../types";
 import { useModalA11y } from "../hooks/useModalA11y";
 
 export interface MethodeSheetProps {
@@ -79,7 +80,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
                 ref={closeBtnRef}
                 type="button"
                 onClick={onClose}
-                aria-label="Fermer"
+                aria-label={MODAL_CLOSE_LABEL}
                 style={{
                   background: "transparent", border: "1px solid var(--line)",
                   color: "var(--ink-2)", borderRadius: 4,
