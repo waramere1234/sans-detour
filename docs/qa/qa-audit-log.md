@@ -2902,3 +2902,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep "max_tokens: 4096\|max_uses: 2\|setTimeout.*15000" scripts/ingest-an.ts → 0 résultat literal (tous via const)
 - [ ] grep "ANTHROPIC_INGEST_MAX_TOKENS\|MAX_WEB_SEARCHES_PER_SCRUTIN\|BATCH_POLL_INTERVAL_MS" scripts/ tests/ → 8+ résultats
 - [ ] grep `~536 tests` CLAUDE.md → 0 résultat (aligné sur ~542)
+
+---
+
+## Session 124 — 2026-05-17
+
+### Vérification session 123
+
+- [VERIFIED] 0 literal `max_tokens: 4096`, `max_uses: 2`, `setTimeout(..., 15000)` dans scripts/ingest-an.ts (tous via const)
+- [VERIFIED] 24 occurrences des 3 tuning consts dans scripts/ + tests/
+- [VERIFIED] CLAUDE.md "~542 tests"
+- 542/542 tests verts, typecheck clean
+
+### Bugs fixés (CARD_FACE_BOX_SHADOW + WEB_SEARCH_TOOL_VERSION + SUPABASE_UPDATE_BATCH_SIZE)
+
+- [FIXED] `boxShadow: "0 18px 30px -16px #000"` dupliqué identique dans `src/components/Card.tsx:26` et `src/components/CardSkeleton.tsx:15` · CardSkeleton mirror le layout de Card pendant le chargement — un re-design de la shadow (par exemple plus lourd à high density screens) devait être édité 2× en lockstep. Une edit one-sided laisserait le skeleton avec une shadow différente, créant un visuel flash au load. Fix : export `CARD_FACE_BOX_SHADOW` depuis Card.tsx (canonical source) ; CardSkeleton.tsx importe + utilise. 1 test Skeleton round-trip pin la shadow CSS sur le DOM rendu. · `src/components/Card.tsx`, `src/components/CardSkeleton.tsx`, `tests/Skeleton.test.tsx`
+- [FIXED] `"web_search_20260209"` magic string inline dans scripts/ingest-an.ts:330 (tool.type) · Anthropic versionne le web_search tool par date suffix (YYYYMMDD) — bumpera en 2026/2027 quand le tool gagne des breaking changes. Une typo (`20260229` au lieu de `20260209` par exemple) silently fail la batch request seulement au runtime. Fix : export `WEB_SEARCH_TOOL_VERSION = "web_search_20260209"` depuis env.ts. 2 tests : pin-the-value + format match `/^web_search_\d{8}$/`. · `scripts/lib/env.ts`, `scripts/ingest-an.ts`, `tests/env.test.ts`
+- [FIXED] `const BATCH = 20` magic local dans scripts/ingest-personnalites.ts:89 (parallel UPDATE chunking) · La taille des batches parallèles vers Supabase contrôle la load sur le PostgREST pool (defaults ~10-15). Un bump accidentel à 100 causerait des 503s cascadants sur un ingest de 100 rows. Fix : export `SUPABASE_UPDATE_BATCH_SIZE = 20` depuis env.ts. 2 tests : pin-the-value + sanity bound 1 ≤ N ≤ 50. · `scripts/lib/env.ts`, `scripts/ingest-personnalites.ts`, `tests/env.test.ts`
+
+### Vérifications à faire en session 125
+
+- [ ] grep `"0 18px 30px -16px #000"` src/ → 1 résultat seulement (la déclaration CARD_FACE_BOX_SHADOW dans Card.tsx)
+- [ ] grep `"web_search_20260209"` scripts/ → 1 résultat seulement (la déclaration env.ts)
+- [ ] grep `const BATCH = 20` scripts/ → 0 résultat (migrated to SUPABASE_UPDATE_BATCH_SIZE)
+- [ ] grep `~542 tests` CLAUDE.md → 0 résultat (aligné sur ~547)

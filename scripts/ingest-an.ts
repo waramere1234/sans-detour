@@ -32,7 +32,7 @@ import {
   ANTHROPIC_BATCHES_URL, anthropicBatchUrl, anthropicBatchResultsUrl,
   anthropicHeaders, ANTHROPIC_MODEL,
   ANTHROPIC_INGEST_MAX_TOKENS, MAX_WEB_SEARCHES_PER_SCRUTIN,
-  BATCH_POLL_INTERVAL_MS,
+  BATCH_POLL_INTERVAL_MS, WEB_SEARCH_TOOL_VERSION,
 } from "./lib/env";
 
 // ───────────────────────────────────────────────────────────────── config
@@ -327,7 +327,7 @@ function buildRequestParams(scrutin: { titre_brut: string; dossier_titre: string
     ],
     tools: [
       {
-        type: "web_search_20260209",
+        type: WEB_SEARCH_TOOL_VERSION,
         name: "web_search",
         max_uses: MAX_WEB_SEARCHES_PER_SCRUTIN,
         // Haiku 4.5 doesn't support programmatic tool calling; web_search must

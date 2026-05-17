@@ -5,6 +5,13 @@ import { MAX_POINTS_CLES_BULLETS, type Scrutin } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
 import { stripCitations, stripVoteResult } from "../lib/text-cleanup";
 
+/** Drop-shadow lifted onto every card face AND onto CardSkeleton so the
+ *  loading placeholder casts the same shadow as the real card behind it.
+ *  Previously inlined identically in both files — a re-design (e.g.
+ *  lighter shadow at higher density) would have meant 2 edits in
+ *  lockstep. Exported here because Card is the canonical source. */
+export const CARD_FACE_BOX_SHADOW = "0 18px 30px -16px #000";
+
 export interface CardProps {
   scrutin: Scrutin;
   topMost: boolean;       // is this the front card (interactive)?
@@ -23,7 +30,7 @@ const FACE_STYLE: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   gap: 18,
-  boxShadow: "0 18px 30px -16px #000",
+  boxShadow: CARD_FACE_BOX_SHADOW,
   // 3D flip plumbing — both faces sit on top of each other; the rotated one
   // hides itself via backface-visibility.
   backfaceVisibility: "hidden",

@@ -107,6 +107,22 @@ export const MAX_WEB_SEARCHES_PER_SCRUTIN = 2;
  *  (DoS-ing the status endpoint) surfaces here. */
 export const BATCH_POLL_INTERVAL_MS = 15_000;
 
+/** Date-coded `type:` identifier for Anthropic's web_search tool.
+ *  Anthropic bumps this string when the tool gains breaking changes;
+ *  the old date keeps working until a deprecation window closes, so
+ *  bumping it is a deliberate edit (test the new version against the
+ *  ingest prompt before swapping). Inlined here at one site rather
+ *  than re-typed in buildRequestParams every time. */
+export const WEB_SEARCH_TOOL_VERSION = "web_search_20260209";
+
+/** Chunk size for the `votes_personnalites` UPDATE loop in
+ *  scripts/ingest-personnalites.ts — controls concurrent Supabase
+ *  requests. 20 keeps the parallel-request count well under
+ *  PostgREST's pool limit while keeping wall-clock reasonable for
+ *  100-scrutins runs. Centralised so a future tune touches the
+ *  policy at the lib level. */
+export const SUPABASE_UPDATE_BATCH_SIZE = 20;
+
 /** Build the common headers every Anthropic Batches API request needs:
  *  api-key, version, and content-type. Pass the key explicitly so the
  *  helper is usable from both narrowed (`requireAnthropicEnv`) and

@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { CardSkeleton } from "../src/components/CardSkeleton";
 import { ResultSkeleton } from "../src/components/ResultSkeleton";
+import { CARD_FACE_BOX_SHADOW } from "../src/components/Card";
 import { GROUP_CODES } from "../src/types";
 
 // The two skeleton components mirror the layouts of Card.tsx (Play) and
@@ -28,6 +29,16 @@ describe("CardSkeleton — a11y", () => {
     const { container } = render(<CardSkeleton />);
     const shimmers = container.querySelectorAll(".skeleton-shimmer");
     expect(shimmers.length).toBeGreaterThan(0);
+  });
+
+  it("uses the shared CARD_FACE_BOX_SHADOW (skeleton mirrors the real Card shadow)", () => {
+    // If Card.tsx updates its shadow, CardSkeleton must follow visually
+    // — pinning the round-trip catches a one-sided edit.
+    const { container } = render(<CardSkeleton />);
+    const root = container.querySelector("[aria-busy='true']") as HTMLElement;
+    // jsdom returns the computed inline `style.boxShadow` as the same
+    // string we set. Pin it to the const.
+    expect(root.style.boxShadow).toBe(CARD_FACE_BOX_SHADOW);
   });
 });
 

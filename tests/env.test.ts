@@ -9,6 +9,8 @@ import {
   ANTHROPIC_INGEST_MAX_TOKENS,
   MAX_WEB_SEARCHES_PER_SCRUTIN,
   BATCH_POLL_INTERVAL_MS,
+  WEB_SEARCH_TOOL_VERSION,
+  SUPABASE_UPDATE_BATCH_SIZE,
   anthropicBatchUrl,
   anthropicBatchResultsUrl,
   anthropicHeaders,
@@ -243,5 +245,28 @@ describe("Anthropic ingest tuning consts (max_tokens / max_uses / poll interval)
     // A regression that drops the interval to <1s would burn through the
     // status-endpoint rate limit on a batch that takes 5+ minutes.
     expect(BATCH_POLL_INTERVAL_MS).toBeGreaterThanOrEqual(1000);
+  });
+
+  it("WEB_SEARCH_TOOL_VERSION matches the current Anthropic-bumped date-coded string", () => {
+    // Anthropic versions the web_search tool by date suffix. Pin the
+    // value so a typo (e.g. wrong date or month) fails a typecheck-
+    // adjacent test rather than the batch request itself at runtime.
+    expect(WEB_SEARCH_TOOL_VERSION).toBe("web_search_20260209");
+  });
+
+  it("WEB_SEARCH_TOOL_VERSION uses the documented `web_search_YYYYMMDD` format", () => {
+    expect(WEB_SEARCH_TOOL_VERSION).toMatch(/^web_search_\d{8}$/);
+  });
+
+  it("SUPABASE_UPDATE_BATCH_SIZE is the documented 20 (parallel update chunking)", () => {
+    expect(SUPABASE_UPDATE_BATCH_SIZE).toBe(20);
+  });
+
+  it("SUPABASE_UPDATE_BATCH_SIZE is a reasonable parallel-request count", () => {
+    // PostgREST's pool defaults are around 10-15; 20 is the upper edge
+    // that still works without pool exhaustion. A bump to 100 would
+    // cause cascading 503s on a 100-row ingest.
+    expect(SUPABASE_UPDATE_BATCH_SIZE).toBeGreaterThanOrEqual(1);
+    expect(SUPABASE_UPDATE_BATCH_SIZE).toBeLessThanOrEqual(50);
   });
 });

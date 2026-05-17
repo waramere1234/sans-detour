@@ -27,7 +27,7 @@ import { PERSONNALITES } from "../src/lib/personnalites";
 import { PERSONNALITE_CODES } from "../src/types";
 import type { PersonnaliteCode, PersonnaliteVote } from "../src/types";
 import { JSON_DIR } from "./lib/an-cache";
-import { requireSupabaseClient } from "./lib/env";
+import { requireSupabaseClient, SUPABASE_UPDATE_BATCH_SIZE } from "./lib/env";
 import {
   extractVotesFromScrutin,
   type ANScrutinForPersonnalites,
@@ -86,10 +86,9 @@ async function main(): Promise<void> {
   // l'instant (même fix que session 70 pour ingest-an.ts + resume-ingest.ts).
   console.log(`↑ Patching ${updates.length} rows via UPDATE …`);
   const patchedAt = new Date().toISOString();
-  const BATCH = 20;
   let patched = 0;
-  for (let i = 0; i < updates.length; i += BATCH) {
-    const batch = updates.slice(i, i + BATCH);
+  for (let i = 0; i < updates.length; i += SUPABASE_UPDATE_BATCH_SIZE) {
+    const batch = updates.slice(i, i + SUPABASE_UPDATE_BATCH_SIZE);
     const results = await Promise.all(
       batch.map((u) =>
         sb.from("scrutins")

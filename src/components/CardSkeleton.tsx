@@ -1,3 +1,5 @@
+import { CARD_FACE_BOX_SHADOW } from "./Card";
+
 export function CardSkeleton() {
   return (
     <div
@@ -12,7 +14,7 @@ export function CardSkeleton() {
         display: "flex",
         flexDirection: "column",
         gap: 14,
-        boxShadow: "0 18px 30px -16px #000",
+        boxShadow: CARD_FACE_BOX_SHADOW,
       }}
     >
       <div className="skeleton-shimmer" style={{ width: "60%", height: 12 }} />
