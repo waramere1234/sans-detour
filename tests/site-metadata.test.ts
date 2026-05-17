@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import {
-  TAGLINE, BRAND_NAME, LEGISLATURE_LABEL_LOWERCASE,
+  TAGLINE, BRAND_NAME, LEGISLATURE_LABEL_LOWERCASE, PROD_ORIGIN,
 } from "../src/types";
 
 // index.html + public/manifest.webmanifest both carry copy that the
@@ -108,5 +108,82 @@ describe("LEGISLATURE_LABEL_LOWERCASE sync (index.html og:description)", () => {
     const match = html.match(/<meta property="og:description" content="([^"]+)"/);
     expect(match).not.toBeNull();
     expect(match![1]).toContain(LEGISLATURE_LABEL_LOWERCASE);
+  });
+});
+
+describe("PROD_ORIGIN sync (index.html canonical + og:url + og:image + twitter:image)", () => {
+  // The prod origin appears 4× in index.html static metadata. A rebrand
+  // to a different domain edits PROD_ORIGIN in src/types/index.ts and
+  // the 4 below; without these pins, a forgotten meta would leave OG
+  // previews / canonical / Twitter card pointing at the old origin
+  // (and crawlers + share dialogs would render stale).
+
+  it("<link rel='canonical'> matches PROD_ORIGIN (with trailing slash)", async () => {
+    const html = await readIndexHtml();
+    const match = html.match(/<link rel="canonical" href="([^"]+)"/);
+    expect(match).not.toBeNull();
+    // Canonical conventionally ends with `/` for the home page.
+    expect(match![1]).toBe(`${PROD_ORIGIN}/`);
+  });
+
+  it("<meta property='og:url'> matches PROD_ORIGIN/", async () => {
+    const html = await readIndexHtml();
+    const match = html.match(/<meta property="og:url" content="([^"]+)"/);
+    expect(match).not.toBeNull();
+    expect(match![1]).toBe(`${PROD_ORIGIN}/`);
+  });
+
+  it("<meta property='og:image'> starts with PROD_ORIGIN (icon path appended)", async () => {
+    const html = await readIndexHtml();
+    const match = html.match(/<meta property="og:image" content="([^"]+)"/);
+    expect(match).not.toBeNull();
+    expect(match![1].startsWith(PROD_ORIGIN + "/")).toBe(true);
+  });
+
+  it("<meta name='twitter:image'> starts with PROD_ORIGIN (icon path appended)", async () => {
+    const html = await readIndexHtml();
+    const match = html.match(/<meta name="twitter:image" content="([^"]+)"/);
+    expect(match).not.toBeNull();
+    expect(match![1].startsWith(PROD_ORIGIN + "/")).toBe(true);
+  });
+});
+
+describe("Icon paths sync (manifest ↔ index.html)", () => {
+  // The manifest declares the canonical PWA icon set. index.html
+  // references the same files for the apple-touch-icon, the favicon,
+  // and og:image + twitter:image (absolute-URL variants). A rename of
+  // /icons/icon-192.png to /icons/sd-192.png in the manifest must
+  // propagate to index.html — without this test, one side would 404
+  // while the other rendered correctly.
+
+  async function manifestIconSrcs(): Promise<string[]> {
+    const manifest = await readManifest() as { icons: Array<{ src: string }> };
+    return manifest.icons.map((i) => i.src);
+  }
+
+  it("apple-touch-icon path is listed in manifest.icons", async () => {
+    const html = await readIndexHtml();
+    const match = html.match(/<link rel="apple-touch-icon" href="([^"]+)"/);
+    expect(match).not.toBeNull();
+    const srcs = await manifestIconSrcs();
+    expect(srcs).toContain(match![1]);
+  });
+
+  it("<link rel='icon'> favicon path is listed in manifest.icons", async () => {
+    const html = await readIndexHtml();
+    const match = html.match(/<link rel="icon"[^>]*href="([^"]+)"/);
+    expect(match).not.toBeNull();
+    const srcs = await manifestIconSrcs();
+    expect(srcs).toContain(match![1]);
+  });
+
+  it("og:image path (relative to PROD_ORIGIN) is listed in manifest.icons", async () => {
+    const html = await readIndexHtml();
+    const match = html.match(/<meta property="og:image" content="([^"]+)"/);
+    expect(match).not.toBeNull();
+    // Strip the absolute prefix to compare against manifest's path-only entries.
+    const pathOnly = match![1].replace(PROD_ORIGIN, "");
+    const srcs = await manifestIconSrcs();
+    expect(srcs).toContain(pathOnly);
   });
 });

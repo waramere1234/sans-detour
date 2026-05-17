@@ -55,6 +55,15 @@ export const TAGLINE = "Pas les programmes. Les vrais votes.";
  *  <title>). Same sync invariant as TAGLINE. */
 export const BRAND_NAME = "Sans Détour";
 
+/** Production origin (no trailing slash) — single source of truth for
+ *  the canonical URL used by index.html's <link rel="canonical">,
+ *  og:url, og:image (with `/icons/...` path appended), and
+ *  twitter:image. A rebrand to a different domain edits this const
+ *  and the 4 static call sites surface in tests/site-metadata.test.ts.
+ *  Distinct from `ANALYTICS_HOSTS` (which also includes the www
+ *  variant for the runtime track() gate). */
+export const PROD_ORIGIN = "https://sansdetour.fr";
+
 /** Official AN open-data portal — both the user-facing reference (Methode
  *  §01 + §06 prose, Legal data-sources block) and the script-side bulk
  *  download (`scripts/ingest-an.ts` builds `${AN_OPEN_DATA_URL}static/...`

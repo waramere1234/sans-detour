@@ -8,7 +8,7 @@ import Cover from "../src/routes/Cover";
 import { resetSession, recordVote, COVER_STORAGE_KEY, loadSession } from "../src/lib/session";
 import { FROM_LOGO_STATE } from "../src/lib/nav-state";
 import { ROUTES } from "../src/lib/routes";
-import { TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL } from "../src/types";
+import { TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL, TAGLINE } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
 function renderCover(initialEntries: InitialEntry[] = [ROUTES.cover]) {
@@ -43,6 +43,30 @@ describe("Cover", () => {
   it("renders the LEGISLATURE_LABEL in the header eyebrow (rename-safe via const)", () => {
     renderCover();
     expect(screen.getByText(new RegExp(LEGISLATURE_LABEL))).toBeInTheDocument();
+  });
+
+  it("hero <h1> textContent concatenates to TAGLINE (split JSX for the accent styling)", () => {
+    // Cover.tsx splits the tagline across 3 JSX nodes:
+    //   "Pas les programmes." + <br/> + <span>Les vrais votes</span> + <span>.</span>
+    // so the accent color can land only on "Les vrais votes" and the
+    // final period. A copy-paste mistake (a word swapped or omitted in
+    // one node) would silently diverge the hero from the
+    // tab title / OG description / manifest description that all
+    // pin against TAGLINE. textContent strips JSX wrapping and gives
+    // us the rendered string for direct comparison.
+    renderCover();
+    const h1 = screen.getByRole("heading", { level: 1 });
+    // The <br/> between "Pas les programmes." and "Les vrais votes"
+    // produces no whitespace in textContent (jsdom flattens it), so
+    // the rendered string is dense at that join. Normalize both sides
+    // by collapsing whitespace to single spaces so a word swap or
+    // missing fragment surfaces while the JSX-vs-flat-string boundary
+    // doesn't false-positive.
+    const normalize = (s: string) => s.replace(/\s+/g, " ").trim();
+    // Drop the single space between "programmes." and "Les" that
+    // TAGLINE has but the <br/>-joined h1 lacks.
+    expect(normalize(h1.textContent ?? "").replace(/\s/g, ""))
+      .toBe(normalize(TAGLINE).replace(/\s/g, ""));
   });
 
   it("redirects to /play when hasSeenCover and votes < 20", () => {

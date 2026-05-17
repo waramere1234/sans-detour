@@ -3000,3 +3000,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] `ls tests/site-metadata.test.ts` → présent
 - [ ] grep `TAGLINE\|BRAND_NAME\|LEGISLATURE_LABEL_LOWERCASE` src/ tests/ → 10+ résultats
 - [ ] grep `~557 tests` CLAUDE.md → 0 résultat (aligné sur ~568)
+
+---
+
+## Session 128 — 2026-05-17
+
+### Vérification session 127
+
+- [VERIFIED] tests/site-metadata.test.ts présent
+- [VERIFIED] 31 occurrences de TAGLINE|BRAND_NAME|LEGISLATURE_LABEL_LOWERCASE dans src/ + tests/
+- [VERIFIED] CLAUDE.md "~568 tests"
+- 568/568 tests verts, typecheck clean
+
+### Bugs fixés (PROD_ORIGIN sync + icon paths sync + Cover h1 TAGLINE round-trip)
+
+- [FIXED] `https://sansdetour.fr/` prod origin hardcoded 4× dans index.html (canonical, og:url, og:image, twitter:image) · Une rebrand vers `.com` aurait laissé certains des 4 sites stale → social previews / canonical / Twitter card pointant vers l'ancien domain. Distinct de ANALYTICS_HOSTS (qui contient apex + www pour le runtime gate de track()). Fix : export `PROD_ORIGIN = "https://sansdetour.fr"` depuis src/types. 4 tests dans site-metadata pin chacun des sites (canonical/og:url asserts === PROD_ORIGIN + "/", og:image/twitter:image asserts startsWith PROD_ORIGIN). · `src/types/index.ts`, `tests/site-metadata.test.ts`
+- [FIXED] Icon paths `/icons/icon-192.png` (× 3) et `/icons/icon-512.png` (× 3) dupliquées entre index.html et public/manifest.webmanifest · Le manifest declare les icons canoniques pour PWA install ; index.html les re-référence pour apple-touch-icon, favicon, og:image, twitter:image. Un rename de l'icon dans manifest sans propager à index.html laisse les references HTML 404 (favicon vide dans le tab, OG preview blank). 3 tests dans site-metadata : apple-touch-icon, favicon, et og:image (path relatif après stripping de PROD_ORIGIN) doivent tous être listés dans manifest.icons[].src. · `tests/site-metadata.test.ts`
+- [FIXED] Cover.tsx hero `<h1>` tagline split JSX (3 nodes : "Pas les programmes." + `<br/>` + `<span>Les vrais votes</span>` + `<span>.</span>`) sans pin contre TAGLINE · Le split est intentional pour le accent color sur "Les vrais votes" + le final period, mais une copy-paste mistake (mot omis ou swap) aurait silently divergé le hero du tab title / OG description / manifest description qui pin tous contre TAGLINE. Fix : test Cover.tsx asserts `normalize(h1.textContent).replace(/\s/g, "") === normalize(TAGLINE).replace(/\s/g, "")` (whitespace-tolerant compare, le `<br/>` flatten sans introduire d'espace en jsdom). · `tests/Cover.test.tsx`
+
+### Vérifications à faire en session 129
+
+- [ ] grep `PROD_ORIGIN` src/ tests/ → 6+ résultats
+- [ ] grep `TAGLINE` tests/Cover.test.tsx → 1+ résultat
+- [ ] grep `~568 tests` CLAUDE.md → 0 résultat (aligné sur ~576)
