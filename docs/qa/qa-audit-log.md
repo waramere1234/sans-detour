@@ -2703,3 +2703,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `^export const THRESHOLD` src/lib/compute-positions.ts → 1 résultat
 - [ ] grep `inner <button>\|inner <a>` tests/useFlipCardA11y.test.tsx → 2 résultats (les 2 nouveaux tests)
 - [ ] grep `~471 tests` CLAUDE.md → 0 résultat (aligné sur ~482)
+
+---
+
+## Session 116 — 2026-05-17
+
+### Vérification session 115
+
+- [VERIFIED] 24 occurrences de `composeShareText|SHARE_TOP_N` dans src/ + tests/
+- [VERIFIED] `export const THRESHOLD = 0.70` dans compute-positions.ts
+- [VERIFIED] 2 tests `inner <button>` + `inner <a>` dans useFlipCardA11y.test.tsx
+- [VERIFIED] CLAUDE.md "~482 tests"
+- 482/482 tests verts, typecheck clean
+
+### Bugs fixés (Result.tsx coverage gap × 3 — refaire / personnalites_revealed / affinement+result_reached)
+
+- [FIXED] `Result.tsx` route 0 test file existait · La page principale post-deck (3rd-most-visited route après Cover et Play) avait 5 analytics events tirés inline + le flow refaire() destructif (window.confirm + resetSession + forgetCover + navigate) + un toggle disclosure "Voir les personnalités" avec un once-per-mount guard via `personnalitesReportedRef` — aucun de ces side-effects ni call sites n'avait de test. Création de `tests/Result.test.tsx` avec 3 describe blocks couvrant : (1) refaire() flow, (2) result_reached + affinement_clicked, (3) personnalites_revealed. Pattern : `vi.mock("../src/lib/supabase", () => ({ supabase: null }))` au top pour pin la fallback path (même approche que tests/scrutins.test.ts session 108) + `seedSession(N)` helper pour amorcer la localStorage session avec N votes sur les premiers fixtures, ce qui permet à computeAlignment de retourner un Result réel plutôt que le Skeleton.
+- [FIXED] `refaire()` confirm flow + result_refaire analytics 0 test · 6 tests : button rendu après TARGET votes, confirm appelé avant destroy, plural phrasing "Tes 20 votes et ton résultat seront perdus" pin l'invariant text, confirm OK → loadSession()=null + hasSeenCover()=false (symétrique avec Cover.restart qui ne forget pas) + result_refaire fired + navigate to /cover, confirm cancel → tout préservé + 0 analytics + reste sur /result, track-AFTER-confirm ordering (mock.invocationCallOrder) pour pin l'invariant "no inflated metric on cancel". · `tests/Result.test.tsx` (nouveau)
+- [FIXED] `personnalites_revealed` once-per-mount guard 0 test · La gate `personnalitesWithData.length > 0` requiert que les fixtures aient un `votes_personnalites` field, mais dev-fixtures.json ne le contient pas (V2 P2 ingest output, pas baked-in). Fix : `vi.spyOn(scrutinsMod, "fetchScrutins").mockResolvedValue(pool)` avec pool synthétique où chaque scrutin a un votes_personnalites complet. 3 tests : fires sur le first toggle-open, NE fire PAS sur les toggles suivants même après 5 clicks (once-per-mount guard via personnalitesReportedRef), NE fire PAS sur un closing toggle. Aussi : 3 tests pour result_reached + affinement_clicked + un test négatif "no affinement on partial". · `tests/Result.test.tsx`
+
+### Vérifications à faire en session 117
+
+- [ ] `ls tests/Result.test.tsx` → présent
+- [ ] grep -c "describe" tests/Result.test.tsx → 3 (refaire flow / affinement+result_reached / personnalites_revealed)
+- [ ] grep "vi.mock.*supabase.*null" tests/Result.test.tsx → 1 résultat (le pattern fallback-pin)
+- [ ] grep `~482 tests` CLAUDE.md → 0 résultat (aligné sur ~494)
