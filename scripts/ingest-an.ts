@@ -30,7 +30,7 @@ import { CACHE_DIR, JSON_DIR, iterEligibleScrutins } from "./lib/an-cache";
 import {
   requireSupabaseClient,
   ANTHROPIC_BATCHES_URL, anthropicBatchUrl, anthropicBatchResultsUrl,
-  anthropicHeaders,
+  anthropicHeaders, ANTHROPIC_MODEL,
 } from "./lib/env";
 
 // ───────────────────────────────────────────────────────────────── config
@@ -311,7 +311,7 @@ Cherche sur le web (1 à 2 recherches max) les détails concrets de ce scrutin :
 
 function buildRequestParams(scrutin: { titre_brut: string; dossier_titre: string; numero: number }): Record<string, unknown> {
   return {
-    model: "claude-haiku-4-5",
+    model: ANTHROPIC_MODEL,
     // 4096 instead of 2048: the analyse field adds 6 string[] arrays with
     // multiple bullets each. Total output now lands around 600-900 tokens
     // including the 4-field wrapper JSON. 4096 leaves plenty of headroom.

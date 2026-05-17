@@ -9,6 +9,12 @@
 
 import type { CSSProperties } from "react";
 
+/** Canonical "fetchScrutins rejected" message — used identically by
+ *  Play.tsx and Result.tsx loadError branches. Exported so a rewording
+ *  is a single edit and the two routes can't drift apart. */
+export const RETRY_FETCH_FAILED_MESSAGE =
+  "Impossible de charger les scrutins. Vérifie ta connexion puis réessaie.";
+
 export interface RetryErrorProps {
   message: string;
   onRetry: () => void;

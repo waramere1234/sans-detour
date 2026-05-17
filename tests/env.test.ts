@@ -5,6 +5,7 @@ import {
   requireAnthropicEnv,
   ANTHROPIC_BATCHES_URL,
   ANTHROPIC_API_VERSION,
+  ANTHROPIC_MODEL,
   anthropicBatchUrl,
   anthropicBatchResultsUrl,
   anthropicHeaders,
@@ -196,5 +197,12 @@ describe("ANTHROPIC_API_VERSION + anthropicHeaders", () => {
     expect(a).not.toBe(b);
     expect(a["x-api-key"]).toBe("k1");
     expect(b["x-api-key"]).toBe("k2");
+  });
+
+  it("ANTHROPIC_MODEL is the canonical Haiku 4.5 id (pin-the-value)", () => {
+    // CLAUDE.md V2 P1 documents the ingestion as Haiku 4.5 + Batches.
+    // A model upgrade should be a deliberate edit here + the buildRequest
+    // call site in ingest-an.ts; pin the value so a typo doesn't drift.
+    expect(ANTHROPIC_MODEL).toBe("claude-haiku-4-5");
   });
 });

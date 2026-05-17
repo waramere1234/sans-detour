@@ -6,6 +6,9 @@ import {
   sanitizeJsonControlChars,
   fallbackSummary,
   extractAnthropicSummary,
+  FALLBACK_TITRE_PEDAGO_WORDS,
+  FALLBACK_CONTEXTE_WORDS,
+  FALLBACK_CHAPEAU_WORDS,
   type MinimalAnthropicMessage,
 } from "../scripts/lib/parse-summary";
 import { MAX_POINTS_CLES_BULLETS, MAX_WORDS_PER_BULLET } from "../src/types";
@@ -169,14 +172,16 @@ describe("sanitizeJsonControlChars", () => {
 });
 
 describe("fallbackSummary", () => {
-  it("derives chapeau from the first 3 dossier words, uppercase", () => {
-    const out = fallbackSummary("any title", "Projet de loi de finances 2026");
-    expect(out.chapeau).toBe("PROJET DE LOI");
+  it(`derives chapeau from the first ${FALLBACK_CHAPEAU_WORDS} dossier words, uppercase`, () => {
+    // Test derives the slice length so a bump to 4 propagates.
+    const dossierWords = ["Projet", "de", "loi", "de", "finances", "2026"];
+    const out = fallbackSummary("any title", dossierWords.join(" "));
+    expect(out.chapeau).toBe(dossierWords.slice(0, FALLBACK_CHAPEAU_WORDS).join(" ").toUpperCase());
   });
 
   it("strips trailing punctuation from chapeau", () => {
     // Implementation regex is `/[.,;:!?]+$/` — only the trailing run is
-    // removed (embedded commas inside the 3-word window stay).
+    // removed (embedded commas inside the chapeau-words window stay).
     const out = fallbackSummary("any title", "Réforme du code.");
     expect(out.chapeau).toBe("RÉFORME DU CODE");
   });
@@ -186,23 +191,43 @@ describe("fallbackSummary", () => {
     expect(out.chapeau).toBe("SCRUTIN");
   });
 
-  it("truncates titre_pedago at 14 words with ellipsis", () => {
-    const longTitle = Array.from({ length: 20 }, (_, i) => `word${i + 1}`).join(" ");
+  it("truncates titre_pedago at FALLBACK_TITRE_PEDAGO_WORDS with ellipsis", () => {
+    // Build a title longer than the cap; assert ellipsis lands at exactly
+    // the boundary derived from the const. A bump to 16 propagates here.
+    const longTitle = Array.from(
+      { length: FALLBACK_TITRE_PEDAGO_WORDS + 6 },
+      (_, i) => `word${i + 1}`,
+    ).join(" ");
     const out = fallbackSummary(longTitle, "Dossier X");
-    // Implementation appends "…" directly to the 14th word (no space):
-    // `words.slice(0, 14).join(" ") + (words.length > 14 ? "…" : "")`
     expect(out.titre_pedago.endsWith("…")).toBe(true);
-    expect(out.titre_pedago.split(/\s+/).length).toBe(14);
+    expect(out.titre_pedago.split(/\s+/).length).toBe(FALLBACK_TITRE_PEDAGO_WORDS);
   });
 
-  it("keeps titre_pedago intact when ≤ 14 words", () => {
+  it("keeps titre_pedago intact when ≤ FALLBACK_TITRE_PEDAGO_WORDS", () => {
     const out = fallbackSummary("short brut title", "Dossier X");
     expect(out.titre_pedago).toBe("short brut title");
+  });
+
+  it("truncates contexte at FALLBACK_CONTEXTE_WORDS with ellipsis", () => {
+    const longDossier = Array.from(
+      { length: FALLBACK_CONTEXTE_WORDS + 5 },
+      (_, i) => `w${i + 1}`,
+    ).join(" ");
+    const out = fallbackSummary("title", longDossier);
+    expect(out.contexte.endsWith("…")).toBe(true);
+    expect(out.contexte.split(/\s+/).length).toBe(FALLBACK_CONTEXTE_WORDS);
   });
 
   it("returns empty contexte for empty dossier", () => {
     const out = fallbackSummary("title", "");
     expect(out.contexte).toBe("");
+  });
+
+  it("fallback constants are the canonical 14 / 25 / 3 values (pin-the-value)", () => {
+    // Edit these alongside an intentional bump in parse-summary.ts.
+    expect(FALLBACK_TITRE_PEDAGO_WORDS).toBe(14);
+    expect(FALLBACK_CONTEXTE_WORDS).toBe(25);
+    expect(FALLBACK_CHAPEAU_WORDS).toBe(3);
   });
 });
 

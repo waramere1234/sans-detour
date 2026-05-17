@@ -2853,3 +2853,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `"https://data\.assemblee-nationale\.fr/"` src/ scripts/ → 1 résultat seulement (la déclaration src/types/index.ts)
 - [ ] grep `Impossible de charger les scrutins\|Réessayer` src/routes/ → 0 occurrence des strings literal dans Play.tsx + Result.tsx (toutes passent par RetryError)
 - [ ] grep `~522 tests` CLAUDE.md → 0 résultat (aligné sur ~531)
+
+---
+
+## Session 122 — 2026-05-17
+
+### Vérification session 121
+
+- [VERIFIED] 0 inline `"anthropic-version": "2023-06-01"` dans scripts/ (la string passe par anthropicHeaders)
+- [VERIFIED] 1 occurrence seulement de `"https://data.assemblee-nationale.fr/"` (la déclaration src/types/index.ts)
+- [VERIFIED] 0 literal "Réessayer" dans src/routes/, plus 2 occurrences de "Impossible de charger les scrutins..." en `message=` prop de RetryError (acceptable — drift candidate pour session 122)
+- [VERIFIED] CLAUDE.md "~531 tests"
+- 531/531 tests verts, typecheck clean
+
+### Bugs fixés (ANTHROPIC_MODEL + RETRY_FETCH_FAILED_MESSAGE + FALLBACK_* boundary consts)
+
+- [FIXED] `model: "claude-haiku-4-5"` magic string inline dans scripts/ingest-an.ts:314 · Le modèle Anthropic Haiku 4.5 est documenté dans CLAUDE.md (V2 P1) et est crucial pour le pricing (Batches = 50% off) + les capacités (web_search supporté). Un upgrade silencieux (haiku-4-6, sonnet, etc.) changerait le coût et les outputs sans être tracké. Fix : export `ANTHROPIC_MODEL = "claude-haiku-4-5"` depuis env.ts ; ingest-an.ts importe + utilise. 1 test pin-the-value pour rendre tout upgrade délibéré. · `scripts/lib/env.ts`, `scripts/ingest-an.ts`, `tests/env.test.ts`
+- [FIXED] La string `"Impossible de charger les scrutins. Vérifie ta connexion puis réessaie."` dupliquée 2× (Play.tsx + Result.tsx loadError branches) · Même drift surface que la session 121 sur le bloc UI complet (que j'avais corrigé en extrayant RetryError) — mais le `message=` prop restait identique sur les 2 sites. Une rewording aurait dû être éditée 2× en lockstep. Fix : export `RETRY_FETCH_FAILED_MESSAGE` depuis `src/components/RetryError.tsx` (le component où la prop atterrit). Play.tsx + Result.tsx importent + passent la const. 2 tests : pin-the-value + render-verbatim. · `src/components/RetryError.tsx`, `src/routes/Play.tsx`, `src/routes/Result.tsx`, `tests/RetryError.test.tsx`
+- [FIXED] `fallbackSummary` magic numbers `14` (titre_pedago words cap), `25` (contexte words cap), `3` (chapeau eyebrow words) inline · Tests hardcodaient `14` aussi. Une bump à 16 ou 30 propage seulement dans parse-summary.ts et les tests passent silently sur l'ancien cap (input de 20 mots tronque à 16 + ellipsis, mais test attend length=14). Même drift pattern que sessions 111/115/117/118/120. Fix : export `FALLBACK_TITRE_PEDAGO_WORDS = 14`, `FALLBACK_CONTEXTE_WORDS = 25`, `FALLBACK_CHAPEAU_WORDS = 3` depuis parse-summary.ts. Tests dérivent les inputs + 1 nouveau test "truncates contexte at FALLBACK_CONTEXTE_WORDS" (le contexte truncation n'était pas testé du tout) + 1 pin-the-value des 3 const. · `scripts/lib/parse-summary.ts`, `tests/parse-summary.test.ts`
+
+### Vérifications à faire en session 123
+
+- [ ] grep `"claude-haiku-4-5"` scripts/ → 1 résultat seulement (la déclaration env.ts)
+- [ ] grep `RETRY_FETCH_FAILED_MESSAGE` src/ tests/ → 6+ résultats
+- [ ] grep `FALLBACK_TITRE_PEDAGO_WORDS\|FALLBACK_CONTEXTE_WORDS\|FALLBACK_CHAPEAU_WORDS` scripts/ tests/ → 10+ résultats
+- [ ] grep `~531 tests` CLAUDE.md → 0 résultat (aligné sur ~536)

@@ -10,7 +10,7 @@ import { PartyRow } from "../components/PartyRow";
 import { ResultSkeleton } from "../components/ResultSkeleton";
 import { PersonnaliteRow } from "../components/PersonnaliteRow";
 import { AuditTrail } from "../components/AuditTrail";
-import { RetryError } from "../components/RetryError";
+import { RetryError, RETRY_FETCH_FAILED_MESSAGE } from "../components/RetryError";
 import { getPartyColorVar, getParty } from "../lib/parties";
 import { composeShareText } from "../lib/share";
 import { track } from "../lib/analytics";
@@ -87,7 +87,7 @@ export default function Result() {
   if (loadError) {
     return (
       <RetryError
-        message="Impossible de charger les scrutins. Vérifie ta connexion puis réessaie."
+        message={RETRY_FETCH_FAILED_MESSAGE}
         onRetry={() => setLoadTick((t) => t + 1)}
       />
     );

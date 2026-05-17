@@ -180,17 +180,37 @@ export function extractAnthropicSummary(message: MinimalAnthropicMessage): Summa
   };
 }
 
+/** Hard cap on titre_pedago words in the fallback summary path. Looser
+ *  than the LLM's "12 mots" target (the LLM gets a soft instruction;
+ *  the fallback caps at 14 with an ellipsis to keep card titles readable
+ *  even when the raw libellé runs long). Exported so the test suite
+ *  derives boundary inputs from the const rather than hardcoding 14. */
+export const FALLBACK_TITRE_PEDAGO_WORDS = 14;
+
+/** Hard cap on contexte words in the fallback summary path (dossier
+ *  title trimmed to N words + ellipsis). Same drift-prevention pattern. */
+export const FALLBACK_CONTEXTE_WORDS = 25;
+
+/** Eyebrow word count used to derive `chapeau` from the dossier title.
+ *  Three words is the canonical pattern across the app (Methode §02
+ *  copy treats the chapeau as a 1-3 word topic prefix). */
+export const FALLBACK_CHAPEAU_WORDS = 3;
+
 // Best-effort summary when the LLM call fails or is skipped. Truncate the
-// raw libellé to ~12 words for titre_pedago, derive a 3-word eyebrow from
-// dossier title, use the dossier title (trimmed to 25 words) as contexte.
+// raw libellé to FALLBACK_TITRE_PEDAGO_WORDS for titre_pedago, derive a
+// FALLBACK_CHAPEAU_WORDS-word eyebrow from dossier title, use the dossier
+// title (trimmed to FALLBACK_CONTEXTE_WORDS) as contexte.
 export function fallbackSummary(titreBrut: string, dossierTitre: string): Summary {
   const words = titreBrut.split(/\s+/).filter(Boolean);
-  const titre_pedago = words.slice(0, 14).join(" ") + (words.length > 14 ? "…" : "");
-  const dossierWords = (dossierTitre || "scrutin").split(/\s+/).filter(Boolean).slice(0, 3);
+  const titre_pedago = words.slice(0, FALLBACK_TITRE_PEDAGO_WORDS).join(" ") +
+    (words.length > FALLBACK_TITRE_PEDAGO_WORDS ? "…" : "");
+  const dossierWords = (dossierTitre || "scrutin")
+    .split(/\s+/).filter(Boolean).slice(0, FALLBACK_CHAPEAU_WORDS);
   const chapeau = dossierWords.join(" ").toUpperCase().replace(/[.,;:!?]+$/, "");
   const ctxWords = (dossierTitre || "").split(/\s+/).filter(Boolean);
   const contexte = ctxWords.length > 0
-    ? ctxWords.slice(0, 25).join(" ") + (ctxWords.length > 25 ? "…" : "")
+    ? ctxWords.slice(0, FALLBACK_CONTEXTE_WORDS).join(" ") +
+      (ctxWords.length > FALLBACK_CONTEXTE_WORDS ? "…" : "")
     : "";
   return { chapeau, titre_pedago, contexte };
 }

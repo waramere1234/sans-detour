@@ -77,6 +77,13 @@ export function anthropicBatchResultsUrl(batchId: string): string {
  *  (ingest-an, resume-ingest, debug-batch × 2). */
 export const ANTHROPIC_API_VERSION = "2023-06-01";
 
+/** Anthropic model id used by the Batches ingestion (V2 P1: Haiku 4.5
+ *  + web_search, ~50% off via Batches). Pinned here so a future model
+ *  swap is a single edit + an explicit test update — previously a
+ *  magic string in the buildRequestParams call. CLAUDE.md notes the
+ *  V2 pipeline runs on Haiku 4.5 specifically. */
+export const ANTHROPIC_MODEL = "claude-haiku-4-5";
+
 /** Build the common headers every Anthropic Batches API request needs:
  *  api-key, version, and content-type. Pass the key explicitly so the
  *  helper is usable from both narrowed (`requireAnthropicEnv`) and

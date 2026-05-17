@@ -5,7 +5,7 @@ import { CardSkeleton } from "../components/CardSkeleton";
 import { ChipTop1 } from "../components/ChipTop1";
 import { RankingOverlay } from "../components/RankingOverlay";
 import { MethodeSheet } from "../components/MethodeSheet";
-import { RetryError } from "../components/RetryError";
+import { RetryError, RETRY_FETCH_FAILED_MESSAGE } from "../components/RetryError";
 import { fetchScrutins } from "../lib/scrutins";
 import {
   composeDeck, drawNext, chapeauPrefix,
@@ -214,7 +214,7 @@ export default function Play() {
   if (loadError) {
     return (
       <RetryError
-        message="Impossible de charger les scrutins. Vérifie ta connexion puis réessaie."
+        message={RETRY_FETCH_FAILED_MESSAGE}
         onRetry={() => setLoadTick((t) => t + 1)}
       />
     );
