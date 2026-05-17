@@ -2452,3 +2452,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `"/play"\|"/result"` tests/Cover.test.tsx → 0 résultat (ROUTES const partout)
 - [ ] grep `~323 tests` CLAUDE.md → 0 résultat (aligné sur ~344)
 - [ ] grep -c "it(" tests/AuditTrail.test.tsx → 16
+
+---
+
+## Session 106 — 2026-05-17
+
+### Vérification session 105
+
+- [VERIFIED] tests/AuditTrail.test.tsx + tests/DeckStack.test.tsx présents
+- [VERIFIED] tests/Cover.test.tsx : 0 résultat pour `/play`/`/result` literals
+- [VERIFIED] CLAUDE.md "~344 tests"
+- 344/344 tests verts, typecheck clean
+
+### Bugs fixés (3 route + integration test gaps)
+
+- [FIXED] `TopBar` 0 test coverage · Composant nav substantiel : route-aware rendering (caché sur Cover, visible sur les 4 autres routes), popover menu (aria-haspopup="menu", aria-expanded, ESC close, auto-close sur navigation, focus-restore au trigger), MIN_FOR_RANKING gate sur "Mon résultat" link, aria-current="page" sur le route actuel. 13 tests dans `tests/TopBar.test.tsx` couvrant les 4 sections (route gating, menu popover, MIN_FOR_RANKING threshold, aria-current per-route). · `tests/TopBar.test.tsx` (nouveau)
+- [FIXED] `RankingOverlay` 0 test coverage · useModalA11y est testé directement (session 98), mais l'intégration au component-level (alignments → rankByAlignment → PartyRow rendering, plural rule sur "compté" du header chip, dialog surface avec aria-modal+aria-label) ne l'était pas. 8 tests : visibility (open=false → nothing rendered, open=true → role=dialog aria-modal), header chip plural rule, alignment rows (11 GROUP_CODES, ranked by pct descending), close interactions (button + Escape). · `tests/RankingOverlay.test.tsx` (nouveau)
+- [FIXED] `Methode` SPA hash deep-link useEffect untested · Le hash deep-link `/methode#methode-07` scroll + focus le section après mount (workaround pour la native anchor jump qui fire avant React mount). Comportement non-trivial + le choix `behavior: "instant"` documenté inline. 9 tests dans `tests/Methode.test.tsx` : section structure (7 régions avec ids `methode-NN`), Sommaire anchor links, hash deep-link (calls scrollIntoView avec behavior=instant, no-op sans hash, no-op sur id absent, moves focus avec preventScroll), references AN + Claude (transparency requirement). · `tests/Methode.test.tsx` (nouveau)
+
+### Vérifications à faire en session 107
+
+- [ ] `ls tests/TopBar.test.tsx tests/RankingOverlay.test.tsx tests/Methode.test.tsx` → 3 fichiers présents
+- [ ] grep `~344 tests` CLAUDE.md → 0 résultat (aligné sur ~374)
+- [ ] grep "useModalA11y" tests/RankingOverlay.test.tsx → 1 résultat (comment qui pointe vers le hook test)
