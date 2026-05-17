@@ -2031,3 +2031,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `ingest:resume\|ingest:personnalites` package.json → 2 résultats
 - [ ] grep `npx tsx scripts/resume-ingest\|npx tsx scripts/ingest-personnalites` CLAUDE.md → 0 résultat (remplacé par `npm run ingest:*`)
 - [ ] grep `recordVote.*boolean\|recordVote.*: boolean` src/lib/session.ts → 1 résultat (signature avec return type)
+
+---
+
+## Session 89 — 2026-05-17
+
+### Vérification session 88
+
+- [VERIFIED] `tests/FreshnessBanner.test.tsx` : 10 `it()` (test symétrique malformed `next_sync_eta` ajouté)
+- [VERIFIED] `package.json` : `ingest:resume` + `ingest:personnalites` aliases présents
+- [VERIFIED] `CLAUDE.md` : `npm run ingest:resume` + `npm run ingest:personnalites` (plus de `npx tsx`)
+- [VERIFIED] `src/lib/session.ts` : `recordVote(...): boolean` signature avec return type
+- 165/165 tests verts, typecheck clean
+
+### Bugs fixés (StrictMode dup-fetch + analytics gap + zero coverage)
+
+- [FIXED] `Methode.tsx fetchFreshness` no `fetchedRef` dedup · Cover.tsx a un `fetchedRef = useRef(false)` qui gate fetchFreshness pour éviter les double-fires en React StrictMode dev (et les re-fires sur location.state changes). Methode.tsx n'avait pas le même pattern — son useEffect avec deps `[]` fire 2x en StrictMode dev → 2 Supabase round-trips par mount. Cosmétique en prod (effet fire une fois), mais inconsistance. Ajout du même pattern : `fetchedRef.current = true` set uniquement on success (sans cleanup of failure path, comme Cover). · `src/routes/Methode.tsx`
+- [FIXED] `Result.tsx refaire()` missing track call · Cover.tsx `restart()` fire `track("cover_restarted")` après le confirm. Mais Result.tsx `refaire()` (action analogue : reset + forgot cover + navigate) ne firait AUCUN analytics event. Une asymétrie de tracking — les utilisateurs qui font le restart depuis Result étaient invisibles dans Plausible. Ajout de `track("result_refaire")` AFTER le confirm (avant le reset, comme Cover). · `src/routes/Result.tsx`
+- [FIXED] `ChipTop1.tsx` zero test coverage · Composant petit (24 lignes) mais critique : c'est le seul affordance visuel pour ouvrir RankingOverlay sur /play, et il render le top-1 group + pct live. Aucun test = une régression sur l'aria-label (utilisée par SR), le type="button" (form submission risk), ou le label/pct render slipperait. Ajout de `tests/ChipTop1.test.tsx` avec 4 tests : render label+pct, onTap callback, aria-label include full party name + pct, type="button". · `tests/ChipTop1.test.tsx` (nouveau)
+
+### Vérifications à faire en session 90
+
+- [ ] grep `fetchedRef` src/routes/Methode.tsx → 3 résultats (déclaration + check + set on success)
+- [ ] grep `track("result_refaire")` src/routes/Result.tsx → 1 résultat
+- [ ] `ls tests/ChipTop1.test.tsx` → présent, 4 tests
+- [ ] grep `~165 tests` CLAUDE.md → 0 résultat (aligné sur ~169)

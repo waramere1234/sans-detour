@@ -141,6 +141,11 @@ export default function Result() {
       `Refaire depuis le début ? Tes ${total} vote${total !== 1 ? "s" : ""} et ton résultat seront perdus.`,
     );
     if (!ok) return;
+    // Track AFTER the confirm passes so a cancelled confirm doesn't
+    // inflate the metric. Mirrors Cover.tsx restart() which fires
+    // `cover_restarted` post-confirm — without this, the symmetric
+    // "refaire from Result" action was invisible to analytics.
+    track("result_refaire");
     resetSession();
     forgetCover();
     navigate("/");

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Wordmark } from "../components/Wordmark";
@@ -10,7 +10,17 @@ import { TARGET, MIN_FOR_RANKING, type FreshnessInfo } from "../types";
 export default function Methode() {
   const [info, setInfo] = useState<FreshnessInfo | null>(null);
   const location = useLocation();
-  useEffect(() => { fetchFreshness().then(setInfo).catch(() => {}); }, []);
+  // Match Cover.tsx's fetchedRef pattern (session 70): only mark fetched
+  // on success so a transient failure doesn't kill the banner for the
+  // rest of the session, and so React StrictMode's intentional double-
+  // invoke in dev doesn't fire two redundant Supabase round-trips.
+  const fetchedRef = useRef(false);
+  useEffect(() => {
+    if (fetchedRef.current) return;
+    fetchFreshness()
+      .then((freshness) => { fetchedRef.current = true; setInfo(freshness); })
+      .catch(() => {});
+  }, []);
 
   // SPA hash scroll : when user lands on `/methode#methode-07` directly,
   // the browser's native anchor jump happens BEFORE React mounts the
