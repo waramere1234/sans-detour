@@ -64,4 +64,20 @@ describe("BRAND_BG sync with static files (manifest + index.html)", () => {
     expect(match).not.toBeNull();
     expect(match![1]).toBe(BRAND_BG);
   });
+
+  it("index.html <noscript> body background matches BRAND_BG (JS-disabled fallback page)", async () => {
+    // The <noscript> fallback page sits behind the same brand chrome as
+    // the live app. A re-skin that updates BRAND_BG must propagate here
+    // too — without this pin, a user with JS disabled would land on a
+    // page that doesn't match the (updated) browser-tab theme color.
+    const html = await fs.readFile(
+      path.join(process.cwd(), "index.html"),
+      "utf-8",
+    );
+    // Extract the inline `background: <hex>` from the noscript div's style attribute.
+    const noscriptBlock = html.match(/<noscript>[\s\S]*?<\/noscript>/)?.[0] ?? "";
+    const bgMatch = noscriptBlock.match(/background:\s*(#[0-9a-fA-F]{3,6})/);
+    expect(bgMatch).not.toBeNull();
+    expect(bgMatch![1]).toBe(BRAND_BG);
+  });
 });

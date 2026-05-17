@@ -2951,3 +2951,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `BRAND_BG\|BRAND_ACCENT\|BRAND_INK\|BRAND_INK_2` api/ tests/ → 8+ résultats
 - [ ] grep `MAX_SHARE_CARD_BARS\|SHARE_TOP_N` api/ src/ tests/ → 8+ résultats
 - [ ] grep `~547 tests` CLAUDE.md → 0 résultat (aligné sur ~555)
+
+---
+
+## Session 126 — 2026-05-17
+
+### Vérification session 125
+
+- [VERIFIED] 5 occurrences de "#1d1f24" : brand-colors.ts (déclaration) + 2 dans manifest + 2 dans index.html (theme-color meta + noscript body — c'est le 5e site que la session 125 avait raté, fixé en session 126 bug #1)
+- [VERIFIED] 25 occurrences des 4 BRAND_* consts dans api/ + tests/
+- [VERIFIED] 23 occurrences de MAX_SHARE_CARD_BARS|SHARE_TOP_N dans api/ + src/ + tests/
+- [VERIFIED] CLAUDE.md "~555 tests"
+- 555/555 tests verts, typecheck clean
+
+### Bugs fixés (noscript bg pin + Plausible data-domain sync + seed-supabase missing catch)
+
+- [FIXED] `index.html:65` noscript body `background: #1d1f24` pas couvert par le brand-colors sync test (session 125) · Le `<noscript>` fallback page (JS désactivé) utilise la même brand bg que la live app, mais le test de session 125 ne pinnait que le `<meta name="theme-color">`. Une re-skin qui bumpe BRAND_BG aurait laissé la noscript page mismatched (visible aux users JS-disabled qui voient une couleur de fond qui ne match plus le tab color). Fix : nouvelle assertion qui extrait le `<noscript>` block via regex puis match `background:\s*#hex` à l'intérieur, asserts === BRAND_BG. · `tests/brand-colors.test.ts`
+- [FIXED] `index.html:55` Plausible `data-domain="sansdetour.fr"` non synchronisé avec `ANALYTICS_HOSTS` (session 110) · Le `<script defer data-domain="..." src="https://plausible.io/...">` tag déclare le dashboard target ; `ANALYTICS_HOSTS` est la runtime allow-list dans `track()`. Si on rebrand vers `.com`, mettre à jour seulement un des deux ferait que les events de la prod runtime sont émis mais perdus (ANALYTICS_HOSTS gate les bloque) OU émis vers un dashboard inexistant. Fix : test qui lit index.html, extract le data-domain via regex, et asserts qu'il est member de `ANALYTICS_HOSTS`. · `tests/analytics.test.ts`
+- [FIXED] `scripts/seed-supabase.ts:38` `main();` sans `.catch()` handler · Les 4 autres scripts (ingest-an, resume-ingest, debug-batch, ingest-personnalites) ont tous le pattern `main().catch((e) => { console.error(e); process.exit(1); });`. seed-supabase était l'outlier — une rejection silently exit avec code 0 (modulo l'UnhandledPromiseRejectionWarning), masquant les failures depuis npm run seed en CI / dev shells. Fix : ajouter le catch+exit(1) pattern aligné sur les 4 autres scripts. · `scripts/seed-supabase.ts`
+
+### Vérifications à faire en session 127
+
+- [ ] grep "background: #" index.html → 1 résultat (la noscript body, déjà pin via test)
+- [ ] grep "data-domain" tests/analytics.test.ts → 1 résultat (le sync test)
+- [ ] grep "main()\.catch" scripts/seed-supabase.ts → 1 résultat (l'ajout)
+- [ ] grep `~555 tests` CLAUDE.md → 0 résultat (aligné sur ~557)

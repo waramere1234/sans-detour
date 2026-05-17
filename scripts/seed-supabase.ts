@@ -35,4 +35,10 @@ async function main() {
   }
   console.log(`Seeded ${rows.length} scrutins.`);
 }
-main();
+
+// Match the .catch + process.exit(1) pattern used by ingest-an.ts,
+// resume-ingest.ts, debug-batch.ts, and ingest-personnalites.ts. Without
+// it, an unhandled rejection inside main() exits with code 0 (modulo
+// an UnhandledPromiseRejectionWarning), masking failures from
+// `npm run seed` in CI / dev shells.
+main().catch((e) => { console.error(e); process.exit(1); });

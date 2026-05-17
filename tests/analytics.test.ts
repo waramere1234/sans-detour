@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { promises as fs } from "node:fs";
+import path from "node:path";
 import {
   track,
   ANALYTICS_HOSTS,
@@ -77,6 +79,28 @@ describe("analytics track() hostname gate", () => {
     setHostname([...ANALYTICS_HOSTS][0]);
     track("result_reached");
     expect(plausibleMock).toHaveBeenCalledWith("result_reached", undefined);
+  });
+});
+
+describe("Plausible data-domain (index.html) sync with ANALYTICS_HOSTS", () => {
+  // The <script defer data-domain="..." src="https://plausible.io/...">
+  // tag in index.html declares the dashboard target. ANALYTICS_HOSTS is
+  // the runtime allow-list. Both must point at the same prod apex — a
+  // rebrand changing one and not the other splits analytics between
+  // a dead dashboard and a stale gate. Pin the linkage here.
+
+  it("data-domain in index.html is a member of ANALYTICS_HOSTS", async () => {
+    const html = await fs.readFile(
+      path.join(process.cwd(), "index.html"),
+      "utf-8",
+    );
+    const match = html.match(/data-domain="([^"]+)"/);
+    expect(match).not.toBeNull();
+    const plausibleDomain = match![1];
+    // The data-domain typically points at the apex (no www). It MUST
+    // appear in ANALYTICS_HOSTS so track() emits events that the
+    // dashboard actually receives.
+    expect(ANALYTICS_HOSTS.has(plausibleDomain)).toBe(true);
   });
 });
 
