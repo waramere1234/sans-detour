@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { PersonnaliteRow } from "../src/components/PersonnaliteRow";
-import type { PersonnaliteAlignment } from "../src/types";
+import { LOW_DATA_THRESHOLD, type PersonnaliteAlignment } from "../src/types";
 
 // PersonnaliteRow has accumulated invariants over sessions 25, 78, 81, 86:
 //  - session 25-like: SR-friendly composed aria-label (one sentence)
@@ -48,9 +48,15 @@ describe("PersonnaliteRow — normal data path", () => {
   });
 });
 
-describe("PersonnaliteRow — tooLittleData path (counted < LOW_DATA_THRESHOLD = 3)", () => {
-  it("renders the 'trop peu de données' label", () => {
-    render(<PersonnaliteRow alignment={mk({ counted: 2, pct: 0 })} />);
+describe("PersonnaliteRow — tooLittleData path (counted < LOW_DATA_THRESHOLD)", () => {
+  // Derive the "just under" boundary from the const so a future bump
+  // (e.g. LOW_DATA_THRESHOLD → 5) reuses the boundary value without
+  // silently leaving counted=2 in the tooLittleData branch when 2 is no
+  // longer below the threshold.
+  const justBelow = LOW_DATA_THRESHOLD - 1; // currently 2
+
+  it("renders the 'trop peu de données' label at LOW_DATA_THRESHOLD - 1", () => {
+    render(<PersonnaliteRow alignment={mk({ counted: justBelow, pct: 0 })} />);
     expect(screen.getByLabelText(/trop peu de données/)).toBeInTheDocument();
   });
 
@@ -59,14 +65,26 @@ describe("PersonnaliteRow — tooLittleData path (counted < LOW_DATA_THRESHOLD =
     expect(screen.getByLabelText(/1 vote comparable(?!s)/)).toBeInTheDocument();
   });
 
-  it("uses plural 'votes comparables' when counted === 2", () => {
-    render(<PersonnaliteRow alignment={mk({ counted: 2, pct: 0 })} />);
-    expect(screen.getByLabelText(/2 votes comparables/)).toBeInTheDocument();
+  it("uses plural 'votes comparables' when counted >= 2", () => {
+    render(<PersonnaliteRow alignment={mk({ counted: justBelow, pct: 0 })} />);
+    expect(screen.getByLabelText(new RegExp(`${justBelow} votes comparables`))).toBeInTheDocument();
   });
 
   it("renders '— · N vote' in the right column (no pct) for low-data", () => {
-    render(<PersonnaliteRow alignment={mk({ counted: 2, pct: 50 })} />);
+    render(<PersonnaliteRow alignment={mk({ counted: justBelow, pct: 50 })} />);
     // No pct number rendered standalone in the right column.
-    expect(screen.getByText(/— · 2 votes/)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`— · ${justBelow} votes`))).toBeInTheDocument();
+  });
+
+  it("crosses out of the tooLittleData branch at exactly LOW_DATA_THRESHOLD (boundary inclusive on the >= side)", () => {
+    // counted === LOW_DATA_THRESHOLD → NOT tooLittleData (counted < THRESHOLD is false).
+    render(<PersonnaliteRow alignment={mk({ counted: LOW_DATA_THRESHOLD, pct: 50 })} />);
+    expect(screen.queryByLabelText(/trop peu de données/)).not.toBeInTheDocument();
+  });
+
+  it("LOW_DATA_THRESHOLD is the canonical value 3 (pin-the-value)", () => {
+    // Bump deliberate: edit this assertion + the matching Methode §03/§04
+    // copy together.
+    expect(LOW_DATA_THRESHOLD).toBe(3);
   });
 });

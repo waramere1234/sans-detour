@@ -90,6 +90,53 @@ describe("useModalA11y", () => {
     });
   });
 
+  describe("focus restore on close (opener captured before open)", () => {
+    // Tested indirectly via MethodeSheet.test.tsx and TopBar.test.tsx ("restores
+    // focus to the trigger after close"), but the hook itself owned no direct
+    // test for the openerRef capture-on-open + focus-on-close contract.
+    // Refactoring useModalA11y to drop openerRef would have surfaced as a 2-file
+    // failure in those consumers but not as a clear "this hook lost its
+    // contract" signal. Pin the contract here.
+
+    function OpenerHarness({ open, onClose }: { open: boolean; onClose: () => void }) {
+      const { dialogRef, closeBtnRef } = useModalA11y({ open, onClose });
+      return (
+        <>
+          <button data-testid="opener" type="button">Opener</button>
+          {open && (
+            <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="test">
+              <button ref={closeBtnRef} type="button">Close</button>
+            </div>
+          )}
+        </>
+      );
+    }
+
+    it("restores focus to the previously-focused element when open flips back to false", async () => {
+      const { rerender } = render(<OpenerHarness open={false} onClose={vi.fn()} />);
+      const opener = screen.getByTestId("opener");
+      opener.focus();
+      expect(opener).toHaveFocus();
+      // Open: hook captures activeElement and moves focus to close button.
+      rerender(<OpenerHarness open={true} onClose={vi.fn()} />);
+      await waitFor(() => expect(screen.getByRole("button", { name: "Close" })).toHaveFocus());
+      // Close: focus should return to the opener.
+      rerender(<OpenerHarness open={false} onClose={vi.fn()} />);
+      await waitFor(() => expect(opener).toHaveFocus());
+    });
+
+    it("no-ops when no element was focused at open time (captured null)", async () => {
+      // Edge case: if document.activeElement was the body when the modal
+      // opened, focus restore should not throw — `openerRef.current?.focus()`
+      // uses optional chaining specifically for this. Pin the behaviour.
+      const { rerender } = render(<OpenerHarness open={true} onClose={vi.fn()} />);
+      await waitFor(() => expect(screen.getByRole("button", { name: "Close" })).toHaveFocus());
+      rerender(<OpenerHarness open={false} onClose={vi.fn()} />);
+      // Hook hasn't crashed; the assertion is that we got here.
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+  });
+
   describe("focus trap", () => {
     it("includes form inputs in the focusable set (session 98 fix)", () => {
       // Before session 98, the selector only matched a/button/[tabindex].

@@ -13,6 +13,7 @@ import {
 import { computeAlignment, rankByAlignment } from "../lib/matching";
 import { getOrCreateSession, recordVote, loadSession } from "../lib/session";
 import { track } from "../lib/analytics";
+import { nextVoteLabel } from "../lib/vote-feedback";
 import { ROUTES, isAffinementMode } from "../lib/routes";
 import {
   GROUP_CODES, TARGET, MIN_FOR_RANKING,
@@ -166,16 +167,10 @@ export default function Play() {
     if (!recorded) return;
     track("vote", { choice });
 
-    // Append a zero-width space so identical consecutive votes (e.g. two
-    // "Pour" in a row) still mutate the string — aria-live polite only
-    // re-announces when content changes. Without it, the second vote
-    // would be silent for SR users.
-    const labels: Record<UserVote, string> = {
-      pour: "Voté pour. Carte suivante.",
-      contre: "Voté contre. Carte suivante.",
-      skip: "Passé. Carte suivante.",
-    };
-    setLastVoteLabel((prev) => labels[choice] + (prev.endsWith("​") ? "" : "​"));
+    // nextVoteLabel handles the zero-width-space alternation so identical
+    // consecutive votes (e.g. two "Pour" in a row) still mutate the string —
+    // aria-live polite only re-announces on content change.
+    setLastVoteLabel((prev) => nextVoteLabel(prev, choice));
 
     const remaining = deck.slice(1);
     if (remaining.length === 0) {

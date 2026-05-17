@@ -2728,3 +2728,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep -c "describe" tests/Result.test.tsx → 3 (refaire flow / affinement+result_reached / personnalites_revealed)
 - [ ] grep "vi.mock.*supabase.*null" tests/Result.test.tsx → 1 résultat (le pattern fallback-pin)
 - [ ] grep `~482 tests` CLAUDE.md → 0 résultat (aligné sur ~494)
+
+---
+
+## Session 117 — 2026-05-17
+
+### Vérification session 116
+
+- [VERIFIED] tests/Result.test.tsx présent
+- [VERIFIED] 3 describes dans tests/Result.test.tsx (refaire flow / result_reached+affinement / personnalites_revealed)
+- [VERIFIED] 1 résultat pour `vi.mock.*supabase.*null` (le pattern fallback-pin)
+- [VERIFIED] CLAUDE.md "~494 tests"
+- 494/494 tests verts, typecheck clean
+
+### Bugs fixés (useModalA11y opener-focus restore + vote-feedback extraction + LOW_DATA_THRESHOLD drift)
+
+- [FIXED] `useModalA11y` "restore focus to opener on close" contract tested seulement indirectement · Le hook capture `openerRef.current = document.activeElement` à l'open (next animation frame) puis restore via `openerRef.current?.focus()` au close. Le contrat est testé via MethodeSheet.test.tsx + TopBar.test.tsx ("restores focus to the trigger after close"), mais un refactor qui dropperait `openerRef` aurait fait failer 2 fichiers de tests consumer sans signal clair "ce hook a perdu son contrat". 2 tests directs ajoutés : (1) opener focus → open → close → opener regains focus, (2) edge case opener captured = null (document.body) → close noop without throw. · `tests/useModalA11y.test.tsx`
+- [FIXED] Play.tsx aria-live vote-feedback labels + ZWSP alternation inline dans `handleVote` · Les 3 labels ("Voté pour. Carte suivante.", etc.) et la logique non-évidente `prev.endsWith("​") ? "" : "​"` (zero-width-space append/strip pour forcer aria-live="polite" à re-announce sur 2 votes "pour" consécutifs) vivaient inline dans le handler — donc 0 test possible sans rendre Play.tsx. Sans le ZWSP toggle, SR users perdent la confirmation du 2e vote identique. Fix : extract dans `src/lib/vote-feedback.ts` avec `voteLabel(choice)` + `nextVoteLabel(prev, choice)` + const exporté `ZWSP`. Play.tsx import + appelle. 10 tests dans `tests/vote-feedback.test.ts` : 3 base labels pin, ZWSP first call appended, alternation flips on repeat, alternation cross-choice, alternation never produces 2 consecutive identical strings (loop sanity), ZWSP est U+200B 1-char. · `src/lib/vote-feedback.ts` (nouveau), `src/routes/Play.tsx`, `tests/vote-feedback.test.ts` (nouveau)
+- [FIXED] `tests/PersonnaliteRow.test.tsx` hardcodait `counted: 1` / `counted: 2` literal boundaries au lieu de dériver de `LOW_DATA_THRESHOLD` · Même drift pattern que sessions 111 (STALE_AFTER_DAYS) et 115 (THRESHOLD). Si LOW_DATA_THRESHOLD bumpe à 5 (par exemple "stricter low-data definition"), counted=2 reste below threshold et le test "renders trop peu de données" passe silently — sans tester le nouveau boundary. Fix : tests dérivent `justBelow = LOW_DATA_THRESHOLD - 1` + 2 nouveaux tests : (a) boundary inclusif au-dessus (counted === LOW_DATA_THRESHOLD → PAS tooLittleData), (b) pin-the-value `expect(LOW_DATA_THRESHOLD).toBe(3)` pour rendre un futur bump délibéré. · `tests/PersonnaliteRow.test.tsx`
+
+### Vérifications à faire en session 118
+
+- [ ] `ls src/lib/vote-feedback.ts tests/vote-feedback.test.ts` → 2 fichiers présents
+- [ ] grep `nextVoteLabel\|voteLabel\|ZWSP` src/ tests/ → résultats dans vote-feedback.ts + Play.tsx + vote-feedback.test.ts
+- [ ] grep `LOW_DATA_THRESHOLD` tests/PersonnaliteRow.test.tsx → 4+ résultats (l'import + 4 usages)
+- [ ] grep `~494 tests` CLAUDE.md → 0 résultat (aligné sur ~507)
