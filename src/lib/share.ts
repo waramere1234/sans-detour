@@ -19,7 +19,32 @@ export { SHARE_SOURCE_LINE };
  *  card endpoint (api/share-card.ts) caps at 8 for its taller layout. */
 export const SHARE_TOP_N = 6;
 
-const LEAD_PREFIX = "Mes affinités politiques réelles";
+/** Lead phrase that opens every share message: "Mes affinités politiques
+ *  réelles, basées sur les vrais votes de l'AN : …". Exported (not file-
+ *  local) because tests/share.test.ts pin the wording via 2 .toContain
+ *  assertions — keeping it private to this file means a rewording would
+ *  silently desync source + tests. The composeShareText output is
+ *  asserted via SHARE_LEAD_PREFIX round-trip in tests. */
+export const SHARE_LEAD_PREFIX = "Mes affinités politiques réelles";
+
+/** Label shown by `window.prompt(...)` in performShare's last-resort
+ *  branch (Safari < 13 / clipboard blocked). Exported because the test
+ *  assertion uses `.toHaveBeenCalledWith(LABEL, …)` and a copy tweak
+ *  would otherwise need to land on source + test in lockstep. */
+export const CLIPBOARD_PROMPT_LABEL = "Copie ton résultat :";
+
+/** Build the parenthetical "(résultat partiel N/TARGET)" marker injected
+ *  into the share-text lead when the user shares a partial session
+ *  (before reaching TARGET votes). Pulled out of the inline template
+ *  in composeShareText so:
+ *    - a future i18n flip ("(partial N/M)" for en-US) touches one place
+ *    - the test pin can round-trip via the helper instead of inlining
+ *      the literal "résultat partiel 7/20" which drifts on rewording
+ *  Returns the marker WITH a leading space so callers concatenate
+ *  cleanly: `${PREFIX}${partialResultMarker(...) || ""}, ${...}`. */
+export function partialResultMarker(total: number, target: number): string {
+  return ` (résultat partiel ${total}/${target})`;
+}
 
 /** Compose the share message. Result.tsx feeds the post-rank alignment
  *  list straight in — we slice locally so callers can't accidentally
@@ -37,9 +62,9 @@ export function composeShareText(args: {
   // DRY: only the parenthetical suffix differs between the two branches —
   // the prefix + " basées sur…" tail is identical, so build it once.
   const partialParen = args.isPartial
-    ? ` (résultat partiel ${args.total}/${args.target})`
+    ? partialResultMarker(args.total, args.target)
     : "";
-  const lead = `${LEAD_PREFIX}${partialParen}, ${SHARE_SOURCE_LINE}`;
+  const lead = `${SHARE_LEAD_PREFIX}${partialParen}, ${SHARE_SOURCE_LINE}`;
   return `${lead} : ${summary}`;
 }
 
@@ -82,7 +107,7 @@ export async function performShare(
     await navigator.clipboard.writeText(clipboardText);
     return "copied";
   } catch {
-    window.prompt("Copie ton résultat :", clipboardText);
+    window.prompt(CLIPBOARD_PROMPT_LABEL, clipboardText);
     return "prompted";
   }
 }

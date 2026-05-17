@@ -3307,3 +3307,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `anScrutinViewAriaLabel\|SKELETON_CARD_LOADING_LABEL\|SKELETON_RESULT_LOADING_LABEL\|DEMO_DATA_LABEL_PREFIX` src/ tests/ → 15+ résultats
 - [ ] grep `"Chargement des scrutins"\|"Chargement de ton résultat"\|"Donnée de démonstration"` src/ tests/ → 3 résultats seulement (les 3 déclarations dans src/types + aria-labels.test.ts pin-the-value)
 - [ ] grep `~621 tests` CLAUDE.md → 0 résultat (aligné sur ~630)
+
+---
+
+## Session 141 — 2026-05-17
+
+### Vérification session 140
+
+- [VERIFIED] 42 occurrences des 4 nouveaux exports (anScrutinViewAriaLabel + SKELETON_*_LOADING_LABEL × 2 + DEMO_DATA_LABEL_PREFIX) dans src/ + tests/
+- [VERIFIED] 8 occurrences seulement des 3 strings ("Chargement des scrutins"/"Chargement de ton résultat"/"Donnée de démonstration") = 4 déclarations + 3 pin-the-value tests + 2 comments (pas de drift)
+- [VERIFIED] CLAUDE.md "~630 tests"
+- 630/630 tests verts, typecheck clean
+
+### Bugs fixés (SHARE_LEAD_PREFIX + CLIPBOARD_PROMPT_LABEL + partialResultMarker)
+
+- [FIXED] `LEAD_PREFIX = "Mes affinités politiques réelles"` était file-local dans `src/lib/share.ts` alors que `tests/share.test.ts` pinnait la wording via 2 `.toContain("Mes affinités politiques réelles, basées sur...")` literals · Drift surface : un rewording (ou un i18n flip EN-US) aurait demandé 3 edits in-lockstep (source + 2 test sites). Fix : export `SHARE_LEAD_PREFIX` depuis src/lib/share.ts. Tests utilisent `expect(out).toContain(\`${SHARE_LEAD_PREFIX}, ${SHARE_SOURCE_LINE}\`)` (round-trip) au lieu de littéral. · `src/lib/share.ts`, `tests/share.test.ts`
+- [FIXED] `"Copie ton résultat :"` window.prompt label hardcoded dans `src/lib/share.ts` performShare (last-resort branch) + asserté en literal dans `tests/share.test.ts` via `.toHaveBeenCalledWith("Copie ton résultat :", ...)` · Drift surface identique : rewording = 2 edits in-lockstep. Fix : export `CLIPBOARD_PROMPT_LABEL`. Tests utilisent la const. · `src/lib/share.ts`, `tests/share.test.ts`
+- [FIXED] Le template `` ` (résultat partiel ${total}/${target})` `` inline dans `composeShareText` était pinné via `.toContain("résultat partiel 7/20")` côté test · Drift surface : rewording du marker (e.g. "(partiel N/M)" plus court) demanderait source + test in-lockstep. Fix : export `partialResultMarker(total, target)` helper qui renvoie le marker complet avec leading space (contract documenté pour clean concatenation). `composeShareText` appelle le helper ; tests utilisent `partialResultMarker(7, 20).trim()`. · `src/lib/share.ts`, `tests/share.test.ts`
+
+### Vérifications à faire en session 142
+
+- [ ] grep `SHARE_LEAD_PREFIX\|CLIPBOARD_PROMPT_LABEL\|partialResultMarker` src/ tests/ → 10+ résultats
+- [ ] grep `"Mes affinités politiques réelles"\|"Copie ton résultat :"\|"résultat partiel 7/20"` src/ tests/ → 3-4 résultats seulement (déclarations + pin-the-value)
+- [ ] grep `~630 tests` CLAUDE.md → 0 résultat (aligné sur ~635)

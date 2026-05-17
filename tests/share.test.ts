@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { composeShareText, performShare, SHARE_TOP_N } from "../src/lib/share";
+import {
+  composeShareText, performShare, SHARE_TOP_N,
+  SHARE_LEAD_PREFIX, CLIPBOARD_PROMPT_LABEL, partialResultMarker,
+} from "../src/lib/share";
 import type { GroupAlignment, GroupCode } from "../src/types";
 import { GROUP_CODES, SHARE_SOURCE_LINE } from "../src/types";
 import { getParty } from "../src/lib/parties";
@@ -39,7 +42,7 @@ describe("composeShareText — happy path (complete session)", () => {
       total: 20,
       target: 20,
     });
-    expect(out).toContain("Mes affinités politiques réelles, basées sur les vrais votes de l'AN");
+    expect(out).toContain(`${SHARE_LEAD_PREFIX}, ${SHARE_SOURCE_LINE}`);
     expect(out).toContain(" : ");
     expect(out).toContain("1. RN 57%");
     expect(out).toContain("2. EPR 42%");
@@ -78,8 +81,8 @@ describe("composeShareText — partial lead branch", () => {
       total: 7,
       target: 20,
     });
-    expect(out).toContain("résultat partiel 7/20");
-    expect(out).not.toContain("Mes affinités politiques réelles,"); // complete-branch lead
+    expect(out).toContain(partialResultMarker(7, 20).trim());
+    expect(out).not.toContain(`${SHARE_LEAD_PREFIX},`); // complete-branch lead
   });
 
   it("does NOT mention 'partiel' when isPartial=false", () => {
@@ -90,6 +93,37 @@ describe("composeShareText — partial lead branch", () => {
       target: 20,
     });
     expect(out).not.toMatch(/partiel/i);
+  });
+});
+
+describe("SHARE_LEAD_PREFIX + CLIPBOARD_PROMPT_LABEL + partialResultMarker — drift pins", () => {
+  // 3 share-text consts/helpers extracted from inline literals so a
+  // rewording propagates from one edit (source + tests + the prompt
+  // assertion would otherwise need to land in lockstep).
+
+  it("SHARE_LEAD_PREFIX matches the canonical 'Mes affinités politiques réelles' wording", () => {
+    expect(SHARE_LEAD_PREFIX).toBe("Mes affinités politiques réelles");
+  });
+
+  it("CLIPBOARD_PROMPT_LABEL matches the canonical 'Copie ton résultat :' wording", () => {
+    expect(CLIPBOARD_PROMPT_LABEL).toBe("Copie ton résultat :");
+  });
+
+  it("partialResultMarker composes ' (résultat partiel N/TARGET)' with leading space", () => {
+    expect(partialResultMarker(7, 20)).toBe(" (résultat partiel 7/20)");
+    expect(partialResultMarker(15, 30)).toBe(" (résultat partiel 15/30)");
+  });
+
+  it("partialResultMarker starts with a space (callers concatenate cleanly)", () => {
+    // The lead build pattern is `${PREFIX}${partialParen}, …`; if the
+    // marker dropped the leading space, the lead would render
+    // "réelles(résultat partiel…" — pin the contract.
+    expect(partialResultMarker(1, 1).startsWith(" ")).toBe(true);
+  });
+
+  it("partialResultMarker interpolates total + target into the N/TARGET slot", () => {
+    expect(partialResultMarker(7, 20)).toContain("7/20");
+    expect(partialResultMarker(0, 20)).toContain("0/20");
   });
 });
 
@@ -199,7 +233,7 @@ describe("performShare — 3-tier fallback chain", () => {
     window.prompt = promptSpy;
     const result = await performShare("text", "https://example.test");
     expect(result).toBe("prompted");
-    expect(promptSpy).toHaveBeenCalledWith("Copie ton résultat :", "text\nhttps://example.test");
+    expect(promptSpy).toHaveBeenCalledWith(CLIPBOARD_PROMPT_LABEL, "text\nhttps://example.test");
   });
 
   it("clipboard payload joins text + url with a newline (single canonical format)", async () => {
