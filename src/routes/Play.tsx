@@ -18,6 +18,9 @@ import { nextVoteLabel } from "../lib/vote-feedback";
 import { ROUTES, isAffinementMode } from "../lib/routes";
 import {
   GROUP_CODES, TARGET, MIN_FOR_RANKING, VIEW_RESULT_LABEL,
+  MENU_RESULT_LABEL,
+  VOTE_LABEL_CONTRE, VOTE_LABEL_SKIP, VOTE_LABEL_POUR,
+  VOTE_ARIA_CONTRE, VOTE_ARIA_SKIP, VOTE_ARIA_POUR,
   type Scrutin, type UserVote, type GroupCode, type GroupAlignment,
 } from "../types";
 
@@ -315,7 +318,7 @@ export default function Play() {
               cursor: "pointer",
             }}
           >
-            Mon résultat<span aria-hidden="true"> →</span>
+            {MENU_RESULT_LABEL}<span aria-hidden="true"> →</span>
           </button>
         )}
       </div>
@@ -342,26 +345,26 @@ export default function Play() {
         <button
           type="button"
           onClick={() => handleVote(deck[0].id, "contre")}
-          aria-label="Contre — voter contre ce scrutin"
+          aria-label={VOTE_ARIA_CONTRE}
           style={btnFallback("var(--contre)")}
         >
-          <span aria-hidden="true">← </span>Contre
+          <span aria-hidden="true">← </span>{VOTE_LABEL_CONTRE}
         </button>
         <button
           type="button"
           onClick={() => handleVote(deck[0].id, "skip")}
-          aria-label="Je passe — passer ce scrutin sans voter"
+          aria-label={VOTE_ARIA_SKIP}
           style={btnFallback("var(--ink-2)")}
         >
-          <span aria-hidden="true">↓ </span>Je passe
+          <span aria-hidden="true">↓ </span>{VOTE_LABEL_SKIP}
         </button>
         <button
           type="button"
           onClick={() => handleVote(deck[0].id, "pour")}
-          aria-label="Pour — voter pour ce scrutin"
+          aria-label={VOTE_ARIA_POUR}
           style={btnFallback("var(--pour)")}
         >
-          Pour<span aria-hidden="true"> →</span>
+          {VOTE_LABEL_POUR}<span aria-hidden="true"> →</span>
         </button>
       </div>
 

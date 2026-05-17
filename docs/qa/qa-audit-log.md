@@ -3260,3 +3260,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `MENU_RESULT_LABEL\|MENU_METHODE_LABEL\|MENU_LEGAL_LABEL\|MENU_CONTACT_LABEL` src/ tests/ → 15+ résultats
 - [ ] grep `"Recommencer à zéro"\|"Voir mon résultat partiel"` src/ tests/ → 0 inline literals (sauf comments + déclarations)
 - [ ] grep `~616 tests` CLAUDE.md → 0 résultat (aligné sur ~617)
+
+---
+
+## Session 139 — 2026-05-17
+
+### Vérification session 138
+
+- [VERIFIED] 22 occurrences de RESTART_LABEL|VIEW_PARTIAL_RESULT_LABEL dans src/ + tests/
+- [VERIFIED] 20 occurrences des 4 MENU_*_LABEL dans src/ + tests/
+- [VERIFIED] 0 inline literal "Recommencer à zéro"/"Voir mon résultat partiel" hors déclarations
+- [VERIFIED] CLAUDE.md "~617 tests"
+- 617/617 tests verts, typecheck clean
+
+### Bugs fixés (VOTE_LABEL/ARIA × 3 + voteButtonAriaLabel + MENU_RESULT_LABEL Play.tsx reuse)
+
+- [FIXED] Play.tsx 3 vote buttons avaient leurs visible texts (`"Contre"`, `"Je passe"`, `"Pour"`) inline · Drift surface : une rewording aurait demandé 3 edits parallèles. Fix : export `VOTE_LABEL_CONTRE`/`VOTE_LABEL_SKIP`/`VOTE_LABEL_POUR` depuis src/types. Play.tsx utilise les 3 consts pour le texte visible des boutons. 2 tests pin-the-value + distinct-set dans `tests/aria-labels.test.ts`. · `src/types/index.ts`, `src/routes/Play.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Play.tsx 3 vote buttons avaient leurs `aria-label` inline (`"Contre — voter contre ce scrutin"`, etc.) avec le pattern `${visible} — ${suffix}` dupliqué · Même drift surface, plus le pattern de composition pas factorisé. Fix : export `voteButtonAriaLabel(visible, suffix) → "${visible} — ${suffix}"` helper + 3 consts `VOTE_ARIA_CONTRE`/`SKIP`/`POUR` derived from `voteButtonAriaLabel(VOTE_LABEL_*, "voter contre ce scrutin"/etc.)`. Play.tsx utilise les 3 ARIA consts. 2 tests round-trip : ARIA labels startWith visible labels + helper composition. · `src/types/index.ts`, `src/routes/Play.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Play.tsx line 318 `"Mon résultat"` inline alors que MENU_RESULT_LABEL existait déjà (session 138) · Drift surface : le label avait été extrait session 138 pour TopBar mais Play avait son propre clone literal. Fix : Play.tsx importe MENU_RESULT_LABEL + utilise comme link text. Aucun nouveau test (TopBar tests pinnent déjà la const). · `src/routes/Play.tsx`
+
+### Vérifications à faire en session 140
+
+- [ ] grep `VOTE_LABEL_CONTRE\|VOTE_LABEL_SKIP\|VOTE_LABEL_POUR\|VOTE_ARIA_CONTRE\|VOTE_ARIA_SKIP\|VOTE_ARIA_POUR\|voteButtonAriaLabel` src/ tests/ → 15+ résultats
+- [ ] grep `"voter contre ce scrutin"\|"passer ce scrutin sans voter"\|"voter pour ce scrutin"` src/ tests/ → 1-3 résultats seulement (déclarations dans src/types)
+- [ ] grep `~617 tests` CLAUDE.md → 0 résultat (aligné sur ~621)

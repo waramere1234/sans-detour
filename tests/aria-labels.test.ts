@@ -6,6 +6,9 @@ import {
   externalLinkLabel,
   AN_OPEN_DATA_URL, AN_OPEN_DATA_HOSTNAME,
   GITHUB_REPO_URL, GITHUB_REPO_DISPLAY,
+  VOTE_LABEL_CONTRE, VOTE_LABEL_SKIP, VOTE_LABEL_POUR,
+  VOTE_ARIA_CONTRE, VOTE_ARIA_SKIP, VOTE_ARIA_POUR,
+  voteButtonAriaLabel,
 } from "../src/types";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
@@ -72,6 +75,36 @@ describe("AN_OPEN_DATA_HOSTNAME — derived from AN_OPEN_DATA_URL", () => {
   it("is a bare hostname (no protocol, no slash)", () => {
     expect(AN_OPEN_DATA_HOSTNAME.startsWith("http")).toBe(false);
     expect(AN_OPEN_DATA_HOSTNAME.includes("/")).toBe(false);
+  });
+});
+
+describe("Play.tsx vote-button labels", () => {
+  // Pin the 3 visible button labels + the 3 aria-labels that compose
+  // from voteButtonAriaLabel. A copy tweak in either pair (visible
+  // text or aria-suffix) should propagate via the same const edit.
+
+  it("VOTE_LABEL_CONTRE / VOTE_LABEL_SKIP / VOTE_LABEL_POUR are the canonical 3 strings", () => {
+    expect(VOTE_LABEL_CONTRE).toBe("Contre");
+    expect(VOTE_LABEL_SKIP).toBe("Je passe");
+    expect(VOTE_LABEL_POUR).toBe("Pour");
+  });
+
+  it("VOTE_ARIA_* labels start with the matching visible text", () => {
+    // The aria-label pattern is `${visible} — ${contextSuffix}`, so each
+    // ARIA const must start with its visible label. A typo (e.g. swapping
+    // the suffix vs label) would surface here.
+    expect(VOTE_ARIA_CONTRE.startsWith(VOTE_LABEL_CONTRE)).toBe(true);
+    expect(VOTE_ARIA_SKIP.startsWith(VOTE_LABEL_SKIP)).toBe(true);
+    expect(VOTE_ARIA_POUR.startsWith(VOTE_LABEL_POUR)).toBe(true);
+  });
+
+  it("voteButtonAriaLabel composes 'label — suffix'", () => {
+    expect(voteButtonAriaLabel("X", "y")).toBe("X — y");
+  });
+
+  it("the 3 visible labels are distinct (no accidental dup)", () => {
+    const set = new Set([VOTE_LABEL_CONTRE, VOTE_LABEL_SKIP, VOTE_LABEL_POUR]);
+    expect(set.size).toBe(3);
   });
 });
 

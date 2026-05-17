@@ -124,11 +124,40 @@ export const VIEW_PARTIAL_RESULT_LABEL = "Voir mon résultat partiel";
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use
  *  a different "result"/"methode"/"legal"/"contact" slug. The visible
- *  labels live here; the analytics slugs live next to their call sites. */
+ *  labels live here; the analytics slugs live next to their call sites.
+ *
+ *  MENU_RESULT_LABEL is also reused inline on the Play.tsx "Mon résultat →"
+ *  shortcut button (visible once countedTotal ≥ MIN_FOR_RANKING) so the
+ *  same wording on the TopBar menu + the in-deck shortcut + the Cover
+ *  partial-result link stays in sync. */
 export const MENU_RESULT_LABEL = "Mon résultat";
 export const MENU_METHODE_LABEL = "Méthode & sources";
 export const MENU_LEGAL_LABEL = "Mentions légales";
 export const MENU_CONTACT_LABEL = "Contact";
+
+/** Play.tsx vote-button labels — the visible text rendered on the
+ *  fallback button row that appears below the deck for keyboard /
+ *  touch-without-gesture users. Each button also carries an aria-label
+ *  composed from VOTE_BUTTON_ARIA_LABEL(...). Centralised so a future
+ *  copy tweak (e.g. "Voter pour" → "D'accord") propagates to both the
+ *  visible text and the SR announcement via one edit. */
+export const VOTE_LABEL_CONTRE = "Contre";
+export const VOTE_LABEL_SKIP = "Je passe";
+export const VOTE_LABEL_POUR = "Pour";
+
+/** Compose the aria-label for a vote button. Pattern:
+ *  - "Contre" → "Contre — voter contre ce scrutin"
+ *  - "Je passe" → "Je passe — passer ce scrutin sans voter"
+ *  - "Pour" → "Pour — voter pour ce scrutin"
+ *  The visible label + a context-suffix. The suffix differs per choice
+ *  (Skip has "passer …sans voter", Pour/Contre have "voter pour/contre…"),
+ *  so the helper takes both as args rather than hardcoding the pattern. */
+export function voteButtonAriaLabel(visible: string, contextSuffix: string): string {
+  return `${visible} — ${contextSuffix}`;
+}
+export const VOTE_ARIA_CONTRE = voteButtonAriaLabel(VOTE_LABEL_CONTRE, "voter contre ce scrutin");
+export const VOTE_ARIA_SKIP = voteButtonAriaLabel(VOTE_LABEL_SKIP, "passer ce scrutin sans voter");
+export const VOTE_ARIA_POUR = voteButtonAriaLabel(VOTE_LABEL_POUR, "voter pour ce scrutin");
 
 /** Result.tsx CTA labels. Each is pinned by regex in tests/Result.test.tsx;
  *  centralising the strings keeps the source + the tests + the confirm
