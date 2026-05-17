@@ -13,6 +13,8 @@ import {
   METHODE_PAGE_H1,
   METHODE_S06_NO_AFFILIATION_PHRASE,
   METHODE_S06_HOSTING_FUNDING_BODY,
+  METHODE_S01_UPDATE_CADENCE,
+  METHODE_S05_NO_TRACKING_PHRASE,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -95,6 +97,18 @@ describe("Methode — section structure", () => {
     renderMethode();
     const section = document.getElementById("methode-06")!;
     expect(section.textContent).toContain(METHODE_S06_HOSTING_FUNDING_BODY);
+  });
+
+  it("§01 surfaces METHODE_S01_UPDATE_CADENCE (weekly ingestion cadence disclosure)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-01")!;
+    expect(section.textContent).toContain(METHODE_S01_UPDATE_CADENCE);
+  });
+
+  it("§05 surfaces METHODE_S05_NO_TRACKING_PHRASE (privacy-tech list)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-05")!;
+    expect(section.textContent).toContain(METHODE_S05_NO_TRACKING_PHRASE);
   });
 
   it("the number of rendered Section bodies matches METHODE_SECTIONS.length (no orphan body)", () => {

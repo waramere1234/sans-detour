@@ -646,6 +646,39 @@ export const METHODE_S06_NO_AFFILIATION_PHRASE =
 export const METHODE_S06_HOSTING_FUNDING_BODY =
   "Hébergement sur fonds personnels. Pas d'annonceur, pas de sponsor, pas de don accepté pendant les 6 mois précédant un scrutin national.";
 
+/** Methode §05 Confidentialité 2 prose paragraphs — paired with
+ *  LEGAL_PERSONAL_DATA_BODY (session 163), these document the same
+ *  no-tracking / browser-local data contract from a plain-prose
+ *  perspective. The technical list ("Pas de compte … pas de POST")
+ *  + the localStorage explanation ("Tes votes vivent dans le
+ *  localStorage…") together form the privacy contract. */
+export const METHODE_S05_NO_TRACKING_PHRASE =
+  "Pas de compte utilisateur, pas de cookie de tracking, pas d'analytics nominatifs, pas de POST.";
+export const METHODE_S05_LOCALSTORAGE_EXPLANATION =
+  "Tes votes vivent dans le ";  // followed by `<code>localStorage</code>` + " de ton navigateur. …"
+
+/** Methode §05 second-paragraph tail (after the inline <code>localStorage</code>
+ *  span). Pinned separately because the JSX splits the text on the
+ *  code element. Both the prefix + the tail are load-bearing privacy
+ *  disclosures. */
+export const METHODE_S05_LOCALSTORAGE_TAIL =
+  " de ton navigateur. Si tu vides ton cache, ils disparaissent. C'est volontaire : on n'a aucun moyen technique de savoir comment tu as voté ni qui tu es.";
+
+/** Methode §01 update-cadence claim. Single source, load-bearing
+ *  documentation of the weekly ingestion pipeline cadence. A future
+ *  bump (daily, monthly) should propagate from this const. */
+export const METHODE_S01_UPDATE_CADENCE =
+  "Mise à jour automatisée toutes les semaines.";
+
+/** Methode §03 closing paragraph on the "divided group" exclusion
+ *  rule — explains that divided groups are skipped from BOTH the
+ *  group's count AND the user's comparison. Load-bearing methodology
+ *  disclosure paired with AUDIT_TRAIL_LABEL_DIVIDED (session 150). */
+export const METHODE_S03_DIVIDED_RULE_BODY =
+  "Un scrutin sur lequel un groupe est ";  // followed by `<strong>divisé</strong>` + the tail
+export const METHODE_S03_DIVIDED_RULE_TAIL =
+  " ne compte pas pour ce groupe — pas pour toi non plus, dans cette comparaison.";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

@@ -3874,3 +3874,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `LEGAL_INDEPENDANCE_BODY\|METHODE_S06_NO_AFFILIATION_PHRASE\|METHODE_S06_HOSTING_FUNDING_BODY` src/ tests/ → 15+ résultats
 - [ ] grep `"Sans Détour est un projet indépendant\|"Aucune affiliation parti\|"Hébergement sur fonds personnels"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~833 tests` CLAUDE.md → 0 résultat (aligné sur ~843)
+
+---
+
+## Session 165 — 2026-05-18
+
+### Vérification session 164
+
+- [VERIFIED] 33 occurrences des 3 nouveaux exports (LEGAL_INDEPENDANCE_BODY + METHODE_S06_NO_AFFILIATION_PHRASE + METHODE_S06_HOSTING_FUNDING_BODY)
+- [VERIFIED] 6 occurrences inline literals = 2 déclarations + 2 pin-the-value tests + 2 comments (pas de drift)
+- [VERIFIED] CLAUDE.md "~843 tests"
+- 843/843 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_S05_NO_TRACKING_PHRASE + METHODE_S05_LOCALSTORAGE_EXPLANATION/TAIL + METHODE_S01_UPDATE_CADENCE + METHODE_S03_DIVIDED_RULE_BODY/TAIL)
+
+- [FIXED] Methode §05 Confidentialité 2 paragraphs inline + untested : `"Pas de compte utilisateur, pas de cookie de tracking, pas d'analytics nominatifs, pas de POST."` + `"Tes votes vivent dans le localStorage de ton navigateur. Si tu vides ton cache, ils disparaissent. C'est volontaire : on n'a aucun moyen technique de savoir comment tu as voté ni qui tu es."` · Drift surface : paired avec LEGAL_PERSONAL_DATA_BODY (session 163) — même no-tracking/localStorage contract documenté en 2 surfaces. Sans pin, un weakening silencieux de la liste "pas de X" pourrait affaiblir le contract. Fix : export `METHODE_S05_NO_TRACKING_PHRASE` + `METHODE_S05_LOCALSTORAGE_EXPLANATION` + `METHODE_S05_LOCALSTORAGE_TAIL` (les 2 derniers splits autour du `<code>localStorage</code>` JSX). Methode.tsx utilise les 3 consts. Tests : 1 round-trip Methode §05 + 3 round-trip aria-labels incluant un anti-merge guard sur les 4 "pas de" clauses (regex match count). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §01 `"Mise à jour automatisée toutes les semaines."` inline + untested · Drift surface : load-bearing claim documenting the weekly ingestion pipeline cadence. Un bump silencieux (daily, monthly) sans test pin propagerait sans alerte. Fix : export `METHODE_S01_UPDATE_CADENCE`. Test Methode §01 round-trip + 2 aria-labels (pin-the-value + contains-"semaines" anti-bump guard). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §03 closing paragraph `"Un scrutin sur lequel un groupe est <strong>divisé</strong> ne compte pas pour ce groupe — pas pour toi non plus, dans cette comparaison."` inline + untested · Drift surface : load-bearing methodology disclosure (divided-group exclusion rule) paired avec AUDIT_TRAIL_LABEL_DIVIDED (session 150). Fix : export `METHODE_S03_DIVIDED_RULE_BODY` + `METHODE_S03_DIVIDED_RULE_TAIL` (split around `<strong>divisé</strong>`). 2 nouveaux aria-labels tests : full-composed-wording round-trip + contains-"ne compte pas pour ce groupe" load-bearing-exclusion-rule guard. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 166
+
+- [ ] grep `METHODE_S05_NO_TRACKING_PHRASE\|METHODE_S05_LOCALSTORAGE_EXPLANATION\|METHODE_S01_UPDATE_CADENCE\|METHODE_S03_DIVIDED_RULE_BODY` src/ tests/ → 20+ résultats
+- [ ] grep `"Pas de compte utilisateur"\|"Mise à jour automatisée"\|"ne compte pas pour ce groupe"` src/ tests/ → 4-6 résultats (déclarations + pin-the-value)
+- [ ] grep `~843 tests` CLAUDE.md → 0 résultat (aligné sur ~852)

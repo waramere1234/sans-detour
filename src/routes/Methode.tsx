@@ -22,6 +22,10 @@ import {
   METHODE_S07_HEADING_LIMITES_SIGNALEMENT,
   METHODE_S06_NO_AFFILIATION_PHRASE,
   METHODE_S06_HOSTING_FUNDING_BODY,
+  METHODE_S05_NO_TRACKING_PHRASE,
+  METHODE_S05_LOCALSTORAGE_EXPLANATION, METHODE_S05_LOCALSTORAGE_TAIL,
+  METHODE_S01_UPDATE_CADENCE,
+  METHODE_S03_DIVIDED_RULE_BODY, METHODE_S03_DIVIDED_RULE_TAIL,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -145,7 +149,7 @@ export default function Methode() {
 
       <Section n="01" title={METHODE_SECTION_BODY_TITLES["01"]}>
         <p>Les votes proviennent de <strong>l'open data officiel de l'Assemblée Nationale</strong>, exposé sur <code>{AN_OPEN_DATA_HOSTNAME}</code>. Ce sont les mêmes fichiers que ceux utilisés par les médias de référence et le service interne de l'AN. Aucune retranscription manuelle, aucune source secondaire.</p>
-        <p>Mise à jour automatisée toutes les semaines.</p>
+        <p>{METHODE_S01_UPDATE_CADENCE}</p>
       </Section>
 
       <Section n="02" title={METHODE_SECTION_BODY_TITLES["02"]}>
@@ -160,7 +164,7 @@ export default function Methode() {
           sinon → groupe divisé<br/>
           (absents et non-votants exclus du calcul)
         </Formula>
-        <p>Un scrutin sur lequel un groupe est <strong>divisé</strong> ne compte pas pour ce groupe — pas pour toi non plus, dans cette comparaison.</p>
+        <p>{METHODE_S03_DIVIDED_RULE_BODY}<strong>divisé</strong>{METHODE_S03_DIVIDED_RULE_TAIL}</p>
       </Section>
 
       <Section n="04" title={METHODE_SECTION_BODY_TITLES["04"]}>
@@ -177,8 +181,8 @@ export default function Methode() {
       </Section>
 
       <Section n="05" title={METHODE_SECTION_BODY_TITLES["05"]}>
-        <p>Pas de compte utilisateur, pas de cookie de tracking, pas d'analytics nominatifs, pas de POST.</p>
-        <p>Tes votes vivent dans le <code>localStorage</code> de ton navigateur. Si tu vides ton cache, ils disparaissent. C'est volontaire : on n'a aucun moyen technique de savoir comment tu as voté ni qui tu es.</p>
+        <p>{METHODE_S05_NO_TRACKING_PHRASE}</p>
+        <p>{METHODE_S05_LOCALSTORAGE_EXPLANATION}<code>localStorage</code>{METHODE_S05_LOCALSTORAGE_TAIL}</p>
       </Section>
 
       <Section n="06" title={METHODE_SECTION_BODY_TITLES["06"]}>

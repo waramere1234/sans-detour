@@ -62,6 +62,10 @@ import {
   LEGAL_INDEPENDANCE_BODY,
   METHODE_S06_NO_AFFILIATION_PHRASE,
   METHODE_S06_HOSTING_FUNDING_BODY,
+  METHODE_S05_NO_TRACKING_PHRASE,
+  METHODE_S05_LOCALSTORAGE_EXPLANATION, METHODE_S05_LOCALSTORAGE_TAIL,
+  METHODE_S01_UPDATE_CADENCE,
+  METHODE_S03_DIVIDED_RULE_BODY, METHODE_S03_DIVIDED_RULE_TAIL,
   COVER_SECONDARY_NAV_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
@@ -1436,6 +1440,61 @@ describe("METHODE_S06_HOSTING_FUNDING_BODY — Methode §06 funding disclosure",
 
   it("contains 'scrutin national' (specifies what triggers the quiet period)", () => {
     expect(METHODE_S06_HOSTING_FUNDING_BODY).toContain("scrutin national");
+  });
+});
+
+describe("METHODE_S05_* + LEGAL_PERSONAL_DATA_BODY — paired privacy disclosures", () => {
+  // Methode §05 + Legal Données personnelles document the same
+  // no-tracking / localStorage privacy contract from different
+  // perspectives (plain prose vs RGPD formal).
+  it("METHODE_S05_NO_TRACKING_PHRASE matches the canonical no-tracking list", () => {
+    expect(METHODE_S05_NO_TRACKING_PHRASE).toBe(
+      "Pas de compte utilisateur, pas de cookie de tracking, pas d'analytics nominatifs, pas de POST.",
+    );
+  });
+
+  it("METHODE_S05_NO_TRACKING_PHRASE lists 4 'pas de' clauses (anti-merge guard)", () => {
+    // 4 negative claims, each prefixed "pas de" — a future merge into
+    // a shorter list would weaken the privacy contract.
+    const count = (METHODE_S05_NO_TRACKING_PHRASE.match(/pas (de|d')/gi) || []).length;
+    expect(count).toBe(4);
+  });
+
+  it("METHODE_S05_LOCALSTORAGE_EXPLANATION + TAIL surround the <code>localStorage</code> token", () => {
+    expect(METHODE_S05_LOCALSTORAGE_EXPLANATION).toContain("Tes votes vivent dans le");
+    expect(METHODE_S05_LOCALSTORAGE_TAIL).toContain("de ton navigateur");
+    expect(METHODE_S05_LOCALSTORAGE_TAIL).toContain("aucun moyen technique");
+  });
+});
+
+describe("METHODE_S01_UPDATE_CADENCE — weekly ingestion cadence", () => {
+  it("matches 'Mise à jour automatisée toutes les semaines.'", () => {
+    expect(METHODE_S01_UPDATE_CADENCE).toBe("Mise à jour automatisée toutes les semaines.");
+  });
+
+  it("contains 'semaines' (anti-bump guard for cadence)", () => {
+    // The ingestion cadence is weekly today. A future bump (daily,
+    // bi-weekly, monthly) should propagate from this const and the
+    // test surfaces a deliberate vs accidental change.
+    expect(METHODE_S01_UPDATE_CADENCE).toContain("semaines");
+  });
+});
+
+describe("METHODE_S03_DIVIDED_RULE — divided-group exclusion", () => {
+  it("BODY + TAIL together compose the canonical wording", () => {
+    // The JSX splits the prose around `<strong>divisé</strong>`.
+    // Re-assembling lets us pin the full claim.
+    const composed = METHODE_S03_DIVIDED_RULE_BODY + "divisé" + METHODE_S03_DIVIDED_RULE_TAIL;
+    expect(composed).toBe(
+      "Un scrutin sur lequel un groupe est divisé ne compte pas pour ce groupe — pas pour toi non plus, dans cette comparaison.",
+    );
+  });
+
+  it("TAIL contains 'ne compte pas pour ce groupe' (load-bearing exclusion rule)", () => {
+    // The whole point: divided groups are removed from the user's
+    // alignment math. Pin so a rewording that softens or drops the
+    // exclusion rule surfaces in tests.
+    expect(METHODE_S03_DIVIDED_RULE_TAIL).toContain("ne compte pas pour ce groupe");
   });
 });
 
