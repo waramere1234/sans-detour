@@ -9,7 +9,7 @@ function mk(id: string, dossier: string, theme?: Theme, chapeau = "X"): Scrutin 
     chapeau, titre_brut: "...", titre_pedago: "...",
     theme,
     position_par_groupe: {} as any, votes_bruts: {} as any,
-    url_an_officielle: "", est_solennel: true, pedago_relu: true,
+    url_an_officielle: "", est_solennel: true, pedago_relu: false,
   };
 }
 

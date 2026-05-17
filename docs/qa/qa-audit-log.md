@@ -1724,3 +1724,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `SPS.*yields 46 entries` dans `supabase/functions/` → 0 résultat
 - [ ] grep `"pedago_relu": true` dans `supabase/seed/` → 0 résultat
 - [ ] `npm run test:run` → 127 tests verts (stable)
+
+---
+
+## Session 76 — 2026-05-17
+
+### Vérification session 75
+
+- [VERIFIED] `src/types/index.ts:40` exporte `normalizeTheme`; scripts l'importent (zéro `function normalizeTheme` local)
+- [VERIFIED] `supabase/functions/ingest-scrutins/README.md` ne dit plus "yields 46 entries"
+- [VERIFIED] `supabase/seed/dev-fixtures.json` : 0 occurrences `pedago_relu: true`
+- 127/127 tests verts, typecheck clean
+
+### Bugs fixés (Methode doc + tests pedago_relu drift + CLAUDE.md count)
+
+- [FIXED] `Methode §02` énumération incomplète · "On garde les scrutins solennels (SPS), les votes finaux sur l'ensemble d'une loi (SOR), les motions de censure et les propositions de résolution" — manquait `motions référendaires` qui est dans `isEligibleScrutin` (scripts/ingest-an.ts:181, et CLAUDE.md "Filtre d'ingestion" le mentionne). User lisait Methode et pensait que les motions référendaires étaient exclues. Ajouté entre motions de censure et propositions de résolution. · `src/routes/Methode.tsx`
+- [FIXED] Tests mocks `pedago_relu: true` drift · Session 75 a fixé les dev-fixtures à `pedago_relu: false` (consistent avec project state). Mais les test mocks (Card, deck, deck-invariants, matching, matching-edge-cases) restaient à `true`. Drift de l'invariant "toujours false pour l'instant". `sed` bulk replace true→false sur les 5 test files. · `tests/*.test.{ts,tsx}`
+- [FIXED] CLAUDE.md test count drift · "~126 tests" — session 74 a ajouté 1 (Cover hasCompleted) → 127. Aligné. · `CLAUDE.md`
+
+### Vérifications à faire en session 77
+
+- [ ] grep `motions référendaires` dans `src/routes/Methode.tsx` → 1 résultat
+- [ ] grep `pedago_relu: true` dans `tests/` → 0 résultat
+- [ ] grep `~126 tests` dans `CLAUDE.md` → 0 résultat

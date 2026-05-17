@@ -113,7 +113,7 @@ export default function Methode() {
       </Section>
 
       <Section n="02" title="Quels scrutins on garde">
-        <p>On garde les <strong>scrutins solennels</strong> (SPS), les <strong>votes finaux sur l'ensemble d'une loi</strong> (SOR), les <strong>motions de censure</strong> et les <strong>propositions de résolution</strong>. On exclut les amendements, les votes en commission et les motions procédurales (rejet préalable, renvoi).</p>
+        <p>On garde les <strong>scrutins solennels</strong> (SPS), les <strong>votes finaux sur l'ensemble d'une loi</strong> (SOR), les <strong>motions de censure</strong>, les <strong>motions référendaires</strong> et les <strong>propositions de résolution</strong>. On exclut les amendements, les votes en commission et les motions procédurales (rejet préalable, renvoi).</p>
         <p>Pour chaque session, on en tire <strong>{TARGET}</strong> en équilibrant les thèmes (santé, immigration, fiscalité…) plutôt qu'au hasard pur, avec deux garde-fous : <strong>jamais plus de 2 scrutins du même dossier législatif</strong> et <strong>jamais plus de 2 scrutins du même sujet</strong> (pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée).</p>
       </Section>
 

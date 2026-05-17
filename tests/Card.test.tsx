@@ -15,7 +15,7 @@ function mkScrutin(): Scrutin {
     position_par_groupe: { LFI: "pour", RN: "contre" } as any,
     votes_bruts: {} as any,
     url_an_officielle: "https://an.example/1234",
-    est_solennel: true, pedago_relu: true,
+    est_solennel: true, pedago_relu: false,
   };
 }
 

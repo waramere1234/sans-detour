@@ -16,7 +16,7 @@ function mkScrutin(id: string, theme: Scrutin["theme"], dossierId: string, chape
     position_par_groupe: { LFI: "pour" } as any,
     votes_bruts: {} as any,
     url_an_officielle: "https://example.com",
-    est_solennel: true, pedago_relu: true,
+    est_solennel: true, pedago_relu: false,
   };
 }
 

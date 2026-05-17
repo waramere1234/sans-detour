@@ -16,7 +16,7 @@ function mkScrutin(id: string, positions: Partial<Record<string, "pour" | "contr
     position_par_groupe: positions as any,
     votes_bruts: {} as any,
     url_an_officielle: "https://example.com",
-    est_solennel: true, pedago_relu: true,
+    est_solennel: true, pedago_relu: false,
   };
 }
 
