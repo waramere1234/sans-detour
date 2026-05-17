@@ -1,10 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { TopBar } from "../src/components/TopBar";
 import { resetSession, recordVote } from "../src/lib/session";
 import { ROUTES } from "../src/lib/routes";
 import { MIN_FOR_RANKING } from "../src/types";
+import * as analytics from "../src/lib/analytics";
 
 // TopBar owns:
 //   - route-aware rendering (hidden on Cover, visible on the other 4 routes)
@@ -151,6 +152,50 @@ describe("TopBar — aria-current on the link matching the current route", () =>
     fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
     const legalLink = screen.getByRole("menuitem", { name: /Mentions légales/ });
     expect(legalLink).toHaveAttribute("aria-current", "page");
+  });
+});
+
+describe("TopBar — topbar_nav analytics (target = result/methode/legal/contact)", () => {
+  let trackSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    localStorage.clear();
+    resetSession();
+    trackSpy = vi.spyOn(analytics, "track").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    trackSpy.mockRestore();
+  });
+
+  it("fires topbar_nav with target=methode on the Méthode menuitem click", () => {
+    renderTopBar(ROUTES.play);
+    fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
+    fireEvent.click(screen.getByRole("menuitem", { name: /Méthode & sources/ }));
+    expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: "methode" });
+  });
+
+  it("fires topbar_nav with target=legal on the Mentions menuitem click", () => {
+    renderTopBar(ROUTES.play);
+    fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
+    fireEvent.click(screen.getByRole("menuitem", { name: /Mentions légales/ }));
+    expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: "legal" });
+  });
+
+  it("fires topbar_nav with target=contact on the Contact menuitem click", () => {
+    renderTopBar(ROUTES.play);
+    fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
+    fireEvent.click(screen.getByRole("menuitem", { name: /Contact/ }));
+    expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: "contact" });
+  });
+
+  it("fires topbar_nav with target=result on the 'Mon résultat' menuitem click (once MIN_FOR_RANKING reached)", () => {
+    // 'Mon résultat' is gated on votes >= MIN_FOR_RANKING.
+    for (let i = 1; i <= MIN_FOR_RANKING; i++) recordVote(`s${i}`, "pour");
+    renderTopBar(ROUTES.play);
+    fireEvent.click(screen.getByRole("button", { name: /Ouvrir le menu/ }));
+    fireEvent.click(screen.getByRole("menuitem", { name: /Mon résultat/ }));
+    expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: "result" });
   });
 });
 // Silence the React act() warnings the AnimatePresence animation otherwise

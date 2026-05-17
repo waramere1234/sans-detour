@@ -10,6 +10,25 @@ import { CONTACT_EMAIL, mailto } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
 import { TARGET, MIN_FOR_RANKING } from "../types";
 
+/** Section ids + short TOC labels. Single source of truth for both the
+ *  inline Sommaire above and the test suite (which iterates over this
+ *  array to assert section ids + anchor hrefs exist).
+ *
+ *  Adding section 08 here without also adding a matching `<Section n="08">`
+ *  body below silently 404s the TOC link in production — the tests pin
+ *  the round-trip (every entry here ↔ every `<Section>` body rendered)
+ *  so a forgotten body surfaces before merge. */
+export const METHODE_SECTIONS = [
+  ["01", "Données"],
+  ["02", "Scrutins"],
+  ["03", "Position d'un groupe"],
+  ["04", "Calcul"],
+  ["05", "Confidentialité"],
+  ["06", "Indépendance"],
+  ["07", "IA Claude"],
+] as const satisfies ReadonlyArray<readonly [string, string]>;
+export type MethodeSectionId = typeof METHODE_SECTIONS[number][0];
+
 export default function Methode() {
   // Freshness fetch + once-per-mount guard live in the useFreshnessOnce
   // hook (session 99), shared with Cover.tsx.
@@ -87,15 +106,7 @@ export default function Methode() {
           letterSpacing: "0.04em",
         }}
       >
-        {[
-          ["01", "Données"],
-          ["02", "Scrutins"],
-          ["03", "Position d'un groupe"],
-          ["04", "Calcul"],
-          ["05", "Confidentialité"],
-          ["06", "Indépendance"],
-          ["07", "IA Claude"],
-        ].map(([n, label]) => (
+        {METHODE_SECTIONS.map(([n, label]) => (
           <a
             key={n}
             href={`#methode-${n}`}

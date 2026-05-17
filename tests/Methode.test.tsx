@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
-import Methode from "../src/routes/Methode";
+import Methode, { METHODE_SECTIONS } from "../src/routes/Methode";
 import { ROUTES } from "../src/lib/routes";
+import * as analytics from "../src/lib/analytics";
 
 // Methode.tsx owns:
 //  - the 7 numbered sections + their `methode-NN` anchor ids
@@ -27,9 +28,12 @@ describe("Methode — section structure", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/Comment on calcule/);
   });
 
-  it("renders the 7 numbered sections with id=methode-NN", () => {
+  it("renders one numbered section per METHODE_SECTIONS entry with id=methode-NN", () => {
+    // Iterating METHODE_SECTIONS (instead of hardcoding 01..07) means
+    // adding a new section to the const list auto-extends this assertion
+    // and forces a matching <Section> body to be rendered.
     renderMethode();
-    for (const n of ["01", "02", "03", "04", "05", "06", "07"]) {
+    for (const [n] of METHODE_SECTIONS) {
       const section = document.getElementById(`methode-${n}`);
       expect(section).not.toBeNull();
       // Each section is a region landmark with a labelled-by heading.
@@ -38,13 +42,19 @@ describe("Methode — section structure", () => {
     }
   });
 
-  it("Sommaire nav has 7 anchor links to the section ids", () => {
+  it("Sommaire nav has one anchor link per METHODE_SECTIONS entry", () => {
     renderMethode();
-    for (const n of ["01", "02", "03", "04", "05", "06", "07"]) {
+    for (const [n] of METHODE_SECTIONS) {
       const links = screen.getAllByRole("link");
       const target = links.find((a) => a.getAttribute("href") === `#methode-${n}`);
       expect(target).toBeTruthy();
     }
+  });
+
+  it("METHODE_SECTIONS contains exactly the 7 documented sections (no surprise add/drop)", () => {
+    // Pin the count so an off-by-one addition surfaces here AND in the
+    // round-trip section-body test above.
+    expect(METHODE_SECTIONS).toHaveLength(7);
   });
 });
 
@@ -89,6 +99,36 @@ describe("Methode — SPA hash deep-link", () => {
       const section = document.getElementById("methode-04");
       expect(document.activeElement).toBe(section);
     });
+  });
+});
+
+describe("Methode — TOC analytics (methode_toc_click × N sections)", () => {
+  let trackSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    trackSpy = vi.spyOn(analytics, "track").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    trackSpy.mockRestore();
+  });
+
+  it("fires methode_toc_click with the section number on each TOC link click", () => {
+    renderMethode();
+    // Scope to the Sommaire nav — there's also a cross-section anchor
+    // (`<a href="#methode-07">section 07</a>`) in the intro paragraph that
+    // intentionally has NO onClick; the previous selector picked that up
+    // first because it sits before the Sommaire in DOM order.
+    const sommaire = screen.getByRole("navigation", { name: /Sommaire/ });
+    for (const [n] of METHODE_SECTIONS) {
+      trackSpy.mockClear();
+      const link = Array.from(sommaire.querySelectorAll("a")).find(
+        (a) => a.getAttribute("href") === `#methode-${n}`,
+      );
+      expect(link).toBeTruthy();
+      fireEvent.click(link!);
+      expect(trackSpy).toHaveBeenCalledWith("methode_toc_click", { section: n });
+    }
   });
 });
 

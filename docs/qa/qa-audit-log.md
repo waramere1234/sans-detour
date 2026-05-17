@@ -2624,3 +2624,32 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `isAffinementMode\|AFFINEMENT_PARAM\|AFFINEMENT_VALUE` src/ tests/ → résultats dans routes.ts + Play.tsx + routes.test.ts
 - [ ] grep -c "describe" tests/Cover.test.tsx → 4 describes (Cover original + 3 nouveaux ajoutés)
 - [ ] grep `~444 tests` CLAUDE.md → 0 résultat (aligné sur ~459)
+
+---
+
+## Session 113 — 2026-05-17
+
+### Vérification session 112
+
+- [VERIFIED] 0 résultat pour `params.get("affinement")` dans src/ — toutes les reads migrées vers `isAffinementMode(params)`
+- [VERIFIED] 25 occurrences de `isAffinementMode|AFFINEMENT_PARAM|AFFINEMENT_VALUE` diffusées
+- [VERIFIED] tests/Cover.test.tsx contient 4 describes (original + start analytics + restart flow + footer nav)
+- [VERIFIED] CLAUDE.md "~459 tests"
+- 459/459 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_SECTIONS extraction + 2 analytics test gaps)
+
+- [FIXED] Section ids `["01"..."07"]` + labels dupliqués 4× dans `src/routes/Methode.tsx` + tests · Le tableau `[["01", "Données"], ["02", "Scrutins"], …]` était inliné dans la Sommaire JSX (lignes 90-97 originales) ; les 7 `<Section n="01" title="…">` éléments le redupliquaient (lignes 114-160) ; `tests/Methode.test.tsx` hardcodait `["01"..."07"]` deux fois (lignes 32 et 43). Ajouter une section 08 à la Sommaire SANS la matching `<Section n="08">` body en bas silently 404s le lien TOC en prod (le tests ne checke pas la cardinality round-trip). Fix : export `METHODE_SECTIONS` (const tuple `[id, label]`) depuis Methode.tsx + helper type `MethodeSectionId`. Sommaire itère le const. Tests itèrent aussi → adding a new section auto-extend the existing assertions + le nouveau test "exactly 7 sections" pin le count pour signaler des add/drop accidentels. · `src/routes/Methode.tsx`, `tests/Methode.test.tsx`
+- [FIXED] Methode `methode_toc_click` analytics — 0 vérification · Le track fire un event par lien TOC cliqué avec `{ section: n }` props, lu par le dashboard Plausible pour mesurer quels sections les users consultent le plus. Régression silencieuse possible : un refactor qui drop le `onClick={() => track(...)}` casserait la metric sans casser le rendering. Test ajouté itère `METHODE_SECTIONS` et fire un click par TOC link (scopé à `<nav aria-label="Sommaire">` pour éviter le faux positif via le cross-section anchor `<a href="#methode-07">section 07</a>` dans l'intro qui n'a PAS d'onClick — bug initial du test fix séparément, voir bug ↓). · `tests/Methode.test.tsx`
+- [FIXED] TopBar `topbar_nav` analytics × 4 targets — 0 vérification · TopBar menu fire `topbar_nav` avec `{ target: "result"|"methode"|"legal"|"contact" }` sur chacun des 4 menuitems, drives the Plausible "menu engagement" funnel. 0 test du call site. 4 tests ajoutés : un par target (Méthode / Legal / Contact / Mon résultat). Le dernier est gated sur `votes >= MIN_FOR_RANKING` (lien "Mon résultat" hidden sinon), donc le test seed la session avec MIN_FOR_RANKING votes avant d'ouvrir le menu — pattern aligné avec les tests existants de session 106. · `tests/TopBar.test.tsx`
+
+### Bug bonus (test scoping)
+
+- [FIXED] (en passant) Mon premier draft du test methode_toc_click utilisait `screen.getAllByRole("link").find(a => a.getAttribute("href") === "#methode-01")` qui matchait 8 anchors (7 TOC + 1 cross-section dans l'intro) et le `.find()` retournait le PREMIER en DOM order — c'est-à-dire le cross-section anchor de l'intro (`<a href="#methode-07">section 07</a>`), qui n'a PAS d'onClick. Test failed avec "track called 0 times". Découvert via un debug test temporaire. Fix : scoper à `screen.getByRole("navigation", { name: /Sommaire/ })` puis `.querySelectorAll("a")` à l'intérieur — exclut l'intro cross-link tout en couvrant les 7 TOC links. · `tests/Methode.test.tsx`
+
+### Vérifications à faire en session 114
+
+- [ ] grep `METHODE_SECTIONS` src/ tests/ → résultats dans Methode.tsx (déclaration + usage) + Methode.test.tsx (import + iterations)
+- [ ] grep `'["01", "Données"]'` src/ tests/ → max 1 résultat (la déclaration `METHODE_SECTIONS`)
+- [ ] grep `topbar_nav\|methode_toc_click` tests/TopBar.test.tsx tests/Methode.test.tsx → résultats dans chacun des deux fichiers
+- [ ] grep `~459 tests` CLAUDE.md → 0 résultat (aligné sur ~465)
