@@ -2499,3 +2499,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep "interface ANVotant\|interface ANNominatif\|interface ANGroup\|interface ANScrutin\b\|function asArr\|function extractVotesFromScrutin" scripts/ingest-personnalites.ts → 0 résultat (toutes les définitions sont parties dans lib/)
 - [ ] grep `~374 tests` CLAUDE.md → 0 résultat (aligné sur ~389)
 - [ ] grep -c "it(" tests/an-personnalites.test.ts → 15
+
+---
+
+## Session 108 — 2026-05-17
+
+### Vérification session 107
+
+- [VERIFIED] `scripts/lib/an-personnalites.ts` + `tests/an-personnalites.test.ts` présents
+- [VERIFIED] 0 inline def (interface AN*, function asArr, function extractVotesFromScrutin) dans `scripts/ingest-personnalites.ts`
+- [VERIFIED] CLAUDE.md "~389 tests"
+- [VERIFIED] 15 `it()` dans `tests/an-personnalites.test.ts`
+- 389/389 tests verts, typecheck clean
+
+### Bugs fixés (3 drift risks: literals dupliqués + 1 test gap critique)
+
+- [FIXED] `tests/an-personnalites.test.ts` hardcodait 8 acteurRefs (`PA720614`, `PA609332`, …) dupliqués depuis `src/lib/personnalites.ts` PERSONNALITES · Même drift pattern que les sessions 90 / 101 / 104 / 105 ont fixé (FROM_LOGO_STATE, route literals, test route literals). Si l'AN republie un député avec un nouveau PA id (déjà arrivé : `acteur_ref` field comment dit "Verified May 2026" — vérification manuelle nécessaire à chaque republication), la table PERSONNALITES serait corrigée mais les tests passeraient toujours avec les literals stale, masquant un mismatch en prod. Fix : `const REF_LE_PEN = PERSONNALITES.le_pen.acteur_ref` (× 8) — un rename touche la table et les tests via une seule edit. · `tests/an-personnalites.test.ts`
+- [FIXED] Storage keys `"sd_session_v1"` et `"sd_seen_cover"` dupliqués 8× dans les tests · `src/lib/session.ts` déclarait `const KEY = "sd_session_v1"` et `const COVER_KEY = "sd_seen_cover"` en private au module, mais `tests/session.test.ts` les hardcodait 5× (loadSession malformed-JSON guards) et `tests/Cover.test.tsx` 3× (hasSeenCover branches). Une migration `sd_session_v1 → sd_session_v2` aurait silencieusement laissé les tests écrire sur la clé obsolète pendant que la prod lirait la nouvelle. Fix : export `SESSION_STORAGE_KEY` et `COVER_STORAGE_KEY` depuis session.ts (les private const KEY/COVER_KEY restent en alias pour minimiser la diff), migration des 8 sites tests vers les imports. · `src/lib/session.ts`, `tests/session.test.ts`, `tests/Cover.test.tsx`
+- [FIXED] `src/lib/scrutins.ts` (fetchScrutins + fetchFreshness) 0 test dedicated · Module consommé par Cover (FreshnessBanner via useFreshnessOnce) et Play/Result (deck source), avec 2 branches de fallback critiques : (a) supabase=null → retourne les dev-fixtures.json (essentiel pour dev/test sans env), (b) malformed `ingere_le` → fall back à un now-anchored sync ETA (sans ce guard, `new Date("garbage").toISOString()` throw RangeError et la banner disparait). 7 tests ajoutés : fetchScrutins fallback (returns fixtures, 20 entries, every scrutin a la shape consumée), fetchFreshness fallback (total_scrutins match fixture count, last_sync_at parseable ISO, next_sync_eta = last + 7d à ±1s près, formats ISO 8601 conformes). Mock module-level `vi.mock("../src/lib/supabase", () => ({ supabase: null }))` pour pin la branche fallback malgré la présence de `.env.local` qui chargerait le client vivant — sinon les tests seraient non-déterministes (hit la prod DB). · `tests/scrutins.test.ts` (nouveau)
+
+### Vérifications à faire en session 109
+
+- [ ] grep `"PA[0-9]\{6\}"` tests/an-personnalites.test.ts → 1 résultat seulement (le "PA999999" unknown-ref intentionnel)
+- [ ] grep `"sd_session_v1\|sd_seen_cover"` tests/ → 0 résultat (literals exportés depuis session.ts)
+- [ ] `ls tests/scrutins.test.ts` → présent
+- [ ] grep `~389 tests` CLAUDE.md → 0 résultat (aligné sur ~396)

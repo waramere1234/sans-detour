@@ -5,7 +5,7 @@ import {
   type InitialEntry,
 } from "react-router-dom";
 import Cover from "../src/routes/Cover";
-import { resetSession, recordVote } from "../src/lib/session";
+import { resetSession, recordVote, COVER_STORAGE_KEY } from "../src/lib/session";
 import { FROM_LOGO_STATE } from "../src/lib/nav-state";
 import { ROUTES } from "../src/lib/routes";
 import { TARGET } from "../src/types";
@@ -40,14 +40,14 @@ describe("Cover", () => {
   });
 
   it("redirects to /play when hasSeenCover and votes < 20", () => {
-    localStorage.setItem("sd_seen_cover", "true");
+    localStorage.setItem(COVER_STORAGE_KEY, "true");
     recordVote("s1", "pour");
     renderCover();
     expect(screen.getByText("play page")).toBeInTheDocument();
   });
 
   it("redirects to /result when hasSeenCover and votes >= TARGET (completed)", () => {
-    localStorage.setItem("sd_seen_cover", "true");
+    localStorage.setItem(COVER_STORAGE_KEY, "true");
     // Record TARGET votes so the completion branch fires. Loop bound uses
     // the constant so changing TARGET in types/index.ts doesn't silently
     // detach this test from the redirect's actual threshold.
@@ -58,7 +58,7 @@ describe("Cover", () => {
   });
 
   it("stays on cover when navigated with state.fromLogo=true (bypass auto-resume)", () => {
-    localStorage.setItem("sd_seen_cover", "true");
+    localStorage.setItem(COVER_STORAGE_KEY, "true");
     recordVote("s1", "pour");
     renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
     // votes=1, hasInProgress=true → primary CTA reads "Reprendre", not

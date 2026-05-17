@@ -5,6 +5,7 @@ import {
   type ANScrutinForPersonnalites,
 } from "../scripts/lib/an-personnalites";
 import { PERSONNALITE_CODES, type PersonnaliteCode } from "../src/types";
+import { PERSONNALITES } from "../src/lib/personnalites";
 
 // scripts/lib/an-personnalites.ts owns:
 //   - the asArr "list-or-bare-object" coercion the AN bulk download forces
@@ -14,14 +15,18 @@ import { PERSONNALITE_CODES, type PersonnaliteCode } from "../src/types";
 //     abstentions/nonVotants/nonVotantsVolontaires) + the "non_dispo"
 //     default for every personality not seen on the scrutin
 
-const REF_LE_PEN = "PA720614";
-const REF_FAURE = "PA609332";
-const REF_CHATELAIN = "PA794008";
-const REF_WAUQUIEZ = "PA267285";
-const REF_ATTAL = "PA722190";
-const REF_CIOTTI = "PA330240";
-const REF_BOMPARD = "PA793444";
-const REF_PANOT = "PA720892";
+// Pull the AN acteurRefs from PERSONNALITES so a ref correction (e.g.
+// AN republishes a deputy with a new PA id) touches both the production
+// table and the tests via one edit. Hardcoding the same PA… literals
+// here would silently keep tests green while production switches refs.
+const REF_LE_PEN = PERSONNALITES.le_pen.acteur_ref;
+const REF_FAURE = PERSONNALITES.faure.acteur_ref;
+const REF_CHATELAIN = PERSONNALITES.chatelain.acteur_ref;
+const REF_WAUQUIEZ = PERSONNALITES.wauquiez.acteur_ref;
+const REF_ATTAL = PERSONNALITES.attal.acteur_ref;
+const REF_CIOTTI = PERSONNALITES.ciotti.acteur_ref;
+const REF_BOMPARD = PERSONNALITES.bompard.acteur_ref;
+const REF_PANOT = PERSONNALITES.panot.acteur_ref;
 
 function refMap(): Map<string, PersonnaliteCode> {
   return new Map<string, PersonnaliteCode>([

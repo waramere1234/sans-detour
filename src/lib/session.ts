@@ -1,8 +1,16 @@
 // src/lib/session.ts
 import type { SessionState, UserVote } from "../types";
 
-const KEY = "sd_session_v1";
-const COVER_KEY = "sd_seen_cover";
+// Exported so tests can prime / inspect storage without re-hardcoding the
+// strings (previously duplicated 5× in tests/session.test.ts and 3× in
+// tests/Cover.test.tsx — a `sd_session_v1 → sd_session_v2` migration would
+// have left those tests writing to a stale key while production read from
+// the new one, silently passing).
+export const SESSION_STORAGE_KEY = "sd_session_v1";
+export const COVER_STORAGE_KEY = "sd_seen_cover";
+
+const KEY = SESSION_STORAGE_KEY;
+const COVER_KEY = COVER_STORAGE_KEY;
 
 function makeId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
