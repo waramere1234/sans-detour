@@ -10,7 +10,7 @@ import { CONTACT_EMAIL, mailto } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
 import { DEFAULT_CAP_PER_DOSSIER, DEFAULT_CAP_PER_CHAPEAU_PREFIX } from "../lib/deck";
 import { THRESHOLD } from "../lib/compute-positions";
-import { TARGET, MIN_FOR_RANKING } from "../types";
+import { TARGET, MIN_FOR_RANKING, MAX_POINTS_CLES_BULLETS } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
  *  inline Sommaire above and the test suite (which iterates over this
@@ -179,7 +179,7 @@ export default function Methode() {
       </Section>
 
       <Section n="07" title="Le rôle de l'IA Claude">
-        <p><strong>Ce que fait Claude.</strong> Reformuler le titre brut du scrutin en 12 mots, condenser le projet de loi en 3 points clés, rédiger un résumé contextuel de 30 à 50 mots, structurer une synthèse détaillée (mesures, concernés, calendrier, exceptions), et taguer le scrutin par thème. <strong>Mise en forme, pas commentaire.</strong></p>
+        <p><strong>Ce que fait Claude.</strong> Reformuler le titre brut du scrutin en 12 mots, condenser le projet de loi en {MAX_POINTS_CLES_BULLETS} points clés, rédiger un résumé contextuel de 30 à 50 mots, structurer une synthèse détaillée (mesures, concernés, calendrier, exceptions), et taguer le scrutin par thème. <strong>Mise en forme, pas commentaire.</strong></p>
 
         <p><strong>Ce qu'il ne fait pas.</strong> Le calcul d'alignement (formule mathématique pure), la composition du deck (round-robin algorithmique par thème), l'extraction des votes individuels (parsing des XML officiels AN). Sur ces trois plans, Claude n'intervient à aucun moment.</p>
 

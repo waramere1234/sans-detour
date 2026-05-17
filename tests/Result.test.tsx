@@ -15,7 +15,7 @@ import {
 } from "../src/lib/session";
 import fixtures from "../supabase/seed/dev-fixtures.json";
 import type { Scrutin } from "../src/types";
-import { TARGET } from "../src/types";
+import { TARGET, LEGISLATURE_LABEL } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
 // Result.tsx fires 5 analytics events (result_reached, result_refaire,
@@ -146,6 +146,13 @@ describe("Result — affinement_clicked analytics + result_reached on mount", ()
           top: expect.any(String),
         }),
       );
+    });
+  });
+
+  it("renders the LEGISLATURE_LABEL in the header on a completed session (rename-safe via const)", async () => {
+    renderResult();
+    await waitFor(() => {
+      expect(screen.getByText(new RegExp(LEGISLATURE_LABEL))).toBeInTheDocument();
     });
   });
 

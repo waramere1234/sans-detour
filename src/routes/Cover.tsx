@@ -9,7 +9,7 @@ import { track } from "../lib/analytics";
 import { FROM_LOGO_STATE, type LocationStateFromLogo } from "../lib/nav-state";
 import { mailto } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
-import { TARGET, MIN_FOR_RANKING } from "../types";
+import { TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL } from "../types";
 
 export default function Cover() {
   const navigate = useNavigate();
@@ -141,7 +141,7 @@ export default function Cover() {
             fontFamily: "var(--font-mono)", fontSize: 10.5,
             color: "var(--accent)", fontWeight: 500,
             letterSpacing: "0.12em", textTransform: "uppercase",
-          }}>17e LÉGISLATURE — TON ALIGNEMENT RÉEL</span>
+          }}>{LEGISLATURE_LABEL} — TON ALIGNEMENT RÉEL</span>
           <h1 style={{
             fontFamily: "var(--font-sans)", fontWeight: 700,
             fontSize: 38, lineHeight: 1.05, letterSpacing: "-0.022em",

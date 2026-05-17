@@ -8,7 +8,7 @@ import Cover from "../src/routes/Cover";
 import { resetSession, recordVote, COVER_STORAGE_KEY, loadSession } from "../src/lib/session";
 import { FROM_LOGO_STATE } from "../src/lib/nav-state";
 import { ROUTES } from "../src/lib/routes";
-import { TARGET, MIN_FOR_RANKING } from "../src/types";
+import { TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
 function renderCover(initialEntries: InitialEntry[] = [ROUTES.cover]) {
@@ -38,6 +38,11 @@ describe("Cover", () => {
     renderCover();
     expect(screen.getByText(/Données AN/i)).toBeInTheDocument();
     expect(screen.getByText(/Claude/i)).toBeInTheDocument();
+  });
+
+  it("renders the LEGISLATURE_LABEL in the header eyebrow (rename-safe via const)", () => {
+    renderCover();
+    expect(screen.getByText(new RegExp(LEGISLATURE_LABEL))).toBeInTheDocument();
   });
 
   it("redirects to /play when hasSeenCover and votes < 20", () => {

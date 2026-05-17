@@ -16,6 +16,25 @@ export const MIN_FOR_RANKING = 5;
  *  two in sync. */
 export const LOW_DATA_THRESHOLD = 3;
 
+/** Maximum bullets the front renders in a card's `points_cles` block.
+ *  Mirrored by `normalizePointsCles` in scripts/lib/parse-summary.ts
+ *  (the ingest-side hard cap) and surfaced in Methode §07's "Ce que fait
+ *  Claude" prose so a future bump propagates from the cap to the
+ *  documentation. Three sites share this single source of truth. */
+export const MAX_POINTS_CLES_BULLETS = 3;
+
+/** Maximum words per `points_cles` bullet — `normalizePointsCles`
+ *  truncates the rest with an ellipsis. Same drift-prevention pattern
+ *  as the bullet count. */
+export const MAX_WORDS_PER_BULLET = 7;
+
+
+/** Short label for the legislature this app covers — surfaced on the
+ *  Cover header ("17e LÉGISLATURE — TON ALIGNEMENT RÉEL") and the Result
+ *  header ("RÉSULTAT · 17e LÉGISLATURE"). Centralised so the V3
+ *  transition to the 18e legislature is a single edit rather than a
+ *  Cover + Result + Methode + Legal scavenger hunt. */
+export const LEGISLATURE_LABEL = "17e LÉGISLATURE";
 
 /** All parliamentary group codes for the 17e legislature. */
 export const GROUP_CODES = [

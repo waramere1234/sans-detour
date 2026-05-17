@@ -1,7 +1,7 @@
 // src/components/Card.tsx
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion, type PanInfo } from "framer-motion";
-import type { Scrutin } from "../types";
+import { MAX_POINTS_CLES_BULLETS, type Scrutin } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
 import { stripCitations, stripVoteResult } from "../lib/text-cleanup";
 
@@ -159,7 +159,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
                 lineHeight: 1.4, color: "var(--ink-2)",
                 letterSpacing: "-0.005em",
               }}>
-                {scrutin.points_cles.slice(0, 3).map((p, i) => (
+                {scrutin.points_cles.slice(0, MAX_POINTS_CLES_BULLETS).map((p, i) => (
                   <li key={i} style={{ display: "flex", gap: 8 }}>
                     <span style={{ color: "var(--accent)", flex: "0 0 auto" }}>·</span>
                     <span>{p}</span>

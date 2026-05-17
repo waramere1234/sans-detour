@@ -4,7 +4,11 @@
 // (initial batch) and `scripts/resume-ingest.ts` (failed-batch recovery).
 // Before session 82 these lived duplicated in both scripts — divergence
 // risk (e.g. a fix in one branch silently leaving the other broken).
-import { normalizeTheme, type ScrutinAnalyse, type Theme } from "../../src/types";
+import {
+  normalizeTheme,
+  MAX_POINTS_CLES_BULLETS, MAX_WORDS_PER_BULLET,
+  type ScrutinAnalyse, type Theme,
+} from "../../src/types";
 
 export interface Summary {
   chapeau: string;
@@ -40,18 +44,26 @@ export function normalizeAnalyse(a: unknown): ScrutinAnalyse | undefined {
   };
 }
 
-// Cap each bullet at 7 words and keep at most 3. Drop empties and trim.
-// Hard cap defends the UI from a model that ignored the prompt constraint.
+// MAX_POINTS_CLES_BULLETS + MAX_WORDS_PER_BULLET live in src/types so the
+// ingest cap (this function), the Card.tsx render slice, and the Methode
+// §07 documentation prose share a single source of truth (cross-project
+// import direction: scripts can import from src; src cannot import from
+// scripts, which would pull script-only deps into the front bundle).
+// Cap each bullet at MAX_WORDS_PER_BULLET words and keep at most
+// MAX_POINTS_CLES_BULLETS. Drop empties and trim. Hard cap defends the
+// UI from a model that ignored the prompt constraint.
 export function normalizePointsCles(v: unknown): string[] | undefined {
   if (!Array.isArray(v)) return undefined;
   const cleaned = v
     .filter((x): x is string => typeof x === "string")
     .map((s) => s.trim())
     .filter((s) => s.length > 0)
-    .slice(0, 3)
+    .slice(0, MAX_POINTS_CLES_BULLETS)
     .map((s) => {
       const w = s.split(/\s+/);
-      return w.length <= 7 ? s : w.slice(0, 7).join(" ") + "…";
+      return w.length <= MAX_WORDS_PER_BULLET
+        ? s
+        : w.slice(0, MAX_WORDS_PER_BULLET).join(" ") + "…";
     });
   return cleaned.length > 0 ? cleaned : undefined;
 }

@@ -5,6 +5,7 @@ import Methode, { METHODE_SECTIONS } from "../src/routes/Methode";
 import { ROUTES } from "../src/lib/routes";
 import { DEFAULT_CAP_PER_DOSSIER, DEFAULT_CAP_PER_CHAPEAU_PREFIX } from "../src/lib/deck";
 import { THRESHOLD } from "../src/lib/compute-positions";
+import { MAX_POINTS_CLES_BULLETS } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
 // Methode.tsx owns:
@@ -175,6 +176,12 @@ describe("Methode — prose derived from canonical const values (no drift betwee
     const section = document.getElementById("methode-03")!;
     const expectedPct = Math.round(THRESHOLD * 100);
     expect(section.textContent).toContain(`≥ ${expectedPct}%`);
+  });
+
+  it("§07 'points clés' count matches MAX_POINTS_CLES_BULLETS", () => {
+    renderMethode();
+    const section = document.getElementById("methode-07")!;
+    expect(section.textContent).toContain(`${MAX_POINTS_CLES_BULLETS} points clés`);
   });
 });
 

@@ -2778,3 +2778,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep "jamais plus de 2\|≥ 70%" src/routes/Methode.tsx → 0 résultat (toutes interpolées)
 - [ ] grep "DEFAULT_CAP_PER_DOSSIER\|THRESHOLD" src/routes/Methode.tsx tests/Methode.test.tsx → 4+ résultats
 - [ ] grep `~507 tests` CLAUDE.md → 0 résultat (aligné sur ~510)
+
+---
+
+## Session 119 — 2026-05-17
+
+### Vérification session 118
+
+- [VERIFIED] 0 hardcoded `<= 5` dans tests/Cover.test.tsx (toutes les boundaries dérivent de MIN_FOR_RANKING)
+- [VERIFIED] 0 hardcoded "jamais plus de 2" / "≥ 70%" dans src/routes/Methode.tsx (toutes interpolées)
+- [VERIFIED] DEFAULT_CAP_PER_DOSSIER + THRESHOLD imports diffusés dans Methode.tsx + tests
+- [VERIFIED] CLAUDE.md "~510 tests"
+- 510/510 tests verts, typecheck clean
+
+### Bugs fixés (LEGISLATURE_LABEL + MAX_POINTS_CLES_BULLETS extraction + Card render slice consolidation)
+
+- [FIXED] `"17e LÉGISLATURE"` literal dupliqué entre Cover.tsx:144 et Result.tsx:198 · Le label de la législature est référencé sur 2 routes différentes ; la V3 transition vers la 18e légis aurait demandé 2 edits avec drift possible (Cover updated mais Result oublié → headers inconsistants). Fix : `export const LEGISLATURE_LABEL = "17e LÉGISLATURE"` depuis src/types/index.ts. Cover.tsx + Result.tsx interpolent. 2 tests round-trip ajoutés (un par route) qui pin la visibilité du label rendu. · `src/types/index.ts`, `src/routes/Cover.tsx`, `src/routes/Result.tsx`, `tests/Cover.test.tsx`, `tests/Result.test.tsx`
+- [FIXED] `MAX_POINTS_CLES_BULLETS = 3` + `MAX_WORDS_PER_BULLET = 7` inline dans `scripts/lib/parse-summary.ts` normalizePointsCles · Les 2 caps LLM (slice(0,3) + length<=7) défendent le DB contre un modèle qui ignore les contraintes du prompt — mais elles étaient des magic numbers inline. Drift surface : la Methode §07 prose hardcodait "3 points clés" (drift entre l'ingest cap et la documentation) ; Card.tsx renderait `points_cles.slice(0, 3)` inline (drift entre l'ingest cap et le render UI). Fix : export `MAX_POINTS_CLES_BULLETS` + `MAX_WORDS_PER_BULLET` depuis `src/types/index.ts` (cross-project source-of-truth ; scripts → src import direction, jamais l'inverse). parse-summary.ts import depuis ../../src/types. · `src/types/index.ts`, `scripts/lib/parse-summary.ts`
+- [FIXED] `Card.tsx` `points_cles.slice(0, 3)` + `Methode.tsx` "3 points clés" literal · Card.tsx ligne 162 hardcodait `slice(0, 3)` — si bump à 5 bullets dans parse-summary, la Card render seulement 3 quand même. Methode §07 hardcodait "3 points clés" dans la prose — si bump à 5, la documentation lie aux users. Fix : Card.tsx + Methode.tsx import MAX_POINTS_CLES_BULLETS depuis src/types et interpolent. 1 test Methode round-trip ajouté qui assert que la §07 prose contient `${MAX_POINTS_CLES_BULLETS} points clés`. · `src/components/Card.tsx`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`
+
+### Vérifications à faire en session 120
+
+- [ ] grep `LEGISLATURE_LABEL` src/ tests/ → 6+ résultats (déclaration + 2 routes + 2 tests + 1 type doc)
+- [ ] grep `MAX_POINTS_CLES_BULLETS` src/ scripts/ tests/ → 5+ résultats (déclaration + parse-summary + Card + Methode + tests)
+- [ ] grep `"17e LÉGISLATURE"\|slice(0, 3)` src/routes/ src/components/Card.tsx → 0 résultat literal (tous via const)
+- [ ] grep `~510 tests` CLAUDE.md → 0 résultat (aligné sur ~513)

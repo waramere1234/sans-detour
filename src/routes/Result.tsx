@@ -14,7 +14,7 @@ import { getPartyColorVar, getParty } from "../lib/parties";
 import { composeShareText } from "../lib/share";
 import { track } from "../lib/analytics";
 import { ROUTES, PLAY_AFFINEMENT } from "../lib/routes";
-import { TARGET, type Scrutin, type GroupCode } from "../types";
+import { TARGET, LEGISLATURE_LABEL, type Scrutin, type GroupCode } from "../types";
 
 export default function Result() {
   // All hooks at the top so the call order is uniform and easy to scan.
@@ -195,7 +195,7 @@ export default function Result() {
           fontFamily: "var(--font-mono)", fontSize: 10.5,
           letterSpacing: "0.14em", textTransform: "uppercase",
           color: isPartial ? "var(--accent)" : "var(--ink-3)",
-        }}>{isPartial ? `RÉSULTAT PARTIEL · ${total}/${TARGET}` : "RÉSULTAT · 17e LÉGISLATURE"}</span>
+        }}>{isPartial ? `RÉSULTAT PARTIEL · ${total}/${TARGET}` : `RÉSULTAT · ${LEGISLATURE_LABEL}`}</span>
         <h1 style={{
           fontFamily: "var(--font-sans)", fontWeight: 700,
           fontSize: 28, lineHeight: 1.15, letterSpacing: "-0.022em",
