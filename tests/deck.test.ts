@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { composeDeck, drawNext, chapeauPrefix } from "../src/lib/deck";
+import {
+  composeDeck, drawNext, chapeauPrefix,
+  DEFAULT_CAP_PER_DOSSIER, DEFAULT_CAP_PER_CHAPEAU_PREFIX,
+} from "../src/lib/deck";
 import type { Scrutin, Theme } from "../src/types";
 
 function mk(id: string, dossier: string, theme?: Theme, chapeau = "X"): Scrutin {
@@ -16,13 +19,13 @@ function mk(id: string, dossier: string, theme?: Theme, chapeau = "X"): Scrutin 
 describe("composeDeck (PRD § 9.3)", () => {
   it("returns 20 scrutins when pool is large enough", () => {
     const pool = Array.from({ length: 100 }, (_, i) => mk(`s${i}`, `d${i % 30}`));
-    const deck = composeDeck(pool, { size: 20, capPerDossier: 2, seed: 42 });
+    const deck = composeDeck(pool, { size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, seed: 42 });
     expect(deck).toHaveLength(20);
   });
 
   it("respects max 2 scrutins per dossier", () => {
     const pool = Array.from({ length: 100 }, (_, i) => mk(`s${i}`, `d${i % 5}`));
-    const deck = composeDeck(pool, { size: 20, capPerDossier: 2, seed: 42 });
+    const deck = composeDeck(pool, { size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, seed: 42 });
     const counts = new Map<string, number>();
     for (const s of deck) counts.set(s.dossier_id, (counts.get(s.dossier_id) ?? 0) + 1);
     for (const [, n] of counts) expect(n).toBeLessThanOrEqual(2);
@@ -30,21 +33,21 @@ describe("composeDeck (PRD § 9.3)", () => {
 
   it("returns no duplicates", () => {
     const pool = Array.from({ length: 50 }, (_, i) => mk(`s${i}`, `d${i % 25}`));
-    const deck = composeDeck(pool, { size: 20, capPerDossier: 2, seed: 1 });
+    const deck = composeDeck(pool, { size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, seed: 1 });
     const ids = new Set(deck.map(s => s.id));
     expect(ids.size).toBe(deck.length);
   });
 
   it("returns fewer than size when pool exhausted", () => {
     const pool = Array.from({ length: 8 }, (_, i) => mk(`s${i}`, `d${i}`));
-    const deck = composeDeck(pool, { size: 20, capPerDossier: 2, seed: 1 });
+    const deck = composeDeck(pool, { size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, seed: 1 });
     expect(deck.length).toBeLessThanOrEqual(8);
   });
 
   it("is deterministic with the same seed", () => {
     const pool = Array.from({ length: 100 }, (_, i) => mk(`s${i}`, `d${i % 30}`));
-    const a = composeDeck(pool, { size: 20, capPerDossier: 2, seed: 7 });
-    const b = composeDeck(pool, { size: 20, capPerDossier: 2, seed: 7 });
+    const a = composeDeck(pool, { size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, seed: 7 });
+    const b = composeDeck(pool, { size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, seed: 7 });
     expect(a.map(s => s.id)).toEqual(b.map(s => s.id));
   });
 
@@ -53,7 +56,7 @@ describe("composeDeck (PRD § 9.3)", () => {
     const seen = new Set(["s0", "s5", "s10", "s15", "s20"]);
     const deck = composeDeck(pool, {
       size: 20,
-      capPerDossier: 2,
+      capPerDossier: DEFAULT_CAP_PER_DOSSIER,
       excludeIds: seen,
       seed: 42,
     });
@@ -67,7 +70,7 @@ describe("composeDeck (PRD § 9.3)", () => {
     const pool = Array.from({ length: 40 }, (_, i) => mk(`s${i}`, `d${i % 10}`));
     const deck = composeDeck(pool, {
       size: 20,
-      capPerDossier: 2,
+      capPerDossier: DEFAULT_CAP_PER_DOSSIER,
       seenDossierCounts: new Map([["d0", 2]]),
       seed: 42,
     });
@@ -86,7 +89,7 @@ describe("composeDeck (PRD § 9.3)", () => {
       ...Array.from({ length: 10 }, (_, i) => mk(`m${i}`, `dM${i}`, "immigration")),
       ...Array.from({ length: 10 }, (_, i) => mk(`s${i}`, `dS${i}`, "santé")),
     ];
-    const deck = composeDeck(pool, { size: 20, capPerDossier: 2, seed: 42 });
+    const deck = composeDeck(pool, { size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, seed: 42 });
     const byTheme = new Map<string, number>();
     for (const s of deck) {
       const t = s.theme ?? "autre";
@@ -99,7 +102,7 @@ describe("composeDeck (PRD § 9.3)", () => {
 
   it("works when no scrutin has a theme (pre-migration rows fall in 'autre')", () => {
     const pool = Array.from({ length: 30 }, (_, i) => mk(`s${i}`, `d${i % 15}`));
-    const deck = composeDeck(pool, { size: 20, capPerDossier: 2, seed: 11 });
+    const deck = composeDeck(pool, { size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, seed: 11 });
     expect(deck).toHaveLength(20);
   });
 
@@ -112,7 +115,7 @@ describe("composeDeck (PRD § 9.3)", () => {
       ...Array.from({ length: 30 }, (_, i) => mk(`o${i}`, `dO${i}`, "santé", `SANTÉ · DOSSIER ${i}`)),
     ];
     const deck = composeDeck(pool, {
-      size: 20, capPerDossier: 2, capPerChapeauPrefix: 2, seed: 42,
+      size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, capPerChapeauPrefix: DEFAULT_CAP_PER_CHAPEAU_PREFIX, seed: 42,
     });
     const mayottes = deck.filter((s) => chapeauPrefix(s) === "mayotte");
     expect(mayottes.length).toBeLessThanOrEqual(2);
@@ -125,7 +128,7 @@ describe("composeDeck (PRD § 9.3)", () => {
     // Pretend the user already saw 2 cards with prefix "santé"; cap should
     // block any further "santé" card from joining the new deck.
     const deck = composeDeck(pool, {
-      size: 20, capPerDossier: 2, capPerChapeauPrefix: 2,
+      size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, capPerChapeauPrefix: DEFAULT_CAP_PER_CHAPEAU_PREFIX,
       seenChapeauPrefixCounts: new Map([["santé", 2]]),
       seed: 7,
     });
@@ -149,7 +152,7 @@ describe("drawNext (mode affinement)", () => {
   it("returns a scrutin not in seenIds, respecting cap", () => {
     const pool = Array.from({ length: 50 }, (_, i) => mk(`s${i}`, `d${i % 10}`));
     const seen = new Set(["s0", "s1", "s2"]);
-    const next = drawNext(pool, seen, { capPerDossier: 2, seenDossierCounts: new Map([["d0", 1]]), seed: 9 });
+    const next = drawNext(pool, seen, { capPerDossier: DEFAULT_CAP_PER_DOSSIER, seenDossierCounts: new Map([["d0", 1]]), seed: 9 });
     expect(next).not.toBeNull();
     expect(seen.has(next!.id)).toBe(false);
   });
@@ -157,7 +160,7 @@ describe("drawNext (mode affinement)", () => {
   it("returns null when pool is exhausted", () => {
     const pool = [mk("s0", "d0")];
     const seen = new Set(["s0"]);
-    const next = drawNext(pool, seen, { capPerDossier: 2, seenDossierCounts: new Map(), seed: 1 });
+    const next = drawNext(pool, seen, { capPerDossier: DEFAULT_CAP_PER_DOSSIER, seenDossierCounts: new Map(), seed: 1 });
     expect(next).toBeNull();
   });
 
@@ -175,7 +178,7 @@ describe("drawNext (mode affinement)", () => {
     // further MAYOTTE pick even though both m1/m2 are unseen by id.
     const next = drawNext(pool, new Set(), {
       capPerDossier: 99, seenDossierCounts: new Map(),
-      capPerChapeauPrefix: 2,
+      capPerChapeauPrefix: DEFAULT_CAP_PER_CHAPEAU_PREFIX,
       seenChapeauPrefixCounts: new Map([["mayotte", 2]]),
       seed: 1,
     });
@@ -191,7 +194,7 @@ describe("drawNext (mode affinement)", () => {
     const pool = [mk("m1", "dA", undefined, "MAYOTTE · cyclone")];
     const next = drawNext(pool, new Set(), {
       capPerDossier: 99, seenDossierCounts: new Map(),
-      capPerChapeauPrefix: 2,
+      capPerChapeauPrefix: DEFAULT_CAP_PER_CHAPEAU_PREFIX,
       seed: 1,
     });
     expect(next?.id).toBe("m1");

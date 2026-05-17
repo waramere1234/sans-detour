@@ -2524,3 +2524,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `"sd_session_v1\|sd_seen_cover"` tests/ → 0 résultat (literals exportés depuis session.ts)
 - [ ] `ls tests/scrutins.test.ts` → présent
 - [ ] grep `~389 tests` CLAUDE.md → 0 résultat (aligné sur ~396)
+
+---
+
+## Session 109 — 2026-05-17
+
+### Vérification session 108
+
+- [VERIFIED] tests/an-personnalites.test.ts : 1 PA…literal (le PA999999 unknown-ref intentionnel)
+- [VERIFIED] 0 occurrence des storage keys `sd_session_v1` / `sd_seen_cover` en literal dans tests/
+- [VERIFIED] tests/scrutins.test.ts présent
+- [VERIFIED] CLAUDE.md "~396 tests"
+- 396/396 tests verts, typecheck clean
+
+### Bugs fixés (drift cap literals + 2 component test gaps)
+
+- [FIXED] `CAP_PER_DOSSIER = 2` et `CAP_PER_CHAPEAU_PREFIX = 2` dupliqués entre `src/routes/Play.tsx` (private consts × 2) et tests deck (~10 occurrences du literal `2` dans tests/deck.test.ts + 6 dans tests/deck-invariants.test.ts) · Même drift pattern que sessions 90 / 101 / 104 / 105 / 108 ont fixé (FROM_LOGO_STATE, route literals, storage keys). Un bump V3 à `CAP_PER_DOSSIER = 3` dans Play.tsx aurait silencieusement laissé les tests valider l'ancienne policy "max 2 par dossier" pendant que la prod permettait 3 — masquant un changement intentionnel par un test qui passe. Fix : `export const DEFAULT_CAP_PER_DOSSIER = 2` + `export const DEFAULT_CAP_PER_CHAPEAU_PREFIX = 2` depuis `src/lib/deck.ts` (lib sémantiquement propriétaire des caps, pas Play.tsx). Play.tsx + tests deck/deck-invariants migrés vers les imports. · `src/lib/deck.ts`, `src/routes/Play.tsx`, `tests/deck.test.ts`, `tests/deck-invariants.test.ts`
+- [FIXED] `src/components/CardSkeleton.tsx` + `src/components/ResultSkeleton.tsx` 0 test coverage · Les deux skeletons rendus pendant les chargements de Play (CardSkeleton) et Result (ResultSkeleton) ont des invariants a11y critiques : aria-busy="true" + aria-label en français pour que l'AT annonce le loading state (silent skeleton = pire UX possible). ResultSkeleton a en plus une invariant non-évidente (row count anchored sur GROUP_CODES.length pour éviter un CLS de 250px quand la real list de 11 rows remplace 6 skeleton rows — documenté en commentaire source mais 0 test). 7 tests ajoutés dans `tests/Skeleton.test.tsx` : aria-busy présent, aria-label français, shimmer placeholders rendus (pas un div vide), row count match GROUP_CODES.length. · `tests/Skeleton.test.tsx` (nouveau)
+- [FIXED] `src/routes/Legal.tsx` 0 test coverage · Sibling de Methode.tsx (qui a eu ses tests en session 106). Owns : page title + sections RGPD (éditeur/hébergeur/données perso/analytics/sources), wordmark+Retour Links pointant `ROUTES.cover` (rename-safe), mailto via `CONTACT_EMAIL`, AN data link avec rel="noopener", deux production-blocker placeholders (`[à compléter]` + `github.com/sansdetour`) flaggés TODO dans la source mais sans test pour bloquer un PR qui les drop sans vraie value. 9 tests : page title, nav landmark aria-label, Retour + Wordmark Links pointent ROUTES.cover, sections RGPD présentes, mailto compose `mailto:${CONTACT_EMAIL}` via la lib (pas un literal), AN link a target=_blank + rel=noopener, Vercel hébergeur block présent. Les 2 derniers tests pinent l'état actuel des placeholders pour qu'un PR "ship" les remplace au lieu de les supprimer silencieusement. · `tests/Legal.test.tsx` (nouveau)
+
+### Vérifications à faire en session 110
+
+- [ ] grep -n `"capPerDossier: 2\b\|capPerChapeauPrefix: 2\b"` tests/deck.test.ts tests/deck-invariants.test.ts → 1 résultat seulement (le comment "// `capPerChapeauPrefix: 2` without the map…" historique en l.191)
+- [ ] grep `DEFAULT_CAP_PER_DOSSIER\|DEFAULT_CAP_PER_CHAPEAU_PREFIX` src/ tests/ → résultats dans deck.ts (déclaration) + Play.tsx + 2 tests
+- [ ] `ls tests/Skeleton.test.tsx tests/Legal.test.tsx` → 2 fichiers présents
+- [ ] grep `~396 tests` CLAUDE.md → 0 résultat (aligné sur ~412)

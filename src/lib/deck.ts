@@ -1,6 +1,15 @@
 // src/lib/deck.ts
 import type { Scrutin } from "../types";
 
+/** Deck composition caps used by both Play.tsx (initial compose + draws
+ *  on swipe) and the deck test suites. Exported here so a future bump
+ *  (e.g. 2 → 3 per dossier) propagates atomically: previously the value
+ *  was a private const in Play.tsx and duplicated as the literal `2`
+ *  ~10× across tests/deck*.test.ts, so a bump would silently leave the
+ *  tests validating the old policy. */
+export const DEFAULT_CAP_PER_DOSSIER = 2;
+export const DEFAULT_CAP_PER_CHAPEAU_PREFIX = 2;
+
 export interface ComposeOptions {
   size: number;
   capPerDossier: number;

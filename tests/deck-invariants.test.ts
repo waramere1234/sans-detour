@@ -1,6 +1,9 @@
 // tests/deck-invariants.test.ts
 import { describe, it, expect } from "vitest";
-import { composeDeck, chapeauPrefix } from "../src/lib/deck";
+import {
+  composeDeck, chapeauPrefix,
+  DEFAULT_CAP_PER_DOSSIER, DEFAULT_CAP_PER_CHAPEAU_PREFIX,
+} from "../src/lib/deck";
 import type { Scrutin } from "../src/types";
 
 function mkScrutin(id: string, theme: Scrutin["theme"], dossierId: string, chapeau: string): Scrutin {
@@ -26,7 +29,7 @@ describe("composeDeck — V2 invariants", () => {
       mkScrutin(`s${i}`, "fiscalité", `d${i}`, `FISCALITÉ · LOI ${i}`)
     );
     const deck = composeDeck(pool, {
-      size: 20, capPerDossier: 2, capPerChapeauPrefix: 2,
+      size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, capPerChapeauPrefix: DEFAULT_CAP_PER_CHAPEAU_PREFIX,
     });
     expect(deck.length).toBeLessThanOrEqual(20);
   });
@@ -42,7 +45,7 @@ describe("composeDeck — V2 invariants", () => {
       mkScrutin("f3", "fiscalité",     "DG", "FISCALITÉ · ISF"),
     ];
     const deck = composeDeck(pool, {
-      size: 20, capPerDossier: 2, capPerChapeauPrefix: 2,
+      size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, capPerChapeauPrefix: DEFAULT_CAP_PER_CHAPEAU_PREFIX,
     });
     // chapeauPrefix() returns lowercase, so compare against the lowercase form.
     // Asserting >0 ensures the cap mechanic is actually exercised (otherwise
@@ -60,7 +63,7 @@ describe("composeDeck — V2 invariants", () => {
     ];
     const seenDossierCounts = new Map([["D1", 2]]);
     const deck = composeDeck(pool, {
-      size: 20, capPerDossier: 2, capPerChapeauPrefix: 2,
+      size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, capPerChapeauPrefix: DEFAULT_CAP_PER_CHAPEAU_PREFIX,
       seenDossierCounts,
     });
     expect(deck.map((s) => s.id)).toEqual(["b1"]);
@@ -70,13 +73,13 @@ describe("composeDeck — V2 invariants", () => {
     const pool = Array.from({ length: 30 }, (_, i) =>
       mkScrutin(`s${i}`, "fiscalité", `d${i}`, `FISCALITÉ · ${i}`)
     );
-    const deck = composeDeck(pool, { size: 20, capPerDossier: 2, capPerChapeauPrefix: 2 });
+    const deck = composeDeck(pool, { size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, capPerChapeauPrefix: DEFAULT_CAP_PER_CHAPEAU_PREFIX });
     const ids = deck.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
   it("returns [] for empty pool", () => {
-    const deck = composeDeck([], { size: 20, capPerDossier: 2, capPerChapeauPrefix: 2 });
+    const deck = composeDeck([], { size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, capPerChapeauPrefix: DEFAULT_CAP_PER_CHAPEAU_PREFIX });
     expect(deck).toEqual([]);
   });
 
@@ -86,7 +89,7 @@ describe("composeDeck — V2 invariants", () => {
       mkScrutin("s2", "santé",     "D2", "SANTÉ · B"),
       mkScrutin("s3", "écologie",  "D3", "ÉCOLOGIE · C"),
     ];
-    const deck = composeDeck(pool, { size: 20, capPerDossier: 2, capPerChapeauPrefix: 2 });
+    const deck = composeDeck(pool, { size: 20, capPerDossier: DEFAULT_CAP_PER_DOSSIER, capPerChapeauPrefix: DEFAULT_CAP_PER_CHAPEAU_PREFIX });
     expect(deck.length).toBe(3);
   });
 });

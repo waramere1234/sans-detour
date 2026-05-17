@@ -6,7 +6,10 @@ import { ChipTop1 } from "../components/ChipTop1";
 import { RankingOverlay } from "../components/RankingOverlay";
 import { MethodeSheet } from "../components/MethodeSheet";
 import { fetchScrutins } from "../lib/scrutins";
-import { composeDeck, drawNext, chapeauPrefix } from "../lib/deck";
+import {
+  composeDeck, drawNext, chapeauPrefix,
+  DEFAULT_CAP_PER_DOSSIER, DEFAULT_CAP_PER_CHAPEAU_PREFIX,
+} from "../lib/deck";
 import { computeAlignment, rankByAlignment } from "../lib/matching";
 import { getOrCreateSession, recordVote, loadSession } from "../lib/session";
 import { track } from "../lib/analytics";
@@ -16,8 +19,10 @@ import {
   type Scrutin, type UserVote, type GroupCode, type GroupAlignment,
 } from "../types";
 
-const CAP_PER_DOSSIER = 2;
-const CAP_PER_CHAPEAU_PREFIX = 2;
+// Caps live in src/lib/deck.ts so a future policy bump (currently 2 each)
+// updates the composer + every call site + every test atomically.
+const CAP_PER_DOSSIER = DEFAULT_CAP_PER_DOSSIER;
+const CAP_PER_CHAPEAU_PREFIX = DEFAULT_CAP_PER_CHAPEAU_PREFIX;
 
 // Shared layout for the Play page section — used by both the loading-skeleton
 // return and the real deck return so they don't drift. minHeight uses 100dvh
