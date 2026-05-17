@@ -1585,3 +1585,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] curl https://sansdetour.fr/robots.txt | grep "Disallow: /api/" → présent
 - [ ] grep `paddingTop: 8` dans `src/components/TopBar.tsx` → 0 résultat
 - [ ] DevTools console : `Object.defineProperty(window, "localStorage", { get() { throw new Error("blocked") } })` puis recharger `/` → app rend la Cover (loadSession + hasSeenCover catch et retournent null/false)
+
+---
+
+## Session 70 — 2026-05-17
+
+### Vérification session 69
+
+- [VERIFIED] `public/robots.txt:8` `Disallow: /api/` présent
+- [VERIFIED] `src/components/TopBar.tsx` plus de `paddingTop: 8` mort (juste un commentaire historique)
+- [VERIFIED] `src/lib/session.ts` `loadSession` et `hasSeenCover` ont try/catch sur localStorage access
+- 123/123 tests verts, typecheck clean
+
+### Bugs fixés (defense symétrie + coverage + DB freshness)
+
+- [FIXED] `resetSession` sans try/catch · Session 69 a ajouté try/catch sur `loadSession` + `hasSeenCover`. `resetSession` (clear le session key au "Recommencer à zéro" / "Refaire depuis le début") restait nu — un throw `localStorage.removeItem` (Safari blocked-storage, sandboxed iframe) crashait le click handler, navigate() ne s'exécutait jamais. Try/catch ajouté pour symétrie complète avec saveSession/loadSession/hasSeenCover/markCoverSeen/forgetCover. · `src/lib/session.ts`
+- [FIXED] Coverage gap throw defense · Les try/catch sessions 69 + 70 n'avaient aucun test. 3 tests ajoutés dans `tests/session.test.ts` avec `vi.spyOn(Storage.prototype, "getItem"/"removeItem")` mockés pour throw : loadSession retourne null, hasSeenCover retourne false, resetSession swallow le throw. · `tests/session.test.ts`
+- [FIXED] `ingere_le` ne refresh pas sur UPDATE · Migration 0001 `ingere_le timestamptz not null default now()` — le default s'applique seulement à l'INSERT. Sur un re-run d'ingest qui UPDATE des rows existantes, `ingere_le` reste à la date originale. `fetchFreshness` retourne le max ingere_le → FreshnessBanner ment ("MAJ il y a 30 jours" alors qu'on vient juste de re-ingest). Fix script-side : stamp `ingere_le: new Date().toISOString()` sur le payload `enriched` dans `ingest-an.ts` + `rows` dans `resume-ingest.ts`. · `scripts/ingest-an.ts`, `scripts/resume-ingest.ts`
+
+### Vérifications à faire en session 71
+
+- [ ] grep `localStorage.removeItem(KEY);$` dans `src/lib/session.ts` → 0 résultat (wrapper try/catch ajouté)
+- [ ] `npm run test:run` → 126 tests verts (était 123)
+- [ ] Mocker une re-ingest qui n'INSERT aucune row (toutes UPDATE) → fetchFreshness retourne `last_sync_at` = maintenant, pas la date originale

@@ -82,7 +82,18 @@ export function recordVote(scrutinId: string, choice: UserVote): void {
 }
 
 export function resetSession(): void {
-  localStorage.removeItem(KEY);
+  // Symmetric with saveSession / forgetCover / markCoverSeen / loadSession
+  // (all have try/catch on localStorage access). Without this guard, a
+  // sandboxed-storage context would crash on the user clicking
+  // "Recommencer à zéro" (Cover restart) or "Refaire depuis le début"
+  // (Result refaire) — the throw bubbles into the click handler and the
+  // navigate() that follows never runs.
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    // Best effort: the localStorage entry stays around (we can't clear
+    // it), but the in-memory state is what callers act on next anyway.
+  }
 }
 
 export function getOrCreateSession(): SessionState {

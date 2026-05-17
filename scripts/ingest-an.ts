@@ -804,13 +804,26 @@ async function main(): Promise<void> {
   const { error: delErr } = await sb.from("scrutins").delete().eq("url_an_officielle", "");
   if (delErr) console.warn("⚠ Could not delete demo rows:", delErr.message);
 
+  // `ingere_le` has `default now()` in migration 0001, but the default only
+  // applies on INSERT — on UPSERT/UPDATE the column keeps its old value.
+  // Without setting it explicitly, re-ingestion of existing scrutins leaves
+  // `ingere_le` at the original date, and the FreshnessBanner banner reports
+  // a stale "MAJ il y a X jours" even right after a re-ingest. Stamp it now.
+  // (Cast back to ParsedScrutin[] because the existing fall-back `as`
+  // casts below assume that type; ParsedScrutin doesn't carry ingere_le
+  // in the interface but Supabase accepts the extra field at runtime.)
+  const ingestedAt = new Date().toISOString();
+  const enrichedWithTimestamp = enriched.map(
+    (s) => ({ ...s, ingere_le: ingestedAt })
+  ) as ParsedScrutin[];
+
   // Upsert in chunks to stay under PostgREST limits.
   const CHUNK = 100;
   let analyseLoiDropped = false;
   let pointsClesDropped = false;
   let themeDropped = false;
-  for (let i = 0; i < enriched.length; i += CHUNK) {
-    let chunk = enriched.slice(i, i + CHUNK);
+  for (let i = 0; i < enrichedWithTimestamp.length; i += CHUNK) {
+    let chunk = enrichedWithTimestamp.slice(i, i + CHUNK);
     if (analyseLoiDropped) {
       chunk = chunk.map(({ analyse_loi: _drop, ...rest }) => rest as ParsedScrutin);
     }

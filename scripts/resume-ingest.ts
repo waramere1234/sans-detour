@@ -307,9 +307,14 @@ async function main(): Promise<void> {
   // OR fallback). This way an upsert that lands as INSERT for a row that
   // never reached the DB on the prior run still satisfies all NOT NULL
   // constraints (numero, date, votes_bruts, …).
+  // `ingere_le` is stamped explicitly because the migration default only
+  // applies on INSERT — on UPSERT/UPDATE it'd keep the old value, and
+  // FreshnessBanner would report a stale "MAJ il y a X jours" after a
+  // resume run that just refreshed every row (same fix as ingest-an.ts).
+  const ingestedAt = new Date().toISOString();
   const rows = [...eligible.values()].map((parsed) => {
     const s = summaries.get(parsed.id) ?? fallbackSummary(parsed.titre_brut, parsed.dossier_titre);
-    return { ...parsed, ...s };
+    return { ...parsed, ...s, ingere_le: ingestedAt };
   });
 
   const sb = createClient(SUPABASE_URL!, SUPABASE_KEY!);

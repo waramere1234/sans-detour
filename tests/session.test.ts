@@ -1,5 +1,8 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { loadSession, saveSession, recordVote, resetSession, newSession } from "../src/lib/session";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import {
+  loadSession, saveSession, recordVote, resetSession, newSession,
+  hasSeenCover,
+} from "../src/lib/session";
 
 describe("session (localStorage state)", () => {
   beforeEach(() => { localStorage.clear(); });
@@ -78,5 +81,41 @@ describe("session (localStorage state)", () => {
       JSON.stringify({ session_id: "x", votes: [], started_at: 0 }),
     );
     expect(loadSession()).toBeNull();
+  });
+
+  // Defenses added session 69 (loadSession + hasSeenCover) and session 70
+  // (resetSession). localStorage access can throw in sandboxed iframes,
+  // Safari blocked-storage privacy mode, and certain extension contexts.
+  // Without these guards, App + Cover crash on first render or on the
+  // "Recommencer" button click.
+  describe("localStorage throw defenses", () => {
+    let getItem: ReturnType<typeof vi.spyOn>;
+    let removeItem: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      getItem = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+        throw new Error("blocked");
+      });
+      removeItem = vi.spyOn(Storage.prototype, "removeItem").mockImplementation(() => {
+        throw new Error("blocked");
+      });
+    });
+
+    afterEach(() => {
+      getItem.mockRestore();
+      removeItem.mockRestore();
+    });
+
+    it("loadSession returns null when localStorage.getItem throws", () => {
+      expect(loadSession()).toBeNull();
+    });
+
+    it("hasSeenCover returns false when localStorage.getItem throws", () => {
+      expect(hasSeenCover()).toBe(false);
+    });
+
+    it("resetSession swallows localStorage.removeItem throws", () => {
+      expect(() => resetSession()).not.toThrow();
+    });
   });
 });
