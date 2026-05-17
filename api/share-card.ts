@@ -53,7 +53,13 @@ export default async function handler(req: Request): Promise<Response> {
     const fmt = searchParams.get("fmt") === "story" ? "story" : "square";
     const bars = parseTopParam(searchParams.get("t")).slice(0, 8);
     if (bars.length === 0) {
-      return new Response("Missing t param", { status: 400 });
+      // Mirror the 500 path: explicit `text/plain` so curl / scrapers /
+      // browsers don't interpret the short body via a platform-default
+      // (which on some hosts is octet-stream, on others text/html).
+      return new Response("Missing t param", {
+        status: 400,
+        headers: { "Content-Type": "text/plain; charset=utf-8" },
+      });
     }
 
     const W = 1080;

@@ -65,7 +65,7 @@ export function FreshnessBanner({ info }: { info: FreshnessInfo }) {
           fontFamily: "var(--font-mono)", fontSize: 11,
           color: "var(--ink-2)", letterSpacing: "0.04em", marginTop: 3,
         }}>
-          {info.total_scrutins} scrutins · {pastPhrase} · {nextPhrase}
+          {info.total_scrutins} scrutin{info.total_scrutins !== 1 ? "s" : ""} · {pastPhrase} · {nextPhrase}
         </div>
       </div>
     </div>

@@ -48,9 +48,18 @@ export async function fetchFreshness(): Promise<FreshnessInfo> {
   // while the lastSync query happened to succeed.
   if (countRes.error) throw countRes.error;
   const lastSync = lastSyncRes.data?.[0]?.ingere_le ?? new Date().toISOString();
+  // Guard the +7 days arithmetic against a malformed `ingere_le` (rare but
+  // possible if a row was written by hand): `new Date("garbage").getTime()`
+  // is NaN, `new Date(NaN).toISOString()` throws RangeError, and the whole
+  // fetchFreshness call rejects — Cover would then never show the banner
+  // even though the data is fine. Fall back to now-anchored sync ETA when
+  // the timestamp can't be parsed; FreshnessBanner already coerces NaN-days
+  // into 0 ("MAJ aujourd'hui") on the display side.
+  const lastSyncMs = new Date(lastSync).getTime();
+  const baseMs = isNaN(lastSyncMs) ? Date.now() : lastSyncMs;
   return {
     total_scrutins: countRes.count ?? 0,
     last_sync_at: lastSync,
-    next_sync_eta: new Date(new Date(lastSync).getTime() + 7 * 86400_000).toISOString(),
+    next_sync_eta: new Date(baseMs + 7 * 86400_000).toISOString(),
   };
 }

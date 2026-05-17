@@ -57,6 +57,14 @@ describe("FreshnessBanner", () => {
     expect(screen.getByText(/92 scrutins/)).toBeInTheDocument();
   });
 
+  it("singularises 'scrutin' when total_scrutins is 1", () => {
+    // Session 83: total_scrutins was hardcoded "scrutins" plural — with a
+    // freshly-seeded Supabase (1 row) the banner read "1 scrutins · …".
+    render(<FreshnessBanner info={mk(3, 7, 1)} />);
+    expect(screen.getByText(/^1 scrutin\b/)).toBeInTheDocument();
+    expect(screen.queryByText(/1 scrutins/)).not.toBeInTheDocument();
+  });
+
   it("falls back to 0 (not NaN) when last_sync_at is malformed", () => {
     const info: FreshnessInfo = {
       total_scrutins: 100,

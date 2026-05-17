@@ -1884,3 +1884,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `^function (asStringArray|normalizeAnalyse|fallbackSummary|sanitizeJsonControlChars)` scripts/ingest-an.ts scripts/resume-ingest.ts → 0 résultat (toutes import depuis lib)
 - [ ] grep `ingere_le` CLAUDE.md → row présente dans tableau Schema
 - [ ] grep `className\?` src/components/Wordmark.tsx → 0 résultat (prop morte retirée)
+
+---
+
+## Session 83 — 2026-05-17
+
+### Vérification session 82
+
+- [VERIFIED] `scripts/lib/parse-summary.ts` présent, 5 helpers exportés
+- [VERIFIED] grep des `function asStringArray|normalizeAnalyse|fallbackSummary|sanitizeJsonControlChars|normalizePointsCles` dans les 2 scripts → 0 résultat (tout déplacé)
+- [VERIFIED] `CLAUDE.md` ligne 61 : row `ingere_le` ajoutée au tableau Schema
+- [VERIFIED] `src/components/Wordmark.tsx` : prop `className?` retirée, `className="sd-wordmark"` literal
+- 135/135 tests verts (avant les fixes de cette session), typecheck clean
+
+### Bugs fixés (plural drift + dateparse crash + missing Content-Type)
+
+- [FIXED] `FreshnessBanner.tsx:68` plural "scrutins" hardcoded · Le compteur disait `{total_scrutins} scrutins` — avec une Supabase fraîchement seedée à 1 row, render "1 scrutins · MAJ aujourd'hui · sync imminente" — drift agreement, même pattern que sessions 78-81 sur d'autres composants. Application de la règle `!== 1 ? "s" : ""` + test ajouté (`tests/FreshnessBanner.test.tsx` "singularises 'scrutin' when total_scrutins is 1"). · `src/components/FreshnessBanner.tsx`, `tests/FreshnessBanner.test.tsx`
+- [FIXED] `src/lib/scrutins.ts:54` crash sur `ingere_le` malformé · `new Date(new Date(lastSync).getTime() + 7 * 86400_000).toISOString()` — si `ingere_le` est invalide (manuellement édité côté DB), `new Date("garbage").getTime()` = NaN, puis `new Date(NaN).toISOString()` THROW RangeError "Invalid time value". `fetchFreshness` rejette → Cover n'affiche jamais le banner même si toutes les autres données sont propres. Guard ajouté : si `lastSyncMs` est NaN, fallback `Date.now()` pour le calcul de `next_sync_eta`. FreshnessBanner défend déjà l'affichage côté display (session 76, `diffDays`/`pastDays` retournent 0 sur NaN). · `src/lib/scrutins.ts`
+- [FIXED] `api/share-card.ts:56` 400 path sans Content-Type explicite · Session 81 a fixé la 500 path pour mêmes raisons (cohérence cross-platform, octet-stream sur certains hosts, text/html sur d'autres). Le sibling 400 ("Missing t param") avait le même defect — un client qui tape `/api/share-card.svg` sans `?t=` reçoit une 400 dont le Content-Type dépend de la platform. Ajout explicite `text/plain; charset=utf-8`. · `api/share-card.ts`
+
+### Vérifications à faire en session 84
+
+- [ ] DevTools : forcer `total_scrutins = 1` dans `FreshnessBanner` props → render "1 scrutin · …" (sans "s")
+- [ ] DevTools : mocker `fetchFreshness` avec `lastSyncRes.data[0].ingere_le = "garbage"` → no throw, banner affiche "MAJ aujourd'hui" + "prochaine sync dans 7 jours"
+- [ ] `curl -i /api/share-card.svg` (sans `?t=`) → 400 + `Content-Type: text/plain; charset=utf-8`
+- [ ] grep `~132 tests` CLAUDE.md → 0 résultat (aligné sur ~136)
