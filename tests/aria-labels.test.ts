@@ -39,6 +39,8 @@ import {
   METHODESHEET_FULL_METHODE_LINK_LABEL, METHODESHEET_REPORT_ERROR_LINK_LABEL,
   RESULT_GROUPS_H2, RESULT_PERSONNALITES_H2,
   TOPBAR_VERSION_LABEL,
+  PLAY_DECK_EXHAUSTED_MESSAGE, PLAY_EMPTY_POOL_MESSAGE,
+  COVER_HERO_PARAGRAPH,
   LEGISLATURE_LABEL,
 } from "../src/types";
 import { RETRY_DEFAULT_LABEL } from "../src/components/RetryError";
@@ -950,6 +952,57 @@ describe("TOPBAR_VERSION_LABEL — TopBar popover footer version", () => {
     // Nationale — pin the suffix to surface a future drop of the
     // attribution.
     expect(TOPBAR_VERSION_LABEL.endsWith("A.N.")).toBe(true);
+  });
+});
+
+describe("PLAY_DECK_EXHAUSTED_MESSAGE + PLAY_EMPTY_POOL_MESSAGE — Play.tsx error fallbacks", () => {
+  // 2 distinct error branches today, both rendered through RetryError:
+  // deck-exhausted (pool has data, deck filtered out everything) routes
+  // to /result on retry; empty-pool (Supabase returned 0) refetches.
+  it("PLAY_DECK_EXHAUSTED_MESSAGE matches the canonical wording", () => {
+    expect(PLAY_DECK_EXHAUSTED_MESSAGE).toBe("Plus de scrutins disponibles à voter dans ton deck.");
+  });
+
+  it("PLAY_EMPTY_POOL_MESSAGE matches the canonical wording", () => {
+    expect(PLAY_EMPTY_POOL_MESSAGE).toBe("Aucun scrutin disponible pour le moment. Réessaie dans quelques minutes.");
+  });
+
+  it("the 2 messages are distinct (different retry semantics — anti-clone guard)", () => {
+    // Deck-exhausted = user has voted everywhere they can; empty-pool
+    // = backend has nothing. Different states, different retry actions
+    // — a future merge into a single string would lose the distinction.
+    expect(PLAY_DECK_EXHAUSTED_MESSAGE).not.toBe(PLAY_EMPTY_POOL_MESSAGE);
+  });
+
+  it("both end with a period (complete-sentence error-message convention)", () => {
+    expect(PLAY_DECK_EXHAUSTED_MESSAGE.endsWith(".")).toBe(true);
+    expect(PLAY_EMPTY_POOL_MESSAGE.endsWith(".")).toBe(true);
+  });
+});
+
+describe("COVER_HERO_PARAGRAPH — Cover.tsx hero <p> value-prop explainer", () => {
+  it("matches the canonical 'Découvre avec quels partis…' wording", () => {
+    expect(COVER_HERO_PARAGRAPH).toBe(
+      "Découvre avec quels partis tu es vraiment aligné. On ne regarde pas les programmes — on regarde ce que les députés ont effectivement voté à l'Assemblée Nationale.",
+    );
+  });
+
+  it("starts with 'Découvre' (call-to-action verb opener)", () => {
+    // The hero copy opens with an imperative — a future rewording
+    // that flattens it to a declarative ("Sans Détour mesure…") would
+    // change the voice. Pin the verb-opener contract.
+    expect(COVER_HERO_PARAGRAPH.startsWith("Découvre")).toBe(true);
+  });
+
+  it("contains 'pas les programmes' (the load-bearing differentiator)", () => {
+    // The whole product framing pivots on "we don't measure programmes
+    // — we measure actual votes". A rewording that drops this phrase
+    // would lose the core differentiator vs traditional voting compasses.
+    expect(COVER_HERO_PARAGRAPH.toLowerCase()).toContain("pas les programmes");
+  });
+
+  it("contains 'Assemblée Nationale' (source attribution)", () => {
+    expect(COVER_HERO_PARAGRAPH).toContain("Assemblée Nationale");
   });
 });
 

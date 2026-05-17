@@ -492,6 +492,24 @@ export const RESULT_PERSONNALITES_H2 = "Alignement avec figures du mandat";
  *  defends against silent rewording (e.g. v2 → v3 with no test pin). */
 export const TOPBAR_VERSION_LABEL = "v2 · données A.N.";
 
+/** Play.tsx RetryError messages — 2 distinct branches today:
+ *    - PLAY_DECK_EXHAUSTED_MESSAGE: deck.length === 0 && pool.length > 0
+ *      (user has voted on every available scrutin) — retry routes to
+ *      /result instead of refetching.
+ *    - PLAY_EMPTY_POOL_MESSAGE: deck.length === 0 && poolLoaded (Supabase
+ *      returned 0 rows / every row was filtered out) — retry refetches.
+ *  Both inline + untested today; centralising surfaces a future rewording
+ *  and pins the 2 distinct error states (different retry semantics). */
+export const PLAY_DECK_EXHAUSTED_MESSAGE = "Plus de scrutins disponibles à voter dans ton deck.";
+export const PLAY_EMPTY_POOL_MESSAGE = "Aucun scrutin disponible pour le moment. Réessaie dans quelques minutes.";
+
+/** Cover.tsx hero <p> paragraph — the value-proposition explainer
+ *  rendered under the h1 TAGLINE. Documents the "vote-based, not
+ *  programme-based" framing called out in Methode §07 + the Cover
+ *  source attribution. Untested today; centralising lets a future
+ *  rewording surface in tests. */
+export const COVER_HERO_PARAGRAPH = "Découvre avec quels partis tu es vraiment aligné. On ne regarde pas les programmes — on regarde ce que les députés ont effectivement voté à l'Assemblée Nationale.";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

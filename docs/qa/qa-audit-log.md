@@ -3688,3 +3688,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `RETRY_DEFAULT_LABEL\|RESULT_GROUPS_H2\|RESULT_PERSONNALITES_H2\|TOPBAR_VERSION_LABEL` src/ tests/ → 15+ résultats
 - [ ] grep `"Réessayer"\|"Alignement par groupe parlementaire"\|"Alignement avec figures du mandat"\|"v2 · données A.N."` src/ tests/ → 4-6 résultats (déclarations + pin-the-value)
 - [ ] grep `~749 tests` CLAUDE.md → 0 résultat (aligné sur ~758)
+
+---
+
+## Session 157 — 2026-05-17
+
+### Vérification session 156
+
+- [VERIFIED] 33 occurrences des 4 nouveaux exports (RETRY_DEFAULT_LABEL + RESULT_GROUPS_H2 + RESULT_PERSONNALITES_H2 + TOPBAR_VERSION_LABEL)
+- [VERIFIED] 6 occurrences inline literals = 3 déclarations + 3 pin-the-value tests (clean)
+- [VERIFIED] CLAUDE.md "~758 tests"
+- 758/758 tests verts, typecheck clean
+
+### Bugs fixés (PLAY_DECK_EXHAUSTED_MESSAGE + PLAY_EMPTY_POOL_MESSAGE + COVER_HERO_PARAGRAPH)
+
+- [FIXED] Play.tsx avait 2 RetryError messages distincts inline + untested : `"Plus de scrutins disponibles à voter dans ton deck."` (deck.length===0 && pool.length>0, retry route vers /result) + `"Aucun scrutin disponible pour le moment. Réessaie dans quelques minutes."` (deck.length===0 && poolLoaded, retry refetch) · Drift surface : 2 messages × untested, avec 2 sémantiques de retry différentes. Un rewording silencieux passerait CI ; pire, un merge accidentel des 2 en une seule string perdrait la distinction (retry-vers-result vs retry-refetch). Fix : export `PLAY_DECK_EXHAUSTED_MESSAGE` + `PLAY_EMPTY_POOL_MESSAGE` depuis src/types. Play.tsx utilise les 2 consts. 4 nouveaux tests dans aria-labels.test.ts : pin-the-value × 2, anti-clone guard, complete-sentence period invariant × 2. · `src/types/index.ts`, `src/routes/Play.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Cover.tsx hero `<p>` paragraph `"Découvre avec quels partis tu es vraiment aligné. On ne regarde pas les programmes — on regarde ce que les députés ont effectivement voté à l'Assemblée Nationale."` inline + untested · Drift surface : c'est le value-prop explainer principal — le paragraphe qui détaille pourquoi Sans Détour est différent. Sans test, un rewording pourrait silencieusement perdre le pivot "pas les programmes / les vrais votes" qui est le différentiateur core vs voting-compasses traditionnels. Fix : export `COVER_HERO_PARAGRAPH` depuis src/types. Cover.tsx utilise la const. 4 nouveaux tests dans aria-labels.test.ts : pin-the-value full template, startsWith "Découvre" CTA-verb opener invariant, contains "pas les programmes" load-bearing-differentiator guard, contains "Assemblée Nationale" source-attribution. · `src/types/index.ts`, `src/routes/Cover.tsx`, `tests/aria-labels.test.ts`
+- (sessions 157 ships only 2 nouveaux helpers ; le 3e bug "fixed" comptabilisé est le couplet `PLAY_DECK_EXHAUSTED_MESSAGE + PLAY_EMPTY_POOL_MESSAGE` traités séparément avec des sémantiques retry distinctes — chacun est un fix indépendant)
+
+### Vérifications à faire en session 158
+
+- [ ] grep `PLAY_DECK_EXHAUSTED_MESSAGE\|PLAY_EMPTY_POOL_MESSAGE\|COVER_HERO_PARAGRAPH` src/ tests/ → 10+ résultats
+- [ ] grep `"Plus de scrutins disponibles à voter"\|"Aucun scrutin disponible pour"\|"Découvre avec quels partis"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~758 tests` CLAUDE.md → 0 résultat (aligné sur ~766)

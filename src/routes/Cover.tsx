@@ -17,7 +17,7 @@ import {
   VOTE_LABEL_CONTRE, VOTE_LABEL_SKIP, VOTE_LABEL_POUR,
   MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
   COVER_SOURCE_ATTRIBUTION_AN, COVER_SOURCE_ATTRIBUTION_CLAUDE,
-  coverProgressChipText,
+  coverProgressChipText, COVER_HERO_PARAGRAPH,
 } from "../types";
 
 export default function Cover() {
@@ -162,7 +162,7 @@ export default function Cover() {
             color: "var(--ink-2)", letterSpacing: "-0.005em",
             maxWidth: "32ch", marginTop: 24,
           }}>
-            Découvre avec quels partis tu es vraiment aligné. On ne regarde pas les programmes — on regarde ce que les députés ont effectivement voté à l'Assemblée Nationale.
+            {COVER_HERO_PARAGRAPH}
           </p>
         </div>
 

@@ -21,6 +21,7 @@ import {
   MENU_RESULT_LABEL,
   VOTE_LABEL_CONTRE, VOTE_LABEL_SKIP, VOTE_LABEL_POUR,
   VOTE_ARIA_CONTRE, VOTE_ARIA_SKIP, VOTE_ARIA_POUR,
+  PLAY_DECK_EXHAUSTED_MESSAGE, PLAY_EMPTY_POOL_MESSAGE,
   type Scrutin, type UserVote, type GroupCode, type GroupAlignment,
 } from "../types";
 
@@ -225,7 +226,7 @@ export default function Play() {
   if (deck.length === 0 && pool.length > 0) {
     return (
       <RetryError
-        message="Plus de scrutins disponibles à voter dans ton deck."
+        message={PLAY_DECK_EXHAUSTED_MESSAGE}
         onRetry={() => navigate(ROUTES.result)}
         retryLabel={VIEW_RESULT_LABEL}
       />
@@ -238,7 +239,7 @@ export default function Play() {
   if (deck.length === 0 && poolLoaded) {
     return (
       <RetryError
-        message="Aucun scrutin disponible pour le moment. Réessaie dans quelques minutes."
+        message={PLAY_EMPTY_POOL_MESSAGE}
         onRetry={() => setLoadTick((t) => t + 1)}
       />
     );
