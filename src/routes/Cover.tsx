@@ -13,7 +13,7 @@ import {
   TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL,
   START_LABEL, RESUME_LABEL, VIEW_RESULT_LABEL,
   RESTART_LABEL, VIEW_PARTIAL_RESULT_LABEL,
-  WORDMARK_HOME_LABEL,
+  WORDMARK_HOME_LABEL, restartConfirmMessage,
 } from "../types";
 
 export default function Cover() {
@@ -63,11 +63,7 @@ export default function Cover() {
   }
 
   function restart() {
-    const ok = window.confirm(
-      votesCount === 1
-        ? `${RESTART_LABEL} ? Ton vote en cours sera perdu.`
-        : `${RESTART_LABEL} ? Tes ${votesCount} votes en cours seront perdus.`,
-    );
+    const ok = window.confirm(restartConfirmMessage(votesCount));
     if (!ok) return;
     // resetSession only clears the session key — the cover-seen flag is
     // already "true" since the user is interacting with the in-progress UI

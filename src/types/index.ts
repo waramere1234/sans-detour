@@ -120,6 +120,21 @@ export const VIEW_RESULT_LABEL = "Voir mon résultat";
 export const RESTART_LABEL = "Recommencer à zéro";
 export const VIEW_PARTIAL_RESULT_LABEL = "Voir mon résultat partiel";
 
+/** Compose the `window.confirm(...)` message body for Cover.tsx's restart
+ *  action. Centralises the singular ("Ton vote en cours sera perdu.") /
+ *  plural ("Tes N votes en cours seront perdus.") French agreement +
+ *  the RESTART_LABEL prefix. tests/Cover.test.tsx pin both branches via
+ *  `expect.stringMatching(/.../)` — exporting the helper lets the tests
+ *  round-trip via the function instead of re-typing the literals. A
+ *  future rewording (or a future stop-pluralizing-and-just-say-"N votes
+ *  perdus" cleanup) propagates from one edit. */
+export function restartConfirmMessage(votesCount: number): string {
+  const lossPhrase = votesCount === 1
+    ? "Ton vote en cours sera perdu."
+    : `Tes ${votesCount} votes en cours seront perdus.`;
+  return `${RESTART_LABEL} ? ${lossPhrase}`;
+}
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

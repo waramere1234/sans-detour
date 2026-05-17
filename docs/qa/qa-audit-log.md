@@ -3330,3 +3330,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `SHARE_LEAD_PREFIX\|CLIPBOARD_PROMPT_LABEL\|partialResultMarker` src/ tests/ → 10+ résultats
 - [ ] grep `"Mes affinités politiques réelles"\|"Copie ton résultat :"\|"résultat partiel 7/20"` src/ tests/ → 3-4 résultats seulement (déclarations + pin-the-value)
 - [ ] grep `~630 tests` CLAUDE.md → 0 résultat (aligné sur ~635)
+
+---
+
+## Session 142 — 2026-05-17
+
+### Vérification session 141
+
+- [VERIFIED] 26 occurrences des 3 nouveaux exports (SHARE_LEAD_PREFIX|CLIPBOARD_PROMPT_LABEL|partialResultMarker) dans src/ + tests/
+- [VERIFIED] 5 occurrences seulement des 3 strings = 2 déclarations + 2 pin-the-value tests + 1 comment (pas de drift)
+- [VERIFIED] CLAUDE.md "~635 tests"
+- 635/635 tests verts, typecheck clean
+
+### Bugs fixés (FreshnessBanner titles/phrases × 4 consts + 2 helpers + restartConfirmMessage)
+
+- [FIXED] FreshnessBanner tone titles `"Synchronisation en retard"` + `"Données à jour"` étaient inline dans le module + dupliqués comme `.getByText("...")` literals dans tests/FreshnessBanner.test.tsx (2 sites chacun) · Drift surface : un rewording (e.g. "Mise à jour récente" / "Pipeline en retard") aurait demandé 4 edits in-lockstep. Fix : export `FRESHNESS_OK_TITLE` + `FRESHNESS_STALE_TITLE` depuis FreshnessBanner.tsx. Source + tests utilisent les consts. 1 nouveau test pin-the-value. · `src/components/FreshnessBanner.tsx`, `tests/FreshnessBanner.test.tsx`
+- [FIXED] Past/Next phrase composition (`"MAJ aujourd'hui"`, `"sync imminente"`, `"MAJ il y a N jour(s)"`, `"prochaine sync dans N jour(s)"`) était inline dans 2 ternaires source + asserté via 5 regex literals dans tests · Drift surface : le plural-rule + le boundary case dupliqués source/tests, plus les 2 phrases canoniques pinnées 4× chacune. Fix : export `FRESHNESS_TODAY_PHRASE` + `FRESHNESS_IMMINENT_PHRASE` + 2 helpers `freshnessPastPhrase(past)` + `freshnessNextPhrase(next)` qui encapsulent boundary + plural rule. Tests round-trip via les helpers/consts. 7 nouveaux tests : boundary x 2 helpers, plural rule x 2 helpers, pin-the-value x 4 consts. · `src/components/FreshnessBanner.tsx`, `tests/FreshnessBanner.test.tsx`
+- [FIXED] Cover.tsx restart() confirm prompt avait inline ternary `${RESTART_LABEL} ? Ton vote en cours sera perdu.` / `${RESTART_LABEL} ? Tes ${votesCount} votes en cours seront perdus.` + tests Cover.test.tsx assertaient `expect.stringMatching(/Ton vote en cours sera perdu/)` + `/Tes 3 votes en cours seront perdus/` literals · Drift surface : rewording = 4 edits in-lockstep (source 2 branches + 2 tests). Fix : export `restartConfirmMessage(votesCount)` helper depuis src/types. Cover utilise `window.confirm(restartConfirmMessage(votesCount))`. Tests round-trip via la helper avec `restartConfirmMessage(1)` / `restartConfirmMessage(3)`. 5 nouveaux tests dans aria-labels.test.ts : starts-with-RESTART_LABEL invariant, singular branch, plural branch, edge case votesCount=0 (plural in French), ends-with-period sentence-completion. · `src/types/index.ts`, `src/routes/Cover.tsx`, `tests/Cover.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 143
+
+- [ ] grep `FRESHNESS_OK_TITLE\|FRESHNESS_STALE_TITLE\|FRESHNESS_TODAY_PHRASE\|FRESHNESS_IMMINENT_PHRASE\|freshnessPastPhrase\|freshnessNextPhrase\|restartConfirmMessage` src/ tests/ → 25+ résultats
+- [ ] grep `"Synchronisation en retard"\|"Données à jour"\|"MAJ aujourd.hui"\|"sync imminente"\|"Ton vote en cours sera perdu"` src/ tests/ → 5 résultats seulement (déclarations dans les modules)
+- [ ] grep `~635 tests` CLAUDE.md → 0 résultat (aligné sur ~646)

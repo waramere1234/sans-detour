@@ -12,6 +12,7 @@ import {
   anScrutinViewAriaLabel,
   SKELETON_CARD_LOADING_LABEL, SKELETON_RESULT_LOADING_LABEL,
   DEMO_DATA_LABEL_PREFIX,
+  RESTART_LABEL, restartConfirmMessage,
 } from "../src/types";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
@@ -174,6 +175,40 @@ describe("DEMO_DATA_LABEL_PREFIX — Card + AuditTrail demo-data hint", () => {
     expect(DEMO_DATA_LABEL_PREFIX.endsWith(" ")).toBe(false);
     expect(DEMO_DATA_LABEL_PREFIX.endsWith(".")).toBe(false);
     expect(DEMO_DATA_LABEL_PREFIX.endsWith(",")).toBe(false);
+  });
+});
+
+describe("restartConfirmMessage — Cover.tsx restart confirm prompt", () => {
+  // Pulls the singular/plural French agreement + RESTART_LABEL prefix
+  // out of inline ternaries in Cover.tsx restart(). tests/Cover.test.tsx
+  // round-trip via this helper instead of regex-matching the literal
+  // "Ton vote en cours sera perdu" / "Tes N votes en cours seront perdus".
+  it("starts with RESTART_LABEL on both branches (preserves the button-copy reuse)", () => {
+    expect(restartConfirmMessage(1).startsWith(RESTART_LABEL)).toBe(true);
+    expect(restartConfirmMessage(5).startsWith(RESTART_LABEL)).toBe(true);
+  });
+
+  it("uses the singular phrasing 'Ton vote ... sera perdu.' when votesCount === 1", () => {
+    expect(restartConfirmMessage(1)).toContain("Ton vote en cours sera perdu.");
+  });
+
+  it("uses the plural phrasing 'Tes N votes ... seront perdus.' when votesCount !== 1", () => {
+    expect(restartConfirmMessage(3)).toContain("Tes 3 votes en cours seront perdus.");
+    expect(restartConfirmMessage(20)).toContain("Tes 20 votes en cours seront perdus.");
+  });
+
+  it("votesCount === 0 falls into the plural branch (sanity — French treats 0 as plural)", () => {
+    // 0 votes is an edge case the UI shouldn't reach (the restart button
+    // only renders when hasInProgress=true → votesCount ≥ 1), but the
+    // helper's plural-rule logic still needs to be consistent. French
+    // treats 0 as plural ("0 votes" not "0 vote") so 0 should hit the
+    // plural branch.
+    expect(restartConfirmMessage(0)).toContain("Tes 0 votes en cours seront perdus.");
+  });
+
+  it("ends with a period (sentence completion, consistent with confirm prompt convention)", () => {
+    expect(restartConfirmMessage(1).endsWith(".")).toBe(true);
+    expect(restartConfirmMessage(2).endsWith(".")).toBe(true);
   });
 });
 

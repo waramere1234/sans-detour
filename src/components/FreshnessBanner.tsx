@@ -26,6 +26,38 @@ function pastDays(target: string, base: number = Date.now()): number {
  *  source + test, with silent test-passing if forgotten. */
 export const STALE_AFTER_DAYS = 10;
 
+/** Tone-driven title rendered in the banner header. Both strings are
+ *  pinned by .getByText(...) assertions in tests/FreshnessBanner.test.tsx
+ *  — exporting them lets the test round-trip via the const instead of
+ *  re-typing the literal, so a rewording propagates from one edit. */
+export const FRESHNESS_OK_TITLE = "Données à jour";
+export const FRESHNESS_STALE_TITLE = "Synchronisation en retard";
+
+/** Natural-language phrasing for the past=0 / next=0 boundary cases —
+ *  "0 j" reads awkwardly, so we promote to these short phrases. Pinned
+ *  by 4 test assertions in FreshnessBanner.test.tsx (today × 2 sites,
+ *  imminent × 2 sites). */
+export const FRESHNESS_TODAY_PHRASE = "MAJ aujourd'hui";
+export const FRESHNESS_IMMINENT_PHRASE = "sync imminente";
+
+/** Compose the "MAJ il y a N jour(s)" past-phrase rendered below the
+ *  title. Pulls the plural rule + boundary handling out of the inline
+ *  ternary so the test suite can round-trip via the helper instead of
+ *  asserting `/MAJ il y a 1 jour\b/` against a parallel hardcoded
+ *  template. Centralised so a future rewording ("dernière MAJ il y a…")
+ *  touches one site. */
+export function freshnessPastPhrase(past: number): string {
+  if (past === 0) return FRESHNESS_TODAY_PHRASE;
+  return `MAJ il y a ${past} jour${past !== 1 ? "s" : ""}`;
+}
+
+/** Compose the "prochaine sync dans N jour(s)" next-phrase. Same drift-
+ *  fix pattern as freshnessPastPhrase. */
+export function freshnessNextPhrase(next: number): string {
+  if (next === 0) return FRESHNESS_IMMINENT_PHRASE;
+  return `prochaine sync dans ${next} jour${next !== 1 ? "s" : ""}`;
+}
+
 export function FreshnessBanner({ info }: { info: FreshnessInfo }) {
   const past = pastDays(info.last_sync_at);
   const next = diffDays(info.next_sync_eta);
@@ -34,17 +66,15 @@ export function FreshnessBanner({ info }: { info: FreshnessInfo }) {
     border: "var(--line)",
     background: "transparent",
     dot: "var(--ink-3)",
-    title: "Synchronisation en retard",
+    title: FRESHNESS_STALE_TITLE,
   } : {
     border: "var(--accent-line)",
     background: "var(--accent-soft)",
     dot: "var(--accent)",
-    title: "Données à jour",
+    title: FRESHNESS_OK_TITLE,
   };
-  // "0 j" reads awkwardly — promote to natural-language phrasing for the
-  // two boundary cases (today + imminent). Same for the past/next plural.
-  const pastPhrase = past === 0 ? "MAJ aujourd'hui" : `MAJ il y a ${past} jour${past !== 1 ? "s" : ""}`;
-  const nextPhrase = next === 0 ? "sync imminente" : `prochaine sync dans ${next} jour${next !== 1 ? "s" : ""}`;
+  const pastPhrase = freshnessPastPhrase(past);
+  const nextPhrase = freshnessNextPhrase(next);
   return (
     <div
       role="status"

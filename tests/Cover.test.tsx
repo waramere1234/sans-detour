@@ -12,6 +12,7 @@ import {
   TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL, TAGLINE,
   START_LABEL, RESUME_LABEL, VIEW_RESULT_LABEL,
   RESTART_LABEL, VIEW_PARTIAL_RESULT_LABEL,
+  restartConfirmMessage,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -178,22 +179,21 @@ describe("Cover — restart() flow (confirm + reset + analytics)", () => {
     expect(confirmSpy).toHaveBeenCalledWith(expect.stringMatching(new RegExp(`^${RESTART_LABEL}`)));
   });
 
-  it("uses the singular phrasing when votesCount === 1", () => {
+  it("uses the singular phrasing when votesCount === 1 (round-trip via restartConfirmMessage)", () => {
     renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
     fireEvent.click(screen.getByRole("button", { name: new RegExp(RESTART_LABEL) }));
-    // The confirm message embeds the count: "...Ton vote en cours sera perdu."
-    // (singular branch — votesCount === 1). Match the singular literal so a
-    // regression to the plural branch on count=1 surfaces here.
-    expect(confirmSpy).toHaveBeenCalledWith(expect.stringMatching(/Ton vote en cours sera perdu/));
+    // Round-trip via restartConfirmMessage(1) — a regression to the plural
+    // branch on count=1 (or a rewording of the loss-phrase) surfaces here.
+    expect(confirmSpy).toHaveBeenCalledWith(restartConfirmMessage(1));
   });
 
-  it("uses the plural phrasing with the vote count when votesCount >= 2", () => {
+  it("uses the plural phrasing with the vote count when votesCount >= 2 (round-trip via restartConfirmMessage)", () => {
     // Add 2 more votes (total = 3).
     recordVote("s2", "pour");
     recordVote("s3", "contre");
     renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
     fireEvent.click(screen.getByRole("button", { name: new RegExp(RESTART_LABEL) }));
-    expect(confirmSpy).toHaveBeenCalledWith(expect.stringMatching(/Tes 3 votes en cours seront perdus/));
+    expect(confirmSpy).toHaveBeenCalledWith(restartConfirmMessage(3));
   });
 
   it("clears the session and fires 'cover_restarted' when the user confirms", () => {
