@@ -3,6 +3,8 @@ import { render, screen } from "@testing-library/react";
 import { AuditTrail } from "../src/components/AuditTrail";
 import {
   anScrutinViewAriaLabel, DEMO_FALLBACK_SHORT_LABEL,
+  AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
+  AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
   type GroupAlignment, type Scrutin, type SessionVote,
   type GroupCode, type GroupPosition,
 } from "../src/types";
@@ -80,33 +82,33 @@ describe("AuditTrail — vote → icon mapping", () => {
   it("renders the aligned row with ✓ + 'Aligné' label", () => {
     const votes: SessionVote[] = [{ scrutin_id: "s-aligne", choice: "pour", voted_at: 1 }];
     render(<AuditTrail alignment={mkAlign()} scrutins={scrutins} votes={votes} />);
-    expect(screen.getByLabelText("Aligné")).toBeInTheDocument();
+    expect(screen.getByLabelText(AUDIT_TRAIL_LABEL_ALIGNED)).toBeInTheDocument();
   });
 
   it("renders the partial row with ≈ + 'Partiel' label", () => {
     const votes: SessionVote[] = [{ scrutin_id: "s-partiel", choice: "pour", voted_at: 1 }];
     render(<AuditTrail alignment={mkAlign()} scrutins={scrutins} votes={votes} />);
-    expect(screen.getByLabelText("Partiel")).toBeInTheDocument();
+    expect(screen.getByLabelText(AUDIT_TRAIL_LABEL_PARTIAL)).toBeInTheDocument();
   });
 
   it("renders the opposed row with ✕ + 'Opposé' label", () => {
     const votes: SessionVote[] = [{ scrutin_id: "s-oppose", choice: "pour", voted_at: 1 }];
     render(<AuditTrail alignment={mkAlign()} scrutins={scrutins} votes={votes} />);
-    expect(screen.getByLabelText("Opposé")).toBeInTheDocument();
+    expect(screen.getByLabelText(AUDIT_TRAIL_LABEL_OPPOSED)).toBeInTheDocument();
   });
 
   it("renders the divided row with ÷ + 'Groupe divisé, non compté' label", () => {
     const votes: SessionVote[] = [{ scrutin_id: "s-divise", choice: "pour", voted_at: 1 }];
     render(<AuditTrail alignment={mkAlign()} scrutins={scrutins} votes={votes} />);
-    expect(screen.getByLabelText("Groupe divisé, non compté")).toBeInTheDocument();
+    expect(screen.getByLabelText(AUDIT_TRAIL_LABEL_DIVIDED)).toBeInTheDocument();
   });
 
   it("filters skip votes (no row rendered for them)", () => {
     const votes: SessionVote[] = [{ scrutin_id: "s-skip", choice: "skip", voted_at: 1 }];
     render(<AuditTrail alignment={mkAlign()} scrutins={scrutins} votes={votes} />);
     // No icon labels render, only the breakdown chips at the top.
-    expect(screen.queryByLabelText("Aligné")).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("Opposé")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(AUDIT_TRAIL_LABEL_ALIGNED)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(AUDIT_TRAIL_LABEL_OPPOSED)).not.toBeInTheDocument();
   });
 
   it("silently drops votes whose scrutin_id is unknown to the pool", () => {

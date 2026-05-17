@@ -1,6 +1,6 @@
 // src/components/PartyRow.tsx
 import { getParty, getPartyColorVar } from "../lib/parties";
-import type { GroupAlignment } from "../types";
+import { partyRowAriaLabel, type GroupAlignment } from "../types";
 
 export interface PartyRowProps {
   alignment: GroupAlignment;
@@ -18,7 +18,7 @@ export function PartyRow({ alignment, expanded, onClick, controlsId }: PartyRowP
   const interactive = !!onClick;
   // Compose a single readable label so SR users don't hear three
   // disconnected fragments ("LFI · 25 % · 8") — they hear one sentence.
-  const rowLabel = `${meta.name}, ${alignment.pct} % d'alignement sur ${alignment.counted} scrutin${alignment.counted !== 1 ? "s" : ""} compté${alignment.counted !== 1 ? "s" : ""}`;
+  const rowLabel = partyRowAriaLabel(meta.name, alignment.pct, alignment.counted);
 
   return (
     <div

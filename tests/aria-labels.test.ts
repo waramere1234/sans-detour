@@ -27,6 +27,9 @@ import {
   CARD_IA_CHIP_ARIA_LABEL,
   METHODE_PAGE_EYEBROW, METHODE_PAGE_H1,
   DEMO_FALLBACK_SHORT_LABEL,
+  AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
+  AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
+  partyRowAriaLabel, personnaliteRowAriaLabel,
 } from "../src/types";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
@@ -530,6 +533,93 @@ describe("DEMO_FALLBACK_SHORT_LABEL — Card recto + AuditTrail demo badge", () 
     // hint prefix ("Donnée de démonstration"). A future merge would
     // change either the visible footprint or the SR experience.
     expect(DEMO_FALLBACK_SHORT_LABEL.length).toBeLessThan(DEMO_DATA_LABEL_PREFIX.length);
+  });
+});
+
+describe("AUDIT_TRAIL_LABEL_* — AuditTrail per-row icon labels", () => {
+  // 10 sites: 4 source if-branches in AuditTrail.tsx + 6 getByLabelText
+  // assertions in tests/AuditTrail.test.tsx. Centralised so a rewording
+  // ("Aligné" → "En accord") propagates from one edit.
+  it("DIVIDED matches the canonical 'Groupe divisé, non compté' wording", () => {
+    expect(AUDIT_TRAIL_LABEL_DIVIDED).toBe("Groupe divisé, non compté");
+  });
+
+  it("ALIGNED matches the canonical 'Aligné' wording", () => {
+    expect(AUDIT_TRAIL_LABEL_ALIGNED).toBe("Aligné");
+  });
+
+  it("PARTIAL matches the canonical 'Partiel' wording", () => {
+    expect(AUDIT_TRAIL_LABEL_PARTIAL).toBe("Partiel");
+  });
+
+  it("OPPOSED matches the canonical 'Opposé' wording", () => {
+    expect(AUDIT_TRAIL_LABEL_OPPOSED).toBe("Opposé");
+  });
+
+  it("the 4 labels are distinct (anti-clone)", () => {
+    const set = new Set([
+      AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
+      AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
+    ]);
+    expect(set.size).toBe(4);
+  });
+});
+
+describe("partyRowAriaLabel — PartyRow SR-friendly one-sentence label", () => {
+  // Pulled out of inline template `${name}, ${pct} % d'alignement sur
+  // ${counted} scrutin(s) compté(s)` in PartyRow.tsx. tests/PartyRow.test.tsx
+  // round-trip via the helper (replacing 4 loose partial-match regexes).
+  it("composes the canonical 'name, P % d'alignement sur N scrutin(s) compté(s)' template", () => {
+    expect(partyRowAriaLabel("La France Insoumise", 67, 8)).toBe(
+      "La France Insoumise, 67 % d'alignement sur 8 scrutins comptés",
+    );
+  });
+
+  it("uses singular 'scrutin compté' when counted === 1", () => {
+    expect(partyRowAriaLabel("X", 50, 1)).toContain("1 scrutin compté");
+    expect(partyRowAriaLabel("X", 50, 1)).not.toContain("scrutins");
+  });
+
+  it("uses plural 'scrutins comptés' when counted === 0 (French rule)", () => {
+    expect(partyRowAriaLabel("X", 0, 0)).toContain("0 scrutins comptés");
+  });
+
+  it("uses plural 'scrutins comptés' when counted >= 2", () => {
+    expect(partyRowAriaLabel("X", 80, 12)).toContain("12 scrutins comptés");
+  });
+});
+
+describe("personnaliteRowAriaLabel — PersonnaliteRow 2-branch SR label", () => {
+  // Helper has 2 branches:
+  //   - normal:    "{name}, {pct} % d'alignement sur {counted} vote(s)"
+  //   - low-data:  "{name}, trop peu de données : {counted} vote(s) comparable(s)"
+  it("normal branch composes the canonical 'name, P % d'alignement sur N vote(s)' template", () => {
+    expect(personnaliteRowAriaLabel("Marine Le Pen", 57, 12, false)).toBe(
+      "Marine Le Pen, 57 % d'alignement sur 12 votes",
+    );
+  });
+
+  it("low-data branch composes the 'trop peu de données : N vote(s) comparable(s)' template", () => {
+    expect(personnaliteRowAriaLabel("Marine Le Pen", 0, 2, true)).toBe(
+      "Marine Le Pen, trop peu de données : 2 votes comparables",
+    );
+  });
+
+  it("normal branch uses singular 'vote' when counted === 1", () => {
+    expect(personnaliteRowAriaLabel("X", 50, 1, false)).toContain("1 vote");
+    expect(personnaliteRowAriaLabel("X", 50, 1, false)).not.toContain("1 votes");
+  });
+
+  it("low-data branch uses singular 'vote comparable' when counted === 1", () => {
+    expect(personnaliteRowAriaLabel("X", 0, 1, true)).toContain("1 vote comparable");
+    expect(personnaliteRowAriaLabel("X", 0, 1, true)).not.toContain("comparables");
+  });
+
+  it("low-data branch drops the pct (avoids implying a real score on a low-sample size)", () => {
+    // Pin the contract: even with a non-zero pct passed in, the low-data
+    // branch must NOT mention it — the whole point is to suppress the
+    // implied "real score" on a 1-2 vote sample.
+    expect(personnaliteRowAriaLabel("X", 99, 2, true)).not.toContain("99");
   });
 });
 

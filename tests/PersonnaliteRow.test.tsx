@@ -1,7 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { PersonnaliteRow } from "../src/components/PersonnaliteRow";
-import { LOW_DATA_THRESHOLD, type PersonnaliteAlignment } from "../src/types";
+import {
+  LOW_DATA_THRESHOLD, personnaliteRowAriaLabel,
+  type PersonnaliteAlignment,
+} from "../src/types";
+import { getPersonnalite } from "../src/lib/personnalites";
 
 // PersonnaliteRow has accumulated invariants over sessions 25, 78, 81, 86:
 //  - session 25-like: SR-friendly composed aria-label (one sentence)
@@ -31,12 +35,13 @@ describe("PersonnaliteRow — normal data path", () => {
     expect(screen.getByText(/57%.*12/)).toBeInTheDocument();
   });
 
-  it("composes a SR-friendly aria-label with pct + counted votes", () => {
+  it("composes a SR-friendly aria-label via personnaliteRowAriaLabel (normal branch round-trip)", () => {
     render(<PersonnaliteRow alignment={mk()} />);
-    expect(screen.getByLabelText(/Marine Le Pen.*57.*12 votes/)).toBeInTheDocument();
+    const expected = personnaliteRowAriaLabel(getPersonnalite("le_pen").display_name, 57, 12, false);
+    expect(screen.getByLabelText(expected)).toBeInTheDocument();
   });
 
-  it("uses singular 'vote' in aria-label when counted === 1 (defense)", () => {
+  it("uses singular 'vote' in aria-label when counted === 1 (defense, round-trip via helper)", () => {
     // Today this branch only fires when counted >= LOW_DATA_THRESHOLD (=3),
     // so counted=1 actually goes to the tooLittleData path. We can't easily
     // exercise the normal-branch-with-counted=1 without lowering the
@@ -44,7 +49,9 @@ describe("PersonnaliteRow — normal data path", () => {
     // (singular form for counted=1 in *either* branch). counted=1 → "trop
     // peu" branch fires → "1 vote comparable" (also singular).
     render(<PersonnaliteRow alignment={mk({ counted: 1 })} />);
-    expect(screen.getByLabelText(/1 vote comparable(?!s)/)).toBeInTheDocument();
+    const expected = personnaliteRowAriaLabel(getPersonnalite("le_pen").display_name, 57, 1, true);
+    expect(screen.getByLabelText(expected)).toBeInTheDocument();
+    expect(expected).toMatch(/1 vote comparable(?!s)/);
   });
 });
 
@@ -55,19 +62,26 @@ describe("PersonnaliteRow — tooLittleData path (counted < LOW_DATA_THRESHOLD)"
   // longer below the threshold.
   const justBelow = LOW_DATA_THRESHOLD - 1; // currently 2
 
-  it("renders the 'trop peu de données' label at LOW_DATA_THRESHOLD - 1", () => {
+  it("renders the 'trop peu de données' label at LOW_DATA_THRESHOLD - 1 (round-trip via helper)", () => {
     render(<PersonnaliteRow alignment={mk({ counted: justBelow, pct: 0 })} />);
-    expect(screen.getByLabelText(/trop peu de données/)).toBeInTheDocument();
+    const expected = personnaliteRowAriaLabel(getPersonnalite("le_pen").display_name, 0, justBelow, true);
+    expect(screen.getByLabelText(expected)).toBeInTheDocument();
   });
 
-  it("singularises 'vote comparable' when counted === 1", () => {
+  it("singularises 'vote comparable' when counted === 1 (round-trip via helper)", () => {
     render(<PersonnaliteRow alignment={mk({ counted: 1, pct: 0 })} />);
-    expect(screen.getByLabelText(/1 vote comparable(?!s)/)).toBeInTheDocument();
+    const expected = personnaliteRowAriaLabel(getPersonnalite("le_pen").display_name, 0, 1, true);
+    expect(screen.getByLabelText(expected)).toBeInTheDocument();
+    // Defence: explicit singular pattern still surfaces if the helper
+    // regresses to a stale "votes comparables" plural on counted=1.
+    expect(expected).toMatch(/1 vote comparable(?!s)/);
   });
 
   it("uses plural 'votes comparables' when counted >= 2", () => {
     render(<PersonnaliteRow alignment={mk({ counted: justBelow, pct: 0 })} />);
-    expect(screen.getByLabelText(new RegExp(`${justBelow} votes comparables`))).toBeInTheDocument();
+    const expected = personnaliteRowAriaLabel(getPersonnalite("le_pen").display_name, 0, justBelow, true);
+    expect(screen.getByLabelText(expected)).toBeInTheDocument();
+    expect(expected).toMatch(new RegExp(`${justBelow} votes comparables`));
   });
 
   it("renders '— · N vote' in the right column (no pct) for low-data", () => {

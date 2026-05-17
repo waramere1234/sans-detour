@@ -3521,3 +3521,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `"MÉTHODE & SOURCES"\|"Comment on calcule, et avec"\|>démo<` src/ tests/ → 3-5 résultats seulement (déclarations + pin-the-value)
 - [ ] grep `MENU_LEGAL_LABEL` src/routes/Legal.tsx → 1 résultat (import + usage en h1)
 - [ ] grep `~687 tests` CLAUDE.md → 0 résultat (aligné sur ~693)
+
+---
+
+## Session 150 — 2026-05-17
+
+### Vérification session 149
+
+- [VERIFIED] 28 occurrences des 3 nouveaux exports (METHODE_PAGE_EYEBROW + METHODE_PAGE_H1 + DEMO_FALLBACK_SHORT_LABEL)
+- [VERIFIED] 2 occurrences seulement des 3 strings = 1 déclaration + 1 pin-the-value test (pas de drift)
+- [VERIFIED] Legal.tsx utilise MENU_LEGAL_LABEL (import + h1)
+- [VERIFIED] CLAUDE.md "~693 tests"
+- 693/693 tests verts, typecheck clean
+
+### Bugs fixés (AUDIT_TRAIL_LABEL × 4 + partyRowAriaLabel + personnaliteRowAriaLabel)
+
+- [FIXED] AuditTrail.tsx 4 per-row icon aria-labels (`"Groupe divisé, non compté"`, `"Aligné"`, `"Partiel"`, `"Opposé"`) inline dans 4 if-branches + dupliqués dans tests/AuditTrail.test.tsx via 6 `getByLabelText("…")` + 2 `queryByLabelText("…")` assertions · Drift surface : 10 sites in-lockstep (4 source + 6 tests). Un rewording de "Aligné" → "En accord" demanderait 7 edits parallèles. Fix : export `AUDIT_TRAIL_LABEL_DIVIDED/ALIGNED/PARTIAL/OPPOSED`. AuditTrail.tsx + tests utilisent les 4 consts. 5 nouveaux tests dans aria-labels.test.ts : pin-the-value × 4 + distinct-set anti-clone. · `src/types/index.ts`, `src/components/AuditTrail.tsx`, `tests/AuditTrail.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] PartyRow.tsx inline template `${name}, ${pct} % d'alignement sur ${counted} scrutin(s) compté(s)` + tests/PartyRow.test.tsx 4 loose-regex partial matches (`/La France Insoumise.*67.*alignement.*8 scrutins comptés/`, `/1 scrutin compté(?!s)/`, etc.) · Drift surface : un partial rewording (e.g. drop "d'alignement") passerait silencieusement les 4 regex partials. Fix : export `partyRowAriaLabel(name, pct, counted)` helper avec plural rule encapsulée. PartyRow utilise le helper ; tests migrent vers `screen.getByLabelText(partyRowAriaLabel(getParty("LFI").name, 67, N))` (full-string round-trip). 4 nouveaux tests dans aria-labels.test.ts : full-template pin-the-value, singular + plural × 3 branches (counted=0/1/2+). · `src/types/index.ts`, `src/components/PartyRow.tsx`, `tests/PartyRow.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] PersonnaliteRow.tsx 2-branch inline template (normal: `${name}, ${pct} % d'alignement sur ${counted} vote(s)` + low-data: `${name}, trop peu de données : ${counted} vote(s) comparable(s)`) + tests/PersonnaliteRow.test.tsx 5+ loose-regex partial matches · Drift surface symétrique à PartyRow. Fix : export `personnaliteRowAriaLabel(name, pct, counted, tooLittleData)` helper (le boolean explicite évite de dupliquer LOW_DATA_THRESHOLD logic). PersonnaliteRow utilise le helper ; tests migrent vers `getByLabelText(personnaliteRowAriaLabel(getPersonnalite("le_pen").display_name, P, N, T))` + gardent les regex pin pour singular/plural rule defense. 5 nouveaux tests dans aria-labels.test.ts : full-template pin-the-value × 2 branches, singular/plural × 2 branches, low-data drops pct (suppression de score implicite sur low-sample). · `src/types/index.ts`, `src/components/PersonnaliteRow.tsx`, `tests/PersonnaliteRow.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 151
+
+- [ ] grep `AUDIT_TRAIL_LABEL_DIVIDED\|AUDIT_TRAIL_LABEL_ALIGNED\|AUDIT_TRAIL_LABEL_PARTIAL\|AUDIT_TRAIL_LABEL_OPPOSED\|partyRowAriaLabel\|personnaliteRowAriaLabel` src/ tests/ → 35+ résultats
+- [ ] grep `"Aligné"\|"Partiel"\|"Opposé"\|"Groupe divisé, non compté"\|"d.alignement sur"\|"trop peu de données"` src/ tests/ → 6-8 résultats (déclarations + pin-the-value)
+- [ ] grep `~693 tests` CLAUDE.md → 0 résultat (aligné sur ~707)

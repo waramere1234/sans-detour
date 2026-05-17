@@ -1,7 +1,10 @@
 // src/components/PersonnaliteRow.tsx
 import { getPersonnalite } from "../lib/personnalites";
 import { getPartyColorVar } from "../lib/parties";
-import { LOW_DATA_THRESHOLD, type PersonnaliteAlignment } from "../types";
+import {
+  LOW_DATA_THRESHOLD, personnaliteRowAriaLabel,
+  type PersonnaliteAlignment,
+} from "../types";
 
 export interface PersonnaliteRowProps {
   alignment: PersonnaliteAlignment;
@@ -15,9 +18,7 @@ export function PersonnaliteRow({ alignment }: PersonnaliteRowProps) {
   // sentence instead of three disconnected fragments ("Le Pen 57 % 12").
   // The low-data path drops the percent to avoid implying a real score
   // on a 1-2 vote sample.
-  const rowLabel = tooLittleData
-    ? `${meta.display_name}, trop peu de données : ${alignment.counted} vote${alignment.counted !== 1 ? "s" : ""} comparable${alignment.counted !== 1 ? "s" : ""}`
-    : `${meta.display_name}, ${alignment.pct} % d'alignement sur ${alignment.counted} vote${alignment.counted !== 1 ? "s" : ""}`;
+  const rowLabel = personnaliteRowAriaLabel(meta.display_name, alignment.pct, alignment.counted, tooLittleData);
 
   return (
     <div

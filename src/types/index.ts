@@ -278,6 +278,50 @@ export const METHODE_PAGE_H1 = "Comment on calcule, et avec quelles données";
  *  This is the short visible badge; that is the long screen-reader hint. */
 export const DEMO_FALLBACK_SHORT_LABEL = "démo";
 
+/** AuditTrail.tsx per-row icon `aria-label`s — one per
+ *  `alignmentScore` outcome ({null, 0, 0.5, 1}). 10 sites today
+ *  (4 source ifs + 6 test getByLabelText assertions). Centralised
+ *  so a rewording propagates to source + 6 tests in one edit. */
+export const AUDIT_TRAIL_LABEL_DIVIDED = "Groupe divisé, non compté";
+export const AUDIT_TRAIL_LABEL_ALIGNED = "Aligné";
+export const AUDIT_TRAIL_LABEL_PARTIAL = "Partiel";
+export const AUDIT_TRAIL_LABEL_OPPOSED = "Opposé";
+
+/** Compose the SR-friendly one-sentence aria-label rendered on each
+ *  PartyRow (Result.tsx ranking + RankingOverlay rows). The previous
+ *  inline template `${name}, ${pct} % d'alignement sur ${counted}
+ *  scrutin(s) compté(s)` was pinned by 4 test regex partial-matches —
+ *  a partial rewording (e.g. drop "d'alignement") would pass silently.
+ *  Helper + round-trip pin closes the gap. Handles the singular /
+ *  plural agreement on "scrutin" + "compté" via the same `!== 1` rule. */
+export function partyRowAriaLabel(name: string, pct: number, counted: number): string {
+  const s = counted !== 1 ? "s" : "";
+  return `${name}, ${pct} % d'alignement sur ${counted} scrutin${s} compté${s}`;
+}
+
+/** Compose the SR-friendly one-sentence aria-label rendered on each
+ *  PersonnaliteRow. Two branches:
+ *    - Normal:    `${name}, ${pct} % d'alignement sur ${counted} vote(s)`
+ *    - Low-data:  `${name}, trop peu de données : ${counted} vote(s) comparable(s)`
+ *  Low-data branch drops the pct to avoid implying a real score on a
+ *  1-2 vote sample (LOW_DATA_THRESHOLD). 5+ test regex partial-matches
+ *  in tests/PersonnaliteRow.test.tsx pin individual fragments; the
+ *  helper enables full-string round-trips. The "tooLittleData" flag is
+ *  passed explicitly so the consumer (PersonnaliteRow) doesn't have to
+ *  duplicate the LOW_DATA_THRESHOLD comparison inside this helper. */
+export function personnaliteRowAriaLabel(
+  displayName: string,
+  pct: number,
+  counted: number,
+  tooLittleData: boolean,
+): string {
+  const s = counted !== 1 ? "s" : "";
+  if (tooLittleData) {
+    return `${displayName}, trop peu de données : ${counted} vote${s} comparable${s}`;
+  }
+  return `${displayName}, ${pct} % d'alignement sur ${counted} vote${s}`;
+}
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

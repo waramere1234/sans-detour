@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { PartyRow } from "../src/components/PartyRow";
-import type { GroupAlignment } from "../src/types";
+import { partyRowAriaLabel, type GroupAlignment } from "../src/types";
+import { getParty } from "../src/lib/parties";
 
 // PartyRow has accumulated subtle invariants over 8+ sessions:
 //  - session 25: SR-friendly composed aria-label (one sentence, not 3 fragments)
@@ -28,29 +29,30 @@ describe("PartyRow — rendering", () => {
     expect(screen.getByText("67%")).toBeInTheDocument();
   });
 
-  it("composes a single readable aria-label (SR-friendly)", () => {
+  it("composes a single readable aria-label via partyRowAriaLabel (SR-friendly round-trip)", () => {
     render(<PartyRow alignment={mk()} />);
-    // The div has no role when not interactive, but the aria-label still
-    // exists on the element.
-    const row = screen.getByLabelText(/La France Insoumise.*67.*alignement.*8 scrutins comptés/);
-    expect(row).toBeInTheDocument();
+    // Round-trip via partyRowAriaLabel — a partial rewording (e.g. drop
+    // "d'alignement") in the helper would surface here as a full-string
+    // mismatch instead of passing a loose `/La France Insoumise.*67/` regex.
+    const expected = partyRowAriaLabel(getParty("LFI").name, 67, 8);
+    expect(screen.getByLabelText(expected)).toBeInTheDocument();
   });
 });
 
 describe("PartyRow — plural rule (session 81 fix)", () => {
-  it("uses singular 'scrutin compté' when counted === 1", () => {
+  it("uses singular 'scrutin compté' when counted === 1 (round-trip via helper)", () => {
     render(<PartyRow alignment={mk({ counted: 1 })} />);
-    expect(screen.getByLabelText(/1 scrutin compté(?!s)/)).toBeInTheDocument();
+    expect(screen.getByLabelText(partyRowAriaLabel(getParty("LFI").name, 67, 1))).toBeInTheDocument();
   });
 
   it("uses plural 'scrutins comptés' when counted === 0 (French rule)", () => {
     render(<PartyRow alignment={mk({ counted: 0 })} />);
-    expect(screen.getByLabelText(/0 scrutins comptés/)).toBeInTheDocument();
+    expect(screen.getByLabelText(partyRowAriaLabel(getParty("LFI").name, 67, 0))).toBeInTheDocument();
   });
 
   it("uses plural 'scrutins comptés' when counted >= 2", () => {
     render(<PartyRow alignment={mk({ counted: 12 })} />);
-    expect(screen.getByLabelText(/12 scrutins comptés/)).toBeInTheDocument();
+    expect(screen.getByLabelText(partyRowAriaLabel(getParty("LFI").name, 67, 12))).toBeInTheDocument();
   });
 });
 

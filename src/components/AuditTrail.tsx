@@ -2,6 +2,8 @@
 import {
   anScrutinViewAriaLabel,
   DEMO_DATA_LABEL_PREFIX, DEMO_FALLBACK_SHORT_LABEL,
+  AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
+  AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
   type GroupAlignment, type Scrutin, type SessionVote,
 } from "../types";
 import { alignmentScore } from "../lib/matching";
@@ -34,10 +36,10 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
       let icon: string;
       let color: string;
       let label: string;
-      if (score === null) { icon = "÷"; color = "var(--ink-4)"; label = "Groupe divisé, non compté"; }
-      else if (score === 1) { icon = "✓"; color = "var(--pour)"; label = "Aligné"; }
-      else if (score === 0.5) { icon = "≈"; color = "var(--warn)"; label = "Partiel"; }
-      else { icon = "✕"; color = "var(--contre)"; label = "Opposé"; }
+      if (score === null) { icon = "÷"; color = "var(--ink-4)"; label = AUDIT_TRAIL_LABEL_DIVIDED; }
+      else if (score === 1) { icon = "✓"; color = "var(--pour)"; label = AUDIT_TRAIL_LABEL_ALIGNED; }
+      else if (score === 0.5) { icon = "≈"; color = "var(--warn)"; label = AUDIT_TRAIL_LABEL_PARTIAL; }
+      else { icon = "✕"; color = "var(--contre)"; label = AUDIT_TRAIL_LABEL_OPPOSED; }
       return { v, sc, groupPos, score, icon, color, label };
     })
     .filter((x): x is NonNullable<typeof x> => x !== null);
