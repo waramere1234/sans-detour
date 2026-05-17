@@ -25,7 +25,7 @@ npm run ingest:an
 
 ## 2. Icônes PWA (10 min) — production-blocker
 
-3 fichiers à placer dans `public/icons/` (le manifest les référence déjà, et `index.html` aussi pour og:image / twitter:image / apple-touch-icon — TODO production-blocker en commentaire dans les deux fichiers) :
+3 fichiers à placer dans `public/icons/` (le manifest les référence déjà, et `index.html` aussi pour favicon `<link rel="icon">` / apple-touch-icon / og:image / twitter:image — TODO production-blocker en commentaire dans les deux fichiers) :
 
 - `icon-192.png` (192×192)
 - `icon-512.png` (512×512)
@@ -73,15 +73,22 @@ git push -u origin feat/v1-implementation
 
 ---
 
-## 5. Domaine `sansdetour.fr` (optionnel, ~10€/an)
+## 5. Domaine `sansdetour.fr` — prérequis pour SEO + analytics (~10€/an)
 
-Si tu veux un vrai domaine :
+Plusieurs fichiers du repo référencent déjà `sansdetour.fr` :
+- `index.html` : `<link rel="canonical">`, `og:url`, `og:image`, `twitter:image`, `data-domain` Plausible
+- `src/lib/analytics.ts` : `ANALYTICS_HOSTS = ["sansdetour.fr", "www.sansdetour.fr"]`
 
+Tant que le domaine n'est pas en place :
+- Google indexe `*.vercel.app` mais la canonical pointe vers une URL 404 → SEO fragmenté.
+- Plausible no-op silencieusement quand l'user visite `*.vercel.app` → analytics zéro.
+
+Étapes :
 1. Achète `sansdetour.fr` chez OVH, Cloudflare Registrar, ou Gandi (~10€/an)
 2. Vercel → Project → **Settings → Domains** → Add `sansdetour.fr`
 3. Suis les instructions Vercel pour configurer les DNS (CNAME ou A record)
 
-Pas urgent — Vercel donne une URL gratuite `xxx.vercel.app` qui marche très bien pour partager.
+Si tu décides de rester sur `*.vercel.app` plus longtemps : update `index.html` canonical / og / plausible data-domain + `ANALYTICS_HOSTS` pour pointer la vraie URL live.
 
 ---
 

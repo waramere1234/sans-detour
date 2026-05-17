@@ -1,5 +1,5 @@
 {
-  "_comment": "TODO production-blocker — the three icon paths below all 404 today (no public/icons/ directory). PWA install picks a default icon; iOS Add-to-Home-Screen does too. Tracked in SHIP-V1.md §2 'Icônes PWA'. Remove this _comment key when public/icons/ exists. The mirror references in index.html (apple-touch-icon, og:image, twitter:image) are flagged with the same TODO.",
+  "_comment": "TODO production-blocker — the three icon paths below all 404 today (no public/icons/ directory). PWA install picks a default icon; iOS Add-to-Home-Screen does too. Tracked in SHIP-V1.md §2 'Icônes PWA'. Remove this _comment key when public/icons/ exists. The mirror references in index.html (favicon link, apple-touch-icon, og:image, twitter:image) are flagged with the same TODO.",
   "id": "/",
   "name": "Sans Détour",
   "short_name": "Sans Détour",

@@ -1539,3 +1539,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] Sur `/` (Cover), inspecter le wordmark Link → `aria-current="page"` présent
 - [ ] grep `Wordmark size=` dans `src/` → 0 résultat
 - [ ] grep `V2 transparence (optionnel)` dans `CLAUDE.md` → 0 résultat (remplacé par "en partie livré")
+
+---
+
+## Session 68 — 2026-05-17
+
+### Vérification session 67
+
+- [VERIFIED] `Cover.tsx:116` `aria-current="page"` sur le Wordmark Link (self-link sur "/")
+- [VERIFIED] `grep "Wordmark size="` retourne 0 (4 sites cleaned : TopBar, Cover, Methode, Legal)
+- [VERIFIED] `CLAUDE.md` "V2 transparence" décomposée en ✅/⏳/⏳ sub-bullets
+- 123/123 tests verts, typecheck clean
+
+### Bugs fixés (3 drifts docs autour de sansdetour.fr + favicon)
+
+- [FIXED] SHIP-V1 §5 framing trompeur · "Domaine sansdetour.fr (optionnel, ~10€/an) ... Pas urgent — Vercel donne une URL gratuite `xxx.vercel.app` qui marche très bien" — mais le repo référence déjà `sansdetour.fr` partout : `<link rel="canonical">`, og:url, og:image, twitter:image, Plausible `data-domain`, ANALYTICS_HOSTS allow-list. Tant que le domaine n'est pas en place : SEO fragmenté (canonical pointe vers 404) + analytics no-op silencieux. Section §5 réécrite : "prérequis pour SEO + analytics", énumère les fichiers concernés et propose le chemin alternatif (rester sur `*.vercel.app` mais reflect partout dans le code). · `SHIP-V1.md`
+- [FIXED] SHIP-V1 §2 enum manifest favicon · La ligne 28 énumérait les références icons dans index.html comme "og:image / twitter:image / apple-touch-icon" — mais session 65 a ajouté `<link rel="icon">` à ce groupe. Énumération complétée avec "favicon `<link rel="icon">` /". · `SHIP-V1.md`
+- [FIXED] manifest._comment enum favicon · Même drift que SHIP-V1 §2 — le `_comment` JSON listait "(apple-touch-icon, og:image, twitter:image)" sans le favicon link. Ajout "favicon link, " en tête de la liste. Le manifest reste un JSON valide (vérifié avec node -e JSON.parse). · `public/manifest.webmanifest`
+
+### Vérifications à faire en session 69
+
+- [ ] grep `Pas urgent\|optionnel.*sansdetour` dans `SHIP-V1.md` → 0 résultat
+- [ ] grep `favicon` dans `SHIP-V1.md` `public/manifest.webmanifest` → 1+ résultat chacun (la mention dans l'enum)
+- [ ] node -e "JSON.parse(require('fs').readFileSync('public/manifest.webmanifest','utf8'))" → pas d'erreur (JSON valide)
