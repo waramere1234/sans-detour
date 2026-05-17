@@ -9,6 +9,9 @@ import {
   VOTE_LABEL_CONTRE, VOTE_LABEL_SKIP, VOTE_LABEL_POUR,
   VOTE_ARIA_CONTRE, VOTE_ARIA_SKIP, VOTE_ARIA_POUR,
   voteButtonAriaLabel,
+  anScrutinViewAriaLabel,
+  SKELETON_CARD_LOADING_LABEL, SKELETON_RESULT_LOADING_LABEL,
+  DEMO_DATA_LABEL_PREFIX,
 } from "../src/types";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
@@ -105,6 +108,72 @@ describe("Play.tsx vote-button labels", () => {
   it("the 3 visible labels are distinct (no accidental dup)", () => {
     const set = new Set([VOTE_LABEL_CONTRE, VOTE_LABEL_SKIP, VOTE_LABEL_POUR]);
     expect(set.size).toBe(3);
+  });
+});
+
+describe("anScrutinViewAriaLabel — Card + AuditTrail external link a11y", () => {
+  // Used 2× (Card.tsx verso footer + AuditTrail.tsx per-row link). Pin
+  // the template + the EXTERNAL_LINK_SUFFIX round-trip so a future
+  // rewording (or i18n flip) propagates atomically.
+  it("composes the canonical 'Voir le scrutin n°N sur le site de l'Assemblée Nationale (nouvel onglet)' wording", () => {
+    expect(anScrutinViewAriaLabel(1234)).toBe(
+      "Voir le scrutin n°1234 sur le site de l'Assemblée Nationale (nouvel onglet)",
+    );
+  });
+
+  it("interpolates the numero into the n°N slot", () => {
+    expect(anScrutinViewAriaLabel(42)).toContain("n°42");
+    expect(anScrutinViewAriaLabel(999)).toContain("n°999");
+  });
+
+  it("ends with EXTERNAL_LINK_SUFFIX (round-trip via the shared external-link marker)", () => {
+    // A future change to EXTERNAL_LINK_SUFFIX (e.g. " (opens in new tab)"
+    // for en-US) should propagate to this helper via concatenation, not
+    // a parallel hardcoded suffix.
+    expect(anScrutinViewAriaLabel(7).endsWith(EXTERNAL_LINK_SUFFIX)).toBe(true);
+  });
+});
+
+describe("SKELETON_CARD_LOADING_LABEL + SKELETON_RESULT_LOADING_LABEL", () => {
+  // Used 1× in CardSkeleton + 1× in ResultSkeleton + 3× in Skeleton.test.tsx.
+  // Pin the visible wording so a rewording propagates from one edit.
+  it("SKELETON_CARD_LOADING_LABEL is the canonical 'Chargement des scrutins' wording", () => {
+    expect(SKELETON_CARD_LOADING_LABEL).toBe("Chargement des scrutins");
+  });
+
+  it("SKELETON_RESULT_LOADING_LABEL is the canonical 'Chargement de ton résultat' wording", () => {
+    expect(SKELETON_RESULT_LOADING_LABEL).toBe("Chargement de ton résultat");
+  });
+
+  it("both start with 'Chargement' (SR skim consistency)", () => {
+    // Distinct skeletons but both must announce "loading" as the first
+    // word so a screen reader user hears the same load-bearing token
+    // regardless of route. A future divergence (e.g. "Loading the deck"
+    // / "Computing your result") should be a deliberate choice, not
+    // accidental drift.
+    expect(SKELETON_CARD_LOADING_LABEL.startsWith("Chargement")).toBe(true);
+    expect(SKELETON_RESULT_LOADING_LABEL.startsWith("Chargement")).toBe(true);
+  });
+
+  it("the 2 labels are distinct (no accidental clone)", () => {
+    expect(SKELETON_CARD_LOADING_LABEL).not.toBe(SKELETON_RESULT_LOADING_LABEL);
+  });
+});
+
+describe("DEMO_DATA_LABEL_PREFIX — Card + AuditTrail demo-data hint", () => {
+  // The full wording varies per site (title is explanatory, aria-labels
+  // are tighter) but the leading "Donnée de démonstration" prefix is the
+  // load-bearing token. 3 sites compose with the same prefix.
+  it("matches the canonical 'Donnée de démonstration' prefix", () => {
+    expect(DEMO_DATA_LABEL_PREFIX).toBe("Donnée de démonstration");
+  });
+
+  it("does not include any trailing punctuation / space (consumers append their own)", () => {
+    // The 3 sites compose `${PREFIX} (…)` or `${PREFIX} — …` — the prefix
+    // must not include the separator else the composed strings double-up.
+    expect(DEMO_DATA_LABEL_PREFIX.endsWith(" ")).toBe(false);
+    expect(DEMO_DATA_LABEL_PREFIX.endsWith(".")).toBe(false);
+    expect(DEMO_DATA_LABEL_PREFIX.endsWith(",")).toBe(false);
   });
 });
 

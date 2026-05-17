@@ -1,5 +1,9 @@
 // src/components/AuditTrail.tsx
-import type { GroupAlignment, Scrutin, SessionVote } from "../types";
+import {
+  anScrutinViewAriaLabel,
+  DEMO_DATA_LABEL_PREFIX,
+  type GroupAlignment, type Scrutin, type SessionVote,
+} from "../types";
 import { alignmentScore } from "../lib/matching";
 import { getParty } from "../lib/parties";
 import { extractConcrete } from "../lib/text-cleanup";
@@ -112,15 +116,15 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
                 href={r.sc.url_an_officielle}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`Voir le scrutin n°${r.sc.numero} sur le site de l'Assemblée Nationale (nouvel onglet)`}
+                aria-label={anScrutinViewAriaLabel(r.sc.numero)}
                 style={{
                   fontFamily: "var(--font-mono)", fontSize: 10,
                   color: "var(--ink-3)", letterSpacing: "0.04em", textDecoration: "none",
                 }}><span aria-hidden="true">AN ↗</span></a>
             ) : (
               <span
-                title="Donnée de démonstration — sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production"
-                aria-label="Donnée de démonstration (pas un scrutin AN réel)"
+                title={`${DEMO_DATA_LABEL_PREFIX} — sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production`}
+                aria-label={`${DEMO_DATA_LABEL_PREFIX} (pas un scrutin AN réel)`}
                 style={{
                   fontFamily: "var(--font-mono)", fontSize: 10,
                   color: "var(--ink-4)", letterSpacing: "0.04em",

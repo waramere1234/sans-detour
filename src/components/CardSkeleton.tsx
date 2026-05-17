@@ -1,10 +1,11 @@
 import { CARD_FACE_BOX_SHADOW } from "./Card";
+import { SKELETON_CARD_LOADING_LABEL } from "../types";
 
 export function CardSkeleton() {
   return (
     <div
       aria-busy="true"
-      aria-label="Chargement des scrutins"
+      aria-label={SKELETON_CARD_LOADING_LABEL}
       style={{
         background: "var(--bg-2)",
         border: "1px solid var(--line)",

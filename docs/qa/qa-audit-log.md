@@ -3284,3 +3284,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `VOTE_LABEL_CONTRE\|VOTE_LABEL_SKIP\|VOTE_LABEL_POUR\|VOTE_ARIA_CONTRE\|VOTE_ARIA_SKIP\|VOTE_ARIA_POUR\|voteButtonAriaLabel` src/ tests/ → 15+ résultats
 - [ ] grep `"voter contre ce scrutin"\|"passer ce scrutin sans voter"\|"voter pour ce scrutin"` src/ tests/ → 1-3 résultats seulement (déclarations dans src/types)
 - [ ] grep `~617 tests` CLAUDE.md → 0 résultat (aligné sur ~621)
+
+---
+
+## Session 140 — 2026-05-17
+
+### Vérification session 139
+
+- [VERIFIED] 29 occurrences de VOTE_LABEL_*/VOTE_ARIA_*/voteButtonAriaLabel dans src/ + tests/
+- [VERIFIED] 3 occurrences seulement des suffixes ARIA dans src/types (déclarations)
+- [VERIFIED] CLAUDE.md "~621 tests"
+- 621/621 tests verts, typecheck clean
+
+### Bugs fixés (anScrutinViewAriaLabel + SKELETON_*_LOADING_LABEL × 2 + DEMO_DATA_LABEL_PREFIX)
+
+- [FIXED] Le template `\`Voir le scrutin n°${num} sur le site de l'Assemblée Nationale (nouvel onglet)\`` dupliqué 2× (Card.tsx verso footer + AuditTrail.tsx per-row link) · Drift surface : un i18n flip (EN-US, ou simplement raccourcir "site de l'AN") aurait demandé 2 edits in-lockstep ; pire, le suffix "(nouvel onglet)" était hardcodé alors qu'EXTERNAL_LINK_SUFFIX existait depuis session 134. Fix : export `anScrutinViewAriaLabel(numero)` helper depuis src/types qui réutilise EXTERNAL_LINK_SUFFIX en interne. Card + AuditTrail importent + appellent. 3 tests round-trip dans `tests/aria-labels.test.ts` : pin-the-value avec interpolation, interpolation isolated, endsWith EXTERNAL_LINK_SUFFIX. · `src/types/index.ts`, `src/components/Card.tsx`, `src/components/AuditTrail.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] `"Chargement des scrutins"` (CardSkeleton) + `"Chargement de ton résultat"` (ResultSkeleton) dupliqués entre les composants et 3 assertions de tests Skeleton.test.tsx (3 `getByLabelText("Chargement...")` literals) · Drift surface : un rewording côté composant aurait laissé les tests rouges + leur regex stale. Fix : export `SKELETON_CARD_LOADING_LABEL` + `SKELETON_RESULT_LOADING_LABEL` depuis src/types. Les 2 composants utilisent. Skeleton.test.tsx migrent les 3 sites vers les consts. 4 tests dans aria-labels.test.ts : pin-the-value × 2, startsWith "Chargement" SR-skim invariant, distinct-set. · `src/types/index.ts`, `src/components/CardSkeleton.tsx`, `src/components/ResultSkeleton.tsx`, `tests/Skeleton.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] `"Donnée de démonstration"` prefix dupliqué 3× avec des suffixes différents (Card.tsx aria-label `"...(pas une vraie source AN)"`, AuditTrail.tsx title `"...— sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production"`, AuditTrail.tsx aria-label `"...(pas un scrutin AN réel)"`) · Drift surface : le prefix "Donnée de démonstration" est load-bearing pour le screen-reader skim — c'est la première chose qu'un user entend qui indique "ceci est de la fake data". Les suffixes diffèrent légitimement (un est explanatory, deux sont tighter), mais le prefix doit rester aligné aux 3 sites. Fix : export `DEMO_DATA_LABEL_PREFIX = "Donnée de démonstration"` depuis src/types. Les 3 sites utilisent le prefix + composent leur propre suffix inline. 2 tests : pin-the-value + no-trailing-punct (le prefix ne doit pas se terminer par espace/punct car les consumers ajoutent leurs séparateurs). · `src/types/index.ts`, `src/components/Card.tsx`, `src/components/AuditTrail.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 141
+
+- [ ] grep `anScrutinViewAriaLabel\|SKELETON_CARD_LOADING_LABEL\|SKELETON_RESULT_LOADING_LABEL\|DEMO_DATA_LABEL_PREFIX` src/ tests/ → 15+ résultats
+- [ ] grep `"Chargement des scrutins"\|"Chargement de ton résultat"\|"Donnée de démonstration"` src/ tests/ → 3 résultats seulement (les 3 déclarations dans src/types + aria-labels.test.ts pin-the-value)
+- [ ] grep `~621 tests` CLAUDE.md → 0 résultat (aligné sur ~630)

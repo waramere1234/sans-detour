@@ -159,6 +159,35 @@ export const VOTE_ARIA_CONTRE = voteButtonAriaLabel(VOTE_LABEL_CONTRE, "voter co
 export const VOTE_ARIA_SKIP = voteButtonAriaLabel(VOTE_LABEL_SKIP, "passer ce scrutin sans voter");
 export const VOTE_ARIA_POUR = voteButtonAriaLabel(VOTE_LABEL_POUR, "voter pour ce scrutin");
 
+/** Compose the aria-label for the "Voir sur AN ↗" external link rendered
+ *  twice today (Card.tsx verso footer + AuditTrail.tsx per-row link). The
+ *  template literal `Voir le scrutin n°${n} sur le site de l'Assemblée
+ *  Nationale (nouvel onglet)` was duplicated; a rewording (or a French
+ *  → English flip via EXTERNAL_LINK_SUFFIX) had to land on both sites
+ *  in lockstep. Centralising the composition keeps them in sync. The
+ *  EXTERNAL_LINK_SUFFIX import inside the body re-uses the canonical
+ *  "(nouvel onglet)" marker so a future i18n change touches one place. */
+export function anScrutinViewAriaLabel(numero: number): string {
+  return `Voir le scrutin n°${numero} sur le site de l'Assemblée Nationale${EXTERNAL_LINK_SUFFIX}`;
+}
+
+/** Skeleton aria-labels — announced to screen readers while the deck
+ *  (Play.tsx) or the ranking (Result.tsx) is still loading. Each label
+ *  was duplicated between its component and its Skeleton.test.tsx
+ *  assertion; centralising the strings keeps source + tests in sync. */
+export const SKELETON_CARD_LOADING_LABEL = "Chargement des scrutins";
+export const SKELETON_RESULT_LOADING_LABEL = "Chargement de ton résultat";
+
+/** Prefix for the 3 sites that surface a "this is a demo data point, not
+ *  a real AN scrutin" hint (Card.tsx verso footer aria-label, AuditTrail
+ *  per-row `title` tooltip + aria-label). The full wording varies per
+ *  site (the title is longer / explanatory; the aria-labels are tighter)
+ *  but the leading "Donnée de démonstration" token is load-bearing —
+ *  it's what a screen-reader skim picks up first and what indicates
+ *  "this is not a production data source" to the user. Centralising the
+ *  prefix lets a single rewording propagate to all 3 sites. */
+export const DEMO_DATA_LABEL_PREFIX = "Donnée de démonstration";
+
 /** Result.tsx CTA labels. Each is pinned by regex in tests/Result.test.tsx;
  *  centralising the strings keeps the source + the tests + the confirm
  *  prompt (refaire) on Result.tsx in sync.

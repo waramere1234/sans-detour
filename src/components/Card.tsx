@@ -1,7 +1,11 @@
 // src/components/Card.tsx
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion, type PanInfo } from "framer-motion";
-import { MAX_POINTS_CLES_BULLETS, APP_LOCALE, type Scrutin } from "../types";
+import {
+  MAX_POINTS_CLES_BULLETS, APP_LOCALE,
+  anScrutinViewAriaLabel, DEMO_DATA_LABEL_PREFIX,
+  type Scrutin,
+} from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
 import { stripCitations, stripVoteResult } from "../lib/text-cleanup";
 
@@ -281,12 +285,12 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
                   href={scrutin.url_an_officielle}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`Voir le scrutin n°${scrutin.numero} sur le site de l'Assemblée Nationale (nouvel onglet)`}
+                  aria-label={anScrutinViewAriaLabel(scrutin.numero)}
                   style={{ color: "var(--accent)", textDecoration: "none" }}
                 >
                   <span aria-hidden="true">Voir sur AN ↗</span>
                 </a>
-              : <span aria-label="Donnée de démonstration (pas une vraie source AN)" style={{ color: "var(--accent)" }}>donnée démo</span>}
+              : <span aria-label={`${DEMO_DATA_LABEL_PREFIX} (pas une vraie source AN)`} style={{ color: "var(--accent)" }}>donnée démo</span>}
           </div>
         </div>
       </motion.div>

@@ -3,7 +3,11 @@ import { render, screen } from "@testing-library/react";
 import { CardSkeleton } from "../src/components/CardSkeleton";
 import { ResultSkeleton } from "../src/components/ResultSkeleton";
 import { CARD_FACE_BOX_SHADOW } from "../src/components/Card";
-import { GROUP_CODES } from "../src/types";
+import {
+  GROUP_CODES,
+  SKELETON_CARD_LOADING_LABEL,
+  SKELETON_RESULT_LOADING_LABEL,
+} from "../src/types";
 
 // The two skeleton components mirror the layouts of Card.tsx (Play) and
 // the alignment list on Result.tsx. Two invariants matter:
@@ -22,7 +26,7 @@ describe("CardSkeleton — a11y", () => {
 
   it("has a French aria-label so SR speaks the loading state", () => {
     render(<CardSkeleton />);
-    expect(screen.getByLabelText("Chargement des scrutins")).toBeInTheDocument();
+    expect(screen.getByLabelText(SKELETON_CARD_LOADING_LABEL)).toBeInTheDocument();
   });
 
   it("renders shimmer placeholders (not an empty div) so the layout reserves space", () => {
@@ -50,7 +54,7 @@ describe("ResultSkeleton — a11y", () => {
 
   it("has a French aria-label so SR speaks the loading state", () => {
     render(<ResultSkeleton />);
-    expect(screen.getByLabelText("Chargement de ton résultat")).toBeInTheDocument();
+    expect(screen.getByLabelText(SKELETON_RESULT_LOADING_LABEL)).toBeInTheDocument();
   });
 });
 
@@ -61,7 +65,7 @@ describe("ResultSkeleton — row count anchored on GROUP_CODES (no CLS regressio
     // Header has 3 shimmer bars in its own <header> (not a row); rows live
     // as direct children of the section, AFTER the header. Easiest stable
     // selector: every direct-child div of the section.
-    const section = screen.getByLabelText("Chargement de ton résultat");
+    const section = screen.getByLabelText(SKELETON_RESULT_LOADING_LABEL);
     const rows = Array.from(section.children).filter(
       (el) => el.tagName.toLowerCase() === "div",
     );

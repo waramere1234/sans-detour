@@ -1,4 +1,4 @@
-import { GROUP_CODES } from "../types";
+import { GROUP_CODES, SKELETON_RESULT_LOADING_LABEL } from "../types";
 
 // Row count anchored on GROUP_CODES.length so the skeleton renders as many
 // placeholders as the real Result page (which maps `ranked.map(...)` over all
@@ -8,7 +8,7 @@ export function ResultSkeleton() {
   return (
     <section
       aria-busy="true"
-      aria-label="Chargement de ton résultat"
+      aria-label={SKELETON_RESULT_LOADING_LABEL}
       style={{
         padding: "24px var(--gutter) 32px",
         maxWidth: "var(--max-content)", margin: "0 auto",
