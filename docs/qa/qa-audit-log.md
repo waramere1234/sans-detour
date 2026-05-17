@@ -2549,3 +2549,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `DEFAULT_CAP_PER_DOSSIER\|DEFAULT_CAP_PER_CHAPEAU_PREFIX` src/ tests/ → résultats dans deck.ts (déclaration) + Play.tsx + 2 tests
 - [ ] `ls tests/Skeleton.test.tsx tests/Legal.test.tsx` → 2 fichiers présents
 - [ ] grep `~396 tests` CLAUDE.md → 0 résultat (aligné sur ~412)
+
+---
+
+## Session 110 — 2026-05-17
+
+### Vérification session 109
+
+- [VERIFIED] 1 résultat seulement pour `capPerDossier: 2\b|capPerChapeauPrefix: 2\b` (un comment historique en tests/deck.test.ts:191)
+- [VERIFIED] 29 occurrences de `DEFAULT_CAP_PER_DOSSIER|DEFAULT_CAP_PER_CHAPEAU_PREFIX` dans src/ + tests/ (déclaration + Play.tsx + 2 fichiers tests deck)
+- [VERIFIED] `tests/Skeleton.test.tsx` + `tests/Legal.test.tsx` présents
+- [VERIFIED] CLAUDE.md "~412 tests"
+- 412/412 tests verts, typecheck clean
+
+### Bugs fixés (analytics drift × 2 + parseTopParam test gap)
+
+- [FIXED] `ANALYTICS_HOSTS` private const dans `src/lib/analytics.ts`, dupliqué 5× en literals dans `tests/analytics.test.ts` · Même drift pattern que sessions 90/101/104/105/108/109. Un rebrand `sansdetour.fr → sansdetour.com` laisserait le gate prod mis-à-jour mais les tests passeraient toujours avec l'ancien hostname (le test ferait `setHostname("sansdetour.fr")` et constaterait que ce n'est PLUS un hôte autorisé — un faux positif vert). Fix : export `ANALYTICS_HOSTS: ReadonlySet<string>` depuis analytics.ts, tests itèrent `for (const host of ANALYTICS_HOSTS)` au lieu de hardcoder, plus un test dédié qui pin la composition actuelle ("includes apex + www") pour ne pas perdre la coverage si on enlève un hôte sans le vouloir. · `src/lib/analytics.ts`, `tests/analytics.test.ts`
+- [FIXED] `AnalyticsEvent` type-only union avec une copie literal parallèle de 15 events dans `tests/analytics.test.ts` · Le test "accepts every documented event" hardcodait les 15 strings du union, ce qui pouvait passer ✓ même quand on ajoutait un 16e event à la union sans étendre le tableau du test — l'event silently uncovered. Fix : convertir le union en runtime-backed const tuple : `export const ANALYTICS_EVENTS = [...] as const` + `export type AnalyticsEvent = typeof ANALYTICS_EVENTS[number]`. Le test itère désormais `for (const e of ANALYTICS_EVENTS)` — ajouter un event au tuple étend automatiquement la couverture. Compile-time : la dérivation `typeof [...][number]` garde l'enforcement contre les typos (un `track("vote_clicked")` reste un TS error). · `src/lib/analytics.ts`, `tests/analytics.test.ts`
+- [FIXED] `parseTopParam` dans `api/share-card.ts` 0 test coverage · Le parser du paramètre `?t=RN:57,LFI:30,EPR:22` qui défend la share card SVG contre les inputs malformés (negative pcts, NaN, missing colons, leading/trailing commas) vivait inline dans le handler aux côtés de `satori` import — non-testable sans dragger Satori + 50KB de TTF dans le test setup. Une régression silencieuse aurait shipped une image "-50% RN" ou "Code:NaN" à des centaines d'utilisateurs sans détection. Fix : extract dans `api/_lib/parse-top.ts` (le préfixe `_` est la convention Vercel pour exclure du deploy comme route). Handler garde l'exact même import + même comportement. 12 tests dans `tests/parse-top.test.ts` : null/empty → [], single/multi bar parsing, clamp [0,100] (-50 → 0, 200 → 100), boundary values, malformed drops (NaN pct, empty code, no-colon orphan, trailing comma). · `api/_lib/parse-top.ts` (nouveau), `api/share-card.ts`, `tests/parse-top.test.ts` (nouveau)
+
+### Vérifications à faire en session 111
+
+- [ ] grep `"sansdetour\.fr"` tests/analytics.test.ts → max 1 résultat (le test "ANALYTICS_HOSTS includes apex + www" qui pin l'état actuel)
+- [ ] grep `ANALYTICS_HOSTS\|ANALYTICS_EVENTS` src/ tests/ → résultats dans analytics.ts + analytics.test.ts (consumers)
+- [ ] `ls api/_lib/parse-top.ts tests/parse-top.test.ts` → 2 fichiers présents
+- [ ] grep `~412 tests` CLAUDE.md → 0 résultat (aligné sur ~424)

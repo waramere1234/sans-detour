@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { track, type AnalyticsEvent } from "../src/lib/analytics";
+import {
+  track,
+  ANALYTICS_HOSTS,
+  ANALYTICS_EVENTS,
+  type AnalyticsEvent,
+} from "../src/lib/analytics";
 
 // Session 56 added a hostname allow-list on track() so dev/preview sessions
 // don't pollute the prod Plausible dashboard. Without these tests, removing
@@ -26,16 +31,20 @@ describe("analytics track() hostname gate", () => {
     });
   }
 
-  it("calls plausible when hostname is the prod domain", () => {
-    setHostname("sansdetour.fr");
-    track("vote", { choice: "pour" });
-    expect(plausibleMock).toHaveBeenCalledWith("vote", { props: { choice: "pour" } });
+  it("calls plausible on every allowed hostname (iterates ANALYTICS_HOSTS — no parallel literal)", () => {
+    for (const host of ANALYTICS_HOSTS) {
+      plausibleMock.mockClear();
+      setHostname(host);
+      track("vote", { choice: "pour" });
+      expect(plausibleMock).toHaveBeenCalledWith("vote", { props: { choice: "pour" } });
+    }
   });
 
-  it("calls plausible when hostname is www.sansdetour.fr", () => {
-    setHostname("www.sansdetour.fr");
-    track("vote");
-    expect(plausibleMock).toHaveBeenCalledWith("vote", undefined);
+  it("ANALYTICS_HOSTS includes the prod apex + www subdomain", () => {
+    // Pin the actual hostnames here — if a rebrand changes the set, both
+    // this test AND the gate update via the same edit.
+    expect(ANALYTICS_HOSTS.has("sansdetour.fr")).toBe(true);
+    expect(ANALYTICS_HOSTS.has("www.sansdetour.fr")).toBe(true);
   });
 
   it("no-ops on localhost (dev)", () => {
@@ -57,7 +66,7 @@ describe("analytics track() hostname gate", () => {
   });
 
   it("passes props in the { props } envelope Plausible expects", () => {
-    setHostname("sansdetour.fr");
+    setHostname([...ANALYTICS_HOSTS][0]);
     track("vote", { choice: "contre", counted: 5 });
     expect(plausibleMock).toHaveBeenCalledWith("vote", {
       props: { choice: "contre", counted: 5 },
@@ -65,7 +74,7 @@ describe("analytics track() hostname gate", () => {
   });
 
   it("omits the second argument when no props are passed", () => {
-    setHostname("sansdetour.fr");
+    setHostname([...ANALYTICS_HOSTS][0]);
     track("result_reached");
     expect(plausibleMock).toHaveBeenCalledWith("result_reached", undefined);
   });
@@ -78,28 +87,22 @@ describe("AnalyticsEvent type (session 99 — typo defense)", () => {
   // union in place, the annotated lines are real type errors that the
   // directive silently swallows — which is the desired protection.
 
-  it("accepts every documented event without a cast", () => {
-    const events: AnalyticsEvent[] = [
-      "cover_started",
-      "cover_resumed",
-      "cover_restarted",
-      "cover_partial_result",
-      "cover_result_revisit",
-      "cover_footer_nav",
-      "topbar_nav",
-      "result_reached",
-      "result_refaire",
-      "share_clicked",
-      "personnalites_revealed",
-      "affinement_clicked",
-      "methode_toc_click",
-      "vote",
-      "error",
-    ];
-    // Sanity: each event is non-empty + lowercase-snake.
-    for (const e of events) {
+  it("every documented event is non-empty lowercase-snake (iterates ANALYTICS_EVENTS — no parallel literal)", () => {
+    // ANALYTICS_EVENTS is the single source of truth; the test auto-extends
+    // the moment a new event is added to the const array. Previous version
+    // hardcoded a parallel 15-element list — adding an event to the union
+    // without updating the array left the new event silently uncovered.
+    expect(ANALYTICS_EVENTS.length).toBeGreaterThan(0);
+    for (const e of ANALYTICS_EVENTS) {
       expect(e).toMatch(/^[a-z_]+$/);
     }
+  });
+
+  it("AnalyticsEvent type is the union of ANALYTICS_EVENTS members (compile-time)", () => {
+    // Pin the type derivation: a refactor that decouples the type from the
+    // const list would surface here as a TS error.
+    const sampled: AnalyticsEvent = ANALYTICS_EVENTS[0];
+    expect(typeof sampled).toBe("string");
   });
 
   it("rejects a typo at compile time (would-be 'vote_clicked')", () => {

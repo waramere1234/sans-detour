@@ -6,24 +6,9 @@
 // in 1–2 s by Satori alone, embeds cleanly in browser tabs and the Web Share
 // API, and is good enough for V1.
 import satori from "satori";
+import { parseTopParam } from "./_lib/parse-top";
 
 export const config = { runtime: "nodejs" };
-
-interface Bar { code: string; pct: number; }
-
-function parseTopParam(t: string | null): Bar[] {
-  if (!t) return [];
-  return t.split(",").map(pair => {
-    const [code, pctStr] = pair.split(":");
-    // Clamp pct to [0, 100]: a hand-crafted (or buggy) share URL like
-    // `?t=RN:-50,LFI:200` would otherwise render "-50%" / "200%" on the
-    // card. Alignment scores are always Math.round((sum/counted) * 100)
-    // ∈ [0, 100], so clamping at the endpoint just defends the image
-    // from out-of-band input.
-    const pct = parseInt(pctStr, 10);
-    return { code, pct: Math.max(0, Math.min(100, pct)) };
-  }).filter(b => !!b.code && !isNaN(b.pct));
-}
 
 const BG = "#1d1f24";
 // Orange signal — sRGB approximation of `oklch(0.76 0.16 55)` (index.css
