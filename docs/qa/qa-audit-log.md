@@ -1791,3 +1791,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] DevTools localStorage : forcer une session à 1 seul vote sur un scrutin où top.counted = 1 → Result header dit "1 scrutin · 1 compté · 0 skips"
 - [ ] AuditTrail breakdown chip avec divided_excluded = 1 → "1 divisé non compté" (singulier sur les 2 adjectifs)
 - [ ] head de la spec V2.5 → banner "MOSTLY SHIPPED" visible
+
+---
+
+## Session 79 — 2026-05-17
+
+### Vérification session 78
+
+- [VERIFIED] V2.5 spec doc a banner "MOSTLY SHIPPED"
+- [VERIFIED] `AuditTrail.tsx` `divided_excluded` plural rule appliquée sur `divisé/compté`
+- [VERIFIED] `Result.tsx` header plural rule appliquée sur `scrutin/compté`
+- 127/127 tests verts, typecheck clean
+
+### Bugs fixés (sweep plural agreement + coverage gap)
+
+- [FIXED] AuditTrail breakdown chips × 3 plural drift · Session 78 a fixé "{N} divisé non comptés" mais raté les 3 chips sibling juste au-dessus : "{N} alignés", "{N} partiels", "{N} opposés". Avec perfect=1 → "1 alignés" cassé. Plural rule appliquée aux 3 adjectifs (sweep complet maintenant). · `src/components/AuditTrail.tsx`
+- [FIXED] Result.tsx "indexées" plural · `{personnalitesWithData.length} indexées` — avec 1 seule personality ayant `counted > 0` (rare mais possible : user vote 5x sur des scrutins où seul Le Pen a voté), render "1 indexées" — drift agreement. Plural rule appliquée. · `src/routes/Result.tsx`
+- [FIXED] Coverage gap `normalizeTheme` · Session 75 a extracted `normalizeTheme` de scripts vers `src/types/index.ts` mais sans test. Si on refactor la fallback "autre" ou le case-folding, régression silencieuse — les 2 scripts ingest dépendent de cette fonction pour garder le DB propre des labels arbitraires. 5 tests ajoutés (`tests/themes.test.ts`) couvrant : non-string → undefined, valid theme → canonical, lowercase+trim, unknown → "autre", autre idempotent. · `tests/themes.test.ts` (nouveau)
+
+### Vérifications à faire en session 80
+
+- [ ] grep `partiels\b\|opposés\b\|alignés\b` dans `src/components/AuditTrail.tsx` → 0 résultat (singulier dans le code, plural ajouté via rule)
+- [ ] grep `indexées\b` dans `src/routes/Result.tsx` → 0 résultat (singulier dans le code)
+- [ ] `npm run test:run` → 132 tests verts (était 127)

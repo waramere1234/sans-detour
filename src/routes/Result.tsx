@@ -246,7 +246,7 @@ export default function Result() {
             <span style={{
               fontFamily: "var(--font-mono)", fontSize: 10.5,
               color: "var(--ink-3)", letterSpacing: "0.04em",
-            }}>{personnalitesWithData.length} indexées</span>
+            }}>{personnalitesWithData.length} indexée{personnalitesWithData.length !== 1 ? "s" : ""}</span>
           </button>
 
           {showPersonnalites && (

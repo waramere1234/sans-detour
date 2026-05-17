@@ -74,9 +74,9 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
         display: "flex", gap: 14, marginBottom: 12, flexWrap: "wrap",
         paddingBottom: 10, borderBottom: "1px solid var(--line)",
       }}>
-        <span><span style={{ color: "var(--pour)" }}><span aria-hidden="true">✓ </span>{alignment.perfect}</span> alignés</span>
-        <span><span style={{ color: "var(--warn)" }}><span aria-hidden="true">≈ </span>{alignment.partial}</span> partiels</span>
-        <span><span style={{ color: "var(--contre)" }}><span aria-hidden="true">✕ </span>{alignment.conflict}</span> opposés</span>
+        <span><span style={{ color: "var(--pour)" }}><span aria-hidden="true">✓ </span>{alignment.perfect}</span> aligné{alignment.perfect !== 1 ? "s" : ""}</span>
+        <span><span style={{ color: "var(--warn)" }}><span aria-hidden="true">≈ </span>{alignment.partial}</span> partiel{alignment.partial !== 1 ? "s" : ""}</span>
+        <span><span style={{ color: "var(--contre)" }}><span aria-hidden="true">✕ </span>{alignment.conflict}</span> opposé{alignment.conflict !== 1 ? "s" : ""}</span>
         <span style={{ color: "var(--ink-3)" }}><span aria-hidden="true">÷ </span>{alignment.divided_excluded} divisé{alignment.divided_excluded !== 1 ? "s" : ""} non compté{alignment.divided_excluded !== 1 ? "s" : ""}</span>
       </div>
 
