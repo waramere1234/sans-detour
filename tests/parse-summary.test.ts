@@ -5,6 +5,8 @@ import {
   normalizePointsCles,
   sanitizeJsonControlChars,
   fallbackSummary,
+  extractAnthropicSummary,
+  type MinimalAnthropicMessage,
 } from "../scripts/lib/parse-summary";
 
 // Session 82 extracted these 5 helpers from the 2 ingest scripts (ingest-an,
@@ -177,5 +179,111 @@ describe("fallbackSummary", () => {
   it("returns empty contexte for empty dossier", () => {
     const out = fallbackSummary("title", "");
     expect(out.contexte).toBe("");
+  });
+});
+
+// Session 95 extracted extractAnthropicSummary from both ingest scripts.
+// This is the function that turns a successful batch message into the
+// Summary object we upsert to Supabase — a regression here would either
+// drop scrutins (parse throws) or upsert bad rows (validation loosens).
+
+function mkMsg(text: string, stop_reason = "end_turn"): MinimalAnthropicMessage {
+  return {
+    content: [{ type: "text", text }],
+    stop_reason,
+  };
+}
+
+describe("extractAnthropicSummary", () => {
+  it("extracts a well-formed JSON payload from a single text block", () => {
+    const out = extractAnthropicSummary(mkMsg(
+      `{"chapeau": "FISCALITÉ · LOI X", "titre_pedago": "Hausse de la taxe", "contexte": "Texte..."}`,
+    ));
+    expect(out.chapeau).toBe("FISCALITÉ · LOI X");
+    expect(out.titre_pedago).toBe("Hausse de la taxe");
+    expect(out.contexte).toBe("Texte...");
+  });
+
+  it("concatenates multiple text blocks before matching JSON", () => {
+    const msg: MinimalAnthropicMessage = {
+      content: [
+        { type: "text", text: `Réflexions préalables...` },
+        { type: "text", text: `{"chapeau": "X", "titre_pedago": "Y", "contexte": "Z"}` },
+      ],
+      stop_reason: "end_turn",
+    };
+    const out = extractAnthropicSummary(msg);
+    expect(out.chapeau).toBe("X");
+  });
+
+  it("ignores non-text blocks (thinking, server_tool_use, etc.)", () => {
+    const msg: MinimalAnthropicMessage = {
+      content: [
+        { type: "thinking", text: "internal thought" },
+        { type: "server_tool_use" },
+        { type: "text", text: `{"chapeau": "A", "titre_pedago": "B", "contexte": "C"}` },
+      ],
+      stop_reason: "end_turn",
+    };
+    const out = extractAnthropicSummary(msg);
+    expect(out.chapeau).toBe("A");
+  });
+
+  it("throws when there's no text block (lists stop_reason + block types)", () => {
+    const msg: MinimalAnthropicMessage = {
+      content: [{ type: "thinking" }, { type: "server_tool_use" }],
+      stop_reason: "max_tokens",
+    };
+    expect(() => extractAnthropicSummary(msg)).toThrow(/No text block/);
+    expect(() => extractAnthropicSummary(msg)).toThrow(/stop_reason=max_tokens/);
+    expect(() => extractAnthropicSummary(msg)).toThrow(/thinking/);
+  });
+
+  it("throws when the text contains no JSON object", () => {
+    expect(() => extractAnthropicSummary(mkMsg("plain prose without braces")))
+      .toThrow(/No JSON in response/);
+  });
+
+  it("throws when chapeau is missing (lists stray keys)", () => {
+    const out = mkMsg(`{"titre_pedago": "Y", "contexte": "Z", "erreur": "oops"}`);
+    expect(() => extractAnthropicSummary(out)).toThrow(/Missing required fields/);
+    expect(() => extractAnthropicSummary(out)).toThrow(/erreur/);
+  });
+
+  it("throws when titre_pedago is missing", () => {
+    expect(() => extractAnthropicSummary(mkMsg(`{"chapeau": "X"}`)))
+      .toThrow(/Missing required fields/);
+  });
+
+  it("sanitizes raw control chars inside JSON string literals", () => {
+    // Real LLM output: literal newline inside the contexte string.
+    const raw = `{"chapeau": "A", "titre_pedago": "B", "contexte": "line1\nline2"}`;
+    const out = extractAnthropicSummary(mkMsg(raw));
+    expect(out.contexte).toBe("line1\nline2");
+  });
+
+  it("normalizes analyse_loi / points_cles / theme on the happy path", () => {
+    const raw = `{
+      "chapeau": "X", "titre_pedago": "Y", "contexte": "Z",
+      "analyse_loi": { "mesures_principales": ["A", "", "B"] },
+      "points_cles": ["one two three four five six seven eight"],
+      "theme": "FISCALITÉ"
+    }`;
+    const out = extractAnthropicSummary(mkMsg(raw));
+    // asStringArray drops the empty string entry
+    expect(out.analyse_loi?.mesures_principales).toEqual(["A", "B"]);
+    // normalizePointsCles truncates at 7 words with ellipsis
+    expect(out.points_cles?.[0].endsWith("…")).toBe(true);
+    // normalizeTheme lowercases + validates against the enum
+    expect(out.theme).toBe("fiscalité");
+  });
+
+  it("trims surrounding whitespace from chapeau / titre_pedago / contexte", () => {
+    const out = extractAnthropicSummary(mkMsg(
+      `{"chapeau": "  X  ", "titre_pedago": "  Y  ", "contexte": "  Z  "}`,
+    ));
+    expect(out.chapeau).toBe("X");
+    expect(out.titre_pedago).toBe("Y");
+    expect(out.contexte).toBe("Z");
   });
 });

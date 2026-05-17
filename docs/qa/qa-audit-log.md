@@ -2180,3 +2180,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] `ls tests/an-filter.test.ts` → présent, 18 tests
 - [ ] grep `scripts/lib/an-filter` CLAUDE.md → 1 résultat (ligne 88 mise à jour)
 - [ ] grep `~195 tests` CLAUDE.md → 0 résultat (aligné sur ~213)
+
+---
+
+## Session 95 — 2026-05-17
+
+### Vérification session 94
+
+- [VERIFIED] `function isEligibleScrutin` présent uniquement dans `scripts/lib/an-filter.ts`
+- [VERIFIED] `tests/an-filter.test.ts` 18 tests
+- [VERIFIED] CLAUDE.md ligne 88 pointe vers `scripts/lib/an-filter.ts`
+- [VERIFIED] CLAUDE.md "~213 tests"
+- 213/213 tests verts, typecheck clean
+
+### Bugs fixés (extractAnthropicSummary dedup + GROUP_MAPPING dedup + tests)
+
+- [FIXED] `extractAnthropicSummary` logique dupliquée · `ingest-an.ts extractSummaryFromMessage` (40 lignes, line 459) et `resume-ingest.ts extractSummary` (18 lignes, line 153) faisaient le même travail : filter text blocks, find JSON, sanitize, parse, validate, normalize. Différences cosmétiques uniquement (verbosité des messages d'erreur). Extraction dans `scripts/lib/parse-summary.ts` avec interface `MinimalAnthropicMessage` (juste `content[]` + `stop_reason` — pas besoin des per-block variants thinking/server_tool_use/etc. que chaque script définissait à part). Error messages tunés pour rester utiles au debug : stop_reason + block types, premiers 300 chars du combined text, list des stray keys. · `scripts/lib/parse-summary.ts`, `scripts/ingest-an.ts`, `scripts/resume-ingest.ts`
+- [FIXED] `GROUP_MAPPING` dupliqué identiquement entre les 2 scripts · 13 entrées chacune, kept in sync à la main. Une drift (e.g. nouvel organeRef ajouté à un script et pas l'autre) ferait que recovery flow route les votes au mauvais group. Extraction dans `scripts/lib/an-groups.ts` avec doc inline (rationale UDR merge PO847173/PO872880, exclusion PO840056 non-inscrits). 2 scripts importent depuis là. · `scripts/lib/an-groups.ts` (nouveau), 2 scripts modifiés
+- [FIXED] `extractAnthropicSummary` 0 test coverage · Ajout de 10 tests dans `tests/parse-summary.test.ts` : happy path single-block, multi-block concatenation, ignore non-text blocks (thinking/tool_use), error paths (no text → list stop_reason + block types, no JSON, missing chapeau → list stray keys), control char sanitization (literal newline inside string), normalization pipeline (asStringArray empty filter, normalizePointsCles ellipsis truncation, normalizeTheme lowercase + enum validation), trimming. + drop unused `normalizeTheme` import dans ingest-an.ts (caught par `tsc -b` quand le include étendu en session 94 a pris effet). · `tests/parse-summary.test.ts`
+
+### Vérifications à faire en session 96
+
+- [ ] grep `function extractSummary\|extractSummaryFromMessage` scripts/ → 0 résultat (tout passe par extractAnthropicSummary depuis parse-summary.ts)
+- [ ] `ls scripts/lib/an-groups.ts` → présent ; 1 export `GROUP_MAPPING`
+- [ ] grep `GROUP_MAPPING:` scripts/ingest-an.ts scripts/resume-ingest.ts → 0 résultat (les déclarations sont retirées, seuls les imports restent)
+- [ ] grep -c "it(" tests/parse-summary.test.ts → 34 (était 24, +10 pour extractAnthropicSummary)

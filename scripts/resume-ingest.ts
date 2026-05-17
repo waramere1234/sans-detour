@@ -21,18 +21,17 @@ import { createClient } from "@supabase/supabase-js";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { computeGroupPosition } from "../src/lib/compute-positions";
-import { normalizeTheme } from "../src/types";
 import type {
   GroupCode, GroupPosition, GroupVoteBreakdown,
 } from "../src/types";
 import {
   type Summary,
-  normalizeAnalyse,
-  normalizePointsCles,
-  sanitizeJsonControlChars,
+  type MinimalAnthropicMessage,
   fallbackSummary,
+  extractAnthropicSummary,
 } from "./lib/parse-summary";
 import { isEligibleScrutin } from "./lib/an-filter";
+import { GROUP_MAPPING } from "./lib/an-groups";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -47,22 +46,8 @@ if (!SUPABASE_URL || !SUPABASE_KEY || !ANTHROPIC_KEY || !BATCH_ID) {
 const JSON_DIR = path.join("/tmp/sd-an-cache", "json");
 
 // ──────────────────── AN parsing (mirrors ingest-an.ts intentionally) ────────
-
-const GROUP_MAPPING: Record<string, GroupCode | null> = {
-  PO845401: "RN",
-  PO845407: "EPR",
-  PO845413: "LFI",
-  PO845419: "SOC",
-  PO845425: "DR",
-  PO845439: "ECO",
-  PO845454: "DEM",
-  PO845470: "HOR",
-  PO845485: "LIOT",
-  PO845514: "GDR",
-  PO847173: "UDR",
-  PO872880: "UDR",
-  PO840056: null,
-};
+// GROUP_MAPPING was inlined in both scripts until session 95; it now lives
+// in scripts/lib/an-groups.ts and both scripts import it.
 
 interface ANGroupVote {
   organeRef: string;
@@ -138,37 +123,14 @@ function parseRaw(raw: ANScrutinRaw): ParsedRaw {
 
 // ──────────────────────────── LLM summary parsing ────────────────────────────
 
-interface AnthropicTextBlock { type: "text"; text: string }
-interface AnthropicMessage { content: Array<AnthropicTextBlock | { type: string }>; stop_reason: string }
-
 interface BatchResultLine {
   custom_id: string;
   result:
-    | { type: "succeeded"; message: AnthropicMessage }
+    | { type: "succeeded"; message: MinimalAnthropicMessage }
     | { type: "errored"; error?: unknown }
     | { type: "canceled" }
     | { type: "expired" };
 }
-
-function extractSummary(message: AnthropicMessage): Summary {
-  const textBlocks = message.content.filter((b): b is AnthropicTextBlock => b.type === "text");
-  if (textBlocks.length === 0) throw new Error(`No text block. stop_reason=${message.stop_reason}`);
-  const combined = textBlocks.map((b) => b.text).join("\n");
-  const m = combined.match(/\{[\s\S]*\}/);
-  if (!m) throw new Error(`No JSON in response. text=${combined.slice(0, 200)}…`);
-  const raw = JSON.parse(sanitizeJsonControlChars(m[0])) as Record<string, unknown>;
-  const chapeau = typeof raw.chapeau === "string" ? raw.chapeau.trim() : "";
-  const titre_pedago = typeof raw.titre_pedago === "string" ? raw.titre_pedago.trim() : "";
-  const contexte = typeof raw.contexte === "string" ? raw.contexte.trim() : "";
-  if (!chapeau || !titre_pedago) throw new Error(`Missing chapeau or titre_pedago`);
-  return {
-    chapeau, titre_pedago, contexte,
-    analyse_loi: normalizeAnalyse(raw.analyse_loi),
-    points_cles: normalizePointsCles(raw.points_cles),
-    theme: normalizeTheme(raw.theme),
-  };
-}
-
 
 // ─────────────────────────────────── main ────────────────────────────────────
 
@@ -209,7 +171,7 @@ async function main(): Promise<void> {
       continue;
     }
     try {
-      summaries.set(result.custom_id, extractSummary(result.result.message));
+      summaries.set(result.custom_id, extractAnthropicSummary(result.result.message));
       ok++;
     } catch (e) {
       console.error(`  ✕ ${result.custom_id} parse: ${(e as Error).message}`);

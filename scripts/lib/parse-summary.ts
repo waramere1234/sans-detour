@@ -4,7 +4,7 @@
 // (initial batch) and `scripts/resume-ingest.ts` (failed-batch recovery).
 // Before session 82 these lived duplicated in both scripts — divergence
 // risk (e.g. a fix in one branch silently leaving the other broken).
-import type { ScrutinAnalyse, Theme } from "../../src/types";
+import { normalizeTheme, type ScrutinAnalyse, type Theme } from "../../src/types";
 
 export interface Summary {
   chapeau: string;
@@ -78,6 +78,72 @@ export function sanitizeJsonControlChars(json: string): string {
     out += c;
   }
   return out;
+}
+
+/** Minimal Anthropic message shape that `extractAnthropicSummary` inspects.
+ *  Each script defines its own full Anthropic response type with extra
+ *  per-block variants (thinking, server_tool_use, etc.); this lib only needs
+ *  the content array (text blocks) and the stop_reason for error reporting. */
+export interface MinimalAnthropicMessage {
+  content: Array<{ type: string; text?: string }>;
+  stop_reason: string;
+}
+
+/** Extract a Summary from a successful Anthropic batch message.
+ *
+ *  Flow (session 95 extracted from both ingest scripts):
+ *  1. Concatenate every `type === "text"` block (Anthropic interleaves
+ *     thinking + server_tool_use + text blocks for web_search runs).
+ *  2. Match the first balanced `{...}` JSON object in the concatenation.
+ *  3. Sanitize control chars (LLM output often has literal newlines inside
+ *     string values) and JSON.parse.
+ *  4. Whitelist chapeau / titre_pedago / contexte / analyse_loi /
+ *     points_cles / theme — anything else is dropped (a hallucinated
+ *     "erreur" key would otherwise break the Postgres upsert).
+ *  5. Throw on missing chapeau or titre_pedago — the caller in both
+ *     scripts catches and substitutes a fallback summary.
+ *
+ *  The error messages are tuned to surface enough context to debug a
+ *  failing batch chunk: stop_reason + block types if no text block,
+ *  first 300 chars of the combined text if no JSON, list of stray keys
+ *  if the model emitted unexpected fields. */
+export function extractAnthropicSummary(message: MinimalAnthropicMessage): Summary {
+  const textBlocks = message.content.filter(
+    (b): b is { type: "text"; text: string } =>
+      b.type === "text" && typeof b.text === "string",
+  );
+  if (textBlocks.length === 0) {
+    const blockTypes = message.content.map((b) => b.type).join(",");
+    throw new Error(
+      `No text block. stop_reason=${message.stop_reason}, blocks=[${blockTypes}]`,
+    );
+  }
+  const combined = textBlocks.map((b) => b.text).join("\n");
+  const m = combined.match(/\{[\s\S]*\}/);
+  if (!m) {
+    throw new Error(`No JSON in response. text=${combined.slice(0, 300)}`);
+  }
+  const safe = sanitizeJsonControlChars(m[0]);
+  const raw = JSON.parse(safe) as Record<string, unknown>;
+
+  const chapeau = typeof raw.chapeau === "string" ? raw.chapeau.trim() : "";
+  const titre_pedago = typeof raw.titre_pedago === "string" ? raw.titre_pedago.trim() : "";
+  const contexte = typeof raw.contexte === "string" ? raw.contexte.trim() : "";
+  if (!chapeau || !titre_pedago) {
+    const expected = ["chapeau", "titre_pedago", "contexte", "analyse_loi", "points_cles", "theme"];
+    const stray = Object.keys(raw).filter((k) => !expected.includes(k));
+    throw new Error(
+      `Missing required fields (chapeau or titre_pedago). Stray keys: [${stray.join(",")}]`,
+    );
+  }
+  return {
+    chapeau,
+    titre_pedago,
+    contexte,
+    analyse_loi: normalizeAnalyse(raw.analyse_loi),
+    points_cles: normalizePointsCles(raw.points_cles),
+    theme: normalizeTheme(raw.theme),
+  };
 }
 
 // Best-effort summary when the LLM call fails or is skipped. Truncate the

@@ -20,18 +20,17 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
 import { computeGroupPosition } from "../src/lib/compute-positions";
-import { normalizeTheme } from "../src/types";
 import type {
   GroupCode, GroupPosition, GroupVoteBreakdown, ScrutinAnalyse, Theme,
 } from "../src/types";
 import {
   type Summary,
-  normalizeAnalyse,
-  normalizePointsCles,
-  sanitizeJsonControlChars,
+  type MinimalAnthropicMessage,
   fallbackSummary,
+  extractAnthropicSummary,
 } from "./lib/parse-summary";
 import { isEligibleScrutin } from "./lib/an-filter";
+import { GROUP_MAPPING } from "./lib/an-groups";
 
 // ───────────────────────────────────────────────────────────────── config
 
@@ -50,33 +49,9 @@ const CACHE_DIR = "/tmp/sd-an-cache";
 const ZIP_PATH = path.join(CACHE_DIR, "Scrutins.json.zip");
 const JSON_DIR = path.join(CACHE_DIR, "json");
 
-/**
- * AN organeRef → internal GroupCode. Triangulated from observed group sizes
- * across the 46 SPS scrutins of the 17e legislature; verified for RN/LFI/ECO
- * via instances/resume pages on assemblee-nationale.fr.
- *
- * PO847173 and PO872880 both correspond to "Union des droites pour la
- * République" — the group was reconstituted around 2025-09 with a new
- * organeRef but the same political identity, so we collapse both to UDR.
- *
- * PO840056 is the non-inscrits pool (~10 deputies) — excluded from the app
- * since it is not a parliamentary group.
- */
-const GROUP_MAPPING: Record<string, GroupCode | null> = {
-  PO845401: "RN",
-  PO845407: "EPR",
-  PO845413: "LFI",
-  PO845419: "SOC",
-  PO845425: "DR",
-  PO845439: "ECO",
-  PO845454: "DEM",
-  PO845470: "HOR",
-  PO845485: "LIOT",
-  PO845514: "GDR",
-  PO847173: "UDR",
-  PO872880: "UDR",
-  PO840056: null,
-};
+// AN organeRef → GroupCode lives in scripts/lib/an-groups.ts (shared with
+// resume-ingest.ts; see that file for the rationale on the PO847173 /
+// PO872880 UDR merge and the PO840056 non-inscrits exclusion).
 
 // ─────────────────────────────────────────────────────── AN bulk download
 
@@ -399,17 +374,6 @@ Tu réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans texte avan
   }
 }`;
 
-interface AnthropicResponse {
-  content: Array<
-    | { type: "text"; text: string }
-    | { type: "thinking"; thinking?: string }
-    | { type: "server_tool_use"; name: string; input?: unknown }
-    | { type: "web_search_tool_result"; content?: unknown }
-    | { type: string; [key: string]: unknown }
-  >;
-  stop_reason: string;
-}
-
 function buildUserMessage(titreBrut: string, dossierTitre: string, numero: number): string {
   return `Numéro de scrutin : ${numero}
 URL AN : https://www.assemblee-nationale.fr/dyn/17/scrutins/${numero}
@@ -456,45 +420,6 @@ function buildRequestParams(scrutin: { titre_brut: string; dossier_titre: string
   };
 }
 
-function extractSummaryFromMessage(message: AnthropicResponse): Summary {
-  const textBlocks = message.content.filter(
-    (b): b is { type: "text"; text: string } => b.type === "text",
-  );
-  if (textBlocks.length === 0) {
-    throw new Error(`No text block. stop_reason=${message.stop_reason}, blocks=${message.content.map((b) => b.type).join(",")}`);
-  }
-  const combined = textBlocks.map((b) => b.text).join("\n");
-  const m = combined.match(/\{[\s\S]*\}/);
-  if (!m) {
-    throw new Error(`No JSON in response. text=${combined.slice(0, 300)}`);
-  }
-  // JSON.parse rejects raw control characters (newlines, tabs, etc.) inside
-  // string literals — even though they're common in LLM output when the model
-  // formats long text. Sanitize: replace literal control chars INSIDE string
-  // values with their escaped form so JSON.parse accepts them.
-  const safe = sanitizeJsonControlChars(m[0]);
-  const raw = JSON.parse(safe) as Record<string, unknown>;
-
-  // Whitelist the expected fields. Without this, a model that hallucinates
-  // an extra key like "erreur" leaks it into the upsert payload and Postgres
-  // rejects the whole chunk. Throw if essential fields are missing — the
-  // orchestrator catches and substitutes a fallback summary.
-  const chapeau = typeof raw.chapeau === "string" ? raw.chapeau.trim() : "";
-  const titre_pedago = typeof raw.titre_pedago === "string" ? raw.titre_pedago.trim() : "";
-  const contexte = typeof raw.contexte === "string" ? raw.contexte.trim() : "";
-  if (!chapeau || !titre_pedago) {
-    const stray = Object.keys(raw).filter((k) => !["chapeau","titre_pedago","contexte","analyse_loi","points_cles","theme"].includes(k));
-    throw new Error(`Missing required fields (chapeau or titre_pedago). Stray keys: [${stray.join(",")}]`);
-  }
-  return {
-    chapeau,
-    titre_pedago,
-    contexte,
-    analyse_loi: normalizeAnalyse(raw.analyse_loi),
-    points_cles: normalizePointsCles(raw.points_cles),
-    theme: normalizeTheme(raw.theme),
-  };
-}
 
 // ─────────────────────────────────────────────────────── Batches API client
 
@@ -542,7 +467,7 @@ async function pollBatch(batchId: string): Promise<BatchStatus> {
 interface BatchResultLine {
   custom_id: string;
   result:
-    | { type: "succeeded"; message: AnthropicResponse }
+    | { type: "succeeded"; message: MinimalAnthropicMessage }
     // Empirically, Anthropic wraps batch errors as
     //   { type: "errored", error: { type: "error", error: { type, message } } }
     // — the inner `error.error` is where the user-facing fields live. We type
@@ -573,7 +498,7 @@ async function fetchBatchResults(batchId: string): Promise<Map<string, Summary>>
     const result = JSON.parse(line) as BatchResultLine;
     if (result.result.type === "succeeded") {
       try {
-        out.set(result.custom_id, extractSummaryFromMessage(result.result.message));
+        out.set(result.custom_id, extractAnthropicSummary(result.result.message));
         okCount++;
       } catch (e) {
         console.error(`  ✕ ${result.custom_id} parse: ${(e as Error).message}`);
