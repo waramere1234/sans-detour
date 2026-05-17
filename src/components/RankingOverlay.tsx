@@ -115,7 +115,7 @@ export function RankingOverlay({ open, alignments, countedTotal, onClose }: Rank
               <span style={{
                 fontFamily: "var(--font-mono)", fontSize: 11,
                 color: "var(--ink-3)", letterSpacing: "0.12em", textTransform: "uppercase",
-              }}>Classement partiel · {countedTotal} comptés</span>
+              }}>Classement partiel · {countedTotal} compté{countedTotal !== 1 ? "s" : ""}</span>
               <button
                 ref={closeBtnRef}
                 type="button"

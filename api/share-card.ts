@@ -15,7 +15,13 @@ function parseTopParam(t: string | null): Bar[] {
   if (!t) return [];
   return t.split(",").map(pair => {
     const [code, pctStr] = pair.split(":");
-    return { code, pct: parseInt(pctStr, 10) };
+    // Clamp pct to [0, 100]: a hand-crafted (or buggy) share URL like
+    // `?t=RN:-50,LFI:200` would otherwise render "-50%" / "200%" on the
+    // card. Alignment scores are always Math.round((sum/counted) * 100)
+    // ∈ [0, 100], so clamping at the endpoint just defends the image
+    // from out-of-band input.
+    const pct = parseInt(pctStr, 10);
+    return { code, pct: Math.max(0, Math.min(100, pct)) };
   }).filter(b => !!b.code && !isNaN(b.pct));
 }
 

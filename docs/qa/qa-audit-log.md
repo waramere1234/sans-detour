@@ -1909,3 +1909,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] DevTools : mocker `fetchFreshness` avec `lastSyncRes.data[0].ingere_le = "garbage"` → no throw, banner affiche "MAJ aujourd'hui" + "prochaine sync dans 7 jours"
 - [ ] `curl -i /api/share-card.svg` (sans `?t=`) → 400 + `Content-Type: text/plain; charset=utf-8`
 - [ ] grep `~132 tests` CLAUDE.md → 0 résultat (aligné sur ~136)
+
+---
+
+## Session 84 — 2026-05-17
+
+### Vérification session 83
+
+- [VERIFIED] `FreshnessBanner.tsx:68` plural rule appliquée — `scrutin{!== 1 ? "s" : ""}`
+- [VERIFIED] `src/lib/scrutins.ts` : guard isNaN sur lastSyncMs + fallback Date.now()
+- [VERIFIED] `api/share-card.ts` : 400 path a `Content-Type: text/plain; charset=utf-8` explicite
+- [VERIFIED] CLAUDE.md ligne 191 : "~136 tests" (drift résolue)
+- 136/136 tests verts, typecheck clean
+
+### Bugs fixés (implicit global + missing clamp + plural drift)
+
+- [FIXED] `Result.tsx:149` ambiguous `location.origin` access · `const shareUrl = location.origin` — `location` n'est jamais importé. Au runtime, JS résout vers le global `window.location.origin` (les browser globals sont implicites sur le scope). Mais c'est fragile : un futur refactor qui ajoute `const location = useLocation()` (react-router) changerait silencieusement le sens — l'objet location de react-router n'a PAS de `.origin`, donc shareUrl deviendrait `undefined`, et `navigator.share({url: undefined})` échouerait sans message clair. Préfixé explicitement `window.location.origin` pour fixer la lecture. · `src/routes/Result.tsx`
+- [FIXED] `api/share-card.ts` `parseTopParam` sans clamp · `parseInt(pctStr, 10)` accepte n'importe quel entier — un URL malformé `?t=RN:-50,LFI:200` rendait des barres "-50%" et "200%" sur la share card. Les vrais pcts viennent de `Math.round((sum / counted) * 100)` ∈ [0, 100]. Clamp ajouté `Math.max(0, Math.min(100, pct))` au moment de la map. NaN reste NaN à travers Math.min/max (propagation NaN), donc le filter `!isNaN(b.pct)` continue d'exclure les pcts invalides. · `api/share-card.ts`
+- [FIXED] `RankingOverlay.tsx:118` "comptés" hardcoded plural · Le chip header disait `Classement partiel · {countedTotal} comptés` — avec un user qui a 1 seul vote comparable (rare mais possible quand 4 votes/5 sont sur des scrutins où le groupe est divisé), render "1 comptés" — drift agreement. Même pattern que sessions 78-83. Plural rule `!== 1 ? "s" : ""` appliquée. · `src/components/RankingOverlay.tsx`
+
+### Vérifications à faire en session 85
+
+- [ ] grep `\blocation\.origin\b` src/routes/Result.tsx → 1 résultat (avec `window.` préfixe)
+- [ ] curl `/api/share-card.svg?t=RN:-50,LFI:200` → SVG avec "0%" et "100%" rendus (pcts clampés), pas "-50%" / "200%"
+- [ ] grep `comptés\b` src/components/RankingOverlay.tsx → 0 résultat (singulier ou avec plural rule, jamais hardcoded)

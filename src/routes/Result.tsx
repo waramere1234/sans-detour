@@ -146,7 +146,13 @@ export default function Result() {
       ? `Mes affinités politiques réelles (résultat partiel ${total}/${TARGET}), basées sur les vrais votes de l'AN`
       : `Mes affinités politiques réelles, basées sur les vrais votes de l'AN`;
     const text = `${lead} : ${summary}`;
-    const shareUrl = location.origin;
+    // Explicit `window.location.origin` — the bare `location` read used to
+    // resolve to the global window.location at runtime, but a future
+    // refactor adding `const location = useLocation()` (react-router) would
+    // silently change the meaning (react-router's location has no .origin
+    // → shareUrl becomes "undefined"). Be explicit so the global stays
+    // unambiguous.
+    const shareUrl = window.location.origin;
 
     if (navigator.share) {
       try {
