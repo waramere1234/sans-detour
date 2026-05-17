@@ -1,13 +1,11 @@
 import { useEffect } from "react";
 import type { ReactNode } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Wordmark } from "../components/Wordmark";
+import { useLocation } from "react-router-dom";
 import { FreshnessBanner } from "../components/FreshnessBanner";
+import { ReadingPageHeader } from "../components/ReadingPageHeader";
 import { useFreshnessOnce } from "../hooks/useFreshnessOnce";
 import { track } from "../lib/analytics";
-import { FROM_LOGO_STATE } from "../lib/nav-state";
 import { CONTACT_EMAIL, mailto } from "../lib/contact";
-import { ROUTES } from "../lib/routes";
 import { DEFAULT_CAP_PER_DOSSIER, DEFAULT_CAP_PER_CHAPEAU_PREFIX } from "../lib/deck";
 import { THRESHOLD } from "../lib/compute-positions";
 import {
@@ -15,7 +13,7 @@ import {
   AN_OPEN_DATA_URL, AN_OPEN_DATA_HOSTNAME,
   GITHUB_REPO_URL, GITHUB_REPO_DISPLAY,
   READING_PAGE_MAX_WIDTH,
-  WORDMARK_HOME_LABEL, PAGE_HEADER_NAV_LABEL, externalLinkLabel,
+  externalLinkLabel,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -64,24 +62,7 @@ export default function Methode() {
 
   return (
     <section style={{ maxWidth: READING_PAGE_MAX_WIDTH, margin: "0 auto", padding: "24px var(--gutter) 48px" }}>
-      {/* 3-column grid keeps the wordmark centered without needing an
-        invisible placeholder span. Left col = back link (justify start),
-        center = wordmark (justify center), right col = empty (1fr) so
-        the geometry is balanced. aria-label distinguishes this landmark
-        from the Sommaire <nav> below for SR users navigating by landmarks. */}
-      <nav
-        aria-label={PAGE_HEADER_NAV_LABEL}
-        style={{
-          display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "baseline",
-          paddingBottom: 14, borderBottom: "1px solid var(--line)",
-        }}>
-        <Link to={ROUTES.cover} style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none", justifySelf: "start" }}>
-          <span aria-hidden="true">‹ </span>Retour
-        </Link>
-        <Link to={ROUTES.cover} state={FROM_LOGO_STATE} aria-label={WORDMARK_HOME_LABEL} style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
-          <Wordmark />
-        </Link>
-      </nav>
+      <ReadingPageHeader />
 
       <header style={{ marginTop: 24 }}>
         <span style={{

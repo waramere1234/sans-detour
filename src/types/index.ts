@@ -94,12 +94,18 @@ export const OG_LOCALE = APP_LOCALE.replace("-", "_");
  *  old width during the Methode lazy-load flash. */
 export const READING_PAGE_MAX_WIDTH = 720;
 
-/** "Voir mon résultat" — the user-facing CTA label shown when the
- *  user has a completed session. Appears as the Cover primary CTA
- *  (when hasCompleted=true) AND as the Play.tsx RetryError fallback
- *  retryLabel (when the deck is exhausted and the user should jump
- *  to /result). Same wording in both contexts; a rewording (e.g.
- *  "Voir ton classement") propagates from one edit. */
+/** Cover primary-CTA label triplet — the button text changes based
+ *  on the user's session state. Co-located so a rewording of any one
+ *  label happens alongside the other two, and tests can iterate the
+ *  set as a single source of truth.
+ *
+ *  - START_LABEL: first visit, no session yet ("Commencer").
+ *  - RESUME_LABEL: in-progress session, votes < TARGET ("Reprendre").
+ *  - VIEW_RESULT_LABEL: completed session, votes ≥ TARGET
+ *    ("Voir mon résultat"). Also re-used by Play.tsx's RetryError
+ *    fallback when the deck is exhausted. */
+export const START_LABEL = "Commencer";
+export const RESUME_LABEL = "Reprendre";
 export const VIEW_RESULT_LABEL = "Voir mon résultat";
 
 /** Canonical "data source" tagline appended to the share text and

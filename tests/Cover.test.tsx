@@ -8,7 +8,10 @@ import Cover from "../src/routes/Cover";
 import { resetSession, recordVote, COVER_STORAGE_KEY, loadSession } from "../src/lib/session";
 import { FROM_LOGO_STATE } from "../src/lib/nav-state";
 import { ROUTES } from "../src/lib/routes";
-import { TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL, TAGLINE, VIEW_RESULT_LABEL } from "../src/types";
+import {
+  TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL, TAGLINE,
+  START_LABEL, RESUME_LABEL, VIEW_RESULT_LABEL,
+} from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
 function renderCover(initialEntries: InitialEntry[] = [ROUTES.cover]) {
@@ -214,6 +217,18 @@ describe("Cover — auto-resume analytics (cover_result_revisit + cover_partial_
 
   afterEach(() => {
     trackSpy.mockRestore();
+  });
+
+  it("primary CTA on a fresh visit uses START_LABEL (rename-safe)", () => {
+    renderCover();
+    expect(screen.getByRole("button", { name: new RegExp(START_LABEL, "i") })).toBeInTheDocument();
+  });
+
+  it("primary CTA on an in-progress session uses RESUME_LABEL (rename-safe)", () => {
+    localStorage.setItem(COVER_STORAGE_KEY, "true");
+    recordVote("s1", "pour");
+    renderCover([{ pathname: ROUTES.cover, state: FROM_LOGO_STATE }]);
+    expect(screen.getByRole("button", { name: new RegExp(RESUME_LABEL, "i") })).toBeInTheDocument();
   });
 
   it("primary CTA on a completed session uses VIEW_RESULT_LABEL (rename-safe)", () => {

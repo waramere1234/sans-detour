@@ -1,34 +1,16 @@
 // src/routes/Legal.tsx
-import { Link } from "react-router-dom";
-import { Wordmark } from "../components/Wordmark";
-import { FROM_LOGO_STATE } from "../lib/nav-state";
+import { ReadingPageHeader } from "../components/ReadingPageHeader";
 import { CONTACT_EMAIL, mailto } from "../lib/contact";
-import { ROUTES } from "../lib/routes";
 import {
   AN_OPEN_DATA_URL, AN_OPEN_DATA_HOSTNAME,
   GITHUB_REPO_URL, GITHUB_REPO_DISPLAY,
-  WORDMARK_HOME_LABEL, PAGE_HEADER_NAV_LABEL, externalLinkLabel,
+  externalLinkLabel,
 } from "../types";
 
 export default function Legal() {
   return (
     <section style={{ maxWidth: 640, margin: "0 auto", padding: "24px var(--gutter) 48px" }}>
-      {/* 3-column grid centers the wordmark without needing an invisible
-        spacer. Same pattern as Methode.tsx. aria-label distinguishes this
-        landmark from the TopBar header for SR users navigating by landmarks. */}
-      <nav
-        aria-label={PAGE_HEADER_NAV_LABEL}
-        style={{
-          display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "baseline",
-          paddingBottom: 14, borderBottom: "1px solid var(--line)",
-        }}>
-        <Link to={ROUTES.cover} style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none", justifySelf: "start" }}>
-          <span aria-hidden="true">‹ </span>Retour
-        </Link>
-        <Link to={ROUTES.cover} state={FROM_LOGO_STATE} aria-label={WORDMARK_HOME_LABEL} style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
-          <Wordmark />
-        </Link>
-      </nav>
+      <ReadingPageHeader />
 
       <h1 style={{
         fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 24,

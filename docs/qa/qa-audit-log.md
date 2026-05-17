@@ -3188,3 +3188,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `GITHUB_REPO_URL\|GITHUB_REPO_DISPLAY\|AN_OPEN_DATA_HOSTNAME` src/ tests/ → 16+ résultats
 - [ ] grep `"https://github\.com/sansdetour"` src/ → 1 résultat seulement (la déclaration)
 - [ ] grep `~600 tests` CLAUDE.md → 0 résultat (aligné sur ~606)
+
+---
+
+## Session 136 — 2026-05-17
+
+### Vérification session 135
+
+- [VERIFIED] 32 occurrences de GITHUB_REPO_URL|GITHUB_REPO_DISPLAY|AN_OPEN_DATA_HOSTNAME dans src/ + tests/
+- [VERIFIED] 1 occurrence seulement de "https://github.com/sansdetour" (la déclaration)
+- [VERIFIED] CLAUDE.md "~606 tests"
+- 606/606 tests verts, typecheck clean
+
+### Bugs fixés (ReadingPageHeader extraction + START_LABEL/RESUME_LABEL + BACK_LINK_LABEL)
+
+- [FIXED] 3-col header block (nav + Retour Link + Wordmark Link, ~20 lines) dupliqué entre `src/routes/Methode.tsx` et `src/routes/Legal.tsx` · Un style tweak (border-color, padding bump, layout change) aurait demandé 2 edits in-lockstep. Fix : extract `<ReadingPageHeader />` component dans `src/components/ReadingPageHeader.tsx`. Methode + Legal importent + utilisent. 5 tests dans `tests/ReadingPageHeader.test.tsx` : nav landmark aria-label, Retour link href, Wordmark link href + aria-label, BACK_LINK_LABEL pin, exactement 2 Links rendered. · `src/components/ReadingPageHeader.tsx` (nouveau), `src/routes/Methode.tsx`, `src/routes/Legal.tsx`, `tests/ReadingPageHeader.test.tsx` (nouveau)
+- [FIXED] Cover.tsx CTA triplet incomplet : VIEW_RESULT_LABEL exporté (session 133) mais "Reprendre" + "Commencer" toujours inline · L'extraction d'un seul des 3 labels du triplet est asymétrique — une rewording du premier ("Voir mes résultats" au lieu de "Voir mon résultat") devrait propager à la même semantic position des deux autres. Fix : export `START_LABEL = "Commencer"` + `RESUME_LABEL = "Reprendre"` co-localisés avec VIEW_RESULT_LABEL dans src/types. Cover.tsx utilise les 3 consts. 2 tests Cover.test.tsx nouveaux : fresh visit → START_LABEL, in-progress → RESUME_LABEL. · `src/types/index.ts`, `src/routes/Cover.tsx`, `tests/Cover.test.tsx`
+- [FIXED] "Retour" + `‹ ` back-link text inline 2× (Methode + Legal headers) · Fixé en tandem avec bug #1 — `BACK_LINK_LABEL = "Retour"` exporté depuis ReadingPageHeader.tsx, utilisé dans le composant + pin-the-value test. · `src/components/ReadingPageHeader.tsx`, `tests/ReadingPageHeader.test.tsx`
+
+### Vérifications à faire en session 137
+
+- [ ] `ls src/components/ReadingPageHeader.tsx tests/ReadingPageHeader.test.tsx` → 2 fichiers présents
+- [ ] grep `START_LABEL\|RESUME_LABEL\|VIEW_RESULT_LABEL` src/ tests/ → 10+ résultats
+- [ ] grep `~606 tests` CLAUDE.md → 0 résultat (aligné sur ~613)
