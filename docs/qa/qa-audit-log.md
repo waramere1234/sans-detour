@@ -1608,3 +1608,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `localStorage.removeItem(KEY);$` dans `src/lib/session.ts` → 0 résultat (wrapper try/catch ajouté)
 - [ ] `npm run test:run` → 126 tests verts (était 123)
 - [ ] Mocker une re-ingest qui n'INSERT aucune row (toutes UPDATE) → fetchFreshness retourne `last_sync_at` = maintenant, pas la date originale
+
+---
+
+## Session 71 — 2026-05-17
+
+### Vérification session 70
+
+- [VERIFIED] `src/lib/session.ts resetSession` a try/catch
+- [VERIFIED] `tests/session.test.ts` contient 3 tests "localStorage throw defenses"
+- [VERIFIED] `scripts/ingest-an.ts` + `scripts/resume-ingest.ts` stamp `ingere_le: ingestedAt` sur les payloads
+- 126/126 tests verts, typecheck clean (project + scripts isolation)
+
+### Bugs fixés (drift counts dans 3 docs + type cleanup)
+
+- [FIXED] `CLAUDE.md` ligne 190 test count drift · "~115 tests aujourd'hui" — stale post sessions 61 (+8 FreshnessBanner) et 70 (+3 throw defense). Aligné sur ~126 + coverage list complétée avec FreshnessBanner, compute-positions, sanity, deck-invariants (4 fichiers manquants à l'enum). · `CLAUDE.md`
+- [FIXED] User memory test+session count · `~/.claude/projects/.../memory/{MEMORY.md, project_sans-detour-v1-shipped.md}` disaient "123 tests" + "65 sessions QA" — sessions 66-70 ont ajouté 3 tests + 5 sessions. Aligné à 126 tests + 70 sessions + 210+ fixes. Le content des 4 production-blockers reste inchangé (toujours valide). · MEMORY.md + project_sans-detour-v1-shipped.md
+- [FIXED] `tests/Cover.test.tsx initialEntries: any[]` typed · Le helper `renderCover` avait `any[]` pour son param `initialEntries`. Importé le type `InitialEntry` de react-router-dom et utilisé pour typer le param strictement. Pas de bug runtime mais fait disparaître un faux trou de typage. · `tests/Cover.test.tsx`
+
+### Vérifications à faire en session 72
+
+- [ ] grep `~115 tests\|123 tests` dans `CLAUDE.md` + memory/ → 0 résultat
+- [ ] grep `any\[\]` dans `tests/Cover.test.tsx` → 0 résultat
+- [ ] cat MEMORY.md → mentionne "126 tests" (pas 123)

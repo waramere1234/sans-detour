@@ -1,10 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import {
+  MemoryRouter, Route, Routes,
+  type InitialEntry,
+} from "react-router-dom";
 import Cover from "../src/routes/Cover";
 import { resetSession, recordVote } from "../src/lib/session";
 
-function renderCover(initialEntries: any[] = ["/"]) {
+function renderCover(initialEntries: InitialEntry[] = ["/"]) {
   return render(
     <MemoryRouter initialEntries={initialEntries}>
       <Routes>
