@@ -17,7 +17,7 @@
 
 ## Original cron design (deferred)
 
-When operational, the function would run weekly · `0 4 * * 1` (Monday 04:00 UTC), pulling new SPS scrutins from `data.assemblee-nationale.fr`, computing group positions via the 70% threshold, generating LLM summaries, and upserting to `scrutins`.
+When operational, the function would run weekly · `0 4 * * 1` (Monday 04:00 UTC), pulling scrutins from `data.assemblee-nationale.fr`, computing group positions via the 70% threshold, generating LLM summaries, and upserting to `scrutins`.
 
 ### Manual relecture des résumés pédago
 
@@ -33,7 +33,7 @@ Flip `pedago_relu = true` once validated.
 ## Verified facts (from data.assemblee-nationale.fr inspection)
 
 - **Bulk endpoint:** `https://data.assemblee-nationale.fr/static/openData/repository/17/loi/scrutins/Scrutins.json.zip` (~20 MB, ~6500 files)
-- **Solennel filter:** `scrutin.typeVote.codeTypeVote === "SPS"` (yields 46 entries as of 2026-05)
-- **Group mapping:** see `parse-scrutins.ts` — 12 organeRef codes mapped to 11 internal codes (UDR appears under two refs, PO847173 pre-2025-09 and PO872880 after)
-- **Dossier titre:** available directly at `scrutin.objet.dossierLegislatif.libelle` (no second endpoint needed); falls back to `objet.libelle` when the scrutin has no attached dossier
+- **Eligibility filter:** initially SPS-only (`scrutin.typeVote.codeTypeVote === "SPS"`, ~46 entries), widened pre-V2 to include final votes on whole texts (`SOR` + "sur l'ensemble" in the title), motions de censure + référendaires, and propositions de résolution. Amendments and procedural motions are excluded. See `scripts/ingest-an.ts isEligibleScrutin` for the authoritative rule — the current corpus is ~100 scrutins.
+- **Group mapping:** see `parse-scrutins.ts` — 12 organeRef codes mapped to 11 internal codes (UDR appears under two refs, PO847173 pre-2025-09 and PO872880 after).
+- **Dossier titre:** available directly at `scrutin.objet.dossierLegislatif.libelle` (no second endpoint needed); falls back to `objet.libelle` when the scrutin has no attached dossier.
 - **AN URL pattern:** `https://www.assemblee-nationale.fr/dyn/17/scrutins/{numero}`

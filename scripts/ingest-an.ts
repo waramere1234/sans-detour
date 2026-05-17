@@ -20,7 +20,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
 import { computeGroupPosition } from "../src/lib/compute-positions";
-import { THEMES } from "../src/types";
+import { normalizeTheme } from "../src/types";
 import type {
   GroupCode, GroupPosition, GroupVoteBreakdown, Theme, ScrutinAnalyse,
 } from "../src/types";
@@ -529,14 +529,6 @@ function extractSummaryFromMessage(message: AnthropicResponse): Summary {
     points_cles: normalizePointsCles(raw.points_cles),
     theme: normalizeTheme(raw.theme),
   };
-}
-
-// Validate against the THEMES enum; anything off-list collapses to "autre" so
-// a misbehaving model can never inject an arbitrary bucket label into the DB.
-function normalizeTheme(v: unknown): Theme | undefined {
-  if (typeof v !== "string") return undefined;
-  const lower = v.trim().toLowerCase();
-  return (THEMES as readonly string[]).includes(lower) ? (lower as Theme) : "autre";
 }
 
 // Cap each bullet at 7 words and keep at most 3. Drop empties and trims.

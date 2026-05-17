@@ -21,7 +21,7 @@ import { createClient } from "@supabase/supabase-js";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { computeGroupPosition } from "../src/lib/compute-positions";
-import { THEMES } from "../src/types";
+import { normalizeTheme } from "../src/types";
 import type {
   GroupCode, GroupPosition, GroupVoteBreakdown, ScrutinAnalyse, Theme,
 } from "../src/types";
@@ -192,11 +192,6 @@ function normalizePointsCles(v: unknown): string[] | undefined {
       return w.length <= 7 ? s : w.slice(0, 7).join(" ") + "…";
     });
   return cleaned.length > 0 ? cleaned : undefined;
-}
-function normalizeTheme(v: unknown): Theme | undefined {
-  if (typeof v !== "string") return undefined;
-  const lower = v.trim().toLowerCase();
-  return (THEMES as readonly string[]).includes(lower) ? (lower as Theme) : "autre";
 }
 function sanitizeJsonControlChars(json: string): string {
   let out = ""; let inString = false; let escapeNext = false;

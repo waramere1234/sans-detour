@@ -28,7 +28,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0002",
@@ -59,7 +59,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0003",
@@ -90,7 +90,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0004",
@@ -121,7 +121,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0005",
@@ -152,7 +152,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0006",
@@ -183,7 +183,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0007",
@@ -214,7 +214,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0008",
@@ -245,7 +245,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0009",
@@ -276,7 +276,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0010",
@@ -307,7 +307,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0011",
@@ -338,7 +338,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0012",
@@ -369,7 +369,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0013",
@@ -400,7 +400,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0014",
@@ -431,7 +431,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0015",
@@ -462,7 +462,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0016",
@@ -493,7 +493,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0017",
@@ -524,7 +524,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0018",
@@ -555,7 +555,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0019",
@@ -586,7 +586,7 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   },
   {
     "id": "VTANR5L17V0020",
@@ -617,6 +617,6 @@
     },
     "url_an_officielle": "",
     "est_solennel": true,
-    "pedago_relu": true
+    "pedago_relu": false
   }
 ]

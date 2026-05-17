@@ -32,6 +32,17 @@ export const THEMES = [
 ] as const;
 export type Theme = typeof THEMES[number];
 
+/** Validate that an LLM-emitted theme label is in the enum; off-list values
+ *  collapse to "autre" so a misbehaving model can never inject an arbitrary
+ *  bucket into the DB. Called by both ingest scripts (ingest-an.ts,
+ *  resume-ingest.ts) — kept here next to THEMES to avoid the previous
+ *  duplication of the same 4-line function in both scripts. */
+export function normalizeTheme(v: unknown): Theme | undefined {
+  if (typeof v !== "string") return undefined;
+  const lower = v.trim().toLowerCase();
+  return (THEMES as readonly string[]).includes(lower) ? (lower as Theme) : "autre";
+}
+
 /** Codes for the 8 presidentially-relevant personalities of the 17e
  *  legislature whose individual votes we extract from the AN nominative
  *  vote breakdown. Each code maps to a député in `PERSONNALITES`

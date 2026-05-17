@@ -1700,3 +1700,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] `npm run test:run` → 127 tests verts (était 126)
 - [ ] grep `const THEMES` dans `scripts/resume-ingest.ts` → 0 résultat (importé maintenant)
 - [ ] Sur Cover, cliquer le wordmark 3× → DevTools Application > History : pas d'entrées supplémentaires accumulées
+
+---
+
+## Session 75 — 2026-05-17
+
+### Vérification session 74
+
+- [VERIFIED] `tests/Cover.test.tsx` contient 5 tests (incluant hasCompleted → /result)
+- [VERIFIED] `scripts/resume-ingest.ts` n'a plus de `const THEMES` local — importe depuis `src/types`
+- [VERIFIED] `src/routes/Cover.tsx` Wordmark Link a `replace`
+- 127/127 tests verts, typecheck clean
+
+### Bugs fixés (DRY drift + 2 docs/fixtures stale)
+
+- [FIXED] `normalizeTheme` dupliqué · La fonction 4-line `normalizeTheme(v) → Theme | undefined` était implémentée à l'identique dans `scripts/ingest-an.ts:536` et `scripts/resume-ingest.ts:196`. Si on change la logique de fallback (ex: pour collapser vers "international" au lieu de "autre" sur certains hints), il faudrait éditer 2 endroits — drift garanti. Extracted dans `src/types/index.ts` à côté de THEMES + Theme (cohérent — c'est de la validation enum). Les 2 scripts importent maintenant. · `src/types/index.ts`, `scripts/ingest-an.ts`, `scripts/resume-ingest.ts`
+- [FIXED] `supabase/functions/ingest-scrutins/README.md` stale corpus + filter · README disait "Solennel filter: scrutin.typeVote.codeTypeVote === 'SPS' (yields 46 entries as of 2026-05)" — pré-V2 P1. La règle V2 inclut SPS + SOR sur l'ensemble + motions + résolutions (~100 scrutins). Si la function edge est jamais réécrite, le dev utiliserait le mauvais filter. Reformulé "Eligibility filter" + pointeur vers `isEligibleScrutin` comme source canonical. · `supabase/functions/ingest-scrutins/README.md`
+- [FIXED] `dev-fixtures.json pedago_relu: true` × 20 · Toutes les 20 dev fixtures claim `pedago_relu: true` (audited human-reviewed) mais c'est faux : (a) ce sont des données synthétiques sans audit humain, (b) CLAUDE.md schema doc dit "toujours false pour l'instant (V3 : audit humain)", (c) migration default = false, (d) ingest scripts force false. Drift sémantique. `sed` bulk replace true→false sur les 20. JSON valide. · `supabase/seed/dev-fixtures.json`
+
+### Vérifications à faire en session 76
+
+- [ ] grep `function normalizeTheme` dans `scripts/` → 0 résultat (importé maintenant)
+- [ ] grep `SPS.*yields 46 entries` dans `supabase/functions/` → 0 résultat
+- [ ] grep `"pedago_relu": true` dans `supabase/seed/` → 0 résultat
+- [ ] `npm run test:run` → 127 tests verts (stable)
