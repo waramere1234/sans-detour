@@ -3,6 +3,9 @@ import {
   requireSupabaseEnv,
   requireSupabaseClient,
   requireAnthropicEnv,
+  ANTHROPIC_BATCHES_URL,
+  anthropicBatchUrl,
+  anthropicBatchResultsUrl,
 } from "../scripts/lib/env";
 
 // Session 102 extracted these helpers from 4 ingest scripts. The
@@ -128,5 +131,35 @@ describe("requireAnthropicEnv", () => {
     expect(err).toHaveBeenCalledWith(expect.stringContaining("Missing ANTHROPIC_API_KEY"));
     exit.mockRestore();
     err.mockRestore();
+  });
+});
+
+describe("ANTHROPIC_BATCHES_URL + anthropicBatchUrl / anthropicBatchResultsUrl", () => {
+  // Previously 6 inline copies of `https://api.anthropic.com/v1/messages/
+  // batches` across 3 scripts (ingest-an, resume-ingest, debug-batch),
+  // each rebuilding `${BASE}/${batchId}` / `${BASE}/${batchId}/results`.
+  // Session 120 centralised the base URL + builders here.
+
+  it("base URL points at the v1 Batches endpoint", () => {
+    expect(ANTHROPIC_BATCHES_URL).toBe("https://api.anthropic.com/v1/messages/batches");
+  });
+
+  it("anthropicBatchUrl(id) → BASE/id", () => {
+    expect(anthropicBatchUrl("msgbatch_xyz")).toBe(`${ANTHROPIC_BATCHES_URL}/msgbatch_xyz`);
+  });
+
+  it("anthropicBatchResultsUrl(id) → BASE/id/results", () => {
+    expect(anthropicBatchResultsUrl("msgbatch_xyz")).toBe(
+      `${ANTHROPIC_BATCHES_URL}/msgbatch_xyz/results`,
+    );
+  });
+
+  it("builders compose deterministically from the base URL (rename-safe)", () => {
+    // If the base URL bumps to v2, both builders re-compose without
+    // per-script edits — pin the linkage here so a refactor that
+    // hand-rolls one builder doesn't drift away from the const.
+    const fakeBase = ANTHROPIC_BATCHES_URL;
+    expect(anthropicBatchUrl("ID").startsWith(fakeBase + "/")).toBe(true);
+    expect(anthropicBatchResultsUrl("ID").endsWith("/results")).toBe(true);
   });
 });

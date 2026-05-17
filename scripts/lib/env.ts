@@ -53,3 +53,21 @@ export function requireAnthropicEnv(): string {
   }
   return key;
 }
+
+/** Anthropic Batches API base URL. Centralised so a future move (e.g.
+ *  regional endpoint, version bump) is a single edit. Previously
+ *  inlined 6× across ingest-an, resume-ingest, debug-batch — each call
+ *  site reconstructing `${BASE}/${batchId}` or `${BASE}/${batchId}/results`
+ *  from scratch. Helper builders below remove the per-site string
+ *  concatenation as a bonus. */
+export const ANTHROPIC_BATCHES_URL = "https://api.anthropic.com/v1/messages/batches";
+
+/** URL for a specific batch by id (status + cancel endpoints share it). */
+export function anthropicBatchUrl(batchId: string): string {
+  return `${ANTHROPIC_BATCHES_URL}/${batchId}`;
+}
+
+/** URL for the JSONL results stream of a completed batch. */
+export function anthropicBatchResultsUrl(batchId: string): string {
+  return `${ANTHROPIC_BATCHES_URL}/${batchId}/results`;
+}

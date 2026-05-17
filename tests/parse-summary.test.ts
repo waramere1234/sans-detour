@@ -8,6 +8,7 @@ import {
   extractAnthropicSummary,
   type MinimalAnthropicMessage,
 } from "../scripts/lib/parse-summary";
+import { MAX_POINTS_CLES_BULLETS, MAX_WORDS_PER_BULLET } from "../src/types";
 
 // Session 82 extracted these 5 helpers from the 2 ingest scripts (ingest-an,
 // resume-ingest) into a shared lib. Both scripts depend on them to keep the
@@ -87,23 +88,46 @@ describe("normalizePointsCles", () => {
     expect(normalizePointsCles({})).toBeUndefined();
   });
 
-  it("caps the list at 3 bullets", () => {
-    expect(normalizePointsCles(["a", "b", "c", "d", "e"])).toEqual(["a", "b", "c"]);
+  it("caps the list at MAX_POINTS_CLES_BULLETS entries", () => {
+    // Build N+2 inputs and assert the output keeps exactly
+    // MAX_POINTS_CLES_BULLETS. A bump to 5 propagates the input length
+    // and the expected slice in lockstep.
+    const inputs = Array.from(
+      { length: MAX_POINTS_CLES_BULLETS + 2 },
+      (_, i) => String.fromCharCode(97 + i), // "a", "b", "c", ...
+    );
+    const expected = inputs.slice(0, MAX_POINTS_CLES_BULLETS);
+    expect(normalizePointsCles(inputs)).toEqual(expected);
   });
 
   it("filters empty + whitespace-only entries", () => {
     expect(normalizePointsCles(["a", "", "b", "  "])).toEqual(["a", "b"]);
   });
 
-  it("truncates bullets > 7 words with an ellipsis", () => {
-    const out = normalizePointsCles(["one two three four five six seven eight nine"]);
-    expect(out).toEqual(["one two three four five six seven…"]);
+  it("truncates bullets > MAX_WORDS_PER_BULLET words with an ellipsis", () => {
+    // Build a bullet of N+2 words; assert the truncation lands exactly on
+    // MAX_WORDS_PER_BULLET. The first 7 words (today) become a prefix.
+    const words = Array.from(
+      { length: MAX_WORDS_PER_BULLET + 2 },
+      (_, i) => `w${i + 1}`,
+    );
+    const out = normalizePointsCles([words.join(" ")]);
+    const expectedPrefix = words.slice(0, MAX_WORDS_PER_BULLET).join(" ") + "…";
+    expect(out).toEqual([expectedPrefix]);
   });
 
-  it("keeps bullets of exactly 7 words unchanged", () => {
-    expect(normalizePointsCles(["one two three four five six seven"])).toEqual([
-      "one two three four five six seven",
-    ]);
+  it("keeps bullets of exactly MAX_WORDS_PER_BULLET words unchanged (boundary inclusive)", () => {
+    const exactly = Array.from(
+      { length: MAX_WORDS_PER_BULLET },
+      (_, i) => `w${i + 1}`,
+    ).join(" ");
+    expect(normalizePointsCles([exactly])).toEqual([exactly]);
+  });
+
+  it("MAX_POINTS_CLES_BULLETS / MAX_WORDS_PER_BULLET are the canonical 3 / 7 values (pin-the-value)", () => {
+    // Future bump → edit these assertions deliberately.
+    expect(MAX_POINTS_CLES_BULLETS).toBe(3);
+    expect(MAX_WORDS_PER_BULLET).toBe(7);
   });
 
   it("returns undefined when all entries are stripped", () => {

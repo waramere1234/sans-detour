@@ -2803,3 +2803,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `MAX_POINTS_CLES_BULLETS` src/ scripts/ tests/ → 5+ résultats (déclaration + parse-summary + Card + Methode + tests)
 - [ ] grep `"17e LÉGISLATURE"\|slice(0, 3)` src/routes/ src/components/Card.tsx → 0 résultat literal (tous via const)
 - [ ] grep `~510 tests` CLAUDE.md → 0 résultat (aligné sur ~513)
+
+---
+
+## Session 120 — 2026-05-17
+
+### Vérification session 119
+
+- [VERIFIED] 11 occurrences de LEGISLATURE_LABEL dans src/ + tests/
+- [VERIFIED] 12 occurrences de MAX_POINTS_CLES_BULLETS dans src/ + scripts/ + tests/
+- [VERIFIED] 0 literal `"17e LÉGISLATURE"` ou `slice(0, 3)` dans src/routes/ + src/components/Card.tsx
+- [VERIFIED] CLAUDE.md "~513 tests"
+- 513/513 tests verts, typecheck clean
+
+### Bugs fixés (parse-summary boundary derivation + ANTHROPIC_BATCHES_URL extraction + an-cache shape tests)
+
+- [FIXED] `tests/parse-summary.test.ts` hardcodait `3 bullets` / `7 mots` boundaries en literal · Même drift pattern que sessions 111/115/117/118 (STALE_AFTER_DAYS, THRESHOLD, LOW_DATA_THRESHOLD, MIN_FOR_RANKING). Si MAX_POINTS_CLES_BULLETS bumpe à 5 ou MAX_WORDS_PER_BULLET à 10, les boundary tests passent toujours silently sur les anciens valeurs (`exactly 7 words unchanged` reste vrai car 7 < 10). Fix : tests dérivent les inputs (`MAX_POINTS_CLES_BULLETS + 2` items, `MAX_WORDS_PER_BULLET + 2` words) + un test pin-the-value pour rendre un bump délibéré. · `tests/parse-summary.test.ts`
+- [FIXED] `https://api.anthropic.com/v1/messages/batches` dupliqué 6× sur 3 scripts (ingest-an x3, debug-batch x2, resume-ingest x1) · Une migration vers v2 ou un endpoint régional aurait demandé 6 edits + tests. Fix : export `ANTHROPIC_BATCHES_URL` + helpers `anthropicBatchUrl(id)` et `anthropicBatchResultsUrl(id)` depuis `scripts/lib/env.ts`. Les 3 scripts importent + composent. 4 tests dans tests/env.test.ts : base URL pin-the-value, builders deterministic, rename-safe linkage. Side fix : resume-ingest.ts utilisait `BATCH_ID!` sans assertion explicite — le ! est désormais documenté avec un comment lié au pattern ANTHROPIC_KEY narrowing dance. · `scripts/lib/env.ts`, `scripts/ingest-an.ts`, `scripts/debug-batch.ts`, `scripts/resume-ingest.ts`, `tests/env.test.ts`
+- [FIXED] `scripts/lib/an-cache.ts` 0 dedicated test · CACHE_DIR + JSON_DIR consts (single source of truth pour le local cache path, read par 3 ingest scripts) + iterEligibleScrutins async generator (walk + filter + parseRaw chain). Le generator résiste au vi.mock("node:fs") en raison de vitest specifier matching complexity — l'iterateur est intégration-testé via les vrai ingest runs, pas testé ici. Mais les consts shape sont pin-able. 4 tests dans `tests/an-cache.test.ts` : CACHE_DIR is /tmp/sd-an-cache pin, JSON_DIR = CACHE_DIR + "/json" round-trip, JSON_DIR is absolute, JSON_DIR basename is "json" (defense contre un rename accidentel de la segment vers "data" qui casserait les 3 ingest scripts qui font fs.readdir(JSON_DIR)). · `tests/an-cache.test.ts` (nouveau)
+
+### Vérifications à faire en session 121
+
+- [ ] grep "https://api\.anthropic\.com/v1/messages/batches" scripts/ → 1 résultat seulement (la déclaration dans env.ts)
+- [ ] grep "ANTHROPIC_BATCHES_URL\|anthropicBatchUrl\|anthropicBatchResultsUrl" scripts/ tests/ → 8+ résultats
+- [ ] `ls tests/an-cache.test.ts` → présent
+- [ ] grep `~513 tests` CLAUDE.md → 0 résultat (aligné sur ~522)

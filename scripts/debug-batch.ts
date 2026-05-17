@@ -9,7 +9,10 @@
 // or
 //   ANTHROPIC_API_KEY=sk-ant-... npx tsx scripts/debug-batch.ts msgbatch_XXX
 
-import { requireAnthropicEnv } from "./lib/env";
+import {
+  requireAnthropicEnv,
+  anthropicBatchUrl, anthropicBatchResultsUrl,
+} from "./lib/env";
 
 const batchId = process.argv[2];
 if (!batchId || !batchId.startsWith("msgbatch_")) {
@@ -22,7 +25,7 @@ const ANTHROPIC_KEY = requireAnthropicEnv();
 async function main() {
   // First, status of the batch
   console.log(`→ Fetching status of ${batchId}…\n`);
-  const statusR = await fetch(`https://api.anthropic.com/v1/messages/batches/${batchId}`, {
+  const statusR = await fetch(anthropicBatchUrl(batchId), {
     headers: {
       "x-api-key": ANTHROPIC_KEY,
       "anthropic-version": "2023-06-01",
@@ -36,7 +39,7 @@ async function main() {
 
   // Then fetch the JSONL results
   console.log(`\n→ Fetching results…\n`);
-  const resultsR = await fetch(`https://api.anthropic.com/v1/messages/batches/${batchId}/results`, {
+  const resultsR = await fetch(anthropicBatchResultsUrl(batchId), {
     headers: {
       "x-api-key": ANTHROPIC_KEY,
       "anthropic-version": "2023-06-01",

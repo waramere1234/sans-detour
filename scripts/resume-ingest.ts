@@ -25,7 +25,7 @@ import {
 } from "./lib/parse-summary";
 import { type ParsedScrutinCore } from "./lib/an-parse";
 import { iterEligibleScrutins } from "./lib/an-cache";
-import { requireSupabaseClient, requireAnthropicEnv } from "./lib/env";
+import { requireSupabaseClient, requireAnthropicEnv, anthropicBatchResultsUrl } from "./lib/env";
 
 // SUPABASE_* + ANTHROPIC_API_KEY are validated lazily via the helpers
 // inside main(); BATCH_ID is script-specific so we still read + guard it
@@ -59,7 +59,11 @@ async function main(): Promise<void> {
   console.log(`◯ Loaded ${eligible.size} eligible scrutins from local AN cache`);
 
   console.log(`↓ Fetching batch ${BATCH_ID} results from Anthropic…`);
-  const r = await fetch(`https://api.anthropic.com/v1/messages/batches/${BATCH_ID}/results`, {
+  // The `!` is safe — the module-level guard at line 35 exits the process
+  // if BATCH_ID is undefined. TS narrows that at module scope but loses
+  // the narrowing inside async main(); same pattern as the ANTHROPIC_KEY
+  // narrowing dance noted in scripts/lib/env.ts comments.
+  const r = await fetch(anthropicBatchResultsUrl(BATCH_ID!), {
     headers: {
       "x-api-key": ANTHROPIC_KEY,
       "anthropic-version": "2023-06-01",

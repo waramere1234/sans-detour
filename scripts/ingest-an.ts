@@ -27,7 +27,10 @@ import {
 } from "./lib/parse-summary";
 import { type ParsedScrutinCore } from "./lib/an-parse";
 import { CACHE_DIR, JSON_DIR, iterEligibleScrutins } from "./lib/an-cache";
-import { requireSupabaseClient } from "./lib/env";
+import {
+  requireSupabaseClient,
+  ANTHROPIC_BATCHES_URL, anthropicBatchUrl, anthropicBatchResultsUrl,
+} from "./lib/env";
 
 // ───────────────────────────────────────────────────────────────── config
 
@@ -345,7 +348,7 @@ async function submitBatch(scrutins: ParsedScrutin[]): Promise<string> {
     custom_id: s.id, // e.g. "VTANR5L17V1234"
     params: buildRequestParams(s),
   }));
-  const r = await fetch("https://api.anthropic.com/v1/messages/batches", {
+  const r = await fetch(ANTHROPIC_BATCHES_URL, {
     method: "POST",
     headers: COMMON_HEADERS(),
     body: JSON.stringify({ requests }),
@@ -363,7 +366,7 @@ interface BatchStatus {
 async function pollBatch(batchId: string): Promise<BatchStatus> {
   // Poll every 15s — typical batch completes in 2-10 min for 46 items.
   while (true) {
-    const r = await fetch(`https://api.anthropic.com/v1/messages/batches/${batchId}`, {
+    const r = await fetch(anthropicBatchUrl(batchId), {
       headers: COMMON_HEADERS(),
     });
     if (!r.ok) throw new Error(`Batch poll failed: ${r.status} ${await r.text()}`);
@@ -376,7 +379,7 @@ async function pollBatch(batchId: string): Promise<BatchStatus> {
 }
 
 async function fetchBatchResults(batchId: string): Promise<Map<string, Summary>> {
-  const r = await fetch(`https://api.anthropic.com/v1/messages/batches/${batchId}/results`, {
+  const r = await fetch(anthropicBatchResultsUrl(batchId), {
     headers: COMMON_HEADERS(),
   });
   if (!r.ok) throw new Error(`Batch results failed: ${r.status} ${await r.text()}`);
