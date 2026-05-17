@@ -73,6 +73,9 @@ import {
   METHODE_S07_MODEL_DISCLOSURE,
   METHODE_S07_CLAUDE_TASKS_PREFIX, METHODE_S07_CLAUDE_TASKS_SUFFIX,
   METHODE_S07_LIMITES_DISCLAIMER_PREFIX, METHODE_S07_LIMITES_DISCLAIMER_SUFFIX,
+  METHODE_S07_NE_FAIT_PAS_BODY,
+  METHODE_S07_CADRE_BIAIS_PREFIX, METHODE_S07_CADRE_BIAIS_SUFFIX,
+  METHODE_S02_CAPS_EXAMPLE,
   COVER_SECONDARY_NAV_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
@@ -1686,6 +1689,86 @@ describe("METHODE_S07_LIMITES_DISCLAIMER_* — V3 roadmap + signalement disclaim
     // can be wrong, no human review yet. Dropping this clause hides
     // the limitation.
     expect(METHODE_S07_LIMITES_DISCLAIMER_PREFIX).toContain("aucune relecture humaine systématique");
+  });
+});
+
+describe("METHODE_S07_NE_FAIT_PAS_BODY — 3-task negative IA list", () => {
+  it("matches the canonical negative-task list", () => {
+    expect(METHODE_S07_NE_FAIT_PAS_BODY).toBe(
+      "Le calcul d'alignement (formule mathématique pure), la composition du deck (round-robin algorithmique par thème), l'extraction des votes individuels (parsing des XML officiels AN). Sur ces trois plans, Claude n'intervient à aucun moment.",
+    );
+  });
+
+  it("contains 'trois plans' (anti-drop guard for the 3-task scope)", () => {
+    // The closing sentence "Sur ces trois plans..." reinforces the
+    // count = 3. A regression that adds a 4th task without updating
+    // this clause would surface here (math mismatch in the prose).
+    expect(METHODE_S07_NE_FAIT_PAS_BODY).toContain("trois plans");
+  });
+
+  it("contains 'calcul d'alignement' + 'composition du deck' + 'extraction des votes' (3-task pin)", () => {
+    expect(METHODE_S07_NE_FAIT_PAS_BODY).toContain("calcul d'alignement");
+    expect(METHODE_S07_NE_FAIT_PAS_BODY).toContain("composition du deck");
+    expect(METHODE_S07_NE_FAIT_PAS_BODY).toContain("extraction des votes");
+  });
+});
+
+describe("METHODE_S07_CADRE_BIAIS_* — prompt-neutrality + verification path", () => {
+  it("PREFIX matches the canonical neutrality + source claim", () => {
+    expect(METHODE_S07_CADRE_BIAIS_PREFIX).toBe(
+      "Le prompt envoyé à Claude est neutre par construction. Sa source : le libellé brut AN + des résultats de recherche web pour le contexte. ",
+    );
+  });
+
+  it("PREFIX contains 'neutre par construction' (anti-bias guarantee)", () => {
+    // Load-bearing claim: the prompt is neutral by construction, not
+    // by reviewer judgement. A rewording that softens this surfaces.
+    expect(METHODE_S07_CADRE_BIAIS_PREFIX).toContain("neutre par construction");
+  });
+
+  it("PREFIX contains 'libellé brut AN' + 'recherche web' (source mix)", () => {
+    // Documents the 2-source mix: raw AN libellé + web_search context.
+    // Same contract as METHODE_S07_MODEL_DISCLOSURE which names the
+    // web_search tool. Pin so both stay aligned.
+    expect(METHODE_S07_CADRE_BIAIS_PREFIX).toContain("libellé brut AN");
+    expect(METHODE_S07_CADRE_BIAIS_PREFIX).toContain("recherche web");
+  });
+
+  it("SUFFIX matches ' — tu peux comparer directement.'", () => {
+    expect(METHODE_S07_CADRE_BIAIS_SUFFIX).toBe(" — tu peux comparer directement.");
+  });
+
+  it("SUFFIX contains 'comparer' (verification-path guarantee)", () => {
+    // The whole point of this paragraph: users can verify the IA
+    // output against the AN source. Dropping "comparer" weakens
+    // the contract.
+    expect(METHODE_S07_CADRE_BIAIS_SUFFIX).toContain("comparer");
+  });
+});
+
+describe("METHODE_S02_CAPS_EXAMPLE — concrete cap-effect illustration", () => {
+  it("matches the canonical retraite/Mayotte example", () => {
+    expect(METHODE_S02_CAPS_EXAMPLE).toBe(
+      "pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée",
+    );
+  });
+
+  it("contains 'retraite' + 'Mayotte' (the 2 concrete topic examples)", () => {
+    // The 2 examples are intentionally chosen for resonance: retraite
+    // is the highest-volume policy topic; Mayotte is a recent cluster.
+    // A regression that changes them to abstract topics ("topic A",
+    // "topic B") would lose the concrete-illustration value.
+    expect(METHODE_S02_CAPS_EXAMPLE).toContain("retraite");
+    expect(METHODE_S02_CAPS_EXAMPLE).toContain("Mayotte");
+  });
+
+  it("contains '8 votes' + '3 votes' (concrete numerical illustrations)", () => {
+    // The 8/3 numbers illustrate the practical effect of the caps
+    // (DEFAULT_CAP_PER_DOSSIER and DEFAULT_CAP_PER_CHAPEAU_PREFIX
+    // both = 2 today). A rewording that drops the numerical
+    // anchors weakens the cap-effect explanation.
+    expect(METHODE_S02_CAPS_EXAMPLE).toContain("8 votes");
+    expect(METHODE_S02_CAPS_EXAMPLE).toContain("3 votes");
   });
 });
 

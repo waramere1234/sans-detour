@@ -744,6 +744,30 @@ export const METHODE_S07_LIMITES_DISCLAIMER_PREFIX =
   "Claude peut se tromper sur les nuances : un mot mal choisi, une mesure oubliée, un thème mal taggué. Pour l'instant, aucune relecture humaine systématique (V3 prévue). Si tu repères une erreur factuelle : ";
 export const METHODE_S07_LIMITES_DISCLAIMER_SUFFIX = " — on corrige.";
 
+/** Methode §07 "Ce qu'il ne fait pas." body — 3-task negative list
+ *  documenting what Claude does NOT do. Paired with the positive
+ *  task-list in METHODE_S07_CLAUDE_TASKS_*. The closing "Sur ces
+ *  trois plans, Claude n'intervient à aucun moment." is the
+ *  load-bearing reinforcement. */
+export const METHODE_S07_NE_FAIT_PAS_BODY =
+  "Le calcul d'alignement (formule mathématique pure), la composition du deck (round-robin algorithmique par thème), l'extraction des votes individuels (parsing des XML officiels AN). Sur ces trois plans, Claude n'intervient à aucun moment.";
+
+/** Methode §07 "Comment on cadre les biais." body — split into prefix
+ *  + suffix around the inline `<strong>METHODE_S07_LIBELLE_BRUT_GUARANTEE</strong>`
+ *  + the « {AN_LINK_VISIBLE_LABEL} » reference. Documents the prompt
+ *  neutrality + source-mix (raw AN libellé + web_search context) +
+ *  the user's verification path. */
+export const METHODE_S07_CADRE_BIAIS_PREFIX =
+  "Le prompt envoyé à Claude est neutre par construction. Sa source : le libellé brut AN + des résultats de recherche web pour le contexte. ";
+export const METHODE_S07_CADRE_BIAIS_SUFFIX = " — tu peux comparer directement.";
+
+/** Methode §02 caps-example parenthetical — illustrates the
+ *  practical effect of the per-dossier + per-chapeau caps using
+ *  concrete examples (retraite, Mayotte). Load-bearing because it
+ *  shows users *why* the diversity caps exist. */
+export const METHODE_S02_CAPS_EXAMPLE =
+  "pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

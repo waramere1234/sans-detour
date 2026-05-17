@@ -33,6 +33,9 @@ import {
   METHODE_S07_MODEL_DISCLOSURE,
   METHODE_S07_CLAUDE_TASKS_PREFIX, METHODE_S07_CLAUDE_TASKS_SUFFIX,
   METHODE_S07_LIMITES_DISCLAIMER_PREFIX, METHODE_S07_LIMITES_DISCLAIMER_SUFFIX,
+  METHODE_S07_NE_FAIT_PAS_BODY,
+  METHODE_S07_CADRE_BIAIS_PREFIX, METHODE_S07_CADRE_BIAIS_SUFFIX,
+  METHODE_S02_CAPS_EXAMPLE,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -161,7 +164,7 @@ export default function Methode() {
 
       <Section n="02" title={METHODE_SECTION_BODY_TITLES["02"]}>
         <p>On garde les <strong>scrutins solennels</strong> (SPS), les <strong>votes finaux sur l'ensemble d'une loi</strong> (SOR), les <strong>motions de censure</strong>, les <strong>motions référendaires</strong> et les <strong>propositions de résolution</strong>. {METHODE_S02_EXCLUSIONS_SUFFIX}</p>
-        <p>Pour chaque session, on en tire <strong>{TARGET}</strong> en équilibrant les thèmes (santé, immigration, fiscalité…) plutôt qu'au hasard pur, avec deux garde-fous : <strong>jamais plus de {DEFAULT_CAP_PER_DOSSIER} scrutins du même dossier législatif</strong> et <strong>jamais plus de {DEFAULT_CAP_PER_CHAPEAU_PREFIX} scrutins du même sujet</strong> (pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée).</p>
+        <p>Pour chaque session, on en tire <strong>{TARGET}</strong> en équilibrant les thèmes (santé, immigration, fiscalité…) plutôt qu'au hasard pur, avec deux garde-fous : <strong>jamais plus de {DEFAULT_CAP_PER_DOSSIER} scrutins du même dossier législatif</strong> et <strong>jamais plus de {DEFAULT_CAP_PER_CHAPEAU_PREFIX} scrutins du même sujet</strong> ({METHODE_S02_CAPS_EXAMPLE}).</p>
       </Section>
 
       <Section n="03" title={METHODE_SECTION_BODY_TITLES["03"]}>
@@ -211,9 +214,9 @@ export default function Methode() {
       <Section n="07" title={METHODE_SECTION_BODY_TITLES["07"]}>
         <p><strong>{METHODE_S07_HEADING_CE_QUE_FAIT_CLAUDE}</strong> {METHODE_S07_CLAUDE_TASKS_PREFIX}{MAX_POINTS_CLES_BULLETS}{METHODE_S07_CLAUDE_TASKS_SUFFIX} <strong>{METHODE_S07_MISE_EN_FORME_CLOSER}</strong></p>
 
-        <p><strong>{METHODE_S07_HEADING_CE_QU_IL_NE_FAIT_PAS}</strong> Le calcul d'alignement (formule mathématique pure), la composition du deck (round-robin algorithmique par thème), l'extraction des votes individuels (parsing des XML officiels AN). Sur ces trois plans, Claude n'intervient à aucun moment.</p>
+        <p><strong>{METHODE_S07_HEADING_CE_QU_IL_NE_FAIT_PAS}</strong> {METHODE_S07_NE_FAIT_PAS_BODY}</p>
 
-        <p><strong>{METHODE_S07_HEADING_CADRE_BIAIS}</strong> Le prompt envoyé à Claude est neutre par construction. Sa source : le libellé brut AN + des résultats de recherche web pour le contexte. <strong>{METHODE_S07_LIBELLE_BRUT_GUARANTEE}</strong> (et la page AN complète est toujours accessible via « {AN_LINK_VISIBLE_LABEL} ») — tu peux comparer directement.</p>
+        <p><strong>{METHODE_S07_HEADING_CADRE_BIAIS}</strong> {METHODE_S07_CADRE_BIAIS_PREFIX}<strong>{METHODE_S07_LIBELLE_BRUT_GUARANTEE}</strong> (et la page AN complète est toujours accessible via « {AN_LINK_VISIBLE_LABEL} »){METHODE_S07_CADRE_BIAIS_SUFFIX}</p>
 
         <p><strong>{METHODE_S07_HEADING_LIMITES_SIGNALEMENT}</strong> {METHODE_S07_LIMITES_DISCLAIMER_PREFIX}<a href={mailto()}>{CONTACT_EMAIL}</a>{METHODE_S07_LIMITES_DISCLAIMER_SUFFIX}</p>
 

@@ -3966,3 +3966,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `METHODE_S07_MODEL_DISCLOSURE\|METHODE_S07_CLAUDE_TASKS_PREFIX\|METHODE_S07_LIMITES_DISCLAIMER_PREFIX` src/ tests/ → 15+ résultats
 - [ ] grep `"Modèle : Claude Haiku\|"V3 prévue"\|"aucune relecture humaine"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~872 tests` CLAUDE.md → 0 résultat (aligné sur ~886)
+
+---
+
+## Session 169 — 2026-05-18 (milestone : 900 tests reached)
+
+### Vérification session 168
+
+- [VERIFIED] 33 occurrences des 3 nouveaux exports (METHODE_S07_MODEL_DISCLOSURE + METHODE_S07_CLAUDE_TASKS_PREFIX + METHODE_S07_LIMITES_DISCLAIMER_PREFIX)
+- [VERIFIED] 4 occurrences inline literal = 1 déclaration + 1 pin-the-value test + 2 comments (clean)
+- [VERIFIED] CLAUDE.md "~886 tests"
+- 886/886 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_S07_NE_FAIT_PAS_BODY + METHODE_S07_CADRE_BIAIS_PREFIX/SUFFIX + METHODE_S02_CAPS_EXAMPLE)
+
+- [FIXED] Methode §07 "Ce qu'il ne fait pas." body inline + untested : 3-task negative IA list (`calcul d'alignement` + `composition du deck` + `extraction des votes individuels`) + closing reinforcement "Sur ces trois plans, Claude n'intervient à aucun moment." · Drift surface : symmetric paired list avec METHODE_S07_CLAUDE_TASKS_* (positive IA list, session 168). Sans pin, un drift entre positive + negative lists laisserait la transparency IA inconsistante. Fix : export `METHODE_S07_NE_FAIT_PAS_BODY`. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + contains "trois plans" anti-count-drift + 3-task-token anti-merge guards. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §07 "Comment on cadre les biais." body split autour de `<strong>METHODE_S07_LIBELLE_BRUT_GUARANTEE</strong>` + `« {AN_LINK_VISIBLE_LABEL} »` · Drift surface : load-bearing claims (prompt neutralité par construction + 2-source mix + verification path). Fix : export `METHODE_S07_CADRE_BIAIS_PREFIX` + `METHODE_S07_CADRE_BIAIS_SUFFIX`. Methode test : 1 round-trip × 2. Aria-labels tests : pin-the-value × 2 + contains "neutre par construction" + "libellé brut AN" + "recherche web" + "comparer" load-bearing-clause guards. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §02 caps-effect example parenthetical `"pour ne pas avoir 8 votes retraite de suite ni 3 votes Mayotte d'affilée"` inline + untested · Drift surface : concrete illustration de l'effet des per-dossier + per-chapeau caps. Les 2 examples ("retraite", "Mayotte") sont chosen pour resonance — un rewording vers abstract topics perdrait la concrete-illustration value. Fix : export `METHODE_S02_CAPS_EXAMPLE`. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + contains "retraite" + "Mayotte" topic-anchor guards + contains "8 votes" + "3 votes" numerical-anchor guards. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 170
+
+- [ ] grep `METHODE_S07_NE_FAIT_PAS_BODY\|METHODE_S07_CADRE_BIAIS_PREFIX\|METHODE_S02_CAPS_EXAMPLE` src/ tests/ → 15+ résultats
+- [ ] grep `"calcul d.alignement (formule mathématique pure)"\|"neutre par construction"\|"8 votes retraite"` src/ tests/ → 3-6 résultats (déclarations + pin-the-value)
+- [ ] grep `~886 tests` CLAUDE.md → 0 résultat (aligné sur ~900)

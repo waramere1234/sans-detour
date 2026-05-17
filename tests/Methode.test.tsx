@@ -22,6 +22,9 @@ import {
   METHODE_S07_MODEL_DISCLOSURE,
   METHODE_S07_CLAUDE_TASKS_PREFIX, METHODE_S07_CLAUDE_TASKS_SUFFIX,
   METHODE_S07_LIMITES_DISCLAIMER_PREFIX, METHODE_S07_LIMITES_DISCLAIMER_SUFFIX,
+  METHODE_S07_NE_FAIT_PAS_BODY,
+  METHODE_S07_CADRE_BIAIS_PREFIX, METHODE_S07_CADRE_BIAIS_SUFFIX,
+  METHODE_S02_CAPS_EXAMPLE,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -173,6 +176,25 @@ describe("Methode — section structure", () => {
     const section = document.getElementById("methode-07")!;
     expect(section.textContent).toContain(METHODE_S07_LIMITES_DISCLAIMER_PREFIX.trim());
     expect(section.textContent).toContain(METHODE_S07_LIMITES_DISCLAIMER_SUFFIX.trim());
+  });
+
+  it("§07 surfaces METHODE_S07_NE_FAIT_PAS_BODY (3-task negative list)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-07")!;
+    expect(section.textContent).toContain(METHODE_S07_NE_FAIT_PAS_BODY);
+  });
+
+  it("§07 surfaces METHODE_S07_CADRE_BIAIS_PREFIX + SUFFIX (prompt neutrality + verification path)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-07")!;
+    expect(section.textContent).toContain(METHODE_S07_CADRE_BIAIS_PREFIX.trim());
+    expect(section.textContent).toContain(METHODE_S07_CADRE_BIAIS_SUFFIX.trim());
+  });
+
+  it("§02 surfaces METHODE_S02_CAPS_EXAMPLE (concrete retraite/Mayotte example)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-02")!;
+    expect(section.textContent).toContain(METHODE_S02_CAPS_EXAMPLE);
   });
 
   it("the number of rendered Section bodies matches METHODE_SECTIONS.length (no orphan body)", () => {
