@@ -258,6 +258,26 @@ export const METHODESHEET_CLAUDE_BLOCK_TITLE = "Mis en forme par IA Claude";
  *  centralising defends against silent rewording. */
 export const CARD_IA_CHIP_ARIA_LABEL = "IA — comment ce contenu a été préparé";
 
+/** Methode.tsx page header eyebrow + h1 visible text. The h1 is pinned
+ *  by 1 test regex (`/Comment on calcule/`, loose partial match) — a
+ *  rewording could partially desync source + test. Centralising both
+ *  strings closes the gap and surfaces the eyebrow too (currently
+ *  unpinned). The eyebrow lives in the same header block above the
+ *  h1 with uppercase styling. */
+export const METHODE_PAGE_EYEBROW = "MÉTHODE & SOURCES";
+export const METHODE_PAGE_H1 = "Comment on calcule, et avec quelles données";
+
+/** Card recto + AuditTrail per-row demo-data short fallback label
+ *  ("démo"). Rendered when the scrutin lacks a real `url_an_officielle`
+ *  — the dev-fixture path used by `npm run seed`. 3 sites today:
+ *    - Card.tsx recto footer (replaces "n° N" when demo)
+ *    - AuditTrail.tsx per-row link (replaces external AN link)
+ *    - tests/AuditTrail.test.tsx `getByText("démo")` assertion
+ *  Distinct from DEMO_DATA_LABEL_PREFIX (which is the longer aria-label
+ *  prefix used on Card verso footer + the AuditTrail title/aria-label).
+ *  This is the short visible badge; that is the long screen-reader hint. */
+export const DEMO_FALLBACK_SHORT_LABEL = "démo";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

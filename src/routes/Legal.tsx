@@ -5,7 +5,7 @@ import {
   AN_OPEN_DATA_URL, AN_OPEN_DATA_HOSTNAME,
   GITHUB_REPO_URL, GITHUB_REPO_DISPLAY,
   READING_PAGE_SECTION_PADDING,
-  externalLinkLabel,
+  externalLinkLabel, MENU_LEGAL_LABEL,
 } from "../types";
 
 export default function Legal() {
@@ -16,7 +16,7 @@ export default function Legal() {
       <h1 style={{
         fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 24,
         margin: "32px 0 18px",
-      }}>Mentions légales</h1>
+      }}>{MENU_LEGAL_LABEL}</h1>
 
       <div style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.6 }}>
         {/* TODO production-blocker · "[à compléter]" placeholders must be

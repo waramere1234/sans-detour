@@ -3497,3 +3497,27 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `chipTop1AriaLabel\|METHODESHEET_AN_BLOCK_TITLE\|METHODESHEET_CLAUDE_BLOCK_TITLE\|CARD_IA_CHIP_ARIA_LABEL` src/ tests/ → 15+ résultats
 - [ ] grep `"Top 1 actuel"\|"AN officiel"\|"Mis en forme par IA Claude"\|"IA — comment ce contenu"` src/ tests/ → 4-6 résultats seulement (déclarations + pin-the-value)
 - [ ] grep `~677 tests` CLAUDE.md → 0 résultat (aligné sur ~687)
+
+---
+
+## Session 149 — 2026-05-17
+
+### Vérification session 148
+
+- [VERIFIED] 31 occurrences des 4 nouveaux exports (chipTop1AriaLabel + METHODESHEET_AN/CLAUDE_BLOCK_TITLE + CARD_IA_CHIP_ARIA_LABEL)
+- [VERIFIED] 5 occurrences des 4 strings = 2 déclarations + 3 pin-the-value tests (pas de drift)
+- [VERIFIED] CLAUDE.md "~687 tests"
+- 687/687 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_PAGE_EYEBROW/H1 × 2 + Legal h1 reuses MENU_LEGAL_LABEL + DEMO_FALLBACK_SHORT_LABEL)
+
+- [FIXED] Methode.tsx page header eyebrow `"MÉTHODE & SOURCES"` + h1 `"Comment on calcule, et avec quelles données"` étaient inline. L'h1 était pinné par tests/Methode.test.tsx via `toHaveTextContent(/Comment on calcule/)` — un partial-match regex qui passerait silencieusement si quelqu'un raccourcit l'h1 à "Comment on calcule" tout court. Le eyebrow était unpinned. Fix : export `METHODE_PAGE_EYEBROW` + `METHODE_PAGE_H1` depuis src/types. Methode.tsx utilise les 2 consts. tests/Methode.test.tsx pin migré vers full-string `new RegExp(METHODE_PAGE_H1)`. 4 nouveaux tests dans aria-labels.test.ts : pin-the-value × 2, uppercase eyebrow invariant, no-trailing-period h1 invariant (puisque le `.` est un span coloré séparé — sinon l'h1 rendrait "données.."). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Legal.tsx h1 visible text `"Mentions légales"` inline dupliqué avec `MENU_LEGAL_LABEL = "Mentions légales"` (extracted session 138 pour TopBar) · Drift surface sémantique : les 2 strings sont la même chose (le titre de la page + l'item du menu pointant vers cette page). Un rewording du label devrait propager au titre de la page. Fix : Legal.tsx importe MENU_LEGAL_LABEL + utilise comme h1. Pas de nouveau test (tests/Legal.test.tsx pinne déjà via `/Mentions légales/` qui matche la const value). · `src/routes/Legal.tsx`
+- [FIXED] `"démo"` visible badge dupliqué 3× : Card.tsx recto footer (line 195, fallback pour `n° N` quand `url_an_officielle` est vide) + AuditTrail.tsx per-row link (line 131, fallback pour le lien AN externe) + tests/AuditTrail.test.tsx `getByText("démo")` assertion · Drift surface : 3 sites in-lockstep ; cette badge est distinct de DEMO_DATA_LABEL_PREFIX ("Donnée de démonstration", session 140) — l'un est le visible footprint compact, l'autre est l'aria-label long. Fix : export `DEMO_FALLBACK_SHORT_LABEL = "démo"` depuis src/types. Card + AuditTrail utilisent la const. Test passe `DEMO_FALLBACK_SHORT_LABEL` à `getByText`. 2 nouveaux tests dans aria-labels.test.ts : pin-the-value + length-distinct vs DEMO_DATA_LABEL_PREFIX (anti-merge guard : les 2 ont des rôles différents). · `src/types/index.ts`, `src/components/Card.tsx`, `src/components/AuditTrail.tsx`, `tests/AuditTrail.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 150
+
+- [ ] grep `METHODE_PAGE_EYEBROW\|METHODE_PAGE_H1\|DEMO_FALLBACK_SHORT_LABEL` src/ tests/ → 15+ résultats
+- [ ] grep `"MÉTHODE & SOURCES"\|"Comment on calcule, et avec"\|>démo<` src/ tests/ → 3-5 résultats seulement (déclarations + pin-the-value)
+- [ ] grep `MENU_LEGAL_LABEL` src/routes/Legal.tsx → 1 résultat (import + usage en h1)
+- [ ] grep `~687 tests` CLAUDE.md → 0 résultat (aligné sur ~693)

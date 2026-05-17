@@ -15,6 +15,7 @@ import {
   READING_PAGE_MAX_WIDTH, READING_PAGE_SECTION_PADDING,
   externalLinkLabel, AN_LINK_VISIBLE_LABEL,
   METHODE_SOMMAIRE_NAV_LABEL,
+  METHODE_PAGE_EYEBROW, METHODE_PAGE_H1,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -70,11 +71,11 @@ export default function Methode() {
           fontFamily: "var(--font-mono)", fontSize: 10.5,
           letterSpacing: "0.14em", textTransform: "uppercase",
           color: "var(--ink-3)",
-        }}>MÉTHODE & SOURCES</span>
+        }}>{METHODE_PAGE_EYEBROW}</span>
         <h1 style={{
           fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 28,
           lineHeight: 1.15, letterSpacing: "-0.022em", margin: "10px 0 0",
-        }}>Comment on calcule, et avec quelles données<span style={{ color: "var(--accent)" }}>.</span></h1>
+        }}>{METHODE_PAGE_H1}<span style={{ color: "var(--accent)" }}>.</span></h1>
         <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.55, marginTop: 12 }}>
           Aucune opinion, aucun panel. <strong>Le calcul d'alignement est une formule mathématique pure — l'IA n'y intervient pas.</strong> En revanche, les résumés, les points clés et les synthèses des scrutins sont mis en forme par Claude (voir <a href="#methode-07" style={{ color: "var(--accent)" }}>section 07</a>).
         </p>

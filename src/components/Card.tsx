@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { motion, useReducedMotion, type PanInfo } from "framer-motion";
 import {
   MAX_POINTS_CLES_BULLETS, APP_LOCALE,
-  anScrutinViewAriaLabel, DEMO_DATA_LABEL_PREFIX,
+  anScrutinViewAriaLabel, DEMO_DATA_LABEL_PREFIX, DEMO_FALLBACK_SHORT_LABEL,
   CARD_VERSO_SEPARATOR_LABEL, AN_LINK_VISIBLE_LABEL,
   CARD_AN_LIBELLE_PREFIX_LABEL, CARD_IA_CHIP_ARIA_LABEL,
   type Scrutin,
@@ -192,7 +192,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             <span>{new Date(scrutin.date).toLocaleDateString(APP_LOCALE)}</span>
             {scrutin.url_an_officielle
               ? <span>n° {scrutin.numero}</span>
-              : <span style={{ color: "var(--accent)" }}>démo</span>}
+              : <span style={{ color: "var(--accent)" }}>{DEMO_FALLBACK_SHORT_LABEL}</span>}
           </div>
         </div>
 

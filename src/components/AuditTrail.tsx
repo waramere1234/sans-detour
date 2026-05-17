@@ -1,7 +1,7 @@
 // src/components/AuditTrail.tsx
 import {
   anScrutinViewAriaLabel,
-  DEMO_DATA_LABEL_PREFIX,
+  DEMO_DATA_LABEL_PREFIX, DEMO_FALLBACK_SHORT_LABEL,
   type GroupAlignment, type Scrutin, type SessionVote,
 } from "../types";
 import { alignmentScore } from "../lib/matching";
@@ -128,7 +128,7 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
                 style={{
                   fontFamily: "var(--font-mono)", fontSize: 10,
                   color: "var(--ink-4)", letterSpacing: "0.04em",
-                }}>démo</span>
+                }}>{DEMO_FALLBACK_SHORT_LABEL}</span>
             )}
           </div>
         );

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AuditTrail } from "../src/components/AuditTrail";
 import {
-  anScrutinViewAriaLabel,
+  anScrutinViewAriaLabel, DEMO_FALLBACK_SHORT_LABEL,
   type GroupAlignment, type Scrutin, type SessionVote,
   type GroupCode, type GroupPosition,
 } from "../src/types";
@@ -143,7 +143,7 @@ describe("AuditTrail — AN link vs demo fallback", () => {
     const sc = mkScrutin("s2", "pour", "LFI", { url_an_officielle: "" });
     const votes: SessionVote[] = [{ scrutin_id: "s2", choice: "pour", voted_at: 1 }];
     render(<AuditTrail alignment={mkAlign()} scrutins={[sc]} votes={votes} />);
-    expect(screen.getByText("démo")).toBeInTheDocument();
+    expect(screen.getByText(DEMO_FALLBACK_SHORT_LABEL)).toBeInTheDocument();
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 });

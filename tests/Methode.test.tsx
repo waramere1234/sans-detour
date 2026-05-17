@@ -10,6 +10,7 @@ import {
   READING_PAGE_MAX_WIDTH,
   READING_PAGE_SECTION_PADDING,
   METHODE_SOMMAIRE_NAV_LABEL,
+  METHODE_PAGE_H1,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -33,7 +34,7 @@ function renderMethode(initialPath: string = ROUTES.methode) {
 describe("Methode — section structure", () => {
   it("renders the page title", () => {
     renderMethode();
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/Comment on calcule/);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(new RegExp(METHODE_PAGE_H1));
   });
 
   it("renders one numbered section per METHODE_SECTIONS entry with id=methode-NN", () => {

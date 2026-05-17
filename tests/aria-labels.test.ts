@@ -25,6 +25,8 @@ import {
   chipTop1AriaLabel,
   METHODESHEET_AN_BLOCK_TITLE, METHODESHEET_CLAUDE_BLOCK_TITLE,
   CARD_IA_CHIP_ARIA_LABEL,
+  METHODE_PAGE_EYEBROW, METHODE_PAGE_H1,
+  DEMO_FALLBACK_SHORT_LABEL,
 } from "../src/types";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
@@ -490,6 +492,44 @@ describe("CARD_IA_CHIP_ARIA_LABEL — Card recto ✨IA chip aria-label", () => {
     // should start with the same token the visible text shows so SR + sighted
     // users get a consistent anchor word.
     expect(CARD_IA_CHIP_ARIA_LABEL.startsWith("IA")).toBe(true);
+  });
+});
+
+describe("METHODE_PAGE_EYEBROW + METHODE_PAGE_H1 — Methode page header", () => {
+  // h1 was pinned by a loose `/Comment on calcule/` regex — a partial
+  // rewording (e.g. dropping "et avec quelles données") would pass that
+  // pin silently. Full const round-trip closes the gap.
+  it("METHODE_PAGE_EYEBROW matches the canonical 'MÉTHODE & SOURCES' wording", () => {
+    expect(METHODE_PAGE_EYEBROW).toBe("MÉTHODE & SOURCES");
+  });
+
+  it("METHODE_PAGE_H1 matches the canonical 'Comment on calcule, et avec quelles données' wording", () => {
+    expect(METHODE_PAGE_H1).toBe("Comment on calcule, et avec quelles données");
+  });
+
+  it("METHODE_PAGE_EYEBROW is fully uppercase (eyebrow styling convention)", () => {
+    expect(METHODE_PAGE_EYEBROW).toBe(METHODE_PAGE_EYEBROW.toUpperCase());
+  });
+
+  it("METHODE_PAGE_H1 has no trailing period (the colored period is a separate JSX span)", () => {
+    // The source appends `<span style={{ color: "var(--accent)" }}>.</span>`
+    // — so the const must NOT include the period, otherwise the rendered
+    // h1 would read "…données.." (double period).
+    expect(METHODE_PAGE_H1.endsWith(".")).toBe(false);
+  });
+});
+
+describe("DEMO_FALLBACK_SHORT_LABEL — Card recto + AuditTrail demo badge", () => {
+  it("matches the canonical 'démo' badge wording", () => {
+    expect(DEMO_FALLBACK_SHORT_LABEL).toBe("démo");
+  });
+
+  it("is shorter than DEMO_DATA_LABEL_PREFIX (badge vs aria-label distinction)", () => {
+    // Confirm the two demo-data labels are intentionally distinct:
+    // the short visible badge ("démo") vs the long screen-reader
+    // hint prefix ("Donnée de démonstration"). A future merge would
+    // change either the visible footprint or the SR experience.
+    expect(DEMO_FALLBACK_SHORT_LABEL.length).toBeLessThan(DEMO_DATA_LABEL_PREFIX.length);
   });
 });
 
