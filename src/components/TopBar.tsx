@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Wordmark } from "./Wordmark";
 import { loadSession } from "../lib/session";
 import { track } from "../lib/analytics";
+import { FROM_LOGO_STATE } from "../lib/nav-state";
 import { MIN_FOR_RANKING } from "../types";
 
 
@@ -60,7 +61,7 @@ export function TopBar() {
       }}>
         <Link
           to="/"
-          state={{ fromLogo: true }}
+          state={FROM_LOGO_STATE}
           aria-label="Accueil"
           style={{ textDecoration: "none", color: "inherit" }}
         >

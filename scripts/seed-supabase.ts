@@ -1,3 +1,19 @@
+// scripts/seed-supabase.ts
+//
+// Dev-mode seed: upserts the 20 scrutins from supabase/seed/dev-fixtures.json
+// into a local Supabase project so `npm run dev` can hit a real database
+// instead of falling back to the file fixtures. Re-runs are idempotent
+// (upsert on PK `id`); `ingere_le` is stamped on every fixture so the
+// FreshnessBanner shows the seed timestamp (default now() only fires on
+// INSERT, not on the UPSERT-as-UPDATE path — same pattern as ingest-an.ts).
+//
+// Usage:
+//   SUPABASE_URL=https://xxx.supabase.co \
+//   SUPABASE_SERVICE_ROLE_KEY=eyJ... \
+//   npm run seed
+//
+// Anthropic API key is NOT required — fixtures are pre-baked.
+
 import { createClient } from "@supabase/supabase-js";
 import fixtures from "../supabase/seed/dev-fixtures.json";
 

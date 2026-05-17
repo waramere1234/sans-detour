@@ -5,6 +5,7 @@ import { Wordmark } from "../components/Wordmark";
 import { FreshnessBanner } from "../components/FreshnessBanner";
 import { fetchFreshness } from "../lib/scrutins";
 import { track } from "../lib/analytics";
+import { FROM_LOGO_STATE } from "../lib/nav-state";
 import { TARGET, MIN_FOR_RANKING, type FreshnessInfo } from "../types";
 
 export default function Methode() {
@@ -57,7 +58,7 @@ export default function Methode() {
         <Link to="/" style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none", justifySelf: "start" }}>
           <span aria-hidden="true">‹ </span>Retour
         </Link>
-        <Link to="/" state={{ fromLogo: true }} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
+        <Link to="/" state={FROM_LOGO_STATE} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
           <Wordmark />
         </Link>
       </nav>

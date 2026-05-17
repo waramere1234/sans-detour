@@ -1,6 +1,7 @@
 // src/routes/Legal.tsx
 import { Link } from "react-router-dom";
 import { Wordmark } from "../components/Wordmark";
+import { FROM_LOGO_STATE } from "../lib/nav-state";
 
 export default function Legal() {
   return (
@@ -17,7 +18,7 @@ export default function Legal() {
         <Link to="/" style={{ color: "var(--ink-2)", fontFamily: "var(--font-mono)", fontSize: 11, textDecoration: "none", justifySelf: "start" }}>
           <span aria-hidden="true">‹ </span>Retour
         </Link>
-        <Link to="/" state={{ fromLogo: true }} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
+        <Link to="/" state={FROM_LOGO_STATE} aria-label="Accueil" style={{ textDecoration: "none", color: "inherit", justifySelf: "center" }}>
           <Wordmark />
         </Link>
       </nav>

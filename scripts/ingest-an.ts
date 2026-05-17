@@ -22,7 +22,7 @@ import { execSync } from "node:child_process";
 import { computeGroupPosition } from "../src/lib/compute-positions";
 import { normalizeTheme } from "../src/types";
 import type {
-  GroupCode, GroupPosition, GroupVoteBreakdown, ScrutinAnalyse,
+  GroupCode, GroupPosition, GroupVoteBreakdown, ScrutinAnalyse, Theme,
 } from "../src/types";
 import {
   type Summary,

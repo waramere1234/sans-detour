@@ -6,6 +6,7 @@ import { FreshnessBanner } from "../components/FreshnessBanner";
 import { fetchFreshness } from "../lib/scrutins";
 import { hasSeenCover, loadSession, markCoverSeen, resetSession } from "../lib/session";
 import { track } from "../lib/analytics";
+import { FROM_LOGO_STATE, type LocationStateFromLogo } from "../lib/nav-state";
 import { TARGET, MIN_FOR_RANKING, type FreshnessInfo } from "../types";
 
 export default function Cover() {
@@ -21,7 +22,7 @@ export default function Cover() {
     // the user lands on the home screen instead of being bounced back to
     // their in-progress deck. Fresh app opens have no state and keep the
     // auto-resume behavior.
-    const fromLogo = (location.state as { fromLogo?: boolean } | null)?.fromLogo === true;
+    const fromLogo = (location.state as LocationStateFromLogo)?.fromLogo === true;
     if (!fromLogo && hasSeenCover()) {
       const s = loadSession();
       const votes = s?.votes.length ?? 0;
@@ -112,7 +113,7 @@ export default function Cover() {
           // page. The state mutation (fromLogo: true) still triggers
           // Cover's effect, just without polluting the back-stack.
           replace
-          state={{ fromLogo: true }}
+          state={FROM_LOGO_STATE}
           aria-label="Accueil"
           // aria-current="page" because Cover IS at "/" — without it, SR
           // users have no way to know the wordmark link is a self-link

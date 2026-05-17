@@ -2056,3 +2056,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `track("result_refaire")` src/routes/Result.tsx → 1 résultat
 - [ ] `ls tests/ChipTop1.test.tsx` → présent, 4 tests
 - [ ] grep `~165 tests` CLAUDE.md → 0 résultat (aligné sur ~169)
+
+---
+
+## Session 90 — 2026-05-17
+
+### Vérification session 89
+
+- [VERIFIED] `src/routes/Methode.tsx` : 4 occurrences `fetchedRef` (decl + check + set + branch return)
+- [VERIFIED] `src/routes/Result.tsx:148` : `track("result_refaire")` après le confirm
+- [VERIFIED] `tests/ChipTop1.test.tsx` présent
+- [VERIFIED] CLAUDE.md "~169 tests"
+- 169/169 tests verts, typecheck clean
+
+### Bugs fixés (typecheck gap exposes latent bug + doc drift + DRY)
+
+- [FIXED] `tsconfig.node.json` n'incluait pas `scripts/` ni `api/` · Le tsconfig.node.json ne couvrait que `vite.config.ts`. Donc les 5 scripts dans `scripts/` (ingest-an, resume-ingest, ingest-personnalites, seed-supabase, debug-batch) + `api/share-card.ts` n'étaient pas typechecked par `tsc -b`. Seul `scripts/lib/parse-summary.ts` était couvert (via import depuis tests/). Extension du `include` à `["vite.config.ts", "scripts/**/*.ts", "api/**/*.ts"]` a immédiatement exposé un bug latent : `scripts/ingest-an.ts:153` référençait `Theme` sans l'importer (régression silencieuse de session 82 quand `Theme` a été retiré du import block dans le dedup). Ajout de `Theme` au type import — `tsc -b` passe maintenant. · `tsconfig.node.json`, `scripts/ingest-an.ts`
+- [FIXED] `scripts/seed-supabase.ts` missing file header doc · Les 5 autres scripts (ingest-an, resume-ingest, ingest-personnalites, debug-batch, lib/parse-summary) ont tous un header `// scripts/X.ts\n//\n// Description...\n//\n// Usage:...`. seed-supabase.ts sautait directement aux imports — inconsistance ; un dev qui découvre `scripts/` ne sait pas ce que fait seed sans lire le code. Ajout du header avec description (dev fixture seed), usage (`npm run seed`), et note sur ingere_le stamp pattern. · `scripts/seed-supabase.ts`
+- [FIXED] `{ fromLogo: true }` literal dupliqué 4 sites · TopBar.tsx:63, Cover.tsx:115, Legal.tsx:20, Methode.tsx:60 utilisaient tous le même literal `state={{ fromLogo: true }}`. Cover.tsx:24 lisait via cast inline `(location.state as { fromLogo?: boolean } | null)`. 5 sites couplés au même contrat de shape — un refactor du nom du field ("fromLogo" → "fromHome") forcerait 5 edits. Extraction dans `src/lib/nav-state.ts` : `FROM_LOGO_STATE` const + `LocationStateFromLogo` type. 4 sites set use la const, 1 site read use le type — single source of truth. · `src/lib/nav-state.ts` (nouveau), `src/components/TopBar.tsx`, `src/routes/Cover.tsx`, `src/routes/Legal.tsx`, `src/routes/Methode.tsx`
+
+### Vérifications à faire en session 91
+
+- [ ] `npx tsc -b` propre (scripts/ + api/ maintenant typechecked)
+- [ ] grep `^// scripts/seed-supabase.ts` scripts/seed-supabase.ts → 1 résultat (header présent)
+- [ ] grep `{ fromLogo: true }` src/ → 0 résultat (literal retiré, remplacé par FROM_LOGO_STATE)
+- [ ] grep `FROM_LOGO_STATE` src/ → ≥5 résultats (4 sets + 1 def)
