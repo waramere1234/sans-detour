@@ -58,6 +58,17 @@ export function freshnessNextPhrase(next: number): string {
   return `prochaine sync dans ${next} jour${next !== 1 ? "s" : ""}`;
 }
 
+/** Compose the "N scrutin(s)" total-scrutins phrase rendered as the
+ *  first segment of the banner body line ("{N} scrutin(s) · {past} ·
+ *  {next}"). Pinned by 2 test regex literals — extracting the helper
+ *  lets tests round-trip via `freshnessTotalScrutinsPhrase(N)` instead
+ *  of regex partial matches. The session 83 plural-rule fix (the body
+ *  line was hardcoded "scrutins" until then) lives inside this helper
+ *  as the load-bearing invariant. */
+export function freshnessTotalScrutinsPhrase(total: number): string {
+  return `${total} scrutin${total !== 1 ? "s" : ""}`;
+}
+
 export function FreshnessBanner({ info }: { info: FreshnessInfo }) {
   const past = pastDays(info.last_sync_at);
   const next = diffDays(info.next_sync_eta);
@@ -100,7 +111,7 @@ export function FreshnessBanner({ info }: { info: FreshnessInfo }) {
           fontFamily: "var(--font-mono)", fontSize: 11,
           color: "var(--ink-2)", letterSpacing: "0.04em", marginTop: 3,
         }}>
-          {info.total_scrutins} scrutin{info.total_scrutins !== 1 ? "s" : ""} · {pastPhrase} · {nextPhrase}
+          {freshnessTotalScrutinsPhrase(info.total_scrutins)} · {pastPhrase} · {nextPhrase}
         </div>
       </div>
     </div>

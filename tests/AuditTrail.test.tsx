@@ -114,14 +114,14 @@ describe("AuditTrail — vote → icon mapping", () => {
   it("silently drops votes whose scrutin_id is unknown to the pool", () => {
     const votes: SessionVote[] = [{ scrutin_id: "missing", choice: "pour", voted_at: 1 }];
     render(<AuditTrail alignment={mkAlign()} scrutins={scrutins} votes={votes} />);
-    expect(screen.queryByLabelText("Aligné")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(AUDIT_TRAIL_LABEL_ALIGNED)).not.toBeInTheDocument();
   });
 
   it("drops votes when the group is missing from position_par_groupe", () => {
     const noGroup = mkScrutin("s-nogroup", undefined);
     const votes: SessionVote[] = [{ scrutin_id: "s-nogroup", choice: "pour", voted_at: 1 }];
     render(<AuditTrail alignment={mkAlign()} scrutins={[noGroup]} votes={votes} />);
-    expect(screen.queryByLabelText("Aligné")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(AUDIT_TRAIL_LABEL_ALIGNED)).not.toBeInTheDocument();
   });
 });
 

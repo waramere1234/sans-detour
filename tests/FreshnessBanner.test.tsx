@@ -5,6 +5,7 @@ import {
   FRESHNESS_OK_TITLE, FRESHNESS_STALE_TITLE,
   FRESHNESS_TODAY_PHRASE, FRESHNESS_IMMINENT_PHRASE,
   freshnessPastPhrase, freshnessNextPhrase,
+  freshnessTotalScrutinsPhrase,
 } from "../src/components/FreshnessBanner";
 import type { FreshnessInfo } from "../src/types";
 
@@ -45,28 +46,28 @@ describe("FreshnessBanner", () => {
     expect(screen.getByText(new RegExp(FRESHNESS_IMMINENT_PHRASE))).toBeInTheDocument();
   });
 
-  it("uses the French !== 1 plural rule for past days", () => {
+  it("uses the French !== 1 plural rule for past days (round-trip via freshnessPastPhrase)", () => {
     // 1 jour = singular, everything else (including 0 if it weren't promoted) = plural
     render(<FreshnessBanner info={mk(1, 7)} />);
-    expect(screen.getByText(/MAJ il y a 1 jour\b/)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`${freshnessPastPhrase(1)}\\b`))).toBeInTheDocument();
     expect(screen.queryByText(/MAJ il y a 1 jours/)).not.toBeInTheDocument();
   });
 
-  it("uses 'jours' plural for past >= 2 days", () => {
+  it("uses 'jours' plural for past >= 2 days (round-trip via freshnessPastPhrase)", () => {
     render(<FreshnessBanner info={mk(5, 7)} />);
-    expect(screen.getByText(/MAJ il y a 5 jours/)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(freshnessPastPhrase(5)))).toBeInTheDocument();
   });
 
-  it("renders total_scrutins in the body line", () => {
+  it("renders total_scrutins in the body line (round-trip via freshnessTotalScrutinsPhrase)", () => {
     render(<FreshnessBanner info={mk(3, 7, 92)} />);
-    expect(screen.getByText(/92 scrutins/)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(freshnessTotalScrutinsPhrase(92)))).toBeInTheDocument();
   });
 
-  it("singularises 'scrutin' when total_scrutins is 1", () => {
+  it("singularises 'scrutin' when total_scrutins is 1 (round-trip via helper)", () => {
     // Session 83: total_scrutins was hardcoded "scrutins" plural — with a
     // freshly-seeded Supabase (1 row) the banner read "1 scrutins · …".
     render(<FreshnessBanner info={mk(3, 7, 1)} />);
-    expect(screen.getByText(/^1 scrutin\b/)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`^${freshnessTotalScrutinsPhrase(1)}\\b`))).toBeInTheDocument();
     expect(screen.queryByText(/1 scrutins/)).not.toBeInTheDocument();
   });
 

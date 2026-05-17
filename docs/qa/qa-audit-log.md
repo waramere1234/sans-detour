@@ -3545,3 +3545,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `AUDIT_TRAIL_LABEL_DIVIDED\|AUDIT_TRAIL_LABEL_ALIGNED\|AUDIT_TRAIL_LABEL_PARTIAL\|AUDIT_TRAIL_LABEL_OPPOSED\|partyRowAriaLabel\|personnaliteRowAriaLabel` src/ tests/ → 35+ résultats
 - [ ] grep `"Aligné"\|"Partiel"\|"Opposé"\|"Groupe divisé, non compté"\|"d.alignement sur"\|"trop peu de données"` src/ tests/ → 6-8 résultats (déclarations + pin-the-value)
 - [ ] grep `~693 tests` CLAUDE.md → 0 résultat (aligné sur ~707)
+
+---
+
+## Session 151 — 2026-05-17
+
+### Vérification session 150
+
+- [VERIFIED] 61 occurrences des 6 nouveaux exports (AUDIT_TRAIL_LABEL × 4 + partyRowAriaLabel + personnaliteRowAriaLabel)
+- [VERIFIED] 9 occurrences des 4 strings = 4 déclarations + 4 pin-the-value tests + 1 comment (pas de drift)
+- [VERIFIED] CLAUDE.md "~707 tests"
+- 2 sites stale `queryByLabelText("Aligné")` trouvés dans AuditTrail.test.tsx (lines 117 + 124) — leftover du replace_all session 150 qui matchait `getByLabelText` mais pas `queryByLabelText`. Fixés en pré-step de session 151.
+- 707/707 tests verts, typecheck clean
+
+### Bugs fixés (freshnessTotalScrutinsPhrase + personnaliteRowRightColumnText + FreshnessBanner test regex cleanup)
+
+- [FIXED] FreshnessBanner.tsx body line `{info.total_scrutins} scrutin{plural}` inline template + tests/FreshnessBanner.test.tsx pinnait via 2 regex partial-matches (`/92 scrutins/`, `/^1 scrutin\b/`) · Drift surface : 1 source + 2 test regex (3 sites in-lockstep). Le bug session 83 "hardcoded plural" (renderait "1 scrutins" sur Supabase fresh seed) vit dans cette template — l'extraction surface l'invariant comme tests dédiés. Fix : export `freshnessTotalScrutinsPhrase(total)` depuis FreshnessBanner.tsx (co-localisé avec freshnessPastPhrase/NextPhrase). FreshnessBanner.tsx utilise le helper ; tests round-trip via `new RegExp(freshnessTotalScrutinsPhrase(N))`. 3 nouveaux tests dans aria-labels.test.ts : full-template pin, session-83 regression guard (singular vs plural), plural rule × 3 cases. · `src/components/FreshnessBanner.tsx`, `tests/FreshnessBanner.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] PersonnaliteRow.tsx right-column inline 2-branch ternary (normal: `${pct}% · ${counted}` + low-data: `— · ${counted} vote(s)`) + tests/PersonnaliteRow.test.tsx pinnait via 2 regex (`/57%.*12/` + `new RegExp(\`— · ${N} votes\`)`) · Drift surface symétrique au personnaliteRowAriaLabel (session 150) — un rewording de la right-column visible footprint serait drift parallèle au SR label. Fix : export `personnaliteRowRightColumnText(pct, counted, tooLittleData)` helper (même flag-pattern que personnaliteRowAriaLabel pour cohérence). PersonnaliteRow utilise le helper ; tests round-trip via full-string match. 5 nouveaux tests dans aria-labels.test.ts : normal branch pin, low-data branch pin, singular/plural rule, em-dash placeholder invariant (visual hint pour low-data state), low-data drops-pct anti-confidence invariant. · `src/types/index.ts`, `src/components/PersonnaliteRow.tsx`, `tests/PersonnaliteRow.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] tests/FreshnessBanner.test.tsx avait 2 regex literals stale (`/MAJ il y a 1 jour\b/` + `/MAJ il y a 5 jours/`) alors que `freshnessPastPhrase` helper existait depuis session 142 · Cleanup symétrique à session 150 PersonnaliteRow migration : les regex tests pour singular/plural rule peuvent round-tripper via le helper au lieu de re-typer le literal. Fix : tests migrés vers `new RegExp(freshnessPastPhrase(N))` — la singular/plural rule defense reste intacte (le helper renvoie la string correcte) mais le test source-of-truth est désormais le helper. · `tests/FreshnessBanner.test.tsx`
+
+### Vérifications à faire en session 152
+
+- [ ] grep `freshnessTotalScrutinsPhrase\|personnaliteRowRightColumnText` src/ tests/ → 10+ résultats
+- [ ] grep `"92 scrutins"\|"1 scrutin"\|"57%.*12"` tests/ → 0 résultat (toutes les regex migrées vers helpers)
+- [ ] grep `"MAJ il y a 1 jour"\|"MAJ il y a 5 jours"` tests/FreshnessBanner.test.tsx → 0 résultat (migré vers freshnessPastPhrase)
+- [ ] grep `~707 tests` CLAUDE.md → 0 résultat (aligné sur ~715)

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { PersonnaliteRow } from "../src/components/PersonnaliteRow";
 import {
-  LOW_DATA_THRESHOLD, personnaliteRowAriaLabel,
+  LOW_DATA_THRESHOLD, personnaliteRowAriaLabel, personnaliteRowRightColumnText,
   type PersonnaliteAlignment,
 } from "../src/types";
 import { getPersonnalite } from "../src/lib/personnalites";
@@ -32,7 +32,7 @@ describe("PersonnaliteRow — normal data path", () => {
     render(<PersonnaliteRow alignment={mk()} />);
     expect(screen.getByText("Le Pen")).toBeInTheDocument();
     // Right column shows "{pct}% · {counted}" in normal mode
-    expect(screen.getByText(/57%.*12/)).toBeInTheDocument();
+    expect(screen.getByText(personnaliteRowRightColumnText(57, 12, false))).toBeInTheDocument();
   });
 
   it("composes a SR-friendly aria-label via personnaliteRowAriaLabel (normal branch round-trip)", () => {
@@ -87,7 +87,7 @@ describe("PersonnaliteRow — tooLittleData path (counted < LOW_DATA_THRESHOLD)"
   it("renders '— · N vote' in the right column (no pct) for low-data", () => {
     render(<PersonnaliteRow alignment={mk({ counted: justBelow, pct: 50 })} />);
     // No pct number rendered standalone in the right column.
-    expect(screen.getByText(new RegExp(`— · ${justBelow} votes`))).toBeInTheDocument();
+    expect(screen.getByText(personnaliteRowRightColumnText(50, justBelow, true))).toBeInTheDocument();
   });
 
   it("crosses out of the tooLittleData branch at exactly LOW_DATA_THRESHOLD (boundary inclusive on the >= side)", () => {

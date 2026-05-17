@@ -29,8 +29,9 @@ import {
   DEMO_FALLBACK_SHORT_LABEL,
   AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
   AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
-  partyRowAriaLabel, personnaliteRowAriaLabel,
+  partyRowAriaLabel, personnaliteRowAriaLabel, personnaliteRowRightColumnText,
 } from "../src/types";
+import { freshnessTotalScrutinsPhrase } from "../src/components/FreshnessBanner";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
 //   - WORDMARK_HOME_LABEL: TopBar wordmark + Cover/Methode/Legal back links (4 sites)
@@ -620,6 +621,58 @@ describe("personnaliteRowAriaLabel — PersonnaliteRow 2-branch SR label", () =>
     // branch must NOT mention it — the whole point is to suppress the
     // implied "real score" on a 1-2 vote sample.
     expect(personnaliteRowAriaLabel("X", 99, 2, true)).not.toContain("99");
+  });
+});
+
+describe("freshnessTotalScrutinsPhrase — FreshnessBanner body-line total-scrutins phrase", () => {
+  // Pulled out of inline `{N} scrutin{plural}` template in
+  // FreshnessBanner.tsx. The session 83 hardcoded-plural bug ("1
+  // scrutins") lives inside this helper as the load-bearing invariant.
+  it("composes the canonical 'N scrutin(s)' phrase", () => {
+    expect(freshnessTotalScrutinsPhrase(92)).toBe("92 scrutins");
+    expect(freshnessTotalScrutinsPhrase(1)).toBe("1 scrutin");
+  });
+
+  it("uses singular 'scrutin' when total === 1 (session 83 regression guard)", () => {
+    expect(freshnessTotalScrutinsPhrase(1)).toBe("1 scrutin");
+    expect(freshnessTotalScrutinsPhrase(1)).not.toContain("scrutins");
+  });
+
+  it("uses plural 'scrutins' for 0, 2, and >=2 (French rule)", () => {
+    expect(freshnessTotalScrutinsPhrase(0)).toBe("0 scrutins");
+    expect(freshnessTotalScrutinsPhrase(2)).toBe("2 scrutins");
+    expect(freshnessTotalScrutinsPhrase(100)).toBe("100 scrutins");
+  });
+});
+
+describe("personnaliteRowRightColumnText — PersonnaliteRow visible right-column text", () => {
+  // Pulled out of inline 2-branch ternary in PersonnaliteRow.tsx.
+  // Distinct from personnaliteRowAriaLabel (the SR sentence) — this
+  // is the compact visible "pct% · counted" / "— · N vote(s)" footprint.
+  it("normal branch composes '{pct}% · {counted}'", () => {
+    expect(personnaliteRowRightColumnText(57, 12, false)).toBe("57% · 12");
+  });
+
+  it("low-data branch composes '— · {counted} vote(s)' (no pct, suppress implied score)", () => {
+    expect(personnaliteRowRightColumnText(50, 2, true)).toBe("— · 2 votes");
+  });
+
+  it("low-data branch uses singular 'vote' when counted === 1", () => {
+    expect(personnaliteRowRightColumnText(0, 1, true)).toBe("— · 1 vote");
+    expect(personnaliteRowRightColumnText(0, 1, true)).not.toContain("votes");
+  });
+
+  it("low-data branch always starts with the em-dash placeholder (visual hint)", () => {
+    // The "—" makes it visually obvious the pct is absent (vs the
+    // normal "57% · …" form). A regression that drops the em-dash
+    // would let low-data rows blend into the normal-data ranking.
+    expect(personnaliteRowRightColumnText(99, 2, true).startsWith("—")).toBe(true);
+  });
+
+  it("low-data branch DROPS the pct (anti-confidence invariant)", () => {
+    // Even passing a non-zero pct, the low-data branch must not surface
+    // it visually — the whole point of the low-data state.
+    expect(personnaliteRowRightColumnText(80, 2, true)).not.toContain("80");
   });
 });
 

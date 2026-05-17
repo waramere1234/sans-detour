@@ -322,6 +322,26 @@ export function personnaliteRowAriaLabel(
   return `${displayName}, ${pct} % d'alignement sur ${counted} vote${s}`;
 }
 
+/** Compose the visible right-column text rendered in PersonnaliteRow:
+ *    - Normal:    "{pct}% · {counted}"
+ *    - Low-data:  "— · {counted} vote(s)" (no pct → suppress implied score)
+ *  Previously an inline 2-branch ternary in PersonnaliteRow.tsx; pinned
+ *  by 2 test regex partial-matches (`/57%.*12/`, `/— · N votes/`). Helper
+ *  enables round-trip via full-string match. Same `tooLittleData` flag
+ *  contract as personnaliteRowAriaLabel — the consumer passes it
+ *  explicitly so the helper doesn't need to know LOW_DATA_THRESHOLD. */
+export function personnaliteRowRightColumnText(
+  pct: number,
+  counted: number,
+  tooLittleData: boolean,
+): string {
+  if (tooLittleData) {
+    const s = counted !== 1 ? "s" : "";
+    return `— · ${counted} vote${s}`;
+  }
+  return `${pct}% · ${counted}`;
+}
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

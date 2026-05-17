@@ -2,7 +2,7 @@
 import { getPersonnalite } from "../lib/personnalites";
 import { getPartyColorVar } from "../lib/parties";
 import {
-  LOW_DATA_THRESHOLD, personnaliteRowAriaLabel,
+  LOW_DATA_THRESHOLD, personnaliteRowAriaLabel, personnaliteRowRightColumnText,
   type PersonnaliteAlignment,
 } from "../types";
 
@@ -56,9 +56,7 @@ export function PersonnaliteRow({ alignment }: PersonnaliteRowProps) {
         color: "var(--ink-2)", textAlign: "right",
         minWidth: 64,
       }}>
-        {tooLittleData
-          ? `— · ${alignment.counted} vote${alignment.counted !== 1 ? "s" : ""}`
-          : `${alignment.pct}% · ${alignment.counted}`}
+        {personnaliteRowRightColumnText(alignment.pct, alignment.counted, tooLittleData)}
       </span>
     </div>
   );
