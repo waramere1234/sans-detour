@@ -4,6 +4,8 @@ import {
   PAGE_HEADER_NAV_LABEL,
   EXTERNAL_LINK_SUFFIX,
   externalLinkLabel,
+  AN_OPEN_DATA_URL, AN_OPEN_DATA_HOSTNAME,
+  GITHUB_REPO_URL, GITHUB_REPO_DISPLAY,
 } from "../src/types";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
@@ -50,5 +52,46 @@ describe("externalLinkLabel + EXTERNAL_LINK_SUFFIX", () => {
     const visible = "test.example";
     expect(externalLinkLabel(visible).endsWith(EXTERNAL_LINK_SUFFIX)).toBe(true);
     expect(externalLinkLabel(visible).startsWith(visible)).toBe(true);
+  });
+});
+
+describe("AN_OPEN_DATA_HOSTNAME — derived from AN_OPEN_DATA_URL", () => {
+  // Used 3× as the visible text in Methode §01 <code> + Methode §06
+  // link text + Legal sources link text. Pin the derivation so a
+  // future AN domain change propagates atomically.
+  it("strips the protocol + trailing slash from AN_OPEN_DATA_URL", () => {
+    expect(AN_OPEN_DATA_HOSTNAME).toBe(
+      AN_OPEN_DATA_URL.replace(/^https?:\/\//, "").replace(/\/$/, ""),
+    );
+  });
+
+  it("is the canonical 'data.assemblee-nationale.fr' value (pin-the-value)", () => {
+    expect(AN_OPEN_DATA_HOSTNAME).toBe("data.assemblee-nationale.fr");
+  });
+
+  it("is a bare hostname (no protocol, no slash)", () => {
+    expect(AN_OPEN_DATA_HOSTNAME.startsWith("http")).toBe(false);
+    expect(AN_OPEN_DATA_HOSTNAME.includes("/")).toBe(false);
+  });
+});
+
+describe("GITHUB_REPO_URL + GITHUB_REPO_DISPLAY — code-source link target", () => {
+  // Used 3× across Methode §06, Methode §07, and Legal Sources block.
+  // Currently a production-blocker TODO (real repo is private at
+  // waramere1234/sans-detour). When the team open-sources the project,
+  // updating GITHUB_REPO_URL propagates href + visible text + aria-label
+  // in one edit.
+  it("GITHUB_REPO_URL is the documented public URL", () => {
+    expect(GITHUB_REPO_URL).toBe("https://github.com/sansdetour");
+  });
+
+  it("GITHUB_REPO_DISPLAY strips the protocol from GITHUB_REPO_URL", () => {
+    expect(GITHUB_REPO_DISPLAY).toBe(
+      GITHUB_REPO_URL.replace(/^https?:\/\//, "").replace(/\/$/, ""),
+    );
+  });
+
+  it("GITHUB_REPO_DISPLAY is the canonical 'github.com/sansdetour' value", () => {
+    expect(GITHUB_REPO_DISPLAY).toBe("github.com/sansdetour");
   });
 });

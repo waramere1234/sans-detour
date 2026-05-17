@@ -142,6 +142,28 @@ export function externalLinkLabel(visibleText: string): string {
  *  don't double-up. */
 export const AN_OPEN_DATA_URL = "https://data.assemblee-nationale.fr/";
 
+/** Visible hostname form of AN_OPEN_DATA_URL — used as <code>display</code>
+ *  text on Methode §01 prose, as link text on Methode §06 + Legal's
+ *  Sources block, and as the visible part of externalLinkLabel(...).
+ *  Derived by stripping protocol + trailing slash so a future AN domain
+ *  change propagates atomically (same pattern as PROD_HOSTNAME). */
+export const AN_OPEN_DATA_HOSTNAME =
+  AN_OPEN_DATA_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
+/** Public GitHub repo URL surfaced on Methode §06 + §07 + Legal as the
+ *  "code source MIT" link target. Currently a production-blocker TODO
+ *  (real repo is private at waramere1234/sans-detour); once the team
+ *  decides to open-source, the URL updates here and the 3 sites + the
+ *  visible-text derivation (GITHUB_REPO_DISPLAY) follow atomically. */
+export const GITHUB_REPO_URL = "https://github.com/sansdetour";
+
+/** Visible "github.com/sansdetour" form of GITHUB_REPO_URL — used as link
+ *  text on the 3 sites and as the visible part of externalLinkLabel(...).
+ *  Derived so a future github.com/<org> rename + URL update propagates
+ *  to the visible text in one edit. */
+export const GITHUB_REPO_DISPLAY =
+  GITHUB_REPO_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
 /** All parliamentary group codes for the 17e legislature. */
 export const GROUP_CODES = [
   "LFI", "GDR", "ECO", "SOC", "LIOT",

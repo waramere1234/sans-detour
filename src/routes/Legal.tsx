@@ -5,7 +5,8 @@ import { FROM_LOGO_STATE } from "../lib/nav-state";
 import { CONTACT_EMAIL, mailto } from "../lib/contact";
 import { ROUTES } from "../lib/routes";
 import {
-  AN_OPEN_DATA_URL,
+  AN_OPEN_DATA_URL, AN_OPEN_DATA_HOSTNAME,
+  GITHUB_REPO_URL, GITHUB_REPO_DISPLAY,
   WORDMARK_HOME_LABEL, PAGE_HEADER_NAV_LABEL, externalLinkLabel,
 } from "../types";
 
@@ -56,7 +57,7 @@ export default function Legal() {
 
         <p><strong>Indépendance</strong> — Sans Détour est un projet indépendant. Aucune affiliation politique, médiatique ou institutionnelle.</p>
 
-        <p><strong>Sources des données</strong> — Open data officiel de l'Assemblée Nationale (<a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel("data.assemblee-nationale.fr")}>data.assemblee-nationale.fr</a>), licence Etalab 2.0.</p>
+        <p><strong>Sources des données</strong> — Open data officiel de l'Assemblée Nationale (<a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(AN_OPEN_DATA_HOSTNAME)}>{AN_OPEN_DATA_HOSTNAME}</a>), licence Etalab 2.0.</p>
 
         {/* TODO production-blocker · same broken github.com/sansdetour
             link as Methode §06 + §07 (real repo is private at
@@ -65,7 +66,7 @@ export default function Legal() {
             is published, also add LICENSE.md before exposing this link
             (RGPD/legal cleanliness). Drop this <p> entirely if the open-
             source path is deferred. */}
-        <p><strong>Code source</strong> — Open source sous licence MIT, disponible sur <a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel("github.com/sansdetour")}>github.com/sansdetour</a>.</p>
+        <p><strong>Code source</strong> — Open source sous licence MIT, disponible sur <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a>.</p>
       </div>
     </section>
   );

@@ -11,7 +11,9 @@ import { ROUTES } from "../lib/routes";
 import { DEFAULT_CAP_PER_DOSSIER, DEFAULT_CAP_PER_CHAPEAU_PREFIX } from "../lib/deck";
 import { THRESHOLD } from "../lib/compute-positions";
 import {
-  TARGET, MIN_FOR_RANKING, MAX_POINTS_CLES_BULLETS, AN_OPEN_DATA_URL,
+  TARGET, MIN_FOR_RANKING, MAX_POINTS_CLES_BULLETS,
+  AN_OPEN_DATA_URL, AN_OPEN_DATA_HOSTNAME,
+  GITHUB_REPO_URL, GITHUB_REPO_DISPLAY,
   READING_PAGE_MAX_WIDTH,
   WORDMARK_HOME_LABEL, PAGE_HEADER_NAV_LABEL, externalLinkLabel,
 } from "../types";
@@ -129,7 +131,7 @@ export default function Methode() {
       </nav>
 
       <Section n="01" title="D'où viennent les données">
-        <p>Les votes proviennent de <strong>l'open data officiel de l'Assemblée Nationale</strong>, exposé sur <code>data.assemblee-nationale.fr</code>. Ce sont les mêmes fichiers que ceux utilisés par les médias de référence et le service interne de l'AN. Aucune retranscription manuelle, aucune source secondaire.</p>
+        <p>Les votes proviennent de <strong>l'open data officiel de l'Assemblée Nationale</strong>, exposé sur <code>{AN_OPEN_DATA_HOSTNAME}</code>. Ce sont les mêmes fichiers que ceux utilisés par les médias de référence et le service interne de l'AN. Aucune retranscription manuelle, aucune source secondaire.</p>
         <p>Mise à jour automatisée toutes les semaines.</p>
       </Section>
 
@@ -170,14 +172,14 @@ export default function Methode() {
         <p>Sans Détour est un projet <strong>indépendant</strong>. Aucune affiliation parti / média / institution.</p>
         <p>Hébergement sur fonds personnels. Pas d'annonceur, pas de sponsor, pas de don accepté pendant les 6 mois précédant un scrutin national.</p>
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)" }}>
-          <li><a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel("data.assemblee-nationale.fr")}>data.assemblee-nationale.fr</a> — open data officiel</li>
+          <li><a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(AN_OPEN_DATA_HOSTNAME)}>{AN_OPEN_DATA_HOSTNAME}</a> — open data officiel</li>
           {/* TODO production-blocker · github.com/sansdetour is a 404 today
               (real repo is private at waramere1234/sans-detour per CLAUDE.md)
               AND no LICENSE file exists despite the "MIT" claim. Either
               publish under the sansdetour org with a LICENSE.md, or drop
               this bullet until the repo is public. Same TODO in §07 below
               and in Legal.tsx — keep them in sync. */}
-          <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel("github.com/sansdetour")}>github.com/sansdetour</a> — code source MIT</li>
+          <li><a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a> — code source MIT</li>
           <li><a href={mailto()}>{CONTACT_EMAIL}</a> — signaler une erreur</li>
         </ul>
       </Section>
@@ -195,7 +197,7 @@ export default function Methode() {
           {/* TODO production-blocker · same broken github.com/sansdetour
               link as §06 above. The "prompt et code source publics" claim
               is aspirational until the repo is published. */}
-          <li><a href="https://github.com/sansdetour" target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel("github.com/sansdetour")}>github.com/sansdetour</a> — prompt et code source publics</li>
+          <li><a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a> — prompt et code source publics</li>
           <li>Modèle : Claude Haiku 4.5 d'Anthropic, via Batches API + web_search</li>
         </ul>
       </Section>

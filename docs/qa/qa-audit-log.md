@@ -3165,3 +3165,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `WORDMARK_HOME_LABEL\|PAGE_HEADER_NAV_LABEL\|externalLinkLabel` src/ tests/ → 12+ résultats
 - [ ] grep `'aria-label="Accueil"\|aria-label="En-tête de la page"\|(nouvel onglet)'` src/ → 0 literals (toutes derivées sauf la déclaration)
 - [ ] grep `~594 tests` CLAUDE.md → 0 résultat (aligné sur ~600)
+
+---
+
+## Session 135 — 2026-05-17
+
+### Vérification session 134
+
+- [VERIFIED] 35 occurrences de WORDMARK_HOME_LABEL/PAGE_HEADER_NAV_LABEL/externalLinkLabel dans src/ + tests/
+- [VERIFIED] 0 inline literal "Accueil"/"En-tête de la page"/"(nouvel onglet)" dans src/
+- [VERIFIED] CLAUDE.md "~600 tests"
+- 600/600 tests verts, typecheck clean
+
+### Bugs fixés (GITHUB_REPO_URL + GITHUB_REPO_DISPLAY + AN_OPEN_DATA_HOSTNAME derivation)
+
+- [FIXED] `"https://github.com/sansdetour"` href hardcoded 3× (Legal + Methode × 2) · Production-blocker URL flagged en TODO (real repo private chez waramere1234/sans-detour). Quand l'équipe finit par open-source le repo, l'URL doit être updated en 3 sites. Fix : export `GITHUB_REPO_URL` depuis src/types. Les 3 sites importent. · `src/types/index.ts`, `src/routes/Legal.tsx`, `src/routes/Methode.tsx`
+- [FIXED] `"github.com/sansdetour"` visible text dupliqué 3× (comme link text + arg de externalLinkLabel) · Drift surface identique au URL — un rename github.com/<org> demanderait d'updater visible text + href + aria-label séparément. Fix : export `GITHUB_REPO_DISPLAY` derived par strip-protocol depuis GITHUB_REPO_URL (même pattern que PROD_HOSTNAME ← PROD_ORIGIN). 3 sites utilisent `{GITHUB_REPO_DISPLAY}` comme link text + arg du helper. · `src/types/index.ts`, `src/routes/Legal.tsx`, `src/routes/Methode.tsx`
+- [FIXED] `"data.assemblee-nationale.fr"` visible text dupliqué 3× (Methode §01 prose `<code>`, Methode §06 link text, Legal Sources link text) · Même drift surface : si l'AN change de domain (ex: data.an.fr), AN_OPEN_DATA_URL update mais les visible texts restent stale. Fix : export `AN_OPEN_DATA_HOSTNAME` derived depuis AN_OPEN_DATA_URL. 3 sites utilisent `{AN_OPEN_DATA_HOSTNAME}`. 6 nouveaux tests dans `tests/aria-labels.test.ts` : derivation regex pin pour les 2 hostnames, pin-the-value des 4 const (URLs + DISPLAYs), no-protocol/no-slash sanity pour AN_OPEN_DATA_HOSTNAME. · `src/types/index.ts`, `src/routes/Legal.tsx`, `src/routes/Methode.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 136
+
+- [ ] grep `GITHUB_REPO_URL\|GITHUB_REPO_DISPLAY\|AN_OPEN_DATA_HOSTNAME` src/ tests/ → 16+ résultats
+- [ ] grep `"https://github\.com/sansdetour"` src/ → 1 résultat seulement (la déclaration)
+- [ ] grep `~600 tests` CLAUDE.md → 0 résultat (aligné sur ~606)
