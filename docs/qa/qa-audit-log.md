@@ -2255,3 +2255,28 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `JSON_DIR = path.join` scripts/*.ts → 0 résultat (les 3 scripts importent depuis an-cache.ts)
 - [ ] grep `interface BatchResultLine` scripts/ingest-an.ts scripts/resume-ingest.ts → 0 résultat (déplacée vers parse-summary.ts)
 - [ ] `npx tsc -b` propre + 240/240 tests verts
+
+---
+
+## Session 98 — 2026-05-17
+
+### Vérification session 97
+
+- [VERIFIED] `scripts/lib/an-cache.ts` présent avec les exports attendus
+- [VERIFIED] 0 résultat pour `JSON_DIR = path.join` dans scripts/*.ts (tout via imports)
+- [VERIFIED] 0 résultat pour `interface BatchResultLine` dans les 2 scripts (déplacée vers parse-summary.ts)
+- [VERIFIED] tsc -b clean, 240/240 tests verts
+- 240/240 tests verts, typecheck clean
+
+### Bugs fixés (modal a11y refactor — hook + tests + selector defense)
+
+- [FIXED] `MethodeSheet` + `RankingOverlay` dupliquaient les 4 useEffects modal-a11y · ESC handler, body scroll lock, focus on open / restore on close (via requestAnimationFrame), Tab focus trap — 8 effects identiques répartis sur les 2 composants. Extraction `src/hooks/useModalA11y.ts` (return `{dialogRef, closeBtnRef}`). 2 composants consomment maintenant : `const { dialogRef, closeBtnRef } = useModalA11y({ open, onClose });`. Drop des imports `useEffect` + `useRef` dans les 2 composants (caught par tsc -b). · `src/hooks/useModalA11y.ts` (nouveau), `src/components/MethodeSheet.tsx`, `src/components/RankingOverlay.tsx`
+- [FIXED] `useModalA11y` 0 test coverage à l'extraction · 11 tests dans `tests/useModalA11y.test.tsx` couvrant les 4 contracts : body scroll lock (set hidden on open, restore on close, no-op on closed), Escape handler (calls onClose, ignores other keys, no-op on closed), focus on open (close button focused after RAF via waitFor — jsdom RAF nuance), focus trap (cycle Tab last→first, Shift+Tab first→last, no-op mid-cycle, INCLUDES `input` form elements). · `tests/useModalA11y.test.tsx` (nouveau)
+- [FIXED] Focus-trap selector missing `input, select, textarea` · L'ancien selector `'a, button, [tabindex]:not([tabindex="-1"])'` ne matchait que ces 3 types. Aucune modal actuelle n'a de form input, mais une future modal avec un input verrait ses inputs ECHAPPER le focus trap (Tab les passerait, atteindrait le browser chrome). Defensive fix dans le selector du hook : `'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])'`. Test inclus pour pin le comportement (input compté dans focusables.length). · `src/hooks/useModalA11y.ts` (line 81)
+
+### Vérifications à faire en session 99
+
+- [ ] `ls src/hooks/useModalA11y.ts` → présent ; exports `useModalA11y`
+- [ ] grep `useModalA11y` src/components/ → 2 résultats (MethodeSheet + RankingOverlay imports + uses)
+- [ ] grep `'a, button, \\[tabindex\\]:not' src/ → 0 résultat (vieux selector éliminé)
+- [ ] grep `~240 tests` CLAUDE.md → 0 résultat (aligné sur ~251)

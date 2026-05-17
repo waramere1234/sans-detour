@@ -1,10 +1,10 @@
 // src/components/RankingOverlay.tsx
-import { useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import type { GroupAlignment } from "../types";
 import { PartyRow } from "./PartyRow";
 import { rankByAlignment } from "../lib/matching";
 import type { GroupCode } from "../types";
+import { useModalA11y } from "../hooks/useModalA11y";
 
 export interface RankingOverlayProps {
   open: boolean;
@@ -15,65 +15,11 @@ export interface RankingOverlayProps {
 
 export function RankingOverlay({ open, alignments, countedTotal, onClose }: RankingOverlayProps) {
   const ranked = rankByAlignment(alignments);
-  const dialogRef = useRef<HTMLDivElement>(null);
-  const closeBtnRef = useRef<HTMLButtonElement>(null);
-  const openerRef = useRef<HTMLElement | null>(null);
+  // Modal-a11y plumbing (ESC, body scroll lock, focus on open / restore on
+  // close, Tab focus trap) lives in src/hooks/useModalA11y.ts and is shared
+  // with MethodeSheet since session 98.
+  const { dialogRef, closeBtnRef } = useModalA11y({ open, onClose });
   const reducedMotion = useReducedMotion();
-
-  // Esc to dismiss the modal (a11y) + lock body scroll while open so the
-  // backdrop doesn't pass through to the underlying /play deck.
-  useEffect(() => {
-    if (!open) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [open, onClose]);
-
-  // Save opener + focus close button on open, restore on close. Pairs with
-  // aria-modal="true" so the modal actually behaves like a modal for
-  // keyboard users (otherwise the aria attribute lies about behavior).
-  useEffect(() => {
-    if (open) {
-      openerRef.current = document.activeElement as HTMLElement | null;
-      const id = requestAnimationFrame(() => closeBtnRef.current?.focus());
-      return () => cancelAnimationFrame(id);
-    } else {
-      openerRef.current?.focus();
-    }
-  }, [open]);
-
-  // Focus trap: cycle Tab within the dialog so users can't tab into the
-  // underlying /play deck while the modal is open.
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Tab") return;
-      const dialog = dialogRef.current;
-      if (!dialog) return;
-      const focusables = dialog.querySelectorAll<HTMLElement>(
-        'a, button, [tabindex]:not([tabindex="-1"])',
-      );
-      if (focusables.length === 0) return;
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
 
   return (
     <AnimatePresence>

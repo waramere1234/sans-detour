@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { mailto } from "../lib/contact";
+import { useModalA11y } from "../hooks/useModalA11y";
 
 export interface MethodeSheetProps {
   open: boolean;
@@ -13,62 +13,11 @@ export interface MethodeSheetProps {
  *  is a popover): aria-modal, focus trap, ESC and backdrop close, focus
  *  restored to the opener (the chip) on close. */
 export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
-  const closeBtnRef = useRef<HTMLButtonElement>(null);
-  const dialogRef = useRef<HTMLDivElement>(null);
-  const openerRef = useRef<HTMLElement | null>(null);
+  // Modal-a11y plumbing (ESC, body scroll lock, focus on open / restore on
+  // close, Tab focus trap) lives in src/hooks/useModalA11y.ts and is shared
+  // with RankingOverlay since session 98.
+  const { dialogRef, closeBtnRef } = useModalA11y({ open, onClose });
   const reducedMotion = useReducedMotion();
-
-  // Save the opener so we can restore focus when the sheet closes
-  useEffect(() => {
-    if (open) {
-      openerRef.current = document.activeElement as HTMLElement | null;
-      const id = requestAnimationFrame(() => closeBtnRef.current?.focus());
-      return () => cancelAnimationFrame(id);
-    } else {
-      openerRef.current?.focus();
-    }
-  }, [open]);
-
-  // ESC handler
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-
-  // Body scroll lock
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
-  }, [open]);
-
-  // Focus trap: cycle Tab within dialog
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Tab") return;
-      const dialog = dialogRef.current;
-      if (!dialog) return;
-      const focusables = dialog.querySelectorAll<HTMLElement>(
-        'a, button, [tabindex]:not([tabindex="-1"])'
-      );
-      if (focusables.length === 0) return;
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
 
   return (
     <AnimatePresence>
