@@ -3,19 +3,16 @@ import type {
   GroupCode, GroupPosition, UserVote, Scrutin, SessionVote, GroupAlignment,
   PersonnaliteCode, PersonnaliteVote, PersonnaliteAlignment,
 } from "../types";
-import { GROUP_CODES, PERSONNALITE_CODES, LOW_DATA_THRESHOLD } from "../types";
-
-const SCALE: Record<"pour" | "contre" | "abstention", number> = {
-  pour: 1,
-  abstention: 0,
-  contre: -1,
-};
+import {
+  GROUP_CODES, PERSONNALITE_CODES, LOW_DATA_THRESHOLD,
+  MATCHING_SCALE, SCORE_PERFECT, SCORE_PARTIAL, SCORE_CONFLICT, PCT_MULTIPLIER,
+} from "../types";
 
 /** Score for a single scrutin between user and group. Returns null if not counted. */
 export function alignmentScore(user: UserVote, group: GroupPosition): number | null {
   if (user === "skip") return null;
   if (group === "divisé") return null;
-  return 1 - Math.abs(SCALE[user] - SCALE[group]) / 2;
+  return 1 - Math.abs(MATCHING_SCALE[user] - MATCHING_SCALE[group]) / 2;
 }
 
 /** Compute per-group alignment given the session's scrutins and votes. */
@@ -49,8 +46,8 @@ export function computeAlignment(
       if (score === null) continue;
 
       result[code].counted++;
-      if (score === 1) result[code].perfect++;
-      else if (score === 0.5) result[code].partial++;
+      if (score === SCORE_PERFECT) result[code].perfect++;
+      else if (score === SCORE_PARTIAL) result[code].partial++;
       else result[code].conflict++;
     }
   }
@@ -61,8 +58,8 @@ export function computeAlignment(
     if (a.counted === 0) {
       a.pct = 0;
     } else {
-      const sum = a.perfect * 1 + a.partial * 0.5 + a.conflict * 0;
-      a.pct = Math.round((sum / a.counted) * 100);
+      const sum = a.perfect * SCORE_PERFECT + a.partial * SCORE_PARTIAL + a.conflict * SCORE_CONFLICT;
+      a.pct = Math.round((sum / a.counted) * PCT_MULTIPLIER);
     }
   }
 
@@ -89,7 +86,7 @@ export function alignmentScorePersonnalite(
 ): number | null {
   if (user === "skip") return null;
   if (vote === "absent" || vote === "non_dispo") return null;
-  return 1 - Math.abs(SCALE[user] - SCALE[vote]) / 2;
+  return 1 - Math.abs(MATCHING_SCALE[user] - MATCHING_SCALE[vote]) / 2;
 }
 
 /** Compute per-personality alignment given the session's scrutins and votes.
@@ -128,8 +125,8 @@ export function computeAlignmentPersonnalites(
       if (score === null) continue;
 
       result[code].counted++;
-      if (score === 1) result[code].perfect++;
-      else if (score === 0.5) result[code].partial++;
+      if (score === SCORE_PERFECT) result[code].perfect++;
+      else if (score === SCORE_PARTIAL) result[code].partial++;
       else result[code].conflict++;
     }
   }
@@ -139,8 +136,8 @@ export function computeAlignmentPersonnalites(
     if (a.counted === 0) {
       a.pct = 0;
     } else {
-      const sum = a.perfect * 1 + a.partial * 0.5 + a.conflict * 0;
-      a.pct = Math.round((sum / a.counted) * 100);
+      const sum = a.perfect * SCORE_PERFECT + a.partial * SCORE_PARTIAL + a.conflict * SCORE_CONFLICT;
+      a.pct = Math.round((sum / a.counted) * PCT_MULTIPLIER);
     }
   }
 

@@ -4537,3 +4537,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `MS_PER_DAY\|SYNC_CADENCE_DAYS\|DECK_SEED_RANGE_EXPONENT` src/ tests/ → 15+ résultats
 - [ ] grep `'86400_000\|86_400_000\|2 \*\* 31'` src/ → 0 résultats (tous via les consts)
 - [ ] grep `~1261 tests` CLAUDE.md → 0 résultat (aligné sur ~1271)
+
+## Session 196 — 2026-05-18
+
+### Vérification session 195
+
+- [VERIFIED] 29 occurrences des nouveaux exports (MS_PER_DAY + SYNC_CADENCE_DAYS + DECK_SEED_RANGE_EXPONENT)
+- [VERIFIED] 0 inline `86_400_000` ou `2 ** 31` literals (tous via les consts ; declaration in types/index.ts only)
+- [VERIFIED] CLAUDE.md "~1261 tests" → 0 résultat (aligné sur ~1271)
+- 1271/1271 tests verts, typecheck clean
+
+### Bugs fixés (SCORE_PERFECT/_PARTIAL/_CONFLICT + MATCHING_SCALE + PCT_MULTIPLIER)
+
+- [FIXED] Matching score discriminant values `1` / `0.5` / `0` inline 8× dans matching.ts (computeAlignment + computeAlignmentPersonnalites x 2 chacune : score === comparisons sur lines 52/54 + 131/133, et sum weights sur lines 64 + 143). Drift surface : les 3 outcome classes pour le matching algorithme — SCORE_PERFECT (full alignment), SCORE_PARTIAL (abstention vs direction), SCORE_CONFLICT (opposite). Returned by alignmentScore() qui implémente `1 - |SCALE[user] - SCALE[group]| / 2`. Un drift sur PARTIAL (e.g., bumping à 0.75 pour favoriser abstention) doit propager via la const. Fix : export `SCORE_PERFECT` + `SCORE_PARTIAL` + `SCORE_CONFLICT`. matching.ts utilise les 3 consts dans les 6 sites. Aria-labels tests : 7 (canonical × 3 + strict-ordering PERFECT > PARTIAL > CONFLICT + midpoint invariant PARTIAL === (PERFECT+CONFLICT)/2 + score-domain [0,1] × 3 + 3-distinct anti-collapse Set). · `src/types/index.ts`, `src/lib/matching.ts`, `tests/aria-labels.test.ts`
+- [FIXED] Local `SCALE` const dans matching.ts (file-private, non exporté) — vote/position-to-numeric mapping `{ pour: 1, abstention: 0, contre: -1 }`. Drift surface : core algorithm contract documenté dans CLAUDE.md. Currently inaccessible aux tests externes + consommateurs. Symmetric around 0 pour produire le 3-bucket score (1/0.5/0) cleanly via `1 - |x - y| / 2`. Un drift asymetrique (e.g., contre = -2) briserait les SCORE_* discriminants. Fix : export `MATCHING_SCALE` from types, drop the local SCALE in matching.ts. alignmentScore() + alignmentScorePersonnalite() utilisent la const exportée. Aria-labels tests : 8 (canonical × 3 + symmetric-around-0 pour + contre === 0 + abstention midpoint + formula round-trip × 3 producing SCORE_PERFECT/_PARTIAL/_CONFLICT). · `src/types/index.ts`, `src/lib/matching.ts`, `tests/aria-labels.test.ts`
+- [FIXED] Magic number `100` (percent multiplier) inline 2× dans matching.ts (`Math.round((sum / a.counted) * 100)` × 2 branches). Drift surface : percent conversion factor pour le pct display value. Un future tweak (e.g., per-mille pour plus de granularité) doit propager. Fix : export `PCT_MULTIPLIER`. matching.ts utilise la const dans les 2 sites. Aria-labels tests : 3 (canonical 100 + positive-integer + compositional sanity SCORE_PARTIAL × PCT_MULTIPLIER === 50 cross-const round-trip). · `src/types/index.ts`, `src/lib/matching.ts`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 197
+
+- [ ] grep `SCORE_PERFECT\|SCORE_PARTIAL\|SCORE_CONFLICT\|MATCHING_SCALE\|PCT_MULTIPLIER` src/ tests/ → 20+ résultats
+- [ ] grep `'score === 1\|score === 0\.5\|\* 100\b\|\* 0\.5\b'` src/lib/matching.ts → 0 résultats (tous via les consts)
+- [ ] grep `~1271 tests` CLAUDE.md → 0 résultat (aligné sur ~1289)

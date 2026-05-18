@@ -1480,6 +1480,35 @@ export const SYNC_CADENCE_DAYS = 7;
  *  a way mulberry32 doesn't promise. */
 export const DECK_SEED_RANGE_EXPONENT = 31;
 
+/** Matching score discriminant values — used 8× in src/lib/matching.ts
+ *  (computeAlignment + computeAlignmentPersonnalites) to classify each
+ *  vote/position pair into one of 3 buckets:
+ *    SCORE_PERFECT (1)   — same direction (pour↔pour, contre↔contre)
+ *    SCORE_PARTIAL (0.5) — one side is abstention
+ *    SCORE_CONFLICT (0)  — opposite directions
+ *  Returned by alignmentScore(); also used as weights when computing
+ *  the per-group pct. Invariant: PERFECT > PARTIAL > CONFLICT, and
+ *  PARTIAL is the midpoint of PERFECT + CONFLICT. */
+export const SCORE_PERFECT = 1;
+export const SCORE_PARTIAL = 0.5;
+export const SCORE_CONFLICT = 0;
+
+/** Vote/position-to-numeric mapping used by alignmentScore() in
+ *  matching.ts. Pour = +1, abstention = 0, contre = -1 — symmetric
+ *  around 0 so `1 - |SCALE[user] - SCALE[group]| / 2` produces the
+ *  3-bucket score (1, 0.5, 0) cleanly. Documented in CLAUDE.md. */
+export const MATCHING_SCALE: Record<"pour" | "contre" | "abstention", number> = {
+  pour: 1,
+  abstention: 0,
+  contre: -1,
+};
+
+/** Percent conversion multiplier — used 2× in matching.ts to convert
+ *  the [0,1] score fraction to a display percent. Centralised so the
+ *  rare future tweak (e.g., showing per-mille instead of percent for
+ *  finer granularity) propagates from one edit. */
+export const PCT_MULTIPLIER = 100;
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

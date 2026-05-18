@@ -129,6 +129,8 @@ import {
   SCRUTINS_TABLE_NAME, SCRUTINS_COL_POINTS_CLES, SCRUTINS_COL_INGERE_LE,
   SCRUTINS_COL_DATE, COVER_STORAGE_TRUE_VALUE, ERROR_STACK_TRACE_MAX_LENGTH,
   MS_PER_DAY, SYNC_CADENCE_DAYS, DECK_SEED_RANGE_EXPONENT,
+  SCORE_PERFECT, SCORE_PARTIAL, SCORE_CONFLICT,
+  MATCHING_SCALE, PCT_MULTIPLIER,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -4115,6 +4117,102 @@ describe("DECK_SEED_RANGE_EXPONENT — mulberry32 seed range bit-width", () => {
     // coercion). A seed below 2^32 round-trips losslessly through
     // the `>>> 0` mask; pin so the exponent stays ≤ 32.
     expect(DECK_SEED_RANGE_EXPONENT).toBeLessThanOrEqual(32);
+  });
+});
+
+describe("SCORE_PERFECT/_PARTIAL/_CONFLICT — matching score discriminants", () => {
+  it("PERFECT matches 1 (pin-the-value, full-alignment outcome)", () => {
+    expect(SCORE_PERFECT).toBe(1);
+  });
+
+  it("PARTIAL matches 0.5 (abstention-against-direction outcome)", () => {
+    expect(SCORE_PARTIAL).toBe(0.5);
+  });
+
+  it("CONFLICT matches 0 (opposite-direction outcome)", () => {
+    expect(SCORE_CONFLICT).toBe(0);
+  });
+
+  it("PERFECT > PARTIAL > CONFLICT (strict ordering invariant)", () => {
+    expect(SCORE_PERFECT).toBeGreaterThan(SCORE_PARTIAL);
+    expect(SCORE_PARTIAL).toBeGreaterThan(SCORE_CONFLICT);
+  });
+
+  it("PARTIAL is the midpoint of PERFECT + CONFLICT (compositional invariant)", () => {
+    // The matching formula `1 - |x - y| / 2` produces exactly these
+    // 3 values; PARTIAL is the midpoint because abstention is
+    // halfway between pour (+1) and contre (-1) on the scale.
+    expect(SCORE_PARTIAL).toBe((SCORE_PERFECT + SCORE_CONFLICT) / 2);
+  });
+
+  it("all 3 scores are in [0, 1] (score-domain invariant)", () => {
+    for (const s of [SCORE_PERFECT, SCORE_PARTIAL, SCORE_CONFLICT]) {
+      expect(s).toBeGreaterThanOrEqual(0);
+      expect(s).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it("all 3 scores are distinct (anti-collapse)", () => {
+    const scores = new Set([SCORE_PERFECT, SCORE_PARTIAL, SCORE_CONFLICT]);
+    expect(scores.size).toBe(3);
+  });
+});
+
+describe("MATCHING_SCALE — vote/position-to-numeric mapping", () => {
+  it("pour matches +1 (pin-the-value, positive direction)", () => {
+    expect(MATCHING_SCALE.pour).toBe(1);
+  });
+
+  it("abstention matches 0 (pin-the-value, neutral)", () => {
+    expect(MATCHING_SCALE.abstention).toBe(0);
+  });
+
+  it("contre matches -1 (pin-the-value, negative direction)", () => {
+    expect(MATCHING_SCALE.contre).toBe(-1);
+  });
+
+  it("is symmetric around 0 (pour + contre === 0)", () => {
+    // The scale is signed so the matching formula `1 - |x - y| / 2`
+    // produces 1/0.5/0 cleanly when paired with itself. A drift to
+    // asymmetric values (e.g., contre = -2) would break the score
+    // discriminants pin above.
+    expect(MATCHING_SCALE.pour + MATCHING_SCALE.contre).toBe(0);
+  });
+
+  it("abstention is the midpoint (pour + contre) / 2 === abstention", () => {
+    expect((MATCHING_SCALE.pour + MATCHING_SCALE.contre) / 2).toBe(MATCHING_SCALE.abstention);
+  });
+
+  it("produces SCORE_PERFECT when both sides match (formula round-trip)", () => {
+    // `1 - |x - y| / 2` with x === y gives 1 (SCORE_PERFECT).
+    expect(1 - Math.abs(MATCHING_SCALE.pour - MATCHING_SCALE.pour) / 2).toBe(SCORE_PERFECT);
+  });
+
+  it("produces SCORE_PARTIAL when one side is abstention (formula round-trip)", () => {
+    expect(1 - Math.abs(MATCHING_SCALE.pour - MATCHING_SCALE.abstention) / 2).toBe(SCORE_PARTIAL);
+  });
+
+  it("produces SCORE_CONFLICT when sides are opposite (formula round-trip)", () => {
+    expect(1 - Math.abs(MATCHING_SCALE.pour - MATCHING_SCALE.contre) / 2).toBe(SCORE_CONFLICT);
+  });
+});
+
+describe("PCT_MULTIPLIER — percent conversion factor", () => {
+  it("matches 100 (pin-the-value)", () => {
+    expect(PCT_MULTIPLIER).toBe(100);
+  });
+
+  it("is a positive integer", () => {
+    expect(Number.isInteger(PCT_MULTIPLIER)).toBe(true);
+    expect(PCT_MULTIPLIER).toBeGreaterThan(0);
+  });
+
+  it("0.5 * PCT_MULTIPLIER === 50 (compositional sanity check)", () => {
+    // SCORE_PARTIAL * PCT_MULTIPLIER should yield 50 (the
+    // half-aligned display percent). Pin the round-trip so a
+    // future drift (e.g., to permille = 1000) catches the
+    // related copy/UI assumptions.
+    expect(SCORE_PARTIAL * PCT_MULTIPLIER).toBe(50);
   });
 });
 
