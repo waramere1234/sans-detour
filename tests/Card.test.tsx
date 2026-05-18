@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { Card } from "../src/components/Card";
 import {
   CARD_VERSO_SEPARATOR_LABEL, CARD_AN_LIBELLE_PREFIX_LABEL,
+  CARD_VERSO_FLIP_BACK_HINT, CARD_NO_ANALYSE_FALLBACK_BODY,
   cardAriaLabel,
   type Scrutin,
 } from "../src/types";
@@ -188,5 +189,25 @@ describe("Card a11y", () => {
     };
     render(<Card scrutin={scrutin} topMost={true} />);
     expect(screen.queryByRole("button", { name: /voir l'analyse/i })).not.toBeInTheDocument();
+  });
+
+  it("verso renders CARD_VERSO_FLIP_BACK_HINT in the shared footer (round-trip)", () => {
+    render(<Card scrutin={mkScrutin()} topMost={true} />);
+    fireEvent.keyDown(screen.getByRole("article"), { key: "Enter" });
+    // The footer "tap pour revenir ‹" hint is the verso's flip-back
+    // affordance. Pin via the const so a copy tweak that drops the
+    // affordance verb propagates to source + test in one edit.
+    expect(screen.getByText(new RegExp(CARD_VERSO_FLIP_BACK_HINT))).toBeInTheDocument();
+  });
+
+  it("verso renders CARD_NO_ANALYSE_FALLBACK_BODY when contexte is missing (round-trip)", () => {
+    const scrutin = mkScrutin();
+    delete (scrutin as { contexte?: string }).contexte;
+    render(<Card scrutin={scrutin} topMost={true} />);
+    fireEvent.keyDown(screen.getByRole("article"), { key: "Enter" });
+    // When the scrutin has no `contexte` field, the verso renders the
+    // canonical fallback prose. Round-trip via the const so a future
+    // rewording stays in sync between Card.tsx and this test.
+    expect(screen.getByText(CARD_NO_ANALYSE_FALLBACK_BODY)).toBeInTheDocument();
   });
 });

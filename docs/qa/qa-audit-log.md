@@ -4104,3 +4104,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `COVER_EYEBROW_SUFFIX\|METHODE_PAGE_LEAD_TAIL\|METHODE_PAGE_LEAD_SECTION_07_REF` src/ tests/ → 15+ résultats
 - [ ] grep `"TON ALIGNEMENT RÉEL"\|"En revanche, les résumés"\|"section 07"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~946 tests` CLAUDE.md → 0 résultat (aligné sur ~956)
+
+## Session 175 — 2026-05-18
+
+### Vérification session 174
+
+- [VERIFIED] 28 occurrences des nouveaux exports (COVER_EYEBROW_SUFFIX + METHODE_PAGE_LEAD_TAIL + METHODE_PAGE_LEAD_SECTION_07_REF)
+- [VERIFIED] 5 occurrences inline literals = 3 déclarations + 2 pin-the-value tests (clean)
+- [VERIFIED] CLAUDE.md "~946 tests" → 0 résultat (aligné sur ~956)
+- 956/956 tests verts, typecheck clean
+
+### Bugs fixés (CARD_VERSO_FLIP_BACK_HINT + CARD_NO_ANALYSE_FALLBACK_BODY + METHODE_S07_AN_LINK_PARENTHETICAL_*)
+
+- [FIXED] Card.tsx verso footer flip-back hint `"tap pour revenir"` inline + untested (rendu dans le shared footer du verso, avant un `‹` aria-hidden) · Drift surface : seule affordance textuelle qui indique à l'utilisateur qu'il peut retourner la carte. Sans pin, un rewording silencieux ("Retour" / "Recto" / "← Retour") pourrait drop le verbe d'action `tap` et casser la mental model touch-first sans déclencher de test. Fix : export `CARD_VERSO_FLIP_BACK_HINT`. Card.tsx utilise la const. Card test : 1 getByText sur le verso après flip. Aria-labels tests : 3 (pin-the-value + contains `tap` touch-affordance verb + contains `revenir` anti-direction-flip guard). · `src/types/index.ts`, `src/components/Card.tsx`, `tests/Card.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Card.tsx verso fallback prose `"Aucune explication détaillée disponible pour ce scrutin. Le texte officiel ci-dessous donne le sujet général."` inline + untested (rendu en `<em>` quand `scrutin.contexte` est falsy) · Drift surface : fallback path silencieux quand l'ingestion LLM n'a pas produit de contexte. Si la pipeline finit par toujours produire un contexte, la const documente quand même le user-visible fallback pour éviter le dead code silencieux. Le pointer "le texte officiel ci-dessous" est aussi load-bearing — il référence l'AN libellé rendu en-dessous, donc un layout change qui déplacerait ce bloc casserait la phrase. Fix : export `CARD_NO_ANALYSE_FALLBACK_BODY`. Card.tsx utilise la const. Card test : 1 getByText après suppression de `contexte` et flip. Aria-labels tests : 4 (pin-the-value + startsWith "Aucune" negation-first + contains "texte officiel" + "ci-dessous" anti-orphan + 2-sentence anti-overgrowth guard). · `src/types/index.ts`, `src/components/Card.tsx`, `tests/Card.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode.tsx §07 AN-link parenthetical `"(et la page AN complète est toujours accessible via « "` + `" »)"` inline (split autour de `{AN_LINK_VISIBLE_LABEL}` JSX interpolation) + untested · Drift surface : load-bearing companion claim de `METHODE_S07_LIBELLE_BRUT_GUARANTEE` (la transparence promise : libellé brut visible + page AN complète accessible). Le "toujours accessible" est non-négociable — un softening en "souvent" ou "généralement" affaiblirait la promesse de transparence. Les guillemets français + parenthèse forment un emballage typographique précis qui doit rester équilibré (1 `(` dans PREFIX, 1 `)` dans SUFFIX). Fix : export `METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX` + `_SUFFIX`. Methode.tsx utilise la composition `{PREFIX}{AN_LINK_VISIBLE_LABEL}{SUFFIX}`. Methode test : 1 toContain (les deux halves). Aria-labels tests : 6 (canonical PREFIX/SUFFIX + opens `(` + opens guillemet + closes guillemet + closes `)` + contains "page AN complète" load-bearing claim + contains "toujours accessible" anti-soften + balanced 1-open/1-close parenthesis count guard). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 176
+
+- [ ] grep `CARD_VERSO_FLIP_BACK_HINT\|CARD_NO_ANALYSE_FALLBACK_BODY\|METHODE_S07_AN_LINK_PARENTHETICAL` src/ tests/ → 15+ résultats
+- [ ] grep `"tap pour revenir"\|"Aucune explication détaillée"\|"page AN complète"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~956 tests` CLAUDE.md → 0 résultat (aligné sur ~973)

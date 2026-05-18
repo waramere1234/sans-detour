@@ -24,6 +24,7 @@ import {
   METHODE_S07_LIMITES_DISCLAIMER_PREFIX, METHODE_S07_LIMITES_DISCLAIMER_SUFFIX,
   METHODE_S07_NE_FAIT_PAS_BODY,
   METHODE_S07_CADRE_BIAIS_PREFIX, METHODE_S07_CADRE_BIAIS_SUFFIX,
+  METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX, METHODE_S07_AN_LINK_PARENTHETICAL_SUFFIX,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -203,6 +204,17 @@ describe("Methode — section structure", () => {
     const section = document.getElementById("methode-07")!;
     expect(section.textContent).toContain(METHODE_S07_CADRE_BIAIS_PREFIX.trim());
     expect(section.textContent).toContain(METHODE_S07_CADRE_BIAIS_SUFFIX.trim());
+  });
+
+  it("§07 surfaces METHODE_S07_AN_LINK_PARENTHETICAL_* (AN-deep-link availability companion)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-07")!;
+    // PREFIX + SUFFIX wrap AN_LINK_VISIBLE_LABEL with French guillemets
+    // inside parentheses. Round-trip both halves so a future split-point
+    // change or copy tweak fails here instead of silently desyncing
+    // from the libellé-brut transparency promise it pairs with.
+    expect(section.textContent).toContain(METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX.trim());
+    expect(section.textContent).toContain(METHODE_S07_AN_LINK_PARENTHETICAL_SUFFIX.trim());
   });
 
   it("§02 surfaces METHODE_S02_CAPS_EXAMPLE (concrete retraite/Mayotte example)", () => {

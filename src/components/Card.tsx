@@ -9,6 +9,7 @@ import {
   CARD_ANALYSE_TITLE_MESURES, CARD_ANALYSE_TITLE_CALENDRIER, CARD_ANALYSE_TITLE_EXCEPTIONS,
   CARD_ANALYSE_CONCERNES_HEADER,
   CARD_ANALYSE_CONCERNES_POSITIFS, CARD_ANALYSE_CONCERNES_NEGATIFS, CARD_ANALYSE_CONCERNES_NEUTRES,
+  CARD_VERSO_FLIP_BACK_HINT, CARD_NO_ANALYSE_FALLBACK_BODY,
   type Scrutin,
 } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
@@ -235,7 +236,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
               renderWithBold(scrutin.contexte)
             ) : (
               <em style={{ color: "var(--ink-3)" }}>
-                Aucune explication détaillée disponible pour ce scrutin. Le texte officiel ci-dessous donne le sujet général.
+                {CARD_NO_ANALYSE_FALLBACK_BODY}
               </em>
             )}
           </div>
@@ -284,7 +285,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             display: "flex", justifyContent: "space-between", alignItems: "center",
             fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.04em",
           }}>
-            <span style={{ color: "var(--ink-3)" }}>tap pour revenir<span aria-hidden="true"> ‹</span></span>
+            <span style={{ color: "var(--ink-3)" }}>{CARD_VERSO_FLIP_BACK_HINT}<span aria-hidden="true"> ‹</span></span>
             {scrutin.url_an_officielle
               ? <a
                   href={scrutin.url_an_officielle}

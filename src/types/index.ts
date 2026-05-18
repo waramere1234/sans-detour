@@ -880,6 +880,28 @@ export const METHODE_PAGE_LEAD_TAIL =
  *  drops the number or changes "section" to "partie" surfaces. */
 export const METHODE_PAGE_LEAD_SECTION_07_REF = "section 07";
 
+/** Card verso footer flip-back hint — visible text rendered on the
+ *  card verso left-side footer ("tap pour revenir ‹"). Tells users
+ *  they can flip the card back to its recto. Pin so a rewording
+ *  that loses the affordance (e.g., to "Retour" or "Recto") surfaces. */
+export const CARD_VERSO_FLIP_BACK_HINT = "tap pour revenir";
+
+/** Card verso fallback prose for scrutins missing `analyse_loi` —
+ *  rendered in place of the ColoredSection blocks when the ingestion
+ *  LLM didn't structure the synthesis. Documents the user-visible
+ *  fallback path so a future ingestion pipeline change that always
+ *  produces analyse_loi doesn't silently leave this dead code. */
+export const CARD_NO_ANALYSE_FALLBACK_BODY =
+  "Aucune explication détaillée disponible pour ce scrutin. Le texte officiel ci-dessous donne le sujet général.";
+
+/** Methode §07 AN-link parenthetical — split into prefix + suffix
+ *  around `{AN_LINK_VISIBLE_LABEL}` JSX interpolation. Documents
+ *  the AN-deep-link availability companion to the
+ *  METHODE_S07_LIBELLE_BRUT_GUARANTEE claim. */
+export const METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX =
+  "(et la page AN complète est toujours accessible via « ";
+export const METHODE_S07_AN_LINK_PARENTHETICAL_SUFFIX = " »)";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

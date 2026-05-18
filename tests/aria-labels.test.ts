@@ -75,6 +75,8 @@ import {
   METHODE_S07_LIMITES_DISCLAIMER_PREFIX, METHODE_S07_LIMITES_DISCLAIMER_SUFFIX,
   METHODE_S07_NE_FAIT_PAS_BODY,
   METHODE_S07_CADRE_BIAIS_PREFIX, METHODE_S07_CADRE_BIAIS_SUFFIX,
+  METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX, METHODE_S07_AN_LINK_PARENTHETICAL_SUFFIX,
+  CARD_VERSO_FLIP_BACK_HINT, CARD_NO_ANALYSE_FALLBACK_BODY,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -2109,5 +2111,111 @@ describe("GITHUB_REPO_URL + GITHUB_REPO_DISPLAY — code-source link target", ()
 
   it("GITHUB_REPO_DISPLAY is the canonical 'github.com/sansdetour' value", () => {
     expect(GITHUB_REPO_DISPLAY).toBe("github.com/sansdetour");
+  });
+});
+
+describe("CARD_VERSO_FLIP_BACK_HINT — Card verso footer flip-back hint", () => {
+  it("matches the canonical 'tap pour revenir' wording (pin-the-value)", () => {
+    expect(CARD_VERSO_FLIP_BACK_HINT).toBe("tap pour revenir");
+  });
+
+  it("contains 'tap' (the touch-affordance verb)", () => {
+    // The hint must surface the actual user gesture (tap/click). A
+    // rewording that drops the gesture verb (e.g., "Retour" / "Recto")
+    // loses the affordance the small text exists to telegraph.
+    expect(CARD_VERSO_FLIP_BACK_HINT.toLowerCase()).toContain("tap");
+  });
+
+  it("contains 'revenir' (anti-direction-flip guard)", () => {
+    // "revenir" anchors the flip-back direction. A flip in copy from
+    // "revenir" to "continuer" or "suivant" would silently invert the
+    // mental model — the hint sits on the verso, so the action must
+    // bring the user back to the recto.
+    expect(CARD_VERSO_FLIP_BACK_HINT).toContain("revenir");
+  });
+});
+
+describe("CARD_NO_ANALYSE_FALLBACK_BODY — Card verso fallback prose when analyse_loi is missing", () => {
+  it("matches the canonical fallback wording (pin-the-value)", () => {
+    expect(CARD_NO_ANALYSE_FALLBACK_BODY).toBe(
+      "Aucune explication détaillée disponible pour ce scrutin. Le texte officiel ci-dessous donne le sujet général.",
+    );
+  });
+
+  it("opens with 'Aucune' (negation-first framing)", () => {
+    // The fallback must lead with the absence (so the user understands
+    // immediately why the synthesis isn't there). A rewording that
+    // buries the negation in mid-sentence would weaken the signal.
+    expect(CARD_NO_ANALYSE_FALLBACK_BODY.startsWith("Aucune")).toBe(true);
+  });
+
+  it("points the user to 'le texte officiel ci-dessous' (anti-orphan guard)", () => {
+    // The second sentence redirects the user to the AN libellé block
+    // rendered below this fallback in the same verso. Pin so a future
+    // layout change that moves the AN libellé elsewhere triggers a
+    // copy update in lockstep (otherwise the pointer "ci-dessous"
+    // becomes a lie).
+    expect(CARD_NO_ANALYSE_FALLBACK_BODY).toContain("texte officiel");
+    expect(CARD_NO_ANALYSE_FALLBACK_BODY).toContain("ci-dessous");
+  });
+
+  it("is exactly 2 sentences (anti-overgrowth guard)", () => {
+    // The fallback sits in a small em block on the verso; a future
+    // tweak that turns it into a paragraph would break the visual
+    // contract with the surrounding short bullets. 2 sentences max.
+    const sentenceCount = (CARD_NO_ANALYSE_FALLBACK_BODY.match(/\./g) || []).length;
+    expect(sentenceCount).toBe(2);
+  });
+});
+
+describe("METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX/SUFFIX — Methode §07 AN-link parenthetical", () => {
+  it("PREFIX is the canonical opener", () => {
+    expect(METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX).toBe(
+      "(et la page AN complète est toujours accessible via « ",
+    );
+  });
+
+  it("SUFFIX is the canonical closer", () => {
+    expect(METHODE_S07_AN_LINK_PARENTHETICAL_SUFFIX).toBe(" »)");
+  });
+
+  it("PREFIX opens a parenthesis + opens French guillemets", () => {
+    // Compositional: PREFIX + AN_LINK_VISIBLE_LABEL + SUFFIX must
+    // form a balanced parenthetical with French guillemets around the
+    // link text. Pin the bracket discipline so a future copy tweak
+    // that drops one half (e.g., removes only « and not ») surfaces.
+    expect(METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX.startsWith("(")).toBe(true);
+    expect(METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX).toContain("«");
+  });
+
+  it("SUFFIX closes guillemet + closes parenthesis", () => {
+    expect(METHODE_S07_AN_LINK_PARENTHETICAL_SUFFIX).toContain("»");
+    expect(METHODE_S07_AN_LINK_PARENTHETICAL_SUFFIX.endsWith(")")).toBe(true);
+  });
+
+  it("PREFIX contains 'page AN complète' (load-bearing claim)", () => {
+    // The §07 paragraph promises that even though the libellé brut is
+    // visible inline, the *full* AN page is still one click away. The
+    // "complète" qualifier is what distinguishes this companion claim
+    // from a vague "link to AN" mention. Drop guard.
+    expect(METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX).toContain("page AN");
+    expect(METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX).toContain("complète");
+  });
+
+  it("PREFIX contains 'toujours accessible' (anti-soften guard)", () => {
+    // "toujours accessible" is the strong promise: not "souvent",
+    // not "généralement", not "quand disponible". Any softening here
+    // weakens the transparency guarantee paired with the libellé brut
+    // promise (METHODE_S07_LIBELLE_BRUT_GUARANTEE).
+    expect(METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX).toContain("toujours accessible");
+  });
+
+  it("PREFIX is the only opening parenthesis + SUFFIX is the only closing one (balanced)", () => {
+    // Exactly one '(' in PREFIX and exactly one ')' in SUFFIX. Catches
+    // accidental nested parentheticals that would render asymmetrically.
+    const openCount = (METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX.match(/\(/g) || []).length;
+    const closeCount = (METHODE_S07_AN_LINK_PARENTHETICAL_SUFFIX.match(/\)/g) || []).length;
+    expect(openCount).toBe(1);
+    expect(closeCount).toBe(1);
   });
 });
