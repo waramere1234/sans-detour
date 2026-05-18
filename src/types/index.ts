@@ -1060,6 +1060,39 @@ export const METHODE_S01_DATA_SOURCE_TO_CODE_SEPARATOR = ", exposé sur ";
  *  register and weaken the methodology page's plain-French tone. */
 export const METHODE_S02_KEPT_OPENER_PREFIX = "On garde les ";
 
+/** Methode §04 rank-threshold opener — splits into prefix + bridge
+ *  around the strong-tagged `{MIN_FOR_RANKING}<sup>e</sup>{...}`
+ *  numeric and the rank-noise explanation. The full rendered
+ *  sentence reads:
+ *  "Le ranking apparaît à partir du <strong>{N}^e ...</strong> —
+ *   {RANK_NOISE_EXPLANATION}."
+ *  PREFIX frames the rank-threshold-rule opener; BRIDGE is the em-dash
+ *  separator that introduces the noise-explanation clause. A
+ *  rewording that loses "apparaît à partir du" would weaken the
+ *  threshold-gating framing that the §04 rule rests on. */
+export const METHODE_S04_RANK_OPENER_PREFIX = "Le ranking apparaît à partir du ";
+export const METHODE_S04_RANK_BRIDGE_SEPARATOR = " — ";
+
+/** Methode §05 `<code>localStorage</code>` label — the literal value
+ *  rendered inside the inline <code> tag. Must match the actual
+ *  browser API key string used in src/lib/session.ts (`localStorage`)
+ *  exactly. A drift between the displayed name and the API call
+ *  would silently misclaim the persistence mechanism. */
+export const METHODE_S05_LOCALSTORAGE_CODE_LABEL = "localStorage";
+
+/** AuditTrail demo-fallback tooltip + aria suffixes — composed onto
+ *  DEMO_DATA_LABEL_PREFIX inside template literals to render the
+ *  `title=` tooltip ("…sera remplacée par les vrais scrutins…")
+ *  and the `aria-label=` short-form ("(pas un scrutin AN réel)").
+ *  Load-bearing for the demo-data disclosure contract — pin so a
+ *  rewording that downplays the demo nature (e.g., "données
+ *  d'exemple" instead of "demo") propagates to source + test.
+ *  Both suffixes are joined with DEMO_DATA_LABEL_PREFIX via
+ *  template-string concatenation in AuditTrail.tsx. */
+export const DEMO_FALLBACK_TITLE_SUFFIX =
+  " — sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production";
+export const DEMO_FALLBACK_ARIA_SUFFIX = " (pas un scrutin AN réel)";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

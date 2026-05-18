@@ -93,6 +93,9 @@ import {
   METHODE_S01_DATA_SOURCE_OPENER_PREFIX, METHODE_S01_DATA_SOURCE_TO_CODE_SEPARATOR,
   METHODE_S02_KEPT_OPENER_PREFIX,
   type GroupPosition,
+  METHODE_S04_RANK_OPENER_PREFIX, METHODE_S04_RANK_BRIDGE_SEPARATOR,
+  METHODE_S05_LOCALSTORAGE_CODE_LABEL,
+  DEMO_FALLBACK_TITLE_SUFFIX, DEMO_FALLBACK_ARIA_SUFFIX,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -2794,5 +2797,124 @@ describe("METHODE_S02_KEPT_OPENER_PREFIX — Methode §02 inclusion-policy opene
     expect(METHODE_S02_KEPT_OPENER_PREFIX.endsWith(" ")).toBe(true);
   });
 });
+
+describe("METHODE_S04_RANK_OPENER_PREFIX + BRIDGE_SEPARATOR — Methode §04 rank-threshold rule opener", () => {
+  it("PREFIX matches the canonical opener (pin-the-value)", () => {
+    expect(METHODE_S04_RANK_OPENER_PREFIX).toBe("Le ranking apparaît à partir du ");
+  });
+
+  it("BRIDGE_SEPARATOR is the em-dash separator (pin-the-value)", () => {
+    expect(METHODE_S04_RANK_BRIDGE_SEPARATOR).toBe(" — ");
+  });
+
+  it("PREFIX contains 'apparaît à partir du' (threshold-gating verb)", () => {
+    // The threshold-gating verb is non-negotiable — it frames the
+    // ranking as appearing *only* past a threshold (not "available
+    // from the start" or "visible always"). A softening to "est
+    // disponible dès le" would lose the gating-rule semantics.
+    expect(METHODE_S04_RANK_OPENER_PREFIX).toContain("apparaît à partir du");
+  });
+
+  it("PREFIX ends with ' du ' (link-to-strong glue cadence)", () => {
+    // The trailing space lets the strong-tagged ordinal number
+    // render flush in JSX. Pin so a future edit that drops the
+    // space doesn't jam the strong content against "du".
+    expect(METHODE_S04_RANK_OPENER_PREFIX.endsWith("du ")).toBe(true);
+  });
+
+  it("BRIDGE_SEPARATOR uses an em-dash (U+2014, not a hyphen)", () => {
+    // The separator is the em-dash "—" (U+2014), not a hyphen "-"
+    // or en-dash "–". The em-dash signals a clause-introducing
+    // separator, which matches the cadence of the noise-explanation
+    // clause that follows.
+    expect(METHODE_S04_RANK_BRIDGE_SEPARATOR).toContain("—");
+    expect(METHODE_S04_RANK_BRIDGE_SEPARATOR).not.toContain("-");
+  });
+
+  it("BRIDGE_SEPARATOR is padded with single spaces (typographic breathing)", () => {
+    // The em-dash is padded with single ASCII spaces on both sides
+    // (French typographic convention for em-dash usage). Pin the
+    // exact " — " form so a tweak doesn't introduce thin spaces
+    // ( ) or non-breaking spaces.
+    expect(METHODE_S04_RANK_BRIDGE_SEPARATOR).toBe(" — ");
+  });
+});
+
+describe("METHODE_S05_LOCALSTORAGE_CODE_LABEL — Methode §05 <code>localStorage</code> API anchor", () => {
+  it("matches the canonical 'localStorage' API name (pin-the-value)", () => {
+    expect(METHODE_S05_LOCALSTORAGE_CODE_LABEL).toBe("localStorage");
+  });
+
+  it("uses lowercase + uppercase camelCase exactly as in the Web Storage API", () => {
+    // The actual browser API is `window.localStorage` (camelCase).
+    // A drift to "LocalStorage" or "local_storage" would misclaim
+    // the API name. src/lib/session.ts calls localStorage.getItem
+    // etc. — this const must match that identifier exactly.
+    expect(METHODE_S05_LOCALSTORAGE_CODE_LABEL).toBe("localStorage");
+    // Defense in depth: lowercase 'l' start, capital 'S' for Storage.
+    expect(METHODE_S05_LOCALSTORAGE_CODE_LABEL.startsWith("l")).toBe(true);
+    expect(METHODE_S05_LOCALSTORAGE_CODE_LABEL).toContain("S");
+  });
+
+  it("has no whitespace (it's an API identifier, not prose)", () => {
+    // The label is the bare API name — no spaces, no surrounding
+    // backticks or quotes. Render-time wrapping happens via the
+    // <code> tag in JSX.
+    expect(METHODE_S05_LOCALSTORAGE_CODE_LABEL).not.toMatch(/\s/);
+  });
+});
+
+describe("DEMO_FALLBACK_TITLE_SUFFIX + ARIA_SUFFIX — AuditTrail demo-fallback tooltip + SR label", () => {
+  it("TITLE_SUFFIX matches the canonical tooltip suffix (pin-the-value)", () => {
+    expect(DEMO_FALLBACK_TITLE_SUFFIX).toBe(
+      " — sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production",
+    );
+  });
+
+  it("ARIA_SUFFIX matches the canonical SR clarifier (pin-the-value)", () => {
+    expect(DEMO_FALLBACK_ARIA_SUFFIX).toBe(" (pas un scrutin AN réel)");
+  });
+
+  it("TITLE_SUFFIX contains 'vrais scrutins' (anti-soften guard for transparency promise)", () => {
+    // The tooltip promises demo data will be replaced by *real*
+    // scrutins. "vrais scrutins" is the load-bearing transparency
+    // anchor — a softening to "futurs scrutins" or "données réelles"
+    // would weaken the demo-vs-real distinction.
+    expect(DEMO_FALLBACK_TITLE_SUFFIX).toContain("vrais scrutins");
+  });
+
+  it("TITLE_SUFFIX contains 'pipeline d'ingestion' (technical-mechanism anchor)", () => {
+    // Names the mechanism that replaces demo with real data — the
+    // ingestion pipeline (scripts/ingest:an in CLAUDE.md). A drop
+    // to "système" or "service" would lose the technical anchor
+    // that explains *how* the substitution happens.
+    expect(DEMO_FALLBACK_TITLE_SUFFIX).toContain("pipeline d'ingestion");
+  });
+
+  it("TITLE_SUFFIX starts with ' — ' (em-dash to compose onto DEMO_DATA_LABEL_PREFIX)", () => {
+    // The suffix composes onto DEMO_DATA_LABEL_PREFIX via
+    // `${PREFIX}${SUFFIX}` — so the suffix must start with the
+    // separator. Pin " — " so a refactor doesn't double-add the
+    // separator or drop it.
+    expect(DEMO_FALLBACK_TITLE_SUFFIX.startsWith(" — ")).toBe(true);
+  });
+
+  it("ARIA_SUFFIX contains 'pas un scrutin AN réel' (negative-claim anti-soften)", () => {
+    // The SR aria-label clarifies: this is NOT a real AN scrutin.
+    // A softening to "scrutin d'exemple" or "donnée demo" without
+    // the explicit negation would weaken the disclosure for SR
+    // users who can't see the visual demo styling.
+    expect(DEMO_FALLBACK_ARIA_SUFFIX).toContain("pas un scrutin AN réel");
+  });
+
+  it("ARIA_SUFFIX is parenthesized (visual cadence: short clarifier appended to the prefix)", () => {
+    // The SR clarifier is a short parenthetical, not a full clause.
+    // Pin the parens so a future edit doesn't turn it into a long
+    // sentence that's noisy in the SR rotor.
+    expect(DEMO_FALLBACK_ARIA_SUFFIX.trim().startsWith("(")).toBe(true);
+    expect(DEMO_FALLBACK_ARIA_SUFFIX.trim().endsWith(")")).toBe(true);
+  });
+});
+
 
 

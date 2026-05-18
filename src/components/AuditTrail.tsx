@@ -2,6 +2,7 @@
 import {
   anScrutinViewAriaLabel,
   DEMO_DATA_LABEL_PREFIX, DEMO_FALLBACK_SHORT_LABEL,
+  DEMO_FALLBACK_TITLE_SUFFIX, DEMO_FALLBACK_ARIA_SUFFIX,
   AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
   AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
   auditTrailChipNoun, AN_LINK_SHORT_LABEL,
@@ -126,8 +127,8 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
                 }}><span aria-hidden="true">{AN_LINK_SHORT_LABEL}</span></a>
             ) : (
               <span
-                title={`${DEMO_DATA_LABEL_PREFIX} — sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production`}
-                aria-label={`${DEMO_DATA_LABEL_PREFIX} (pas un scrutin AN réel)`}
+                title={`${DEMO_DATA_LABEL_PREFIX}${DEMO_FALLBACK_TITLE_SUFFIX}`}
+                aria-label={`${DEMO_DATA_LABEL_PREFIX}${DEMO_FALLBACK_ARIA_SUFFIX}`}
                 style={{
                   fontFamily: "var(--font-mono)", fontSize: 10,
                   color: "var(--ink-4)", letterSpacing: "0.04em",

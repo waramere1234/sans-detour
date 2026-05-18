@@ -18,6 +18,8 @@ import {
   METHODE_S03_DIVIDED_STRONG_LABEL,
   METHODE_S01_DATA_SOURCE_OPENER_PREFIX, METHODE_S01_DATA_SOURCE_TO_CODE_SEPARATOR,
   METHODE_S02_KEPT_OPENER_PREFIX,
+  METHODE_S04_RANK_OPENER_PREFIX, METHODE_S04_RANK_BRIDGE_SEPARATOR,
+  METHODE_S05_LOCALSTORAGE_CODE_LABEL,
   METHODE_S01_UPDATE_CADENCE,
   METHODE_S05_NO_TRACKING_PHRASE,
   METHODE_S03_GROUP_INTRO,
@@ -115,6 +117,26 @@ describe("Methode — section structure", () => {
     const sectionIds = METHODE_SECTIONS.map(([n]) => n);
     const titleIds = Object.keys(METHODE_SECTION_BODY_TITLES);
     expect(titleIds.sort()).toEqual(sectionIds.slice().sort());
+  });
+
+  it("§04 surfaces METHODE_S04_RANK_OPENER_PREFIX + BRIDGE_SEPARATOR (rank-threshold rule opener glue)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-04")!;
+    expect(section.textContent).toContain(METHODE_S04_RANK_OPENER_PREFIX.trim());
+    expect(section.textContent).toContain(METHODE_S04_RANK_BRIDGE_SEPARATOR.trim());
+  });
+
+  it("§05 surfaces METHODE_S05_LOCALSTORAGE_CODE_LABEL inside a <code> tag (browser-API anchor)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-05")!;
+    // The literal "localStorage" must render inside a <code> tag.
+    // querySelector locates the code element and asserts textContent
+    // matches the const — catches an accidental <em> swap or unwrap.
+    const codes = Array.from(section.querySelectorAll("code"));
+    const localStorageCode = codes.find(
+      (el) => el.textContent === METHODE_S05_LOCALSTORAGE_CODE_LABEL,
+    );
+    expect(localStorageCode).toBeDefined();
   });
 
   it("§01 surfaces METHODE_S01_DATA_SOURCE_OPENER_PREFIX + TO_CODE_SEPARATOR (data-provenance opener glue)", () => {

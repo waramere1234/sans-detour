@@ -4230,3 +4230,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `METHODE_S03_DIVIDED_STRONG_LABEL\|METHODE_S01_DATA_SOURCE_OPENER_PREFIX\|METHODE_S01_DATA_SOURCE_TO_CODE_SEPARATOR\|METHODE_S02_KEPT_OPENER_PREFIX` src/ tests/ → 15+ résultats
 - [ ] grep `"Les votes proviennent de"\|"On garde les"\|">divisé<"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~1041 tests` CLAUDE.md → 0 résultat (aligné sur ~1059)
+
+## Session 181 — 2026-05-18
+
+### Vérification session 180
+
+- [VERIFIED] 42 occurrences des nouveaux exports (METHODE_S03_DIVIDED_STRONG_LABEL + METHODE_S01_DATA_SOURCE_OPENER_PREFIX/_TO_CODE_SEPARATOR + METHODE_S02_KEPT_OPENER_PREFIX)
+- [VERIFIED] 3 occurrences inline literals = 1 const comment + 1 test comment + 1 describe header (clean)
+- [VERIFIED] CLAUDE.md "~1041 tests" → 0 résultat (aligné sur ~1059)
+- 1059/1059 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_S04_RANK_OPENER_PREFIX/_BRIDGE_SEPARATOR + METHODE_S05_LOCALSTORAGE_CODE_LABEL + DEMO_FALLBACK_TITLE_SUFFIX/_ARIA_SUFFIX)
+
+- [FIXED] Methode.tsx §04 rank-threshold opener `"Le ranking apparaît à partir du "` + `" — "` inline (split autour du strong-tagged `{MIN_FOR_RANKING}<sup>e</sup>{...}` ordinal + le rank-noise explanation) + untested. Drift surface : load-bearing threshold-gating verb "apparaît à partir du" frame le §04 rule entirely — un softening en "est disponible dès le" perdrait la gating-rule semantics. Le bridge separator " — " (em-dash padded with single spaces, French typographic convention) introduit la noise-explanation clause. Fix : export `METHODE_S04_RANK_OPENER_PREFIX` + `METHODE_S04_RANK_BRIDGE_SEPARATOR`. Methode.tsx utilise la composition. Methode test : 1 toContain × 2. Aria-labels tests : 6 (canonical PREFIX + canonical BRIDGE + contains "apparaît à partir du" anti-soften threshold-gating-verb + PREFIX endsWith " du " glue-cadence + BRIDGE em-dash U+2014 not hyphen anti-asciify + BRIDGE === " — " exact-typographic-cadence guard). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode.tsx §05 `<code>localStorage</code>` literal inside the code tag inline + untested. Drift surface : load-bearing browser-API anchor — DOIT match l'identifier exact utilisé dans src/lib/session.ts (`localStorage.getItem`, `localStorage.setItem`, `localStorage.removeItem`). Un drift en "LocalStorage" ou "local_storage" rendrait visuellement OK mais misclaim l'API name + sync silencieusement faux avec l'impl. Fix : export `METHODE_S05_LOCALSTORAGE_CODE_LABEL`. Methode.tsx utilise la const dans le `<code>`. Methode test : 1 querySelectorAll("code") + find par textContent === const (catches accidental `<em>` swap or unwrap). Aria-labels tests : 3 (pin-the-value + camelCase identifier shape (l prefix + capital S) anti-rename + no-whitespace bare-identifier guard). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] AuditTrail.tsx demo-fallback `title` + `aria-label` suffixes : `" — sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production"` + `" (pas un scrutin AN réel)"` inline (composed onto DEMO_DATA_LABEL_PREFIX via template literals) + untested. Drift surface : title tooltip + aria-label SR clarifier sont la disclosure contract pour demo fallback. "vrais scrutins" est le load-bearing transparency anchor (un softening en "futurs scrutins" perdrait la demo-vs-real distinction) ; "pipeline d'ingestion" anchors le technical-mechanism ; le ARIA "pas un scrutin AN réel" est non-négociable pour SR users qui ne voient pas le visual demo styling. Fix : export `DEMO_FALLBACK_TITLE_SUFFIX` + `DEMO_FALLBACK_ARIA_SUFFIX`. AuditTrail.tsx utilise les template literals. AuditTrail test : 1 toHaveAttribute round-trip × 2 sur title + aria-label en composé via les 2 suffixes (catches a copy-paste mistake où tooltip suffix swapped with aria suffix). Aria-labels tests : 7 (canonical TITLE_SUFFIX + canonical ARIA_SUFFIX + contains "vrais scrutins" anti-soften + contains "pipeline d'ingestion" technical-mechanism anchor + TITLE_SUFFIX startsWith " — " compositional-prefix + ARIA_SUFFIX contains "pas un scrutin AN réel" anti-soften negative-claim + ARIA_SUFFIX parenthesized cadence guard). · `src/types/index.ts`, `src/components/AuditTrail.tsx`, `tests/AuditTrail.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 182
+
+- [ ] grep `METHODE_S04_RANK_OPENER_PREFIX\|METHODE_S04_RANK_BRIDGE_SEPARATOR\|METHODE_S05_LOCALSTORAGE_CODE_LABEL\|DEMO_FALLBACK_TITLE_SUFFIX\|DEMO_FALLBACK_ARIA_SUFFIX` src/ tests/ → 18+ résultats
+- [ ] grep `"Le ranking apparaît à partir"\|">localStorage<"\|"pas un scrutin AN réel"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~1059 tests` CLAUDE.md → 0 résultat (aligné sur ~1078)

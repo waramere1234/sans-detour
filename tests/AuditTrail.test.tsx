@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { AuditTrail } from "../src/components/AuditTrail";
 import {
   anScrutinViewAriaLabel, DEMO_FALLBACK_SHORT_LABEL,
+  DEMO_DATA_LABEL_PREFIX, DEMO_FALLBACK_TITLE_SUFFIX, DEMO_FALLBACK_ARIA_SUFFIX,
   AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
   AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
   auditTrailChipText,
@@ -148,6 +149,25 @@ describe("AuditTrail — AN link vs demo fallback", () => {
     render(<AuditTrail alignment={mkAlign()} scrutins={[sc]} votes={votes} />);
     expect(screen.getByText(DEMO_FALLBACK_SHORT_LABEL)).toBeInTheDocument();
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
+  });
+
+  it("demo fallback span has title + aria-label composed from DEMO_DATA_LABEL_PREFIX + the two SUFFIX consts (round-trip)", () => {
+    const sc = mkScrutin("s3", "pour", "LFI", { url_an_officielle: "" });
+    const votes: SessionVote[] = [{ scrutin_id: "s3", choice: "pour", voted_at: 1 }];
+    render(<AuditTrail alignment={mkAlign()} scrutins={[sc]} votes={votes} />);
+    // Locate the demo fallback span by its short label, then assert
+    // title + aria-label round-trip through the prefix + suffix consts.
+    // Catches a copy-paste mistake (the tooltip suffix swapped for the
+    // aria suffix, or either dropped).
+    const demoSpan = screen.getByText(DEMO_FALLBACK_SHORT_LABEL);
+    expect(demoSpan).toHaveAttribute(
+      "title",
+      `${DEMO_DATA_LABEL_PREFIX}${DEMO_FALLBACK_TITLE_SUFFIX}`,
+    );
+    expect(demoSpan).toHaveAttribute(
+      "aria-label",
+      `${DEMO_DATA_LABEL_PREFIX}${DEMO_FALLBACK_ARIA_SUFFIX}`,
+    );
   });
 });
 
