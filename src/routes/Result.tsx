@@ -23,6 +23,7 @@ import {
   resultPersonnalitesIndexedCountText, continueTestRemainingSuffix,
   RESULT_TOP_LEAD, RESULT_GROUPS_H2, RESULT_PERSONNALITES_H2,
   RESULT_EMPTY_POOL_MESSAGE,
+  RESULT_PERSONNALITES_EXCLUSIONS_NOTE,
   type Scrutin, type GroupCode,
 } from "../types";
 
@@ -254,11 +255,7 @@ export default function Result() {
                 fontFamily: "var(--font-mono)", fontSize: 10,
                 color: "var(--ink-3)", lineHeight: 1.5,
               }}>
-                Basé uniquement sur leurs votes effectifs à l'Assemblée Nationale.
-                Mélenchon, Philippe, Glucksmann, Tondelier ne siègent pas dans la
-                17ᵉ législature ; Bardella, élu en 2024, a démissionné avant de
-                siéger ; Darmanin est ministre sur la quasi-totalité du mandat
-                (son suppléant vote à sa place). Aucun d'eux n'est mesuré ici.
+                {RESULT_PERSONNALITES_EXCLUSIONS_NOTE}
               </p>
             </div>
           )}

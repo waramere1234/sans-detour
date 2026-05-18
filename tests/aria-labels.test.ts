@@ -96,6 +96,9 @@ import {
   METHODE_S04_RANK_OPENER_PREFIX, METHODE_S04_RANK_BRIDGE_SEPARATOR,
   METHODE_S05_LOCALSTORAGE_CODE_LABEL,
   DEMO_FALLBACK_TITLE_SUFFIX, DEMO_FALLBACK_ARIA_SUFFIX,
+  RESULT_PERSONNALITES_EXCLUSIONS_NOTE,
+  METHODE_S04_RANK_ORDINAL_MARKER,
+  METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -2913,6 +2916,115 @@ describe("DEMO_FALLBACK_TITLE_SUFFIX + ARIA_SUFFIX — AuditTrail demo-fallback 
     // sentence that's noisy in the SR rotor.
     expect(DEMO_FALLBACK_ARIA_SUFFIX.trim().startsWith("(")).toBe(true);
     expect(DEMO_FALLBACK_ARIA_SUFFIX.trim().endsWith(")")).toBe(true);
+  });
+});
+
+describe("RESULT_PERSONNALITES_EXCLUSIONS_NOTE — personality-exclusion disclosure", () => {
+  it("contains the data-provenance opener 'votes effectifs à l'Assemblée Nationale' (pin)", () => {
+    // Anchors the methodology contract: only real votes count, no
+    // declarations / programs / sondages. Pairs with TAGLINE_PART_2
+    // "Les vrais votes" and the entire product pitch.
+    expect(RESULT_PERSONNALITES_EXCLUSIONS_NOTE).toContain(
+      "votes effectifs à l'Assemblée Nationale",
+    );
+  });
+
+  it("names all 4 ne-siègent-pas exclusions (Mélenchon + Philippe + Glucksmann + Tondelier)", () => {
+    // The 4 figures excluded by structural constraint (not deputies
+    // in the 17th legislature). Documented in CLAUDE.md "Exclus par
+    // contrainte structurelle". A future edit that drops a name
+    // would silently misclaim the V2 personalities scope.
+    expect(RESULT_PERSONNALITES_EXCLUSIONS_NOTE).toContain("Mélenchon");
+    expect(RESULT_PERSONNALITES_EXCLUSIONS_NOTE).toContain("Philippe");
+    expect(RESULT_PERSONNALITES_EXCLUSIONS_NOTE).toContain("Glucksmann");
+    expect(RESULT_PERSONNALITES_EXCLUSIONS_NOTE).toContain("Tondelier");
+  });
+
+  it("names the 2 special-case exclusions (Bardella démissionné + Darmanin ministre)", () => {
+    // The 2 figures with special-case reasons (not "ne siègent pas"):
+    // Bardella was elected then resigned before sitting; Darmanin is
+    // a minister whose alternate votes in his stead. CLAUDE.md
+    // documents both — drop guard.
+    expect(RESULT_PERSONNALITES_EXCLUSIONS_NOTE).toContain("Bardella");
+    expect(RESULT_PERSONNALITES_EXCLUSIONS_NOTE).toContain("Darmanin");
+  });
+
+  it("references the '17ᵉ législature' (anti-legislature-drift guard)", () => {
+    // The exclusion is 17ᵉ-legislature-specific (the AN seating
+    // period this product measures). When a future legislature
+    // turnover happens, this disclosure must be updated alongside
+    // LEGISLATURE_LABEL — pin so an update to LEGISLATURE_LABEL
+    // alone surfaces here as a sync requirement.
+    expect(RESULT_PERSONNALITES_EXCLUSIONS_NOTE).toContain("17ᵉ législature");
+  });
+
+  it("contains the supplément clause 'son suppléant vote à sa place' (Darmanin-specific)", () => {
+    // The Darmanin-specific reason is that his alternate (suppléant)
+    // casts the votes in his stead — meaning his votes don't reflect
+    // his personal positions. Without this clause, the disclosure
+    // wouldn't explain WHY a minister is excluded.
+    expect(RESULT_PERSONNALITES_EXCLUSIONS_NOTE).toContain("son suppléant vote à sa place");
+  });
+
+  it("closes with 'Aucun d'eux n'est mesuré ici.' (anti-soften final claim)", () => {
+    // The closing sentence anchors the exclusion contract: NONE of
+    // the named figures appears in the measurement. "Aucun" is the
+    // strongest possible negation; a softening to "Ces personnes
+    // n'apparaissent pas" would weaken the disclosure.
+    expect(RESULT_PERSONNALITES_EXCLUSIONS_NOTE.endsWith("Aucun d'eux n'est mesuré ici.")).toBe(true);
+  });
+});
+
+describe("METHODE_S04_RANK_ORDINAL_MARKER — Methode §04 French-ordinal-superscript marker", () => {
+  it("matches the canonical 'e' marker (pin-the-value)", () => {
+    expect(METHODE_S04_RANK_ORDINAL_MARKER).toBe("e");
+  });
+
+  it("is a single lowercase character (French ordinal-superscript convention)", () => {
+    // French ordinal in superscript is "e" (Académie française usage:
+    // "19e" not "19ème"). A drift to "ème" would render with a full-form
+    // suffix that's typographically incorrect for academic register.
+    expect(METHODE_S04_RANK_ORDINAL_MARKER).toHaveLength(1);
+    expect(METHODE_S04_RANK_ORDINAL_MARKER).toBe(
+      METHODE_S04_RANK_ORDINAL_MARKER.toLowerCase(),
+    );
+  });
+
+  it("is exactly 'e' (no accent, no uppercase, no full-form)", () => {
+    // Defense in depth: assert exact value. The French ordinal
+    // typography is unambiguous — N + <sup>e</sup>.
+    expect(METHODE_S04_RANK_ORDINAL_MARKER).not.toBe("ème");
+    expect(METHODE_S04_RANK_ORDINAL_MARKER).not.toBe("E");
+    expect(METHODE_S04_RANK_ORDINAL_MARKER).not.toBe("é");
+  });
+});
+
+describe("METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX — Methode page-lead link closer ').'", () => {
+  it("matches the canonical ').' (pin-the-value)", () => {
+    expect(METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX).toBe(").");
+  });
+
+  it("is exactly 2 chars (anti-overgrowth)", () => {
+    // The closer is a 2-char compositional anchor: ) closes the
+    // parenthesis opened by METHODE_PAGE_LEAD_TAIL's "(voir " +
+    // . ends the sentence. A future edit that adds words would
+    // duplicate prose that belongs in METHODE_PAGE_LEAD_TAIL.
+    expect(METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX).toHaveLength(2);
+  });
+
+  it("starts with ')' (closes the parenthesis from METHODE_PAGE_LEAD_TAIL's '(voir ' opener)", () => {
+    // Compositional invariant: the page-lead tail opens "(voir "
+    // before the inline link, and this suffix MUST close that
+    // parenthesis. Pin the start to ")" so a future tweak that
+    // changes the closer (e.g., to "].") fails CI alongside any
+    // matching change in the tail.
+    expect(METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX.startsWith(")")).toBe(true);
+    // And the tail must indeed open with "(voir ":
+    expect(METHODE_PAGE_LEAD_TAIL.endsWith("(voir ")).toBe(true);
+  });
+
+  it("ends with '.' (sentence terminator)", () => {
+    expect(METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX.endsWith(".")).toBe(true);
   });
 });
 

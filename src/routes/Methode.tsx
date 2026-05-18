@@ -43,6 +43,7 @@ import {
   METHODE_S02_KEPT_OPENER_PREFIX,
   METHODE_S04_RANK_OPENER_PREFIX, METHODE_S04_RANK_BRIDGE_SEPARATOR,
   METHODE_S05_LOCALSTORAGE_CODE_LABEL,
+  METHODE_S04_RANK_ORDINAL_MARKER, METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -143,7 +144,7 @@ export default function Methode() {
           lineHeight: 1.15, letterSpacing: "-0.022em", margin: "10px 0 0",
         }}>{METHODE_PAGE_H1}<span style={{ color: "var(--accent)" }}>.</span></h1>
         <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.55, marginTop: 12 }}>
-          {METHODE_PAGE_LEAD_INTRO} <strong>{METHODE_PAGE_LEAD_PURE_MATH}</strong> {METHODE_PAGE_LEAD_TAIL}<a href="#methode-07" style={{ color: "var(--accent)" }}>{METHODE_PAGE_LEAD_SECTION_07_REF}</a>).
+          {METHODE_PAGE_LEAD_INTRO} <strong>{METHODE_PAGE_LEAD_PURE_MATH}</strong> {METHODE_PAGE_LEAD_TAIL}<a href="#methode-07" style={{ color: "var(--accent)" }}>{METHODE_PAGE_LEAD_SECTION_07_REF}</a>{METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX}
         </p>
       </header>
 
@@ -209,7 +210,7 @@ export default function Methode() {
           <br/>
           {METHODE_S04_FORMULA_LINES[4]}
         </Formula>
-        <p>{METHODE_S04_RANK_OPENER_PREFIX}<strong>{MIN_FOR_RANKING}<sup>e</sup>{METHODE_S04_RANK_THRESHOLD_SUFFIX}</strong>{METHODE_S04_RANK_BRIDGE_SEPARATOR}{METHODE_S04_RANK_NOISE_EXPLANATION}.</p>
+        <p>{METHODE_S04_RANK_OPENER_PREFIX}<strong>{MIN_FOR_RANKING}<sup>{METHODE_S04_RANK_ORDINAL_MARKER}</sup>{METHODE_S04_RANK_THRESHOLD_SUFFIX}</strong>{METHODE_S04_RANK_BRIDGE_SEPARATOR}{METHODE_S04_RANK_NOISE_EXPLANATION}.</p>
       </Section>
 
       <Section n="05" title={METHODE_SECTION_BODY_TITLES["05"]}>

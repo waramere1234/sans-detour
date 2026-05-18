@@ -1093,6 +1093,37 @@ export const DEMO_FALLBACK_TITLE_SUFFIX =
   " — sera remplacée par les vrais scrutins de l'AN une fois le pipeline d'ingestion en production";
 export const DEMO_FALLBACK_ARIA_SUFFIX = " (pas un scrutin AN réel)";
 
+/** Result.tsx personality-exclusion disclosure — surfaced as a footer
+ *  note under the personnalites panel. Documents WHY specific public
+ *  political figures are NOT in the 8-personality V2 set. Paired with
+ *  the exclusion logic documented in CLAUDE.md ("Mélenchon, Philippe,
+ *  Glucksmann, Tondelier, Bardella, Darmanin" excluded by structural
+ *  constraint). A change to the personnalites list MUST update this
+ *  disclosure — without the pin, adding/removing a name would silently
+ *  desync the visible disclosure from the actual exclusion logic. */
+export const RESULT_PERSONNALITES_EXCLUSIONS_NOTE =
+  "Basé uniquement sur leurs votes effectifs à l'Assemblée Nationale. " +
+  "Mélenchon, Philippe, Glucksmann, Tondelier ne siègent pas dans la " +
+  "17ᵉ législature ; Bardella, élu en 2024, a démissionné avant de " +
+  "siéger ; Darmanin est ministre sur la quasi-totalité du mandat " +
+  "(son suppléant vote à sa place). Aucun d'eux n'est mesuré ici.";
+
+/** Methode §04 French-ordinal-superscript marker — the literal "e"
+ *  rendered inside the inline `<sup>` tag for the rank-threshold
+ *  ordinal (e.g., the "e" in "19e" for "19th"). The French ordinal
+ *  convention is "Ne" in superscript (Académie française usage),
+ *  NOT "ème" full-form. A drift to "ème" or asciification (dropping
+ *  the superscript wrapper) would change the typography. */
+export const METHODE_S04_RANK_ORDINAL_MARKER = "e";
+
+/** Methode page-lead link closer suffix — the literal ")." rendered
+ *  after the inline `<a href="#methode-07">{SECTION_07_REF}</a>` link.
+ *  Closes the parenthesis from METHODE_PAGE_LEAD_TAIL's "(voir " opener
+ *  AND ends the sentence with a period. The 2-char suffix is small
+ *  but compositionally load-bearing: drop the ")" → unbalanced parens,
+ *  drop the "." → no sentence terminator. */
+export const METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX = ").";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

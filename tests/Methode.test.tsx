@@ -20,6 +20,7 @@ import {
   METHODE_S02_KEPT_OPENER_PREFIX,
   METHODE_S04_RANK_OPENER_PREFIX, METHODE_S04_RANK_BRIDGE_SEPARATOR,
   METHODE_S05_LOCALSTORAGE_CODE_LABEL,
+  METHODE_S04_RANK_ORDINAL_MARKER, METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX,
   METHODE_S01_UPDATE_CADENCE,
   METHODE_S05_NO_TRACKING_PHRASE,
   METHODE_S03_GROUP_INTRO,
@@ -124,6 +125,28 @@ describe("Methode — section structure", () => {
     const section = document.getElementById("methode-04")!;
     expect(section.textContent).toContain(METHODE_S04_RANK_OPENER_PREFIX.trim());
     expect(section.textContent).toContain(METHODE_S04_RANK_BRIDGE_SEPARATOR.trim());
+  });
+
+  it("§04 surfaces METHODE_S04_RANK_ORDINAL_MARKER inside a <sup> tag (French ordinal superscript)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-04")!;
+    // The literal "e" must render inside a <sup> tag. querySelector
+    // catches an unwrap (sup → plain span) or an asciify (sup gets
+    // removed leaving the number bare).
+    const sups = Array.from(section.querySelectorAll("sup"));
+    const ordinalSup = sups.find(
+      (el) => el.textContent === METHODE_S04_RANK_ORDINAL_MARKER,
+    );
+    expect(ordinalSup).toBeDefined();
+  });
+
+  it("page-lead surfaces METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX after the #methode-07 link", () => {
+    renderMethode();
+    // The page-lead paragraph ends with the link followed by the
+    // ').' closer. textContent of the page header should end with
+    // SECTION_07_REF text followed by the closer suffix.
+    const lead = document.querySelector("header p")!;
+    expect(lead.textContent?.endsWith(METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX)).toBe(true);
   });
 
   it("§05 surfaces METHODE_S05_LOCALSTORAGE_CODE_LABEL inside a <code> tag (browser-API anchor)", () => {

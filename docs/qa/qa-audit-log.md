@@ -4251,3 +4251,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `METHODE_S04_RANK_OPENER_PREFIX\|METHODE_S04_RANK_BRIDGE_SEPARATOR\|METHODE_S05_LOCALSTORAGE_CODE_LABEL\|DEMO_FALLBACK_TITLE_SUFFIX\|DEMO_FALLBACK_ARIA_SUFFIX` src/ tests/ → 18+ résultats
 - [ ] grep `"Le ranking apparaît à partir"\|">localStorage<"\|"pas un scrutin AN réel"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~1059 tests` CLAUDE.md → 0 résultat (aligné sur ~1078)
+
+## Session 182 — 2026-05-18
+
+### Vérification session 181
+
+- [VERIFIED] 48 occurrences des nouveaux exports (METHODE_S04_RANK_OPENER_PREFIX/_BRIDGE_SEPARATOR + METHODE_S05_LOCALSTORAGE_CODE_LABEL + DEMO_FALLBACK_TITLE_SUFFIX/_ARIA_SUFFIX)
+- [VERIFIED] 1 occurrence inline literal = 1 pin-the-value test assert (clean)
+- [VERIFIED] CLAUDE.md "~1059 tests" → 0 résultat (aligné sur ~1078)
+- 1078/1078 tests verts, typecheck clean
+
+### Bugs fixés (RESULT_PERSONNALITES_EXCLUSIONS_NOTE + METHODE_S04_RANK_ORDINAL_MARKER + METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX)
+
+- [FIXED] Result.tsx personality-exclusion disclosure paragraph (4 sentences listing the 6 excluded political figures + their reasons) inline + untested. Drift surface : load-bearing transparency claim qui documente WHY Mélenchon/Philippe/Glucksmann/Tondelier (ne siègent pas dans la 17ᵉ législature) et Bardella (élu 2024 + démissionné) et Darmanin (ministre + suppléant vote à sa place) ne sont PAS dans le 8-personnalités V2 set. Paired avec la documentation CLAUDE.md "Exclus par contrainte structurelle". Si l'équipe ajoute/retire une personnalité du set V2, cette disclosure DOIT être updated en lockstep — sans le pin, la disclosure visible désync silencieusement de la actual exclusion logic. Fix : export `RESULT_PERSONNALITES_EXCLUSIONS_NOTE`. Result.tsx utilise la const. Aria-labels tests : 6 (contains "votes effectifs à l'Assemblée Nationale" data-provenance opener + names all 4 ne-siègent-pas exclusions [Mélenchon, Philippe, Glucksmann, Tondelier] anti-drop + names 2 special-case exclusions [Bardella démissionné + Darmanin ministre] + "17ᵉ législature" anti-legislature-drift sync-with-LEGISLATURE_LABEL + "son suppléant vote à sa place" Darmanin-specific clause + endsWith "Aucun d'eux n'est mesuré ici." anti-soften final-claim closer). · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode.tsx §04 `<sup>e</sup>` literal `"e"` inline (French ordinal superscript marker for the rank threshold like "19e") + untested. Drift surface : tiny mais load-bearing French typography convention. L'Académie française ordinal usage est "Ne" en superscript, PAS "ème" full-form. Un drift en "ème" ou asciification (dropping the sup wrapper) changerait la typographie. Fix : export `METHODE_S04_RANK_ORDINAL_MARKER`. Methode.tsx utilise la const dans le `<sup>`. Methode test : 1 querySelectorAll("sup") + find par textContent === const (catches unwrap or asciify). Aria-labels tests : 3 (pin-the-value + single-lowercase-char French-ordinal-convention + exact "e" anti-drift-to-"ème"/"E"/"é" defense-in-depth pin). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode.tsx page-lead `).` after the `#methode-07` link inline + untested. Drift surface : closes la parenthèse ouverte par METHODE_PAGE_LEAD_TAIL ("(voir ") + termine la phrase avec le period. Le 2-char suffix est small mais compositionally load-bearing — drop le `)` → unbalanced parens, drop le `.` → no sentence terminator. Pairs avec METHODE_PAGE_LEAD_TAIL via composition invariant. Fix : export `METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX`. Methode.tsx utilise la const après le `</a>`. Methode test : 1 lead textContent endsWith assertion. Aria-labels tests : 4 (pin-the-value ").":") + exactly-2-chars anti-overgrowth + startsWith ")" + sync invariant que METHODE_PAGE_LEAD_TAIL endsWith "(voir " (compositional pair) + endsWith "." sentence-terminator guard). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 183
+
+- [ ] grep `RESULT_PERSONNALITES_EXCLUSIONS_NOTE\|METHODE_S04_RANK_ORDINAL_MARKER\|METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX` src/ tests/ → 15+ résultats
+- [ ] grep `"Mélenchon, Philippe, Glucksmann"\|"Bardella, élu en 2024"\|"son suppléant vote"` src/ tests/ → 1-2 résultats (déclaration uniquement, pas de pin-the-value inline)
+- [ ] grep `~1078 tests` CLAUDE.md → 0 résultat (aligné sur ~1093)
