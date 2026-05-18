@@ -13,7 +13,7 @@ import {
   BUTTON_ARROW_RIGHT_PREFIX, BUTTON_ICON_MAIL,
   MODAL_CLOSE_GLYPH,
   METHODESHEET_BLOCK_EMOJI_AN, METHODESHEET_BLOCK_EMOJI_CLAUDE,
-  METHODE_SHEET_BACKDROP_TESTID,
+  METHODE_SHEET_BACKDROP_TESTID, METHODE_SHEET_TITLE_ID,
 } from "../types";
 import { useModalA11y } from "../hooks/useModalA11y";
 
@@ -55,7 +55,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
             ref={dialogRef}
             role="dialog"
             aria-modal="true"
-            aria-labelledby="methode-sheet-title"
+            aria-labelledby={METHODE_SHEET_TITLE_ID}
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
@@ -82,7 +82,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
               display: "flex", justifyContent: "space-between", alignItems: "center",
               borderBottom: "1px solid var(--line)", paddingBottom: 12,
             }}>
-              <h2 id="methode-sheet-title" style={{
+              <h2 id={METHODE_SHEET_TITLE_ID} style={{
                 margin: 0,
                 fontFamily: "var(--font-mono)", fontSize: 11,
                 letterSpacing: "0.14em", textTransform: "uppercase",

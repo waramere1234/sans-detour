@@ -4,7 +4,7 @@ import {
   DEMO_DATA_LABEL_PREFIX, DEMO_FALLBACK_SHORT_LABEL,
   DEMO_FALLBACK_TITLE_SUFFIX, DEMO_FALLBACK_ARIA_SUFFIX,
   AUDIT_GLYPH_ALIGNED, AUDIT_GLYPH_PARTIAL, AUDIT_GLYPH_OPPOSED, AUDIT_GLYPH_DIVIDED,
-  AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX,
+  AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX, AUDIT_TRAIL_HEADING_ID_PREFIX,
   AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
   AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
   auditTrailChipNoun, AN_LINK_SHORT_LABEL,
@@ -60,7 +60,7 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
     <section
       id={id}
       role="region"
-      aria-labelledby={`audit-heading-${alignment.group}`}
+      aria-labelledby={`${AUDIT_TRAIL_HEADING_ID_PREFIX}${alignment.group}`}
       style={{
         background: "var(--bg-2)",
         border: "1px solid var(--line)",
@@ -75,7 +75,7 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
         deep-detail section under Result.tsx's h1 + future h2 grouping —
         nesting keeps the heading rotor navigable for SR users. */}
       <h3
-        id={`audit-heading-${alignment.group}`}
+        id={`${AUDIT_TRAIL_HEADING_ID_PREFIX}${alignment.group}`}
         style={{
           fontFamily: "var(--font-sans)", fontWeight: 600,
           fontSize: 14, color: "var(--ink)",

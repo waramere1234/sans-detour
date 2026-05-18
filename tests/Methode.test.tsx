@@ -21,6 +21,7 @@ import {
   METHODE_S04_RANK_OPENER_PREFIX, METHODE_S04_RANK_BRIDGE_SEPARATOR,
   METHODE_S05_LOCALSTORAGE_CODE_LABEL,
   METHODE_S04_RANK_ORDINAL_MARKER, METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX,
+  METHODE_SECTION_ID_PREFIX, METHODE_SECTION_HEADING_ID_PREFIX,
   METHODE_S01_UPDATE_CADENCE,
   METHODE_S05_NO_TRACKING_PHRASE,
   METHODE_S03_GROUP_INTRO,
@@ -80,11 +81,11 @@ describe("Methode — section structure", () => {
     // and forces a matching <Section> body to be rendered.
     renderMethode();
     for (const [n] of METHODE_SECTIONS) {
-      const section = document.getElementById(`methode-${n}`);
+      const section = document.getElementById(`${METHODE_SECTION_ID_PREFIX}${n}`);
       expect(section).not.toBeNull();
       // Each section is a region landmark with a labelled-by heading.
       expect(section).toHaveAttribute("role", "region");
-      expect(section).toHaveAttribute("aria-labelledby", `methode-heading-${n}`);
+      expect(section).toHaveAttribute("aria-labelledby", `${METHODE_SECTION_HEADING_ID_PREFIX}${n}`);
     }
   });
 
@@ -92,7 +93,7 @@ describe("Methode — section structure", () => {
     renderMethode();
     for (const [n] of METHODE_SECTIONS) {
       const links = screen.getAllByRole("link");
-      const target = links.find((a) => a.getAttribute("href") === `#methode-${n}`);
+      const target = links.find((a) => a.getAttribute("href") === `#${METHODE_SECTION_ID_PREFIX}${n}`);
       expect(target).toBeTruthy();
     }
   });
@@ -108,7 +109,7 @@ describe("Methode — section structure", () => {
     for (const [n] of METHODE_SECTIONS) {
       const expected = METHODE_SECTION_BODY_TITLES[n];
       // Section renders the title in an h2 with id=`methode-heading-${n}`.
-      const heading = document.getElementById(`methode-heading-${n}`);
+      const heading = document.getElementById(`${METHODE_SECTION_HEADING_ID_PREFIX}${n}`);
       expect(heading).not.toBeNull();
       expect(heading!.textContent).toContain(expected);
     }
@@ -479,7 +480,7 @@ describe("Methode — TOC analytics (methode_toc_click × N sections)", () => {
     for (const [n] of METHODE_SECTIONS) {
       trackSpy.mockClear();
       const link = Array.from(sommaire.querySelectorAll("a")).find(
-        (a) => a.getAttribute("href") === `#methode-${n}`,
+        (a) => a.getAttribute("href") === `#${METHODE_SECTION_ID_PREFIX}${n}`,
       );
       expect(link).toBeTruthy();
       fireEvent.click(link!);

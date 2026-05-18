@@ -123,6 +123,9 @@ import {
   NAV_TARGET_RESULT, NAV_TARGET_METHODE, NAV_TARGET_LEGAL, NAV_TARGET_CONTACT,
   SKELETON_SHIMMER_CLASS,
   METHODE_SHEET_BACKDROP_TESTID,
+  METHODE_SHEET_TITLE_ID, RESULT_PERSONNALITES_PANEL_ID,
+  METHODE_SECTION_ID_PREFIX, METHODE_SECTION_HEADING_ID_PREFIX,
+  AUDIT_TRAIL_HEADING_ID_PREFIX, AUDIT_TRAIL_PANEL_ID_PREFIX,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -3857,6 +3860,96 @@ describe("METHODE_SHEET_BACKDROP_TESTID — paired source/test selector", () => 
 
   it("has no whitespace (single attribute value)", () => {
     expect(METHODE_SHEET_BACKDROP_TESTID).not.toMatch(/\s/);
+  });
+});
+
+describe("METHODE_SHEET_TITLE_ID + RESULT_PERSONNALITES_PANEL_ID — paired aria-labelledby/aria-controls ids", () => {
+  it("METHODE_SHEET_TITLE_ID matches 'methode-sheet-title' (pin-the-value)", () => {
+    expect(METHODE_SHEET_TITLE_ID).toBe("methode-sheet-title");
+  });
+
+  it("RESULT_PERSONNALITES_PANEL_ID matches 'personnalites-panel' (pin-the-value)", () => {
+    expect(RESULT_PERSONNALITES_PANEL_ID).toBe("personnalites-panel");
+  });
+
+  it("both ids are kebab-case (DOM-id naming convention)", () => {
+    expect(METHODE_SHEET_TITLE_ID).toMatch(/^[a-z]+(-[a-z]+)+$/);
+    expect(RESULT_PERSONNALITES_PANEL_ID).toMatch(/^[a-z]+(-[a-z]+)+$/);
+  });
+
+  it("both ids are distinct (no accidental shared id collision)", () => {
+    expect(METHODE_SHEET_TITLE_ID).not.toBe(RESULT_PERSONNALITES_PANEL_ID);
+  });
+
+  it("neither id has whitespace (single DOM attribute value)", () => {
+    expect(METHODE_SHEET_TITLE_ID).not.toMatch(/\s/);
+    expect(RESULT_PERSONNALITES_PANEL_ID).not.toMatch(/\s/);
+  });
+});
+
+describe("METHODE_SECTION_ID_PREFIX + METHODE_SECTION_HEADING_ID_PREFIX — Methode id template prefixes", () => {
+  it("SECTION_ID_PREFIX matches 'methode-' (pin-the-value)", () => {
+    expect(METHODE_SECTION_ID_PREFIX).toBe("methode-");
+  });
+
+  it("SECTION_HEADING_ID_PREFIX matches 'methode-heading-' (pin-the-value)", () => {
+    expect(METHODE_SECTION_HEADING_ID_PREFIX).toBe("methode-heading-");
+  });
+
+  it("HEADING_ID_PREFIX starts with SECTION_ID_PREFIX (paired-prefix invariant)", () => {
+    // Compositional invariant: the heading-id prefix builds on the
+    // section-id prefix ("methode-heading-" derives from "methode-").
+    // A future tweak that breaks the relationship would silently desync
+    // the section/heading naming convention.
+    expect(METHODE_SECTION_HEADING_ID_PREFIX.startsWith(METHODE_SECTION_ID_PREFIX)).toBe(true);
+  });
+
+  it("both prefixes end with '-' (kebab-case template glue)", () => {
+    expect(METHODE_SECTION_ID_PREFIX.endsWith("-")).toBe(true);
+    expect(METHODE_SECTION_HEADING_ID_PREFIX.endsWith("-")).toBe(true);
+  });
+
+  it("composing `${SECTION_ID_PREFIX}07` produces the canonical section id 'methode-07'", () => {
+    // Round-trip the canonical §07 deep-link id via the prefix.
+    expect(`${METHODE_SECTION_ID_PREFIX}07`).toBe("methode-07");
+  });
+
+  it("composing `${SECTION_HEADING_ID_PREFIX}07` produces 'methode-heading-07'", () => {
+    expect(`${METHODE_SECTION_HEADING_ID_PREFIX}07`).toBe("methode-heading-07");
+  });
+});
+
+describe("AUDIT_TRAIL_HEADING_ID_PREFIX + AUDIT_TRAIL_PANEL_ID_PREFIX — AuditTrail id template prefixes", () => {
+  it("HEADING_ID_PREFIX matches 'audit-heading-' (pin-the-value)", () => {
+    expect(AUDIT_TRAIL_HEADING_ID_PREFIX).toBe("audit-heading-");
+  });
+
+  it("PANEL_ID_PREFIX matches 'audit-trail-' (pin-the-value)", () => {
+    expect(AUDIT_TRAIL_PANEL_ID_PREFIX).toBe("audit-trail-");
+  });
+
+  it("both prefixes start with 'audit-' (paired-prefix-family invariant)", () => {
+    // Both ids belong to the audit-trail UI family. Pin the shared
+    // "audit-" stem so a future rebrand doesn't accidentally rename
+    // only one of the two.
+    expect(AUDIT_TRAIL_HEADING_ID_PREFIX.startsWith("audit-")).toBe(true);
+    expect(AUDIT_TRAIL_PANEL_ID_PREFIX.startsWith("audit-")).toBe(true);
+  });
+
+  it("both prefixes end with '-' (kebab-case template glue)", () => {
+    expect(AUDIT_TRAIL_HEADING_ID_PREFIX.endsWith("-")).toBe(true);
+    expect(AUDIT_TRAIL_PANEL_ID_PREFIX.endsWith("-")).toBe(true);
+  });
+
+  it("HEADING and PANEL prefixes are distinct (no collision when groups overlap)", () => {
+    // Both prefixes get a group-code suffix ("audit-heading-LFI" +
+    // "audit-trail-LFI"). They must be distinct stems so the IDs
+    // don't collide on the same alignment.group.
+    expect(AUDIT_TRAIL_HEADING_ID_PREFIX).not.toBe(AUDIT_TRAIL_PANEL_ID_PREFIX);
+  });
+
+  it("composing `${HEADING_ID_PREFIX}LFI` produces 'audit-heading-LFI'", () => {
+    expect(`${AUDIT_TRAIL_HEADING_ID_PREFIX}LFI`).toBe("audit-heading-LFI");
   });
 });
 

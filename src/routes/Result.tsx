@@ -30,6 +30,8 @@ import {
   RESULT_CONTINUE_TEST_PAREN_PREFIX, RESULT_CONTINUE_TEST_PAREN_SUFFIX,
   BUTTON_ARROW_RIGHT_PREFIX, BUTTON_ICON_SHARE,
   DISCLOSURE_GLYPH_OPEN, DISCLOSURE_GLYPH_CLOSED,
+  RESULT_PERSONNALITES_PANEL_ID,
+  AUDIT_TRAIL_PANEL_ID_PREFIX,
   type Scrutin, type GroupCode,
 } from "../types";
 
@@ -193,7 +195,7 @@ export default function Result() {
           {RESULT_GROUPS_H2}
         </h2>
         {ranked.map(a => {
-          const panelId = `audit-trail-${a.group}`;
+          const panelId = `${AUDIT_TRAIL_PANEL_ID_PREFIX}${a.group}`;
           return (
             <div key={a.group}>
               <PartyRow
@@ -233,7 +235,7 @@ export default function Result() {
             // gated on `showPersonnalites`). Pointing at a non-existent id is
             // undefined per WAI-ARIA and triggers warnings in some SR/devtool
             // combos — same fix session 87 applied to PartyRow.
-            aria-controls={showPersonnalites ? "personnalites-panel" : undefined}
+            aria-controls={showPersonnalites ? RESULT_PERSONNALITES_PANEL_ID : undefined}
           >
             <span><span aria-hidden="true">{showPersonnalites ? DISCLOSURE_GLYPH_OPEN : DISCLOSURE_GLYPH_CLOSED} </span>{PERSONNALITES_TOGGLE_LABEL}</span>
             <span style={{
@@ -243,7 +245,7 @@ export default function Result() {
           </button>
 
           {showPersonnalites && (
-            <div id="personnalites-panel">
+            <div id={RESULT_PERSONNALITES_PANEL_ID}>
               <h2 style={{
                 margin: "0 0 6px",
                 fontFamily: "var(--font-mono)", fontSize: 10.5,

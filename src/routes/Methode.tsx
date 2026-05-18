@@ -45,6 +45,7 @@ import {
   METHODE_S05_LOCALSTORAGE_CODE_LABEL,
   METHODE_S04_RANK_ORDINAL_MARKER, METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX,
   H1_ACCENT_PERIOD,
+  METHODE_SECTION_ID_PREFIX, METHODE_SECTION_HEADING_ID_PREFIX,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -168,7 +169,7 @@ export default function Methode() {
         {METHODE_SECTIONS.map(([n, label]) => (
           <a
             key={n}
-            href={`#methode-${n}`}
+            href={`#${METHODE_SECTION_ID_PREFIX}${n}`}
             onClick={() => track("methode_toc_click", { section: n })}
             style={{
               color: "var(--ink-2)", textDecoration: "none",
@@ -257,7 +258,7 @@ export default function Methode() {
 }
 
 function Section({ n, title, children }: { n: string; title: string; children: ReactNode }) {
-  const headingId = `methode-heading-${n}`;
+  const headingId = `${METHODE_SECTION_HEADING_ID_PREFIX}${n}`;
   return (
     // id is `methode-NN` so cross-section references (e.g. "voir section 07"
     // in §04 intro) can use `<a href="#methode-07">` to deep-link. Without an
@@ -269,7 +270,7 @@ function Section({ n, title, children }: { n: string; title: string; children: R
     // with their titles (else they were anonymous divs in the landmark
     // tree, indistinguishable from each other).
     <div
-      id={`methode-${n}`}
+      id={`${METHODE_SECTION_ID_PREFIX}${n}`}
       role="region"
       aria-labelledby={headingId}
       // tabIndex=-1 makes the div programmatically focusable so browsers

@@ -4456,3 +4456,23 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `NAV_TARGET_RESULT\|NAV_TARGET_METHODE\|NAV_TARGET_LEGAL\|NAV_TARGET_CONTACT\|SKELETON_SHIMMER_CLASS\|METHODE_SHEET_BACKDROP_TESTID` src/ tests/ → 25+ résultats
 - [ ] grep `'target: "[a-z]+"'\|'className="skeleton-shimmer"'\|'"methode-sheet-backdrop"'` src/ tests/ → 0-1 résultats (declarations + pin-the-value tests uniquement)
 - [ ] grep `~1216 tests` CLAUDE.md → 0 résultat (aligné sur ~1228)
+
+## Session 192 — 2026-05-18
+
+### Vérification session 191
+
+- [VERIFIED] 61 occurrences des nouveaux exports (NAV_TARGET_* + SKELETON_SHIMMER_CLASS + METHODE_SHEET_BACKDROP_TESTID)
+- [VERIFIED] CLAUDE.md "~1216 tests" → 0 résultat (aligné sur ~1228)
+- 1228/1228 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_SHEET_TITLE_ID + RESULT_PERSONNALITES_PANEL_ID + METHODE_SECTION_ID_PREFIX/_HEADING_ID_PREFIX + AUDIT_TRAIL_HEADING_ID_PREFIX/_PANEL_ID_PREFIX)
+
+- [FIXED] Paired aria-labelledby/aria-controls IDs : MethodeSheet `"methode-sheet-title"` inline 2× (aria-labelledby ligne 58 + h2 id ligne 85) + Result `"personnalites-panel"` inline 2× (aria-controls ligne 236 + div id ligne 246). Drift surface : un rename source-side sur un des 2 sites desyncerait silencieusement la SR dialog-title association (MethodeSheet) ou la SR disclosure affordance (Result). Fix : export `METHODE_SHEET_TITLE_ID` + `RESULT_PERSONNALITES_PANEL_ID`. MethodeSheet.tsx + Result.tsx utilisent les consts dans leurs 2 sites paired chacun. Aria-labels tests : 5 (canonical × 2 + kebab-case naming convention × 2 + distinct anti-collision + no-whitespace × 2). · `src/types/index.ts`, `src/components/MethodeSheet.tsx`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode section id template prefixes `"methode-"` + `"methode-heading-"` inline 4 source sites + 4 test sites. Drift surface : template-literal prefixes utilisés pour `id={\`methode-\${n}\`}` (section ids), `id={\`methode-heading-\${n}\`}` (heading ids), `href={\`#methode-\${n}\`}` (TOC anchor refs). Tests utilisent les mêmes templates pour round-trip. Un rename du prefix (e.g., "section-") doit propager 4 source + 4 test in lockstep. Le HEADING prefix doit start avec le SECTION prefix (compositional invariant). Fix : export `METHODE_SECTION_ID_PREFIX` + `METHODE_SECTION_HEADING_ID_PREFIX`. Methode.tsx utilise les 2 consts dans le Section component template + le TOC href. Methode.test.tsx round-trip via les consts. Aria-labels tests : 6 (canonical × 2 + HEADING.startsWith(SECTION) paired-prefix invariant + both endsWith "-" kebab-glue + canonical composed-template round-trip × 2). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] AuditTrail id template prefixes `"audit-heading-"` + `"audit-trail-"` inline 2 source sites + 4 test sites. Drift surface : `audit-heading-` est utilisé 2× dans AuditTrail.tsx pour la h3 id + region aria-labelledby ; `audit-trail-` est le panelId composé dans Result.tsx via `\`audit-trail-\${a.group}\`` puis passé comme `id={panelId}`. Les 2 prefixes belong à la même AuditTrail UI family (shared "audit-" stem). Un rename one-side seulement breakerait silencieusement les SR landmarks ou la aria-controls association. Fix : export `AUDIT_TRAIL_HEADING_ID_PREFIX` + `AUDIT_TRAIL_PANEL_ID_PREFIX`. AuditTrail.tsx + Result.tsx utilisent les consts. AuditTrail tests round-trip via les consts. Aria-labels tests : 6 (canonical × 2 + both startsWith "audit-" family-stem invariant + both endsWith "-" kebab-glue + HEADING !== PANEL anti-collision + canonical composed-template round-trip). · `src/types/index.ts`, `src/components/AuditTrail.tsx`, `src/routes/Result.tsx`, `tests/AuditTrail.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 193
+
+- [ ] grep `METHODE_SHEET_TITLE_ID\|RESULT_PERSONNALITES_PANEL_ID\|METHODE_SECTION_ID_PREFIX\|METHODE_SECTION_HEADING_ID_PREFIX\|AUDIT_TRAIL_HEADING_ID_PREFIX\|AUDIT_TRAIL_PANEL_ID_PREFIX` src/ tests/ → 25+ résultats
+- [ ] grep `'"methode-sheet-title"'\|'"personnalites-panel"'\|'"audit-heading-LFI"'\|'"audit-trail-LFI"'` src/ tests/ → 0 résultats (tout via les consts)
+- [ ] grep `~1228 tests` CLAUDE.md → 0 résultat (aligné sur ~1245)

@@ -1371,6 +1371,49 @@ export const SKELETON_SHIMMER_CLASS = "skeleton-shimmer";
  *  test instead of silently breaking the backdrop-close test pin. */
 export const METHODE_SHEET_BACKDROP_TESTID = "methode-sheet-backdrop";
 
+/** MethodeSheet title id — used 2× in the same file: as the `id=` on
+ *  the h2 title AND as the `aria-labelledby=` on the role=dialog
+ *  motion.div. A rename on one side without the other silently
+ *  breaks the SR dialog-title association. Pin so the 2 sites stay
+ *  in sync via a single edit. */
+export const METHODE_SHEET_TITLE_ID = "methode-sheet-title";
+
+/** Result.tsx personnalites disclosure panel id — used 2× in the
+ *  same file: as the `id=` on the disclosure-revealed div AND as
+ *  the `aria-controls=` on the toggle button. aria-controls points
+ *  at an id; a rename desync silently breaks the SR disclosure
+ *  affordance. Pin so both sites stay in sync. */
+export const RESULT_PERSONNALITES_PANEL_ID = "personnalites-panel";
+
+/** Methode section-id template prefix — composed via template
+ *  literals as `${PREFIX}${n}` (e.g., "methode-07") in 4 source
+ *  sites:
+ *    - TOC anchor href:      `#${PREFIX}${n}`
+ *    - Section id:           `${PREFIX}${n}`
+ *    - Page-lead deep-link:  inline `"#methode-07"` literal (cross-ref)
+ *    - SPA hash-scroll handler reads `location.hash` against the same prefix
+ *  Tests pin the round-trip via the same template. A future rename of
+ *  the prefix (e.g., to "section-") needs to land on all 4 source sites
+ *  + tests in lockstep — centralising forces that sync. */
+export const METHODE_SECTION_ID_PREFIX = "methode-";
+
+/** Methode section-heading-id template prefix — composed as
+ *  `${PREFIX}${n}` (e.g., "methode-heading-07") for the h2 id inside
+ *  each Section component. The section wrapper points its
+ *  aria-labelledby at this id. Pin paired with METHODE_SECTION_ID_PREFIX
+ *  so both prefixes stay related (METHODE_SECTION + "heading-" → heading id). */
+export const METHODE_SECTION_HEADING_ID_PREFIX = "methode-heading-";
+
+/** AuditTrail h3 heading-id + region id prefixes — composed as
+ *  `${PREFIX}${group}` (e.g., "audit-heading-LFI" + "audit-trail-LFI").
+ *  HEADING_ID_PREFIX is used 2× in AuditTrail.tsx (h3 id + region
+ *  aria-labelledby); PANEL_ID_PREFIX appears as the runtime panelId
+ *  passed from Result.tsx via `id={panelId}` and matched against the
+ *  PartyRow aria-controls. Pin both so renames stay in sync across
+ *  files. */
+export const AUDIT_TRAIL_HEADING_ID_PREFIX = "audit-heading-";
+export const AUDIT_TRAIL_PANEL_ID_PREFIX = "audit-trail-";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

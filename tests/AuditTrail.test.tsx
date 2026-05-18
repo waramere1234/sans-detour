@@ -4,6 +4,7 @@ import { AuditTrail } from "../src/components/AuditTrail";
 import {
   anScrutinViewAriaLabel, DEMO_FALLBACK_SHORT_LABEL,
   DEMO_DATA_LABEL_PREFIX, DEMO_FALLBACK_TITLE_SUFFIX, DEMO_FALLBACK_ARIA_SUFFIX,
+  AUDIT_TRAIL_HEADING_ID_PREFIX, AUDIT_TRAIL_PANEL_ID_PREFIX,
   AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
   AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
   auditTrailChipText,
@@ -61,14 +62,14 @@ describe("AuditTrail — region landmark", () => {
   it("renders as a region with aria-labelledby pointing at the heading", () => {
     render(<AuditTrail alignment={mkAlign()} scrutins={[]} votes={[]} />);
     const region = screen.getByRole("region");
-    expect(region).toHaveAttribute("aria-labelledby", "audit-heading-LFI");
+    expect(region).toHaveAttribute("aria-labelledby", `${AUDIT_TRAIL_HEADING_ID_PREFIX}LFI`);
     // The h3 with that id contains the group code + party name.
-    expect(document.getElementById("audit-heading-LFI")).not.toBeNull();
+    expect(document.getElementById(`${AUDIT_TRAIL_HEADING_ID_PREFIX}LFI`)).not.toBeNull();
   });
 
   it("uses the optional `id` prop on the section (aria-controls pairing)", () => {
-    render(<AuditTrail alignment={mkAlign()} scrutins={[]} votes={[]} id="audit-trail-LFI" />);
-    expect(screen.getByRole("region")).toHaveAttribute("id", "audit-trail-LFI");
+    render(<AuditTrail alignment={mkAlign()} scrutins={[]} votes={[]} id={`${AUDIT_TRAIL_PANEL_ID_PREFIX}LFI`} />);
+    expect(screen.getByRole("region")).toHaveAttribute("id", `${AUDIT_TRAIL_PANEL_ID_PREFIX}LFI`);
   });
 });
 
