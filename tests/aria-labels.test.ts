@@ -104,6 +104,9 @@ import {
   CARD_FOOTER_NUMERO_PREFIX, CARD_FOOTER_DATE_SEPARATOR,
   MIDDLE_DOT_SEPARATOR,
   SHARE_LEAD_TO_SOURCE_SEPARATOR, SHARE_LEAD_TO_SUMMARY_SEPARATOR,
+  VOTE_GLYPH_CONTRE, VOTE_GLYPH_SKIP, VOTE_GLYPH_POUR,
+  BUTTON_ICON_RESTART,
+  RESULT_CONTINUE_TEST_PAREN_PREFIX, RESULT_CONTINUE_TEST_PAREN_SUFFIX,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -3189,6 +3192,103 @@ describe("SHARE_LEAD_TO_SOURCE_SEPARATOR + SHARE_LEAD_TO_SUMMARY_SEPARATOR — s
     // from the summary. A copy-paste collapse to one shared const
     // would render incorrect French typography.
     expect(SHARE_LEAD_TO_SOURCE_SEPARATOR).not.toBe(SHARE_LEAD_TO_SUMMARY_SEPARATOR);
+  });
+});
+
+describe("VOTE_GLYPH_CONTRE/SKIP/POUR — Play vote-button arrow glyphs (1:1 with VOTE_LABEL_*)", () => {
+  it("VOTE_GLYPH_CONTRE matches '← ' (left-arrow + space)", () => {
+    expect(VOTE_GLYPH_CONTRE).toBe("← ");
+  });
+
+  it("VOTE_GLYPH_SKIP matches '↓ ' (down-arrow + space)", () => {
+    expect(VOTE_GLYPH_SKIP).toBe("↓ ");
+  });
+
+  it("VOTE_GLYPH_POUR matches ' →' (space + right-arrow, suffix-style)", () => {
+    expect(VOTE_GLYPH_POUR).toBe(" →");
+  });
+
+  it("CONTRE arrow is left-pointing U+2190 (matches swipe-left affordance)", () => {
+    // The Cover swipe-legend shows ← for contre. Play must use the
+    // same glyph so the affordance preview matches the actual button.
+    expect(VOTE_GLYPH_CONTRE).toContain("←");
+    expect(VOTE_GLYPH_CONTRE.charCodeAt(0)).toBe(0x2190);
+  });
+
+  it("SKIP arrow is down-pointing U+2193 (matches swipe-down affordance)", () => {
+    expect(VOTE_GLYPH_SKIP).toContain("↓");
+    expect(VOTE_GLYPH_SKIP.charCodeAt(0)).toBe(0x2193);
+  });
+
+  it("POUR arrow is right-pointing U+2192 (matches swipe-right affordance)", () => {
+    expect(VOTE_GLYPH_POUR).toContain("→");
+    // POUR is suffix-style so the arrow is the SECOND char (after leading space).
+    expect(VOTE_GLYPH_POUR.charCodeAt(1)).toBe(0x2192);
+  });
+
+  it("CONTRE/SKIP are prefix-style (glyph + space), POUR is suffix-style (space + glyph)", () => {
+    // Anti-position-flip guard: a future edit that reverses the
+    // POUR positioning (or swaps any of the 3 between prefix/suffix)
+    // would render inconsistent buttons. The directionality matters:
+    // pour points rightward → glyph trails the label.
+    expect(VOTE_GLYPH_CONTRE.endsWith(" ")).toBe(true);
+    expect(VOTE_GLYPH_SKIP.endsWith(" ")).toBe(true);
+    expect(VOTE_GLYPH_POUR.startsWith(" ")).toBe(true);
+  });
+
+  it("all 3 glyphs are exactly 2 chars long (1 arrow + 1 space)", () => {
+    expect(VOTE_GLYPH_CONTRE).toHaveLength(2);
+    expect(VOTE_GLYPH_SKIP).toHaveLength(2);
+    expect(VOTE_GLYPH_POUR).toHaveLength(2);
+  });
+});
+
+describe("BUTTON_ICON_RESTART — Result restart-icon glyph (continue-refine + refaire)", () => {
+  it("matches the canonical '↻ ' (pin-the-value)", () => {
+    expect(BUTTON_ICON_RESTART).toBe("↻ ");
+  });
+
+  it("uses cycle arrow U+21BB (anti-replace guard)", () => {
+    // The clockwise open-circle arrow ↻ (U+21BB) signals "redo from
+    // start". A drift to ↺ (counterclockwise) or 🔄 (emoji) would
+    // change the visual semantics or the rendering register.
+    expect(BUTTON_ICON_RESTART).toContain("↻");
+    expect(BUTTON_ICON_RESTART.charCodeAt(0)).toBe(0x21BB);
+  });
+
+  it("ends with a trailing space (glue cadence before the label)", () => {
+    // The trailing space lets `{GLYPH}{LABEL}` render flush without
+    // manual spacing. A drop would render "↻Refaire" jammed.
+    expect(BUTTON_ICON_RESTART.endsWith(" ")).toBe(true);
+  });
+});
+
+describe("RESULT_CONTINUE_TEST_PAREN_PREFIX + _SUFFIX — Result continue-test button paren wrapper", () => {
+  it("PREFIX matches the canonical ' (' (pin-the-value)", () => {
+    expect(RESULT_CONTINUE_TEST_PAREN_PREFIX).toBe(" (");
+  });
+
+  it("SUFFIX matches the canonical ')' (pin-the-value)", () => {
+    expect(RESULT_CONTINUE_TEST_PAREN_SUFFIX).toBe(")");
+  });
+
+  it("PREFIX starts with space + open-paren (separates from CONTINUE_TEST_LABEL_PREFIX)", () => {
+    expect(RESULT_CONTINUE_TEST_PAREN_PREFIX.startsWith(" ")).toBe(true);
+    expect(RESULT_CONTINUE_TEST_PAREN_PREFIX).toContain("(");
+  });
+
+  it("PREFIX contains '(' and SUFFIX contains ')' (balanced parenthesis discipline)", () => {
+    const openCount = (RESULT_CONTINUE_TEST_PAREN_PREFIX.match(/\(/g) || []).length;
+    const closeCount = (RESULT_CONTINUE_TEST_PAREN_SUFFIX.match(/\)/g) || []).length;
+    expect(openCount).toBe(1);
+    expect(closeCount).toBe(1);
+  });
+
+  it("matches RESULT_H1_PERCENT_WRAPPER_PREFIX (same compositional pattern)", () => {
+    // Both consts open " (" for a numeric interpolation. Pin the
+    // value equality so the 2 compositional surfaces stay typographically
+    // consistent. A future change to one should land alongside the other.
+    expect(RESULT_CONTINUE_TEST_PAREN_PREFIX).toBe(RESULT_H1_PERCENT_WRAPPER_PREFIX);
   });
 });
 

@@ -4314,3 +4314,23 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `MIDDLE_DOT_SEPARATOR\|SHARE_LEAD_TO_SOURCE_SEPARATOR\|SHARE_LEAD_TO_SUMMARY_SEPARATOR` src/ tests/ → 15+ résultats
 - [ ] grep `'" · "'\|'", "'\|'" : "'` src/ tests/ → ~3-5 résultats (declarations + pin-the-value)
 - [ ] grep `~1110 tests` CLAUDE.md → 0 résultat (aligné sur ~1119)
+
+## Session 185 — 2026-05-18
+
+### Vérification session 184
+
+- [VERIFIED] 41 occurrences des nouveaux exports (MIDDLE_DOT_SEPARATOR + SHARE_LEAD_TO_SOURCE_SEPARATOR + SHARE_LEAD_TO_SUMMARY_SEPARATOR)
+- [VERIFIED] CLAUDE.md "~1110 tests" → 0 résultat (aligné sur ~1119)
+- 1119/1119 tests verts, typecheck clean
+
+### Bugs fixés (VOTE_GLYPH_CONTRE/_SKIP/_POUR + BUTTON_ICON_RESTART + RESULT_CONTINUE_TEST_PAREN_PREFIX/_SUFFIX)
+
+- [FIXED] Play vote-button aria-hidden arrow glyphs `"← "` + `"↓ "` + `" →"` inline (3 sites — contre/skip/pour buttons line 352/360/368) + untested. Drift surface : ces 3 arrows pair 1:1 avec VOTE_LABEL_CONTRE/SKIP/POUR et mirror la touch-gesture directions documented sur la Cover swipe-legend (← contre / ↓ skip / → pour). Un swap silently desyncerait les Play buttons du Cover affordance preview. POUR est suffix-style (` →`) tandis que CONTRE/SKIP sont prefix-style — la directionality est load-bearing (pour = rightward = glyph trails). Fix : export `VOTE_GLYPH_CONTRE` + `VOTE_GLYPH_SKIP` + `VOTE_GLYPH_POUR`. Play.tsx utilise les 3 consts. Aria-labels tests : 8 (canonical × 3 + Unicode codepoint defense-in-depth × 3 [U+2190 left + U+2193 down + U+2192 right] + prefix/suffix-style position contract + exactly-2-chars cadence guard). · `src/types/index.ts`, `src/routes/Play.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Result.tsx restart-icon `"↻ "` inline 2× (continue-refine button line 279 + refaire button line 281) + untested. Drift surface : cycle arrow U+21BB signals "redo from start". Le même glyph utilisé pour 2 boutons différents (continue-refine = post-completion only, refaire = always). Un drift vers ↺ (counterclockwise) ou 🔄 (emoji) changerait visual semantics ou rendering register. Fix : export `BUTTON_ICON_RESTART`. Result.tsx utilise la const dans les 2 boutons. Aria-labels tests : 3 (canonical + U+21BB cycle-arrow charCodeAt defense-in-depth + trailing-space glue-cadence). · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Result.tsx continue-test button paren wrapper `" ("` + `")"` inline (split autour de `{remaining} {continueTestRemainingSuffix(remaining)}` interpolation) + untested. Drift surface : same compositional pattern que RESULT_H1_PERCENT_WRAPPER_PREFIX mais pour un button différent. Le `(N remaining)` paren wrap docs la remaining-vote count. Un drop d'une moitié rendrait une parenthèse unbalanced. Fix : export `RESULT_CONTINUE_TEST_PAREN_PREFIX` + `RESULT_CONTINUE_TEST_PAREN_SUFFIX`. Result.tsx utilise la composition. Aria-labels tests : 5 (canonical PREFIX + canonical SUFFIX + PREFIX startsWith space + open-paren + balanced 1-open/1-close anti-nesting count + value-equals RESULT_H1_PERCENT_WRAPPER_PREFIX typography-consistency cross-check). · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 186
+
+- [ ] grep `VOTE_GLYPH_CONTRE\|VOTE_GLYPH_SKIP\|VOTE_GLYPH_POUR\|BUTTON_ICON_RESTART\|RESULT_CONTINUE_TEST_PAREN_PREFIX\|RESULT_CONTINUE_TEST_PAREN_SUFFIX` src/ tests/ → 18+ résultats
+- [ ] grep `'"← "'\|'"↓ "'\|'" →"'\|'"↻ "'` src/ tests/ → ~3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~1119 tests` CLAUDE.md → 0 résultat (aligné sur ~1135)

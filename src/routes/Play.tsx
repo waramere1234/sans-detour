@@ -22,6 +22,7 @@ import {
   VOTE_LABEL_CONTRE, VOTE_LABEL_SKIP, VOTE_LABEL_POUR,
   VOTE_ARIA_CONTRE, VOTE_ARIA_SKIP, VOTE_ARIA_POUR,
   PLAY_DECK_EXHAUSTED_MESSAGE, PLAY_EMPTY_POOL_MESSAGE, PLAY_SR_HEADING,
+  VOTE_GLYPH_CONTRE, VOTE_GLYPH_SKIP, VOTE_GLYPH_POUR,
   type Scrutin, type UserVote, type GroupCode, type GroupAlignment,
 } from "../types";
 
@@ -349,7 +350,7 @@ export default function Play() {
           aria-label={VOTE_ARIA_CONTRE}
           style={btnFallback("var(--contre)")}
         >
-          <span aria-hidden="true">← </span>{VOTE_LABEL_CONTRE}
+          <span aria-hidden="true">{VOTE_GLYPH_CONTRE}</span>{VOTE_LABEL_CONTRE}
         </button>
         <button
           type="button"
@@ -357,7 +358,7 @@ export default function Play() {
           aria-label={VOTE_ARIA_SKIP}
           style={btnFallback("var(--ink-2)")}
         >
-          <span aria-hidden="true">↓ </span>{VOTE_LABEL_SKIP}
+          <span aria-hidden="true">{VOTE_GLYPH_SKIP}</span>{VOTE_LABEL_SKIP}
         </button>
         <button
           type="button"
@@ -365,7 +366,7 @@ export default function Play() {
           aria-label={VOTE_ARIA_POUR}
           style={btnFallback("var(--pour)")}
         >
-          {VOTE_LABEL_POUR}<span aria-hidden="true"> →</span>
+          {VOTE_LABEL_POUR}<span aria-hidden="true">{VOTE_GLYPH_POUR}</span>
         </button>
       </div>
 

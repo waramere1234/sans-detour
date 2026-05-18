@@ -1172,6 +1172,37 @@ export const MIDDLE_DOT_SEPARATOR = " · ";
 export const SHARE_LEAD_TO_SOURCE_SEPARATOR = ", ";
 export const SHARE_LEAD_TO_SUMMARY_SEPARATOR = " : ";
 
+/** Play vote-button aria-hidden glyphs — the 3 visual arrows that
+ *  pair 1:1 with VOTE_LABEL_CONTRE / SKIP / POUR. Rendered inside
+ *  `<span aria-hidden="true">` since SR users hear the button label
+ *  via aria-label (not the decorative arrow). The 3 arrows mirror
+ *  the touch-gesture directions documented on the Cover swipe-legend
+ *  (← contre / ↓ skip / → pour) — a swap would silently desync the
+ *  Play buttons from the Cover affordance preview. */
+export const VOTE_GLYPH_CONTRE = "← ";
+export const VOTE_GLYPH_SKIP = "↓ ";
+/** POUR glyph is a suffix (rendered after the label), not a prefix —
+ *  matches the rightward directionality (right-swipe = pour). */
+export const VOTE_GLYPH_POUR = " →";
+
+/** Result.tsx restart-icon glyph — used 2× on /result for the
+ *  "Continuer à affiner" button (post-completion only) and the
+ *  "Refaire" button (always rendered). The cycle arrow ↻ (U+21BB)
+ *  signals "redo from start" — a swap to a different glyph would
+ *  silently change the affordance hint. */
+export const BUTTON_ICON_RESTART = "↻ ";
+
+/** Result.tsx continue-test button paren wrapper — splits into
+ *  prefix + suffix around `{remaining} {continueTestRemainingSuffix}`.
+ *  The button label reads:
+ *  "{ARROW}{CONTINUE_TEST_LABEL_PREFIX} ({N} {suffix})"
+ *  PREFIX " (" opens the parenthesis after the label; SUFFIX ")"
+ *  closes after the count. Same compositional pattern as the Result
+ *  h1 percent wrapper — pin so a future copy tweak that drops one
+ *  half renders an unbalanced parenthesis. */
+export const RESULT_CONTINUE_TEST_PAREN_PREFIX = " (";
+export const RESULT_CONTINUE_TEST_PAREN_SUFFIX = ")";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

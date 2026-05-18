@@ -26,6 +26,8 @@ import {
   RESULT_PERSONNALITES_EXCLUSIONS_NOTE,
   H1_ACCENT_PERIOD,
   RESULT_H1_PERCENT_WRAPPER_PREFIX, RESULT_H1_PERCENT_WRAPPER_SUFFIX,
+  BUTTON_ICON_RESTART,
+  RESULT_CONTINUE_TEST_PAREN_PREFIX, RESULT_CONTINUE_TEST_PAREN_SUFFIX,
   type Scrutin, type GroupCode,
 } from "../types";
 
@@ -268,7 +270,7 @@ export default function Result() {
         {isPartial && (
           <button type="button"
             onClick={() => navigate(ROUTES.play)}
-            style={btnPrimary()}><span aria-hidden="true">→ </span>{CONTINUE_TEST_LABEL_PREFIX} ({remaining} {continueTestRemainingSuffix(remaining)})</button>
+            style={btnPrimary()}><span aria-hidden="true">→ </span>{CONTINUE_TEST_LABEL_PREFIX}{RESULT_CONTINUE_TEST_PAREN_PREFIX}{remaining} {continueTestRemainingSuffix(remaining)}{RESULT_CONTINUE_TEST_PAREN_SUFFIX}</button>
         )}
         <button type="button"
           onClick={share}
@@ -276,9 +278,9 @@ export default function Result() {
         {!isPartial && (
           <button type="button"
             onClick={() => { track("affinement_clicked"); navigate(PLAY_AFFINEMENT); }}
-            style={btnSecondary()}><span aria-hidden="true">↻ </span>{CONTINUE_REFINE_LABEL}</button>
+            style={btnSecondary()}><span aria-hidden="true">{BUTTON_ICON_RESTART}</span>{CONTINUE_REFINE_LABEL}</button>
         )}
-        <button type="button" onClick={refaire} style={btnTertiary()}><span aria-hidden="true">↻ </span>{REFAIRE_LABEL}</button>
+        <button type="button" onClick={refaire} style={btnTertiary()}><span aria-hidden="true">{BUTTON_ICON_RESTART}</span>{REFAIRE_LABEL}</button>
       </div>
     </section>
   );
