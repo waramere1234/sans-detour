@@ -78,6 +78,9 @@ import {
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
+  METHODE_S01_SAME_FILES_CLAIM,
+  METHODE_S02_THEMES_EXAMPLES,
+  METHODE_S03_ABSENTS_EXCLUSION,
   COVER_SECONDARY_NAV_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
@@ -1813,6 +1816,69 @@ describe("METHODE_S04_RANK_NOISE_EXPLANATION — rank threshold justification", 
     // too much to mean anything. Both tokens carry the explanation.
     expect(METHODE_S04_RANK_NOISE_EXPLANATION).toContain("pourcentages");
     expect(METHODE_S04_RANK_NOISE_EXPLANATION).toContain("signifier");
+  });
+});
+
+describe("METHODE_S01_SAME_FILES_CLAIM — data-source authority/provenance", () => {
+  it("matches the canonical 'mêmes fichiers' authority claim", () => {
+    expect(METHODE_S01_SAME_FILES_CLAIM).toBe(
+      "Ce sont les mêmes fichiers que ceux utilisés par les médias de référence et le service interne de l'AN.",
+    );
+  });
+
+  it("contains 'médias de référence' + 'service interne de l'AN' (2-witness authority guard)", () => {
+    // The 2 witnesses (major media + AN internal service) establish
+    // provenance. A regression that drops either weakens the
+    // non-manipulation contract.
+    expect(METHODE_S01_SAME_FILES_CLAIM).toContain("médias de référence");
+    expect(METHODE_S01_SAME_FILES_CLAIM).toContain("service interne de l'AN");
+  });
+});
+
+describe("METHODE_S02_THEMES_EXAMPLES — concrete theme anchors", () => {
+  it("matches the canonical 3-theme list 'santé, immigration, fiscalité…'", () => {
+    expect(METHODE_S02_THEMES_EXAMPLES).toBe("santé, immigration, fiscalité…");
+  });
+
+  it("contains 3 distinct theme anchors (anti-merge guard)", () => {
+    // The 3 themes are chosen for political-salience resonance.
+    // A regression that flattens them into abstract topics loses
+    // the concrete-illustration value.
+    expect(METHODE_S02_THEMES_EXAMPLES).toContain("santé");
+    expect(METHODE_S02_THEMES_EXAMPLES).toContain("immigration");
+    expect(METHODE_S02_THEMES_EXAMPLES).toContain("fiscalité");
+  });
+
+  it("ends with '…' typographic ellipsis (signals open-ended list)", () => {
+    // The trailing ellipsis (single typographic char "…", not "...")
+    // signals the 3 examples aren't exhaustive — there are 11 themes
+    // total in src/types/index.ts THEME_CODES. A regression to 3 dots
+    // would render differently typographically.
+    expect(METHODE_S02_THEMES_EXAMPLES.endsWith("…")).toBe(true);
+    expect(METHODE_S02_THEMES_EXAMPLES).not.toContain("...");
+  });
+});
+
+describe("METHODE_S03_ABSENTS_EXCLUSION — Formula footnote on excluded actors", () => {
+  it("matches '(absents et non-votants exclus du calcul)'", () => {
+    expect(METHODE_S03_ABSENTS_EXCLUSION).toBe("(absents et non-votants exclus du calcul)");
+  });
+
+  it("contains 'absents' + 'non-votants' (2-category anti-merge guard)", () => {
+    // The 2 excluded actor categories are distinct in
+    // src/lib/compute-positions.ts: "absent" + "non_dispo" + the
+    // implicit "didn't cast a vote". A merge in the prose would
+    // desync from the actual exclusion logic.
+    expect(METHODE_S03_ABSENTS_EXCLUSION).toContain("absents");
+    expect(METHODE_S03_ABSENTS_EXCLUSION).toContain("non-votants");
+  });
+
+  it("is wrapped in parentheses (Formula footnote convention)", () => {
+    // The Formula block renders this as a typographic footnote — the
+    // parentheses signal "side detail, not main rule" which matters
+    // for the visual hierarchy.
+    expect(METHODE_S03_ABSENTS_EXCLUSION.startsWith("(")).toBe(true);
+    expect(METHODE_S03_ABSENTS_EXCLUSION.endsWith(")")).toBe(true);
   });
 });
 

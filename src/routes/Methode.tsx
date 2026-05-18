@@ -38,6 +38,9 @@ import {
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
+  METHODE_S01_SAME_FILES_CLAIM,
+  METHODE_S02_THEMES_EXAMPLES,
+  METHODE_S03_ABSENTS_EXCLUSION,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -160,13 +163,13 @@ export default function Methode() {
       </nav>
 
       <Section n="01" title={METHODE_SECTION_BODY_TITLES["01"]}>
-        <p>Les votes proviennent de <strong>{METHODE_S01_DATA_SOURCE_STRONG}</strong>, exposé sur <code>{AN_OPEN_DATA_HOSTNAME}</code>. Ce sont les mêmes fichiers que ceux utilisés par les médias de référence et le service interne de l'AN. {METHODE_S01_DATA_SOURCE_QUALITY_CLAIM}</p>
+        <p>Les votes proviennent de <strong>{METHODE_S01_DATA_SOURCE_STRONG}</strong>, exposé sur <code>{AN_OPEN_DATA_HOSTNAME}</code>. {METHODE_S01_SAME_FILES_CLAIM} {METHODE_S01_DATA_SOURCE_QUALITY_CLAIM}</p>
         <p>{METHODE_S01_UPDATE_CADENCE}</p>
       </Section>
 
       <Section n="02" title={METHODE_SECTION_BODY_TITLES["02"]}>
         <p>On garde les <strong>scrutins solennels</strong> (SPS), les <strong>votes finaux sur l'ensemble d'une loi</strong> (SOR), les <strong>motions de censure</strong>, les <strong>motions référendaires</strong> et les <strong>propositions de résolution</strong>. {METHODE_S02_EXCLUSIONS_SUFFIX}</p>
-        <p>Pour chaque session, on en tire <strong>{TARGET}</strong> en équilibrant les thèmes (santé, immigration, fiscalité…) plutôt qu'au hasard pur, avec deux garde-fous : <strong>jamais plus de {DEFAULT_CAP_PER_DOSSIER} scrutins du même dossier législatif</strong> et <strong>jamais plus de {DEFAULT_CAP_PER_CHAPEAU_PREFIX} scrutins du même sujet</strong> ({METHODE_S02_CAPS_EXAMPLE}).</p>
+        <p>Pour chaque session, on en tire <strong>{TARGET}</strong> en équilibrant les thèmes ({METHODE_S02_THEMES_EXAMPLES}) plutôt qu'au hasard pur, avec deux garde-fous : <strong>jamais plus de {DEFAULT_CAP_PER_DOSSIER} scrutins du même dossier législatif</strong> et <strong>jamais plus de {DEFAULT_CAP_PER_CHAPEAU_PREFIX} scrutins du même sujet</strong> ({METHODE_S02_CAPS_EXAMPLE}).</p>
       </Section>
 
       <Section n="03" title={METHODE_SECTION_BODY_TITLES["03"]}>
@@ -174,7 +177,7 @@ export default function Methode() {
         <Formula>
           si ≥ {Math.round(THRESHOLD * 100)}% des votants effectifs du groupe → pour / contre / abstention<br/>
           sinon → groupe divisé<br/>
-          (absents et non-votants exclus du calcul)
+          {METHODE_S03_ABSENTS_EXCLUSION}
         </Formula>
         <p>{METHODE_S03_DIVIDED_RULE_BODY}<strong>divisé</strong>{METHODE_S03_DIVIDED_RULE_TAIL}</p>
       </Section>

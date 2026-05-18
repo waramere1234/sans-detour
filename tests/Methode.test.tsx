@@ -27,6 +27,9 @@ import {
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
+  METHODE_S01_SAME_FILES_CLAIM,
+  METHODE_S02_THEMES_EXAMPLES,
+  METHODE_S03_ABSENTS_EXCLUSION,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -210,6 +213,24 @@ describe("Methode — section structure", () => {
     renderMethode();
     const section = document.getElementById("methode-04")!;
     expect(section.textContent).toContain(METHODE_S04_RANK_NOISE_EXPLANATION);
+  });
+
+  it("§01 surfaces METHODE_S01_SAME_FILES_CLAIM (authority/provenance claim)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-01")!;
+    expect(section.textContent).toContain(METHODE_S01_SAME_FILES_CLAIM);
+  });
+
+  it("§02 surfaces METHODE_S02_THEMES_EXAMPLES (concrete theme anchors)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-02")!;
+    expect(section.textContent).toContain(METHODE_S02_THEMES_EXAMPLES);
+  });
+
+  it("§03 surfaces METHODE_S03_ABSENTS_EXCLUSION (Formula footnote on excluded actors)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-03")!;
+    expect(section.textContent).toContain(METHODE_S03_ABSENTS_EXCLUSION);
   });
 
   it("the number of rendered Section bodies matches METHODE_SECTIONS.length (no orphan body)", () => {

@@ -4012,3 +4012,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `METHODE_S01_DATA_SOURCE_STRONG\|METHODE_S01_DATA_SOURCE_QUALITY_CLAIM\|METHODE_S04_RANK_NOISE_EXPLANATION` src/ tests/ → 15+ résultats
 - [ ] grep `"open data officiel de l.Assemblée Nationale"\|"Aucune retranscription manuelle"\|"pourcentages bougent trop"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~900 tests` CLAUDE.md → 0 résultat (aligné sur ~908)
+
+---
+
+## Session 171 — 2026-05-18
+
+### Vérification session 170
+
+- [VERIFIED] 25 occurrences des 3 nouveaux exports (METHODE_S01_DATA_SOURCE_STRONG + METHODE_S01_DATA_SOURCE_QUALITY_CLAIM + METHODE_S04_RANK_NOISE_EXPLANATION)
+- [VERIFIED] 0 inline literal matches (tous migrés vers consts)
+- [VERIFIED] CLAUDE.md "~908 tests"
+- 908/908 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_S01_SAME_FILES_CLAIM + METHODE_S02_THEMES_EXAMPLES + METHODE_S03_ABSENTS_EXCLUSION)
+
+- [FIXED] Methode §01 `"Ce sont les mêmes fichiers que ceux utilisés par les médias de référence et le service interne de l'AN."` inline + untested · Drift surface : load-bearing authority/provenance claim — 2 witnesses (major media + AN internal service) établissent que les data files Sans Détour utilise sont les mêmes que la canonical AN distribution. Sans pin, un rewording qui drop un témoin affaibrait le non-manipulation contract. Fix : export `METHODE_S01_SAME_FILES_CLAIM`. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + contains "médias de référence" + "service interne de l'AN" 2-witness anti-drop guards. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §02 themes parenthetical `"santé, immigration, fiscalité…"` inline + untested · Drift surface : concrete theme anchors (3 chosen pour political-salience resonance), paired avec METHODE_S02_CAPS_EXAMPLE (retraite/Mayotte) extracted session 169. Un rewording qui flattens ces themes en abstract topics perdrait la concrete-illustration value. Fix : export `METHODE_S02_THEMES_EXAMPLES`. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + contains 3-theme-token anti-merge guards + ends-with-"…" typographic-ellipsis vs three-dots anti-substitution guard. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §03 Formula footnote `"(absents et non-votants exclus du calcul)"` inline + untested · Drift surface : transparency sur l'exclusion logic du group-position calcul. Les 2 categories (absents + non-votants) doivent rester synchronized avec computePosition dans src/lib/compute-positions.ts. Sans pin, un merge dans la prose desyncerait la doc user-side de la logic réelle. Fix : export `METHODE_S03_ABSENTS_EXCLUSION`. Methode test : 1 round-trip toContain. Aria-labels tests : pin-the-value + contains 2-category-token anti-merge + parentheses-wrap Formula-footnote-convention guards. · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 172
+
+- [ ] grep `METHODE_S01_SAME_FILES_CLAIM\|METHODE_S02_THEMES_EXAMPLES\|METHODE_S03_ABSENTS_EXCLUSION` src/ tests/ → 15+ résultats
+- [ ] grep `"mêmes fichiers que ceux utilisés par"\|"santé, immigration, fiscalité"\|"absents et non-votants exclus"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~908 tests` CLAUDE.md → 0 résultat (aligné sur ~919)

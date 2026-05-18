@@ -788,6 +788,25 @@ export const METHODE_S01_DATA_SOURCE_QUALITY_CLAIM =
 export const METHODE_S04_RANK_NOISE_EXPLANATION =
   "en dessous, les pourcentages bougent trop pour signifier quoi que ce soit";
 
+/** Methode §01 "same files" authority claim — documents that the AN
+ *  open-data files Sans Détour uses are the same files used by major
+ *  media + the AN's own internal service. Load-bearing because it
+ *  establishes provenance + non-manipulation. */
+export const METHODE_S01_SAME_FILES_CLAIM =
+  "Ce sont les mêmes fichiers que ceux utilisés par les médias de référence et le service interne de l'AN.";
+
+/** Methode §02 concrete theme examples — illustrates the strategic
+ *  round-robin theme balance with 3 anchor topics (paired with
+ *  METHODE_S02_CAPS_EXAMPLE's retraite/Mayotte topic anchors). */
+export const METHODE_S02_THEMES_EXAMPLES = "santé, immigration, fiscalité…";
+
+/** Methode §03 Formula footnote on excluded actors — documents that
+ *  absents + non-voters are dropped from the group-position math.
+ *  Load-bearing transparency on the per-group threshold-vote logic
+ *  (paired with `computePosition` in src/lib/compute-positions.ts). */
+export const METHODE_S03_ABSENTS_EXCLUSION =
+  "(absents et non-votants exclus du calcul)";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use
