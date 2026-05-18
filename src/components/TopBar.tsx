@@ -16,6 +16,8 @@ import {
   EXTERNAL_LINK_GLYPH,
   NAV_TARGET_RESULT, NAV_TARGET_METHODE, NAV_TARGET_LEGAL, NAV_TARGET_CONTACT,
   EASE_OUT_QUART,
+  MENU_TRIGGER_GLYPH, POPOVER_BACKDROP_FADE_DURATION_S,
+  TOPBAR_TRIGGER_TRANSITION_DURATION_MS,
 } from "../types";
 
 
@@ -117,13 +119,13 @@ function MenuTrigger({
         fontFamily: "var(--font-mono)", fontSize: 14,
         cursor: "pointer", lineHeight: 1,
         letterSpacing: "0.04em",
-        transition: "color 140ms ease, background 140ms ease, border-color 140ms ease",
+        transition: `color ${TOPBAR_TRIGGER_TRANSITION_DURATION_MS}ms ease, background ${TOPBAR_TRIGGER_TRANSITION_DURATION_MS}ms ease, border-color ${TOPBAR_TRIGGER_TRANSITION_DURATION_MS}ms ease`,
         // Above the popover backdrop so a tap on the trigger toggles
         // (rather than being eaten by the backdrop click-catcher).
         position: "relative", zIndex: 32,
       }}
     >
-      •••
+      {MENU_TRIGGER_GLYPH}
     </button>
   );
 }
@@ -152,7 +154,7 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: reducedMotion ? 0 : 0.12 }}
+            transition={{ duration: reducedMotion ? 0 : POPOVER_BACKDROP_FADE_DURATION_S }}
             onClick={onClose}
             aria-hidden="true"
             style={{

@@ -4618,3 +4618,23 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `EASE_OUT_QUART\|CARD_FLIP_DURATION_S\|CARD_FLIP_ROTATE_DEGREES` src/ tests/ → 15+ résultats
 - [ ] grep `'\[0.22, 1, 0.36, 1\]\|duration: 0.45\|rotateY(180deg)'` src/ → 0 résultats (tous via les consts)
 - [ ] grep `~1312 tests` CLAUDE.md → 0 résultat (aligné sur ~1324)
+
+## Session 200 — 2026-05-18
+
+### Vérification session 199
+
+- [VERIFIED] 29 occurrences des nouveaux exports (EASE_OUT_QUART + CARD_FLIP_DURATION_S + CARD_FLIP_ROTATE_DEGREES)
+- [VERIFIED] CLAUDE.md "~1312 tests" → 0 résultat (aligné sur ~1324)
+- 1324/1324 tests verts, typecheck clean
+
+### Bugs fixés (MENU_TRIGGER_GLYPH + POPOVER_BACKDROP_FADE_DURATION_S + TOPBAR_TRIGGER_TRANSITION_DURATION_MS)
+
+- [FIXED] TopBar menu-trigger visible glyph `"•••"` inline 1 site source (line 127 JSX button content) + 2 inline-comment refs (lines 23 + 53). Drift surface : trigger button visible content rendered as JSX text. Compact 3-bullet form distinct de `⋯` (U+22EF horizontal ellipsis, thinner single char) ou `"..."` (3 periods, baseline-shifted). Pin the exact 3 × U+2022 bullet form so a future "…" drift surfaces. Fix : export `MENU_TRIGGER_GLYPH`. TopBar.tsx utilise la const dans le button JSX. Aria-labels tests : 3 (canonical "•••" + exactly-3-chars anti-ellipsis-substitution + each char === U+2022 bullet codepoint defense-in-depth). · `src/types/index.ts`, `src/components/TopBar.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] TopBar popover backdrop fade duration `0.12` inline 1× (line 158 `transition={{ duration: reducedMotion ? 0 : 0.12 }}`). Drift surface : TopBar popover backdrop fade timing — distinct from BACKDROP_FADE_DURATION_S = 0.16 (modal backdrop) because popover is lighter-weight non-modal. Cross-const invariant : POPOVER_BACKDROP_FADE_DURATION_S < BACKDROP_FADE_DURATION_S so the perceptual hierarchy (modal heavier than popover) stays consistent. Fix : export `POPOVER_BACKDROP_FADE_DURATION_S`. TopBar.tsx utilise la const. Aria-labels tests : 4 (canonical 0.12 + positive-finite + < BACKDROP_FADE_DURATION_S perceptual-hierarchy cross-const + ≤ 0.2s fast-fade-range boundary). · `src/types/index.ts`, `src/components/TopBar.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] TopBar trigger button transition duration `140ms` inline 3× dans le même CSS `transition:` string (line 120, color/background/border-color all transitioning à 140ms). Drift surface : tweak doit propager aux 3 properties — un edit qui change color à 200ms mais oublie background reads inconsistant à hover. Fix : export `TOPBAR_TRIGGER_TRANSITION_DURATION_MS`. TopBar.tsx utilise la const dans une template-literal qui compose les 3 transitions. Aria-labels tests : 4 (canonical 140 + positive-integer ms + UX-validated range [50, 250]ms + compositional round-trip via template literal === "color 140ms ease, background 140ms ease, border-color 140ms ease"). · `src/types/index.ts`, `src/components/TopBar.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 201
+
+- [ ] grep `MENU_TRIGGER_GLYPH\|POPOVER_BACKDROP_FADE_DURATION_S\|TOPBAR_TRIGGER_TRANSITION_DURATION_MS` src/ tests/ → 15+ résultats
+- [ ] grep `'>•••<\|: 0\.12\|140ms ease'` src/ → 0 résultats (tous via les consts)
+- [ ] grep `~1324 tests` CLAUDE.md → 0 résultat (aligné sur ~1335)

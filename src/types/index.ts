@@ -1584,6 +1584,27 @@ export const CARD_FLIP_DURATION_S = 0.45;
  *  the flip math and show the back face mirrored. */
 export const CARD_FLIP_ROTATE_DEGREES = 180;
 
+/** TopBar menu-trigger visible glyph — the `•••` (3 bullet characters)
+ *  rendered as the button's text content. Compact, square enough to
+ *  fit the 11px-padding button. A drift to "⋯" (U+22EF horizontal
+ *  ellipsis, single char) would look thinner; "..." (3 periods)
+ *  would baseline-shift wrong. Pin the exact 3-bullet form. */
+export const MENU_TRIGGER_GLYPH = "•••";
+
+/** TopBar popover backdrop fade duration in seconds — used 1× on the
+ *  TopBar popover's transparent backdrop. Distinct from
+ *  BACKDROP_FADE_DURATION_S (0.16) because the popover is a lighter-
+ *  weight non-modal — the fade can be snappier. Invariant:
+ *  POPOVER_BACKDROP_FADE_DURATION_S < BACKDROP_FADE_DURATION_S so the
+ *  perceptual hierarchy (modal heavier than popover) stays consistent. */
+export const POPOVER_BACKDROP_FADE_DURATION_S = 0.12;
+
+/** TopBar trigger button transition duration in milliseconds — used 3×
+ *  in a single CSS `transition:` string (color, background,
+ *  border-color all transitioning at 140ms ease). Centralised so a
+ *  future tweak propagates to all 3 properties via 1 edit. */
+export const TOPBAR_TRIGGER_TRANSITION_DURATION_MS = 140;
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

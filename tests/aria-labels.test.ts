@@ -135,6 +135,8 @@ import {
   DECK_VISIBLE_DEPTH, SWIPE_THRESHOLD,
   SAFE_AREA_VIEWPORT_HEIGHT, BACKDROP_FADE_DURATION_S, MAILTO_SCHEME,
   EASE_OUT_QUART, CARD_FLIP_DURATION_S, CARD_FLIP_ROTATE_DEGREES,
+  MENU_TRIGGER_GLYPH, POPOVER_BACKDROP_FADE_DURATION_S,
+  TOPBAR_TRIGGER_TRANSITION_DURATION_MS,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -4448,6 +4450,77 @@ describe("CARD_FLIP_ROTATE_DEGREES — Card rotateY target", () => {
     // const — pin the round-trip so a future tweak forces both
     // sites to update in lockstep.
     expect(`rotateY(${CARD_FLIP_ROTATE_DEGREES}deg)`).toBe("rotateY(180deg)");
+  });
+});
+
+describe("MENU_TRIGGER_GLYPH — TopBar menu-trigger visible glyph", () => {
+  it("matches '•••' (pin-the-value, 3 bullet characters)", () => {
+    expect(MENU_TRIGGER_GLYPH).toBe("•••");
+  });
+
+  it("is exactly 3 chars (anti-drift to single ellipsis ⋯ or 3 periods)", () => {
+    // U+22EF ⋯ would render thinner; "..." would baseline-shift wrong.
+    // Pin the exact 3-bullet form (each • is U+2022, single char).
+    expect(MENU_TRIGGER_GLYPH).toHaveLength(3);
+  });
+
+  it("uses bullet U+2022 (anti-replace guard against • lookalikes)", () => {
+    // Each char must be U+2022 (bullet), not U+00B7 (middle dot)
+    // or U+2027 (hyphenation point). Pin the codepoint defensively.
+    for (let i = 0; i < MENU_TRIGGER_GLYPH.length; i++) {
+      expect(MENU_TRIGGER_GLYPH.charCodeAt(i)).toBe(0x2022);
+    }
+  });
+});
+
+describe("POPOVER_BACKDROP_FADE_DURATION_S — TopBar popover backdrop fade", () => {
+  it("matches 0.12 (pin-the-value, seconds)", () => {
+    expect(POPOVER_BACKDROP_FADE_DURATION_S).toBe(0.12);
+  });
+
+  it("is positive finite", () => {
+    expect(Number.isFinite(POPOVER_BACKDROP_FADE_DURATION_S)).toBe(true);
+    expect(POPOVER_BACKDROP_FADE_DURATION_S).toBeGreaterThan(0);
+  });
+
+  it("is less than BACKDROP_FADE_DURATION_S (perceptual hierarchy: popover lighter than modal)", () => {
+    // The TopBar popover is a non-modal lightweight surface;
+    // modal backdrops fade slightly slower to signal weight.
+    // Cross-const invariant pins the visual hierarchy.
+    expect(POPOVER_BACKDROP_FADE_DURATION_S).toBeLessThan(BACKDROP_FADE_DURATION_S);
+  });
+
+  it("is in a fast-fade range (≤ 0.2s for non-modal surfaces)", () => {
+    // Non-modal popovers should fade fast (< 0.2s) so they feel
+    // snappy. Modal backdrops can take slightly longer to signal
+    // weight. Pin the boundary.
+    expect(POPOVER_BACKDROP_FADE_DURATION_S).toBeLessThanOrEqual(0.2);
+  });
+});
+
+describe("TOPBAR_TRIGGER_TRANSITION_DURATION_MS — TopBar trigger button hover/active transition", () => {
+  it("matches 140 (pin-the-value, milliseconds)", () => {
+    expect(TOPBAR_TRIGGER_TRANSITION_DURATION_MS).toBe(140);
+  });
+
+  it("is a positive integer (CSS ms duration)", () => {
+    expect(Number.isInteger(TOPBAR_TRIGGER_TRANSITION_DURATION_MS)).toBe(true);
+    expect(TOPBAR_TRIGGER_TRANSITION_DURATION_MS).toBeGreaterThan(0);
+  });
+
+  it("is in a hover-transition range (50–250 ms)", () => {
+    // Below 50ms = no transition perceived; above 250ms = sluggish
+    // for hover state. Pin the UX-validated window.
+    expect(TOPBAR_TRIGGER_TRANSITION_DURATION_MS).toBeGreaterThanOrEqual(50);
+    expect(TOPBAR_TRIGGER_TRANSITION_DURATION_MS).toBeLessThanOrEqual(250);
+  });
+
+  it("composes into the canonical CSS transition string (compositional round-trip)", () => {
+    // The full transition string composes 3× the same duration for
+    // color, background, border-color. Pin the round-trip so a
+    // future tweak that breaks the composition surfaces here.
+    const expected = `color ${TOPBAR_TRIGGER_TRANSITION_DURATION_MS}ms ease, background ${TOPBAR_TRIGGER_TRANSITION_DURATION_MS}ms ease, border-color ${TOPBAR_TRIGGER_TRANSITION_DURATION_MS}ms ease`;
+    expect(expected).toBe("color 140ms ease, background 140ms ease, border-color 140ms ease");
   });
 });
 
