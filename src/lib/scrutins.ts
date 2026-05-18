@@ -1,6 +1,9 @@
 // src/lib/scrutins.ts
 import { supabase } from "./supabase";
-import type { Scrutin, FreshnessInfo } from "../types";
+import {
+  SCRUTINS_TABLE_NAME, SCRUTINS_COL_POINTS_CLES, SCRUTINS_COL_INGERE_LE,
+  type Scrutin, type FreshnessInfo,
+} from "../types";
 import fixtures from "../../supabase/seed/dev-fixtures.json";
 
 export async function fetchScrutins(): Promise<Scrutin[]> {
@@ -12,9 +15,9 @@ export async function fetchScrutins(): Promise<Scrutin[]> {
   // analyse, just a truncated raw title. Skip them in the deck rather than
   // ship cards the user can't position on.
   const { data, error } = await supabase
-    .from("scrutins")
+    .from(SCRUTINS_TABLE_NAME)
     .select("*")
-    .not("points_cles", "is", null)
+    .not(SCRUTINS_COL_POINTS_CLES, "is", null)
     .order("date", { ascending: false });
   if (error) throw error;
   return (data ?? []) as Scrutin[];
@@ -32,14 +35,14 @@ export async function fetchFreshness(): Promise<FreshnessInfo> {
   // sooner on cold loads. Halves the round-trip latency.
   const [lastSyncRes, countRes] = await Promise.all([
     supabase
-      .from("scrutins")
-      .select("ingere_le")
-      .order("ingere_le", { ascending: false })
+      .from(SCRUTINS_TABLE_NAME)
+      .select(SCRUTINS_COL_INGERE_LE)
+      .order(SCRUTINS_COL_INGERE_LE, { ascending: false })
       .limit(1),
     supabase
-      .from("scrutins")
+      .from(SCRUTINS_TABLE_NAME)
       .select("*", { count: "exact", head: true })
-      .not("points_cles", "is", null),
+      .not(SCRUTINS_COL_POINTS_CLES, "is", null),
   ]);
   if (lastSyncRes.error) throw lastSyncRes.error;
   // Without this, a permissions/network error on the count query would

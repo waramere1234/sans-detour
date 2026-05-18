@@ -1414,6 +1414,28 @@ export const METHODE_SECTION_HEADING_ID_PREFIX = "methode-heading-";
 export const AUDIT_TRAIL_HEADING_ID_PREFIX = "audit-heading-";
 export const AUDIT_TRAIL_PANEL_ID_PREFIX = "audit-trail-";
 
+/** Supabase table name for scrutins — used 4× in src/lib/scrutins.ts
+ *  (.from("scrutins") in fetchScrutins + 2 sites in fetchFreshness).
+ *  The table is defined by supabase/migrations/0001_*.sql; if it ever
+ *  rebrands (unlikely but possible during a schema reorg), all source
+ *  call sites must update in lockstep. Centralising forces that. */
+export const SCRUTINS_TABLE_NAME = "scrutins";
+
+/** Supabase column name for the points_cles JSONB list — used 2× as
+ *  the filter `.not("points_cles", "is", null)` in fetchScrutins + the
+ *  fetchFreshness count query. Filters out unvotable ingest-fallback
+ *  rows (LLM-call failed → no contexte / analyse / points_cles, just
+ *  a truncated raw title). Pin so a schema migration renaming the
+ *  column (e.g., to `bullet_points`) propagates atomically. */
+export const SCRUTINS_COL_POINTS_CLES = "points_cles";
+
+/** Supabase column name for the ingestion timestamp — used 2× in
+ *  fetchFreshness (.select("ingere_le") + .order("ingere_le")). The
+ *  column is stamped on every upsert by the ingest pipeline so the
+ *  banner can compute "MAJ il y a N jours". Pin so a future column
+ *  rename surfaces alongside the migration. */
+export const SCRUTINS_COL_INGERE_LE = "ingere_le";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

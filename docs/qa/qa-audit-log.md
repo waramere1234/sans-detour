@@ -4476,3 +4476,23 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `METHODE_SHEET_TITLE_ID\|RESULT_PERSONNALITES_PANEL_ID\|METHODE_SECTION_ID_PREFIX\|METHODE_SECTION_HEADING_ID_PREFIX\|AUDIT_TRAIL_HEADING_ID_PREFIX\|AUDIT_TRAIL_PANEL_ID_PREFIX` src/ tests/ → 25+ résultats
 - [ ] grep `'"methode-sheet-title"'\|'"personnalites-panel"'\|'"audit-heading-LFI"'\|'"audit-trail-LFI"'` src/ tests/ → 0 résultats (tout via les consts)
 - [ ] grep `~1228 tests` CLAUDE.md → 0 résultat (aligné sur ~1245)
+
+## Session 193 — 2026-05-18
+
+### Vérification session 192
+
+- [VERIFIED] 63 occurrences des nouveaux exports (METHODE_SHEET_TITLE_ID + RESULT_PERSONNALITES_PANEL_ID + METHODE_SECTION_ID_PREFIX/_HEADING_ID_PREFIX + AUDIT_TRAIL_HEADING_ID_PREFIX/_PANEL_ID_PREFIX)
+- [VERIFIED] CLAUDE.md "~1228 tests" → 0 résultat (aligné sur ~1245)
+- 1245/1245 tests verts, typecheck clean
+
+### Bugs fixés (SCRUTINS_TABLE_NAME + SCRUTINS_COL_POINTS_CLES + SCRUTINS_COL_INGERE_LE)
+
+- [FIXED] Supabase table name `"scrutins"` inline 4× (src/lib/scrutins.ts: fetchScrutins .from + fetchFreshness 2× .from). Drift surface : la table est définie par supabase/migrations/0001_*.sql ; si elle rebrand (schema reorg), tous les call sites doivent update in lockstep. Pin centralization. Fix : export `SCRUTINS_TABLE_NAME`. scrutins.ts utilise la const dans les 4 .from() sites. · `src/types/index.ts`, `src/lib/scrutins.ts`
+- [FIXED] Supabase column `"points_cles"` inline 2× (filter `.not("points_cles", "is", null)` dans fetchScrutins + fetchFreshness count). Drift surface : column name filtering les unvotable ingest-fallback rows. Un schema migration renaming en `bullet_points` doit propager atomiquement. Fix : export `SCRUTINS_COL_POINTS_CLES`. scrutins.ts utilise la const dans les 2 filter sites. · `src/types/index.ts`, `src/lib/scrutins.ts`
+- [FIXED] Supabase column `"ingere_le"` inline 2× (fetchFreshness .select + .order). Drift surface : ingestion timestamp column stamped sur every upsert par le ingest pipeline pour permettre "MAJ il y a N jours" computation. Un rename migration doit propager. Fix : export `SCRUTINS_COL_INGERE_LE`. scrutins.ts utilise la const dans les 2 sites. Aria-labels tests pour les 3 consts ensemble : 6 (canonical × 3 + lowercase Postgres-convention table + snake_case column convention × 2 + 3-distinct anti-collision Set check + no-whitespace-no-quote SQL-safe-identifiers guard). · `src/types/index.ts`, `src/lib/scrutins.ts`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 194
+
+- [ ] grep `SCRUTINS_TABLE_NAME\|SCRUTINS_COL_POINTS_CLES\|SCRUTINS_COL_INGERE_LE` src/ tests/ → 12+ résultats
+- [ ] grep `'\.from\("scrutins"\)\|"points_cles"\|"ingere_le"'` src/lib/scrutins.ts → 0 résultats (tous via les consts)
+- [ ] grep `~1245 tests` CLAUDE.md → 0 résultat (aligné sur ~1252)

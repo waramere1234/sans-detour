@@ -126,6 +126,7 @@ import {
   METHODE_SHEET_TITLE_ID, RESULT_PERSONNALITES_PANEL_ID,
   METHODE_SECTION_ID_PREFIX, METHODE_SECTION_HEADING_ID_PREFIX,
   AUDIT_TRAIL_HEADING_ID_PREFIX, AUDIT_TRAIL_PANEL_ID_PREFIX,
+  SCRUTINS_TABLE_NAME, SCRUTINS_COL_POINTS_CLES, SCRUTINS_COL_INGERE_LE,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -3950,6 +3951,50 @@ describe("AUDIT_TRAIL_HEADING_ID_PREFIX + AUDIT_TRAIL_PANEL_ID_PREFIX — AuditT
 
   it("composing `${HEADING_ID_PREFIX}LFI` produces 'audit-heading-LFI'", () => {
     expect(`${AUDIT_TRAIL_HEADING_ID_PREFIX}LFI`).toBe("audit-heading-LFI");
+  });
+});
+
+describe("SCRUTINS_TABLE_NAME + SCRUTINS_COL_* — Supabase schema identifiers", () => {
+  it("SCRUTINS_TABLE_NAME matches 'scrutins' (pin-the-value, schema-anchored)", () => {
+    expect(SCRUTINS_TABLE_NAME).toBe("scrutins");
+  });
+
+  it("SCRUTINS_COL_POINTS_CLES matches 'points_cles' (snake_case Supabase column)", () => {
+    expect(SCRUTINS_COL_POINTS_CLES).toBe("points_cles");
+  });
+
+  it("SCRUTINS_COL_INGERE_LE matches 'ingere_le' (snake_case Supabase column)", () => {
+    expect(SCRUTINS_COL_INGERE_LE).toBe("ingere_le");
+  });
+
+  it("table name is lowercase (Postgres canonical-form convention)", () => {
+    // Postgres folds unquoted identifiers to lowercase. Mixed-case
+    // would require quoted identifiers in every query — pin so a
+    // future "Scrutins" or "SCRUTINS" drift surfaces.
+    expect(SCRUTINS_TABLE_NAME).toBe(SCRUTINS_TABLE_NAME.toLowerCase());
+  });
+
+  it("column names are snake_case (Postgres + Supabase convention)", () => {
+    // Both columns use snake_case (underscore-separated lowercase).
+    // A drift to camelCase would break the Postgres binding. Pin
+    // the convention so a future rebrand stays snake_case.
+    expect(SCRUTINS_COL_POINTS_CLES).toMatch(/^[a-z]+(_[a-z]+)+$/);
+    expect(SCRUTINS_COL_INGERE_LE).toMatch(/^[a-z]+(_[a-z]+)+$/);
+  });
+
+  it("all 3 identifiers are distinct (no accidental collision)", () => {
+    const ids = new Set([SCRUTINS_TABLE_NAME, SCRUTINS_COL_POINTS_CLES, SCRUTINS_COL_INGERE_LE]);
+    expect(ids.size).toBe(3);
+  });
+
+  it("table + columns have no whitespace or quote chars (SQL-safe identifiers)", () => {
+    // Any whitespace/quote would require Postgres-quoted identifiers
+    // and break the .from() / .select() string concatenation. Pin
+    // safety guards so a future identifier rename can't ship an
+    // injection-prone value.
+    for (const id of [SCRUTINS_TABLE_NAME, SCRUTINS_COL_POINTS_CLES, SCRUTINS_COL_INGERE_LE]) {
+      expect(id).not.toMatch(/[\s"']/);
+    }
   });
 });
 
