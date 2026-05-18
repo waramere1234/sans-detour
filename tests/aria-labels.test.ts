@@ -107,6 +107,9 @@ import {
   VOTE_GLYPH_CONTRE, VOTE_GLYPH_SKIP, VOTE_GLYPH_POUR,
   BUTTON_ICON_RESTART,
   RESULT_CONTINUE_TEST_PAREN_PREFIX, RESULT_CONTINUE_TEST_PAREN_SUFFIX,
+  AUDIT_GLYPH_ALIGNED, AUDIT_GLYPH_PARTIAL, AUDIT_GLYPH_OPPOSED, AUDIT_GLYPH_DIVIDED,
+  BUTTON_ARROW_RIGHT_PREFIX,
+  BACK_ARROW_PREFIX_GLYPH, BACK_ARROW_SUFFIX_GLYPH,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -3289,6 +3292,119 @@ describe("RESULT_CONTINUE_TEST_PAREN_PREFIX + _SUFFIX — Result continue-test b
     // value equality so the 2 compositional surfaces stay typographically
     // consistent. A future change to one should land alongside the other.
     expect(RESULT_CONTINUE_TEST_PAREN_PREFIX).toBe(RESULT_H1_PERCENT_WRAPPER_PREFIX);
+  });
+});
+
+describe("AUDIT_GLYPH_ALIGNED/PARTIAL/OPPOSED/DIVIDED — AuditTrail breakdown chip glyphs", () => {
+  it("ALIGNED matches '✓ ' (check mark + space)", () => {
+    expect(AUDIT_GLYPH_ALIGNED).toBe("✓ ");
+  });
+
+  it("PARTIAL matches '≈ ' (almost-equal + space)", () => {
+    expect(AUDIT_GLYPH_PARTIAL).toBe("≈ ");
+  });
+
+  it("OPPOSED matches '✕ ' (cross + space)", () => {
+    expect(AUDIT_GLYPH_OPPOSED).toBe("✕ ");
+  });
+
+  it("DIVIDED matches '÷ ' (division sign + space)", () => {
+    expect(AUDIT_GLYPH_DIVIDED).toBe("÷ ");
+  });
+
+  it("ALIGNED uses check mark U+2713 (semantic match — aligned)", () => {
+    // U+2713 is the WCAG-friendly check mark. A drift to U+2705 (✅
+    // emoji) would change the rendering register (color-coded emoji
+    // vs monochrome glyph that inherits the color from the surrounding
+    // span).
+    expect(AUDIT_GLYPH_ALIGNED.charCodeAt(0)).toBe(0x2713);
+  });
+
+  it("PARTIAL uses almost-equal U+2248 (semantic match — partial)", () => {
+    expect(AUDIT_GLYPH_PARTIAL.charCodeAt(0)).toBe(0x2248);
+  });
+
+  it("OPPOSED uses heavy multiplication X U+2715 (semantic match — opposed)", () => {
+    expect(AUDIT_GLYPH_OPPOSED.charCodeAt(0)).toBe(0x2715);
+  });
+
+  it("DIVIDED uses division sign U+00F7 (semantic match — divided)", () => {
+    expect(AUDIT_GLYPH_DIVIDED.charCodeAt(0)).toBe(0x00F7);
+  });
+
+  it("all 4 glyphs are exactly 2 chars long (1 glyph + trailing space)", () => {
+    expect(AUDIT_GLYPH_ALIGNED).toHaveLength(2);
+    expect(AUDIT_GLYPH_PARTIAL).toHaveLength(2);
+    expect(AUDIT_GLYPH_OPPOSED).toHaveLength(2);
+    expect(AUDIT_GLYPH_DIVIDED).toHaveLength(2);
+  });
+
+  it("all 4 glyphs end with trailing space (glue cadence before the count)", () => {
+    expect(AUDIT_GLYPH_ALIGNED.endsWith(" ")).toBe(true);
+    expect(AUDIT_GLYPH_PARTIAL.endsWith(" ")).toBe(true);
+    expect(AUDIT_GLYPH_OPPOSED.endsWith(" ")).toBe(true);
+    expect(AUDIT_GLYPH_DIVIDED.endsWith(" ")).toBe(true);
+  });
+});
+
+describe("BUTTON_ARROW_RIGHT_PREFIX — '→ ' forward-navigation glyph (MethodeSheet + Result)", () => {
+  it("matches the canonical '→ ' (pin-the-value)", () => {
+    expect(BUTTON_ARROW_RIGHT_PREFIX).toBe("→ ");
+  });
+
+  it("uses right-arrow U+2192 (matches VOTE_GLYPH_POUR's arrow)", () => {
+    expect(BUTTON_ARROW_RIGHT_PREFIX.charCodeAt(0)).toBe(0x2192);
+  });
+
+  it("is prefix-style (arrow + trailing space), distinct from VOTE_GLYPH_POUR suffix-style", () => {
+    // BUTTON_ARROW_RIGHT_PREFIX = "→ " (prefix) vs VOTE_GLYPH_POUR = " →" (suffix).
+    // Same arrow glyph but reversed spacing. Pin so a future tweak
+    // doesn't accidentally merge them into one shared const that
+    // ships with wrong cadence at one of the call sites.
+    expect(BUTTON_ARROW_RIGHT_PREFIX.endsWith(" ")).toBe(true);
+    expect(VOTE_GLYPH_POUR.startsWith(" ")).toBe(true);
+    expect(BUTTON_ARROW_RIGHT_PREFIX).not.toBe(VOTE_GLYPH_POUR);
+  });
+
+  it("is exactly 2 chars long", () => {
+    expect(BUTTON_ARROW_RIGHT_PREFIX).toHaveLength(2);
+  });
+});
+
+describe("BACK_ARROW_PREFIX_GLYPH + BACK_ARROW_SUFFIX_GLYPH — back-navigation guillemet glyphs", () => {
+  it("PREFIX matches '‹ ' (single guillemet + space)", () => {
+    expect(BACK_ARROW_PREFIX_GLYPH).toBe("‹ ");
+  });
+
+  it("SUFFIX matches ' ‹' (space + single guillemet)", () => {
+    expect(BACK_ARROW_SUFFIX_GLYPH).toBe(" ‹");
+  });
+
+  it("both use single-left guillemet U+2039 (same glyph, different spacing)", () => {
+    // Pin the Unicode codepoint so a drift to < (less-than) or « (double
+    // guillemet) surfaces. The single guillemet is the brand convention
+    // for back-affordance arrows on reading pages + card verso footers.
+    expect(BACK_ARROW_PREFIX_GLYPH.charCodeAt(0)).toBe(0x2039);
+    expect(BACK_ARROW_SUFFIX_GLYPH.charCodeAt(1)).toBe(0x2039);
+  });
+
+  it("PREFIX is glyph + trailing space, SUFFIX is leading space + glyph (mirrored cadence)", () => {
+    // Mirrored: PREFIX leads with the glyph, SUFFIX trails with the
+    // glyph. A swap at either site would invert the visual cue.
+    expect(BACK_ARROW_PREFIX_GLYPH.endsWith(" ")).toBe(true);
+    expect(BACK_ARROW_SUFFIX_GLYPH.startsWith(" ")).toBe(true);
+  });
+
+  it("both glyphs are exactly 2 chars long", () => {
+    expect(BACK_ARROW_PREFIX_GLYPH).toHaveLength(2);
+    expect(BACK_ARROW_SUFFIX_GLYPH).toHaveLength(2);
+  });
+
+  it("PREFIX and SUFFIX are NOT equal (anti-collapse — they have opposite spacing)", () => {
+    // The 2 consts serve mirrored roles. A future refactor that
+    // collapses them into one shared const would render incorrect
+    // cadence at one of the 2 sites.
+    expect(BACK_ARROW_PREFIX_GLYPH).not.toBe(BACK_ARROW_SUFFIX_GLYPH);
   });
 });
 

@@ -3,6 +3,7 @@ import {
   anScrutinViewAriaLabel,
   DEMO_DATA_LABEL_PREFIX, DEMO_FALLBACK_SHORT_LABEL,
   DEMO_FALLBACK_TITLE_SUFFIX, DEMO_FALLBACK_ARIA_SUFFIX,
+  AUDIT_GLYPH_ALIGNED, AUDIT_GLYPH_PARTIAL, AUDIT_GLYPH_OPPOSED, AUDIT_GLYPH_DIVIDED,
   AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
   AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
   auditTrailChipNoun, AN_LINK_SHORT_LABEL,
@@ -83,10 +84,10 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
         display: "flex", gap: 14, marginBottom: 12, flexWrap: "wrap",
         paddingBottom: 10, borderBottom: "1px solid var(--line)",
       }}>
-        <span><span style={{ color: "var(--pour)" }}><span aria-hidden="true">✓ </span>{alignment.perfect}</span> {auditTrailChipNoun(alignment.perfect, "aligned")}</span>
-        <span><span style={{ color: "var(--warn)" }}><span aria-hidden="true">≈ </span>{alignment.partial}</span> {auditTrailChipNoun(alignment.partial, "partial")}</span>
-        <span><span style={{ color: "var(--contre)" }}><span aria-hidden="true">✕ </span>{alignment.conflict}</span> {auditTrailChipNoun(alignment.conflict, "opposed")}</span>
-        <span style={{ color: "var(--ink-3)" }}><span aria-hidden="true">÷ </span>{alignment.divided_excluded} {auditTrailChipNoun(alignment.divided_excluded, "divided")}</span>
+        <span><span style={{ color: "var(--pour)" }}><span aria-hidden="true">{AUDIT_GLYPH_ALIGNED}</span>{alignment.perfect}</span> {auditTrailChipNoun(alignment.perfect, "aligned")}</span>
+        <span><span style={{ color: "var(--warn)" }}><span aria-hidden="true">{AUDIT_GLYPH_PARTIAL}</span>{alignment.partial}</span> {auditTrailChipNoun(alignment.partial, "partial")}</span>
+        <span><span style={{ color: "var(--contre)" }}><span aria-hidden="true">{AUDIT_GLYPH_OPPOSED}</span>{alignment.conflict}</span> {auditTrailChipNoun(alignment.conflict, "opposed")}</span>
+        <span style={{ color: "var(--ink-3)" }}><span aria-hidden="true">{AUDIT_GLYPH_DIVIDED}</span>{alignment.divided_excluded} {auditTrailChipNoun(alignment.divided_excluded, "divided")}</span>
       </div>
 
       {/* Per-scrutin breakdown */}

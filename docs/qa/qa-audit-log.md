@@ -4334,3 +4334,23 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `VOTE_GLYPH_CONTRE\|VOTE_GLYPH_SKIP\|VOTE_GLYPH_POUR\|BUTTON_ICON_RESTART\|RESULT_CONTINUE_TEST_PAREN_PREFIX\|RESULT_CONTINUE_TEST_PAREN_SUFFIX` src/ tests/ → 18+ résultats
 - [ ] grep `'"← "'\|'"↓ "'\|'" →"'\|'"↻ "'` src/ tests/ → ~3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~1119 tests` CLAUDE.md → 0 résultat (aligné sur ~1135)
+
+## Session 186 — 2026-05-18
+
+### Vérification session 185
+
+- [VERIFIED] 50 occurrences des nouveaux exports (VOTE_GLYPH_CONTRE/_SKIP/_POUR + BUTTON_ICON_RESTART + RESULT_CONTINUE_TEST_PAREN_PREFIX/_SUFFIX)
+- [VERIFIED] CLAUDE.md "~1119 tests" → 0 résultat (aligné sur ~1135)
+- 1135/1135 tests verts, typecheck clean
+
+### Bugs fixés (AUDIT_GLYPH_ALIGNED/_PARTIAL/_OPPOSED/_DIVIDED + BUTTON_ARROW_RIGHT_PREFIX + BACK_ARROW_PREFIX_GLYPH/_SUFFIX_GLYPH)
+
+- [FIXED] AuditTrail.tsx breakdown chip glyphs (4 sites lines 86-89) `"✓ "` + `"≈ "` + `"✕ "` + `"÷ "` inline + untested. Drift surface : 4 aria-hidden glyphs pairing 1:1 avec AUDIT_TRAIL_LABEL_ALIGNED/PARTIAL/OPPOSED/DIVIDED. Chaque glyph est colored to match le vote class via le surrounding span. Un drift de check mark ✓ (U+2713) vers ✅ (U+2705 emoji) changerait le rendering register (monochrome glyph inheriting color → color-coded emoji ignoring color). Fix : export `AUDIT_GLYPH_ALIGNED` + `_PARTIAL` + `_OPPOSED` + `_DIVIDED`. AuditTrail.tsx utilise les 4 consts. Aria-labels tests : 10 (pin-the-value × 4 + Unicode codepoint defense-in-depth × 4 [U+2713 check + U+2248 almost-equal + U+2715 multiplication-X + U+00F7 division-sign] + exactly-2-chars cadence × 1 + trailing-space cadence × 1). · `src/types/index.ts`, `src/components/AuditTrail.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Right-arrow prefix glyph `"→ "` inline 2× (MethodeSheet.tsx line 124 full-methode link + Result.tsx line 273 continue-test button) + untested. Drift surface : forward-navigation affordance visuelle. Distinct from VOTE_GLYPH_POUR (" →" suffix-style) — prefix-style trails l'arrow before le label, suffix-style trails le label before l'arrow. Un accidental merge dans une const partagée shipperait wrong cadence at one site. Fix : export `BUTTON_ARROW_RIGHT_PREFIX`. MethodeSheet.tsx + Result.tsx utilisent la const. Aria-labels tests : 4 (canonical + U+2192 right-arrow charCodeAt defense-in-depth + prefix/suffix-style distinct-from-VOTE_GLYPH_POUR anti-collapse + exactly-2-chars cadence). · `src/types/index.ts`, `src/components/MethodeSheet.tsx`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Back-navigation guillemet glyphs `"‹ "` + `" ‹"` inline 2 sites (ReadingPageHeader.tsx line 45 prefix + Card.tsx line 290 suffix paired avec CARD_VERSO_FLIP_BACK_HINT) + untested. Drift surface : back-affordance brand convention sur reading pages + card verso footers. Same single guillemet U+2039 dans les 2 sites mais spacing différent (PREFIX = glyph + space leads ; SUFFIX = space + glyph trails). Un swap ou drift en < (less-than) ou « (double guillemet) changerait l'iconographie. Fix : export `BACK_ARROW_PREFIX_GLYPH` + `BACK_ARROW_SUFFIX_GLYPH`. ReadingPageHeader.tsx + Card.tsx utilisent les consts. Aria-labels tests : 5 (canonical PREFIX + canonical SUFFIX + U+2039 single-left-guillemet × 2 sites charCodeAt defense-in-depth + mirrored prefix/suffix cadence + exactly-2-chars × 2 + PREFIX !== SUFFIX anti-collapse). · `src/types/index.ts`, `src/components/ReadingPageHeader.tsx`, `src/components/Card.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 187
+
+- [ ] grep `AUDIT_GLYPH_ALIGNED\|AUDIT_GLYPH_PARTIAL\|AUDIT_GLYPH_OPPOSED\|AUDIT_GLYPH_DIVIDED\|BUTTON_ARROW_RIGHT_PREFIX\|BACK_ARROW_PREFIX_GLYPH\|BACK_ARROW_SUFFIX_GLYPH` src/ tests/ → 20+ résultats
+- [ ] grep `'"✓ "'\|'"≈ "'\|'"✕ "'\|'"÷ "'\|'"‹ "'\|'" ‹"'` src/ tests/ → ~3-5 résultats (declarations + pin-the-value)
+- [ ] grep `~1135 tests` CLAUDE.md → 0 résultat (aligné sur ~1155)

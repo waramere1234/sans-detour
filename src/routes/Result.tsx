@@ -28,6 +28,7 @@ import {
   RESULT_H1_PERCENT_WRAPPER_PREFIX, RESULT_H1_PERCENT_WRAPPER_SUFFIX,
   BUTTON_ICON_RESTART,
   RESULT_CONTINUE_TEST_PAREN_PREFIX, RESULT_CONTINUE_TEST_PAREN_SUFFIX,
+  BUTTON_ARROW_RIGHT_PREFIX,
   type Scrutin, type GroupCode,
 } from "../types";
 
@@ -270,7 +271,7 @@ export default function Result() {
         {isPartial && (
           <button type="button"
             onClick={() => navigate(ROUTES.play)}
-            style={btnPrimary()}><span aria-hidden="true">→ </span>{CONTINUE_TEST_LABEL_PREFIX}{RESULT_CONTINUE_TEST_PAREN_PREFIX}{remaining} {continueTestRemainingSuffix(remaining)}{RESULT_CONTINUE_TEST_PAREN_SUFFIX}</button>
+            style={btnPrimary()}><span aria-hidden="true">{BUTTON_ARROW_RIGHT_PREFIX}</span>{CONTINUE_TEST_LABEL_PREFIX}{RESULT_CONTINUE_TEST_PAREN_PREFIX}{remaining} {continueTestRemainingSuffix(remaining)}{RESULT_CONTINUE_TEST_PAREN_SUFFIX}</button>
         )}
         <button type="button"
           onClick={share}

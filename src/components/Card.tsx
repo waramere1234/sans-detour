@@ -12,6 +12,7 @@ import {
   CARD_VERSO_FLIP_BACK_HINT, CARD_NO_ANALYSE_FALLBACK_BODY,
   CARD_FOOTER_NUMERO_PREFIX, CARD_FOOTER_DATE_SEPARATOR,
   MIDDLE_DOT_SEPARATOR,
+  BACK_ARROW_SUFFIX_GLYPH,
   type Scrutin,
 } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
@@ -287,7 +288,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             display: "flex", justifyContent: "space-between", alignItems: "center",
             fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.04em",
           }}>
-            <span style={{ color: "var(--ink-3)" }}>{CARD_VERSO_FLIP_BACK_HINT}<span aria-hidden="true"> ‹</span></span>
+            <span style={{ color: "var(--ink-3)" }}>{CARD_VERSO_FLIP_BACK_HINT}<span aria-hidden="true">{BACK_ARROW_SUFFIX_GLYPH}</span></span>
             {scrutin.url_an_officielle
               ? <a
                   href={scrutin.url_an_officielle}

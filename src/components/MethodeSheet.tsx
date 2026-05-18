@@ -10,6 +10,7 @@ import {
   METHODESHEET_CLAUDE_MISSION_STRONG,
   METHODESHEET_AN_BLOCK_BODY, METHODESHEET_CLAUDE_NO_AI_IN_SCORE,
   METHODESHEET_CLAUDE_TASKS_BODY, METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY,
+  BUTTON_ARROW_RIGHT_PREFIX,
 } from "../types";
 import { useModalA11y } from "../hooks/useModalA11y";
 
@@ -121,7 +122,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
                 to={ROUTES.methode}
                 onClick={onClose}
                 style={btnPrimary()}
-              ><span aria-hidden="true">→ </span>{METHODESHEET_FULL_METHODE_LINK_LABEL}</Link>
+              ><span aria-hidden="true">{BUTTON_ARROW_RIGHT_PREFIX}</span>{METHODESHEET_FULL_METHODE_LINK_LABEL}</Link>
               <a
                 href={mailto(ERROR_REPORT_SUBJECT)}
                 onClick={onClose}

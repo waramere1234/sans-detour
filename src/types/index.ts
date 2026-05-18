@@ -1203,6 +1203,38 @@ export const BUTTON_ICON_RESTART = "↻ ";
 export const RESULT_CONTINUE_TEST_PAREN_PREFIX = " (";
 export const RESULT_CONTINUE_TEST_PAREN_SUFFIX = ")";
 
+/** AuditTrail breakdown chip glyphs — 4 aria-hidden visual icons
+ *  paired 1:1 with AUDIT_TRAIL_LABEL_ALIGNED / PARTIAL / OPPOSED /
+ *  DIVIDED. The chips render in the audit-trail header next to each
+ *  count, with the glyph colored to match the vote class. A drift
+ *  on any of the 4 glyphs would silently change the visual semantics
+ *  without surfacing via the existing label tests. */
+export const AUDIT_GLYPH_ALIGNED = "✓ ";
+export const AUDIT_GLYPH_PARTIAL = "≈ ";
+export const AUDIT_GLYPH_OPPOSED = "✕ ";
+export const AUDIT_GLYPH_DIVIDED = "÷ ";
+
+/** Right-arrow prefix glyph "→ " — used in MethodeSheet's full-methode
+ *  link (l.124) and Result's continue-test button (l.273). 2 sites,
+ *  same visual affordance (forward navigation). Pin so a typography
+ *  tweak propagates to one site instead of 2. Distinct from
+ *  VOTE_GLYPH_POUR (" →" suffix-style) — the prefix-style trails the
+ *  arrow before the label, suffix-style trails the label before the
+ *  arrow. */
+export const BUTTON_ARROW_RIGHT_PREFIX = "→ ";
+
+/** Back-navigation guillemet glyphs — paired prefix + suffix used as
+ *  back-affordance visual affordances:
+ *    - PREFIX "‹ " leads ReadingPageHeader's back link (l.45)
+ *    - SUFFIX " ‹" trails Card.tsx's verso flip-back hint (l.290),
+ *      paired with CARD_VERSO_FLIP_BACK_HINT
+ *  Same single-guillemet glyph U+2039 in both, but the spacing
+ *  differs (leading vs trailing space). Pin both so a future
+ *  tweak that aligns the 2 sites (or replaces the glyph) lands
+ *  in lockstep. */
+export const BACK_ARROW_PREFIX_GLYPH = "‹ ";
+export const BACK_ARROW_SUFFIX_GLYPH = " ‹";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

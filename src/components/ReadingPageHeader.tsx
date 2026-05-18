@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 import { Wordmark } from "./Wordmark";
 import { FROM_LOGO_STATE } from "../lib/nav-state";
 import { ROUTES } from "../lib/routes";
-import { PAGE_HEADER_NAV_LABEL, WORDMARK_HOME_LABEL } from "../types";
+import { PAGE_HEADER_NAV_LABEL, WORDMARK_HOME_LABEL, BACK_ARROW_PREFIX_GLYPH } from "../types";
 
 /** Visible back-link text — matches the Cover/TopBar wordmark Link's
  *  "Accueil" aria-label conceptually, but uses the shorter "‹ Retour"
@@ -42,7 +42,7 @@ export function ReadingPageHeader() {
           justifySelf: "start",
         }}
       >
-        <span aria-hidden="true">‹ </span>{BACK_LINK_LABEL}
+        <span aria-hidden="true">{BACK_ARROW_PREFIX_GLYPH}</span>{BACK_LINK_LABEL}
       </Link>
       <Link
         to={ROUTES.cover}
