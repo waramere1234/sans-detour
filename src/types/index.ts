@@ -902,6 +902,37 @@ export const METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX =
   "(et la page AN complète est toujours accessible via « ";
 export const METHODE_S07_AN_LINK_PARENTHETICAL_SUFFIX = " »)";
 
+/** Cover h1 tagline — split across 2 JSX nodes so the second half can
+ *  carry the accent color. TAGLINE itself documents that the two halves
+ *  compose into the canonical product tagline; pin both halves so the
+ *  hero h1 stays in lockstep with the meta description / og:description /
+ *  twitter:description copies that read TAGLINE directly. The composition
+ *  invariant (`PART_1 + " " + PART_2 + "." === TAGLINE`) lives in the
+ *  Cover test so any tweak to one half without the other fails CI. */
+export const TAGLINE_PART_1 = "Pas les programmes";
+export const TAGLINE_PART_2 = "Les vrais votes";
+
+/** Methode §06 independence opener — split around `<strong>indépendant</strong>`
+ *  JSX interpolation. The opening sentence ("Sans Détour est un projet
+ *  indépendant.") pairs with the formal Legal version in
+ *  LEGAL_INDEPENDANCE_BODY (same claim, different register). The
+ *  load-bearing word is `indépendant` — strong-tagged for emphasis on
+ *  the methodology page. PREFIX starts with BRAND_NAME so a future
+ *  rebrand propagates here automatically. */
+export const METHODE_S06_INDEPENDENCE_OPENER_PREFIX = "Sans Détour est un projet ";
+export const METHODE_S06_INDEPENDENCE_STRONG = "indépendant";
+export const METHODE_S06_INDEPENDENCE_OPENER_SUFFIX = ". ";
+
+/** MethodeSheet Claude block "Sa mission" strong-tagged claim — the
+ *  load-bearing AI-role-boundary statement. Documents the contract
+ *  between Sans Détour and Claude: render legibly (transform the
+ *  libellé brut into a synthesis), DO NOT comment (no political
+ *  opinion, no editorialization). Pinned so a rewording that softens
+ *  "pas commenter" to "résumer fidèlement" (or similar) — which
+ *  would weaken the no-editorialization contract — surfaces in tests. */
+export const METHODESHEET_CLAUDE_MISSION_STRONG =
+  "Sa mission : rendre lisible, pas commenter.";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

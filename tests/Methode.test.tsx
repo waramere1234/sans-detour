@@ -13,6 +13,8 @@ import {
   METHODE_PAGE_H1,
   METHODE_S06_NO_AFFILIATION_PHRASE,
   METHODE_S06_HOSTING_FUNDING_BODY,
+  METHODE_S06_INDEPENDENCE_OPENER_PREFIX, METHODE_S06_INDEPENDENCE_STRONG,
+  METHODE_S06_INDEPENDENCE_OPENER_SUFFIX,
   METHODE_S01_UPDATE_CADENCE,
   METHODE_S05_NO_TRACKING_PHRASE,
   METHODE_S03_GROUP_INTRO,
@@ -110,6 +112,20 @@ describe("Methode — section structure", () => {
     const sectionIds = METHODE_SECTIONS.map(([n]) => n);
     const titleIds = Object.keys(METHODE_SECTION_BODY_TITLES);
     expect(titleIds.sort()).toEqual(sectionIds.slice().sort());
+  });
+
+  it("§06 surfaces METHODE_S06_INDEPENDENCE_OPENER_* (brand independence opener wrapping <strong>indépendant</strong>)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-06")!;
+    expect(section.textContent).toContain(METHODE_S06_INDEPENDENCE_OPENER_PREFIX.trim());
+    expect(section.textContent).toContain(METHODE_S06_INDEPENDENCE_STRONG);
+    expect(section.textContent).toContain(METHODE_S06_INDEPENDENCE_OPENER_SUFFIX.trim());
+    // The <strong> tag wraps METHODE_S06_INDEPENDENCE_STRONG — assert
+    // the strong element exists and carries exactly that text so a
+    // future refactor that drops the emphasis (e.g., removes the
+    // <strong>) fails CI.
+    const strong = section.querySelector("strong");
+    expect(strong?.textContent).toBe(METHODE_S06_INDEPENDENCE_STRONG);
   });
 
   it("§06 surfaces METHODE_S06_NO_AFFILIATION_PHRASE (independence claim)", () => {

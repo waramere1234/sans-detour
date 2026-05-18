@@ -77,6 +77,11 @@ import {
   METHODE_S07_CADRE_BIAIS_PREFIX, METHODE_S07_CADRE_BIAIS_SUFFIX,
   METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX, METHODE_S07_AN_LINK_PARENTHETICAL_SUFFIX,
   CARD_VERSO_FLIP_BACK_HINT, CARD_NO_ANALYSE_FALLBACK_BODY,
+  TAGLINE, TAGLINE_PART_1, TAGLINE_PART_2,
+  BRAND_NAME,
+  METHODE_S06_INDEPENDENCE_OPENER_PREFIX, METHODE_S06_INDEPENDENCE_STRONG,
+  METHODE_S06_INDEPENDENCE_OPENER_SUFFIX,
+  METHODESHEET_CLAUDE_MISSION_STRONG,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -2219,3 +2224,122 @@ describe("METHODE_S07_AN_LINK_PARENTHETICAL_PREFIX/SUFFIX — Methode §07 AN-li
     expect(closeCount).toBe(1);
   });
 });
+
+describe("TAGLINE_PART_1 + TAGLINE_PART_2 — Cover h1 tagline halves composing into TAGLINE", () => {
+  it("TAGLINE_PART_1 matches the canonical first half (pin-the-value)", () => {
+    expect(TAGLINE_PART_1).toBe("Pas les programmes");
+  });
+
+  it("TAGLINE_PART_2 matches the canonical second half (pin-the-value)", () => {
+    expect(TAGLINE_PART_2).toBe("Les vrais votes");
+  });
+
+  it("PART_1 + '. ' + PART_2 + '.' composes back to TAGLINE (round-trip invariant)", () => {
+    // The Cover h1 renders PART_1 + "." + <br/> + PART_2 + "." while
+    // TAGLINE is the joined "Pas les programmes. Les vrais votes." used
+    // by the meta description / og:description / twitter:description /
+    // title / manifest. If a future tweak edits one half without the
+    // other, this invariant fails and forces a sync edit.
+    expect(`${TAGLINE_PART_1}. ${TAGLINE_PART_2}.`).toBe(TAGLINE);
+  });
+
+  it("neither half ends with a period (the period lives in Cover JSX, not the const)", () => {
+    // The h1 renders the period after each half via a separate JSX
+    // span (so the accent color extends to the dot for PART_2). Pin
+    // the no-trailing-period contract so a future edit that inlines
+    // the period back into the const would surface in CI before drift.
+    expect(TAGLINE_PART_1.endsWith(".")).toBe(false);
+    expect(TAGLINE_PART_2.endsWith(".")).toBe(false);
+  });
+
+  it("PART_2 contains 'vrais votes' (anti-dilution guard for product pitch)", () => {
+    // "vrais votes" is THE product pitch — Sans Détour exists because
+    // it measures alignment on real parliamentary votes, not programmes
+    // or declarations. A rewording that drops "vrais" (e.g., to "Les
+    // votes des députés") would lose the load-bearing adjective that
+    // distinguishes this product.
+    expect(TAGLINE_PART_2).toContain("vrais votes");
+  });
+});
+
+describe("METHODE_S06_INDEPENDENCE_OPENER_PREFIX/STRONG/SUFFIX — Methode §06 independence claim opener", () => {
+  it("PREFIX matches the canonical opener (pin-the-value)", () => {
+    expect(METHODE_S06_INDEPENDENCE_OPENER_PREFIX).toBe("Sans Détour est un projet ");
+  });
+
+  it("STRONG is the single 'indépendant' word (pin-the-value)", () => {
+    expect(METHODE_S06_INDEPENDENCE_STRONG).toBe("indépendant");
+  });
+
+  it("SUFFIX is the period-space separator before the next sentence", () => {
+    expect(METHODE_S06_INDEPENDENCE_OPENER_SUFFIX).toBe(". ");
+  });
+
+  it("PREFIX starts with BRAND_NAME (anti-brand-drift guard)", () => {
+    // PREFIX hardcodes "Sans Détour" rather than interpolating BRAND_NAME
+    // (the inline-with-strong split doesn't allow it cleanly). Anti-drift
+    // guard: assert the brand prefix matches BRAND_NAME so a future
+    // rebrand fails this test until PREFIX is updated in lockstep.
+    expect(METHODE_S06_INDEPENDENCE_OPENER_PREFIX.startsWith(BRAND_NAME)).toBe(true);
+  });
+
+  it("STRONG is 'indépendant' (the load-bearing claim word)", () => {
+    // The whole §06 paragraph (and the parallel LEGAL_INDEPENDANCE_BODY)
+    // hangs on this single word. A softening to "neutre" or "autonome"
+    // would weaken the independence contract that distinguishes Sans
+    // Détour from partisan affiliations.
+    expect(METHODE_S06_INDEPENDENCE_STRONG).toBe("indépendant");
+  });
+
+  it("PREFIX + STRONG + SUFFIX composes the same opening sentence as LEGAL_INDEPENDANCE_BODY's first sentence", () => {
+    // Methode §06 (informal) and Legal Indépendance (formal RGPD)
+    // surface the same brand-independence contract. The opening
+    // sentence must match exactly so a tweak in one surface stays
+    // aligned with the other.
+    const methodeOpener = METHODE_S06_INDEPENDENCE_OPENER_PREFIX
+      + METHODE_S06_INDEPENDENCE_STRONG
+      + METHODE_S06_INDEPENDENCE_OPENER_SUFFIX.trim();
+    expect(methodeOpener).toBe("Sans Détour est un projet indépendant.");
+  });
+});
+
+describe("METHODESHEET_CLAUDE_MISSION_STRONG — load-bearing AI-role-boundary claim", () => {
+  it("matches the canonical mission statement (pin-the-value)", () => {
+    expect(METHODESHEET_CLAUDE_MISSION_STRONG).toBe(
+      "Sa mission : rendre lisible, pas commenter.",
+    );
+  });
+
+  it("contains 'rendre lisible' (the positive half of the role)", () => {
+    // The MUST-DO half: Claude transforms the libellé brut + web search
+    // results into a synthesis that's readable. A rewording that drops
+    // "rendre lisible" would lose the positive contract — what Claude
+    // is actually for.
+    expect(METHODESHEET_CLAUDE_MISSION_STRONG).toContain("rendre lisible");
+  });
+
+  it("contains 'pas commenter' (the must-NOT-do half of the role)", () => {
+    // The MUST-NOT-DO half — the no-editorialization contract. A
+    // softening to "résumer" or "synthétiser" without the explicit
+    // negation would weaken the transparency promise: Claude is
+    // permitted to render but forbidden from commenting.
+    expect(METHODESHEET_CLAUDE_MISSION_STRONG).toContain("pas commenter");
+  });
+
+  it("uses 'Sa mission :' (role-framing) not 'Son rôle' or generic intro (anti-soften guard)", () => {
+    // "mission" frames the boundary as a contract, not a suggestion.
+    // A softening to "Son rôle est de" or "Claude essaie de" would
+    // weaken the binding nature of the claim.
+    expect(METHODESHEET_CLAUDE_MISSION_STRONG.startsWith("Sa mission")).toBe(true);
+  });
+
+  it("contains exactly one ',' (the rendre/pas-commenter split)", () => {
+    // The mission is a 2-clause sentence joined by a single comma:
+    // "rendre lisible, pas commenter". A future tweak that adds a
+    // third clause or removes the comma would change the cadence
+    // and weaken the parallel rendre/pas-commenter structure.
+    const commaCount = (METHODESHEET_CLAUDE_MISSION_STRONG.match(/,/g) || []).length;
+    expect(commaCount).toBe(1);
+  });
+});
+

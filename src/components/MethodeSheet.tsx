@@ -7,6 +7,7 @@ import {
   METHODESHEET_AN_BLOCK_TITLE, METHODESHEET_CLAUDE_BLOCK_TITLE,
   METHODESHEET_TITLE,
   METHODESHEET_FULL_METHODE_LINK_LABEL, METHODESHEET_REPORT_ERROR_LINK_LABEL,
+  METHODESHEET_CLAUDE_MISSION_STRONG,
 } from "../types";
 import { useModalA11y } from "../hooks/useModalA11y";
 
@@ -110,8 +111,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
               <p style={{ margin: "0 0 10px" }}>
                 Claude reçoit le libellé brut de l'AN + des résultats de
                 recherche web. Pas d'opinion humaine ni d'orientation
-                politique dans son prompt. <strong>Sa mission : rendre lisible,
-                pas commenter.</strong>
+                politique dans son prompt. <strong>{METHODESHEET_CLAUDE_MISSION_STRONG}</strong>
               </p>
               <p style={{ margin: 0 }}>
                 Le calcul d'alignement, lui, est une formule mathématique

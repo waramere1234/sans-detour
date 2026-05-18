@@ -6,6 +6,7 @@ import {
   MODAL_CLOSE_LABEL,
   METHODESHEET_FULL_METHODE_LINK_LABEL,
   METHODESHEET_REPORT_ERROR_LINK_LABEL,
+  METHODESHEET_CLAUDE_MISSION_STRONG,
 } from "../src/types";
 
 function renderSheet(open: boolean, onClose = vi.fn()) {
@@ -57,5 +58,17 @@ describe("MethodeSheet", () => {
     const mailLink = screen.getByRole("link", { name: new RegExp(METHODESHEET_REPORT_ERROR_LINK_LABEL, "i") });
     expect(mailLink).toHaveAttribute("href", expect.stringContaining("mailto:"));
     expect(screen.getByRole("link", { name: new RegExp(METHODESHEET_FULL_METHODE_LINK_LABEL, "i") })).toBeInTheDocument();
+  });
+
+  it("surfaces METHODESHEET_CLAUDE_MISSION_STRONG inside a <strong> (AI-role-boundary contract)", () => {
+    renderSheet(true);
+    // The mission line lives inside a <strong> in the Claude block.
+    // Round-trip via the const so a future rewording that softens
+    // "pas commenter" propagates to both the source and this test.
+    const strongs = Array.from(document.querySelectorAll("strong"));
+    const missionStrong = strongs.find(
+      (el) => el.textContent === METHODESHEET_CLAUDE_MISSION_STRONG,
+    );
+    expect(missionStrong).toBeDefined();
   });
 });

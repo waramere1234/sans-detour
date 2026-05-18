@@ -19,6 +19,7 @@ import {
   COVER_SOURCE_ATTRIBUTION_AN, COVER_SOURCE_ATTRIBUTION_CLAUDE,
   coverProgressChipText, COVER_HERO_PARAGRAPH,
   COVER_SECONDARY_NAV_LABEL, COVER_EYEBROW_SUFFIX,
+  TAGLINE_PART_1, TAGLINE_PART_2,
 } from "../types";
 
 export default function Cover() {
@@ -153,9 +154,9 @@ export default function Cover() {
             fontSize: 38, lineHeight: 1.05, letterSpacing: "-0.022em",
             margin: "14px 0 0", color: "var(--ink)",
           }}>
-            Pas les programmes.
+            {TAGLINE_PART_1}.
             <br />
-            <span style={{ color: "var(--accent)" }}>Les vrais votes</span>
+            <span style={{ color: "var(--accent)" }}>{TAGLINE_PART_2}</span>
             <span style={{ color: "var(--accent)" }}>.</span>
           </h1>
           <p style={{

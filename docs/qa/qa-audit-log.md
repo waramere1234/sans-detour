@@ -4125,3 +4125,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `CARD_VERSO_FLIP_BACK_HINT\|CARD_NO_ANALYSE_FALLBACK_BODY\|METHODE_S07_AN_LINK_PARENTHETICAL` src/ tests/ → 15+ résultats
 - [ ] grep `"tap pour revenir"\|"Aucune explication détaillée"\|"page AN complète"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~956 tests` CLAUDE.md → 0 résultat (aligné sur ~973)
+
+## Session 176 — 2026-05-18
+
+### Vérification session 175
+
+- [VERIFIED] 42 occurrences des nouveaux exports (CARD_VERSO_FLIP_BACK_HINT + CARD_NO_ANALYSE_FALLBACK_BODY + METHODE_S07_AN_LINK_PARENTHETICAL_*)
+- [VERIFIED] 2 occurrences inline literals = 2 déclarations (clean — pin-the-value tests réfèrent via la const)
+- [VERIFIED] CLAUDE.md "~956 tests" → 0 résultat (aligné sur ~973)
+- 973/973 tests verts, typecheck clean
+
+### Bugs fixés (TAGLINE_PART_1/2 + METHODE_S06_INDEPENDENCE_OPENER_* + METHODESHEET_CLAUDE_MISSION_STRONG)
+
+- [FIXED] Cover.tsx h1 tagline hardcoded inline en 2 morceaux (`"Pas les programmes."` + `"Les vrais votes"`) alors que `TAGLINE` const existe et documente explicitement le split JSX. Drift surface : TAGLINE est utilisé par 5 fichiers statiques (index.html meta description + og:description + twitter:description + title + manifest.webmanifest description) via tests/site-metadata.test.ts ; le commentaire de TAGLINE dit "split across JSX nodes for the accent color" mais Cover.tsx n'enforçait pas le lien. Si TAGLINE change, le h1 ne suit pas. Fix : export `TAGLINE_PART_1` + `TAGLINE_PART_2`. Cover.tsx utilise les consts. Cover test : 1 nouveau test (toContain les 2 halves) en plus du round-trip h1.textContent → TAGLINE existant. Aria-labels tests : 5 (canonical PART_1 + canonical PART_2 + composition invariant `PART_1 + ". " + PART_2 + "." === TAGLINE` + no-trailing-period contract sur les 2 + contains "vrais votes" anti-dilution product-pitch guard). · `src/types/index.ts`, `src/routes/Cover.tsx`, `tests/Cover.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode.tsx §06 independence opener `"Sans Détour est un projet "` + `<strong>indépendant</strong>` + `". "` inline (split autour du strong) + untested. Drift surface : claim paired avec LEGAL_INDEPENDANCE_BODY (`"Sans Détour est un projet indépendant. Aucune affiliation politique..."` — formel RGPD). Les 2 surfaces documentent le même contrat brand-independence mais sont délibérément worded différemment (informel Methode vs formel Legal). Le brand name "Sans Détour" était hardcodé inline plutôt que dérivé de BRAND_NAME, et le strong-tagged `"indépendant"` (load-bearing claim word) n'était pinné nulle part. Fix : export `METHODE_S06_INDEPENDENCE_OPENER_PREFIX` + `_STRONG` + `_SUFFIX`. Methode.tsx utilise la composition. Methode test : 1 test (toContain × 3 + querySelector("strong") roundtrip sur STRONG). Aria-labels tests : 7 (canonical PREFIX + STRONG + SUFFIX + PREFIX startsWith BRAND_NAME anti-brand-drift + STRONG === "indépendant" load-bearing + composition compose en "Sans Détour est un projet indépendant." === sentence one de LEGAL_INDEPENDANCE_BODY). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] MethodeSheet.tsx Claude block `<strong>Sa mission : rendre lisible, pas commenter.</strong>` inline + untested. Drift surface : load-bearing AI-role-boundary claim — documente le contrat entre Sans Détour et Claude (must DO : rendre lisible ; must NOT DO : commenter). Un softening en "résumer fidèlement" ou "synthétiser objectivement" affaiblirait la promesse de neutralité (le no-editorialization contract paired avec METHODE_S07_NE_FAIT_PAS_BODY). Fix : export `METHODESHEET_CLAUDE_MISSION_STRONG`. MethodeSheet.tsx utilise la const dans le `<strong>`. MethodeSheet test : 1 test (querySelectorAll("strong") + find par textContent === const, garantie que le strong-tag emphasis reste). Aria-labels tests : 5 (canonical pin-the-value + contains "rendre lisible" positive role + contains "pas commenter" negative role anti-soften + startsWith "Sa mission" role-framing-as-contract guard + exactly-1-comma cadence guard). · `src/types/index.ts`, `src/components/MethodeSheet.tsx`, `tests/MethodeSheet.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 177
+
+- [ ] grep `TAGLINE_PART_\|METHODE_S06_INDEPENDENCE_\|METHODESHEET_CLAUDE_MISSION_STRONG` src/ tests/ → 20+ résultats
+- [ ] grep `"Pas les programmes"\|"Sans Détour est un projet"\|"Sa mission : rendre lisible"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value uniquement)
+- [ ] grep `~973 tests` CLAUDE.md → 0 résultat (aligné sur ~992)

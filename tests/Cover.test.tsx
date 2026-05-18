@@ -10,6 +10,7 @@ import { FROM_LOGO_STATE } from "../src/lib/nav-state";
 import { ROUTES } from "../src/lib/routes";
 import {
   TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL, TAGLINE,
+  TAGLINE_PART_1, TAGLINE_PART_2,
   START_LABEL, RESUME_LABEL, VIEW_RESULT_LABEL,
   RESTART_LABEL, VIEW_PARTIAL_RESULT_LABEL,
   restartConfirmMessage,
@@ -56,6 +57,18 @@ describe("Cover", () => {
   it("renders COVER_EYEBROW_SUFFIX in the header eyebrow (after LEGISLATURE_LABEL ' — ')", () => {
     renderCover();
     expect(screen.getByText(new RegExp(COVER_EYEBROW_SUFFIX))).toBeInTheDocument();
+  });
+
+  it("hero <h1> contains both TAGLINE_PART_1 and TAGLINE_PART_2 (round-trip via the const halves)", () => {
+    // Cover.tsx renders the tagline as {TAGLINE_PART_1}. + <br/> +
+    // <span>{TAGLINE_PART_2}</span><span>.</span>. The aria-labels
+    // suite holds the composition invariant; this test pins the
+    // *render path* — that both halves end up in the h1's textContent.
+    renderCover();
+    const h1 = screen.getByRole("heading", { level: 1 });
+    const text = h1.textContent ?? "";
+    expect(text).toContain(TAGLINE_PART_1);
+    expect(text).toContain(TAGLINE_PART_2);
   });
 
   it("hero <h1> textContent concatenates to TAGLINE (split JSX for the accent styling)", () => {
