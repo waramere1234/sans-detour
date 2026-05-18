@@ -99,6 +99,9 @@ import {
   RESULT_PERSONNALITES_EXCLUSIONS_NOTE,
   METHODE_S04_RANK_ORDINAL_MARKER,
   METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX,
+  H1_ACCENT_PERIOD,
+  RESULT_H1_PERCENT_WRAPPER_PREFIX, RESULT_H1_PERCENT_WRAPPER_SUFFIX,
+  CARD_FOOTER_NUMERO_PREFIX, CARD_FOOTER_DATE_SEPARATOR,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -3025,6 +3028,106 @@ describe("METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX — Methode page-lead link closer
 
   it("ends with '.' (sentence terminator)", () => {
     expect(METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX.endsWith(".")).toBe(true);
+  });
+});
+
+describe("H1_ACCENT_PERIOD — brand-finish accent-colored period at h1 end", () => {
+  it("is the literal '.' (pin-the-value)", () => {
+    expect(H1_ACCENT_PERIOD).toBe(".");
+  });
+
+  it("is exactly 1 char (anti-overgrowth)", () => {
+    // The accent terminator is intentionally a single period. A future
+    // tweak to "‧" or ".." or em-dash would change the brand-finish
+    // convention across 3 routes simultaneously.
+    expect(H1_ACCENT_PERIOD).toHaveLength(1);
+  });
+
+  it("is a period character (anti-replace guard)", () => {
+    // The 3 h1 sites (Cover/Methode/Result) all use the same period
+    // for the same accent-colored terminator. A typo to "," or ";"
+    // would silently change the brand convention.
+    expect(H1_ACCENT_PERIOD).toBe(".");
+  });
+});
+
+describe("RESULT_H1_PERCENT_WRAPPER_PREFIX + SUFFIX — Result h1 percent-wrapper around the pct interpolation", () => {
+  it("PREFIX matches the canonical ' (' opener (pin-the-value)", () => {
+    expect(RESULT_H1_PERCENT_WRAPPER_PREFIX).toBe(" (");
+  });
+
+  it("SUFFIX matches the canonical '%)' closer (pin-the-value)", () => {
+    expect(RESULT_H1_PERCENT_WRAPPER_SUFFIX).toBe("%)");
+  });
+
+  it("PREFIX starts with a space (separates from preceding party-name span)", () => {
+    expect(RESULT_H1_PERCENT_WRAPPER_PREFIX.startsWith(" ")).toBe(true);
+  });
+
+  it("PREFIX contains '(' and SUFFIX contains ')' (balanced parenthesis discipline)", () => {
+    // Compositional: PREFIX opens "(", SUFFIX closes ")". A drop on
+    // either side would render an unbalanced parenthesis.
+    expect(RESULT_H1_PERCENT_WRAPPER_PREFIX).toContain("(");
+    expect(RESULT_H1_PERCENT_WRAPPER_SUFFIX).toContain(")");
+  });
+
+  it("SUFFIX contains '%' (load-bearing unit marker)", () => {
+    // The percent sign is what makes the wrapped number a percentage,
+    // not a raw count. Dropping "%" would silently misclaim the score
+    // (e.g., "(42)" reads as a vote count, not 42%).
+    expect(RESULT_H1_PERCENT_WRAPPER_SUFFIX).toContain("%");
+  });
+
+  it("PREFIX exactly 1 open paren, SUFFIX exactly 1 close paren (no nesting)", () => {
+    const openCount = (RESULT_H1_PERCENT_WRAPPER_PREFIX.match(/\(/g) || []).length;
+    const closeCount = (RESULT_H1_PERCENT_WRAPPER_SUFFIX.match(/\)/g) || []).length;
+    expect(openCount).toBe(1);
+    expect(closeCount).toBe(1);
+  });
+});
+
+describe("CARD_FOOTER_NUMERO_PREFIX + CARD_FOOTER_DATE_SEPARATOR — Card recto footer 'n° N · DATE' line", () => {
+  it("NUMERO_PREFIX matches the canonical 'n° ' (pin-the-value)", () => {
+    expect(CARD_FOOTER_NUMERO_PREFIX).toBe("n° ");
+  });
+
+  it("DATE_SEPARATOR matches the canonical ' · ' (pin-the-value)", () => {
+    expect(CARD_FOOTER_DATE_SEPARATOR).toBe(" · ");
+  });
+
+  it("NUMERO_PREFIX uses degree sign U+00B0 (not ASCII 'o' lookalike)", () => {
+    // French scrutin-number convention uses the degree sign (°,
+    // U+00B0), not an ASCII lowercase "o". A drift to "no " would
+    // visually approximate but render as the wrong glyph at smaller
+    // sizes and screen-reader incorrectly.
+    expect(CARD_FOOTER_NUMERO_PREFIX).toContain("°");
+    // Defense-in-depth: confirm the second character is U+00B0
+    expect(CARD_FOOTER_NUMERO_PREFIX.charCodeAt(1)).toBe(0x00B0);
+  });
+
+  it("NUMERO_PREFIX ends with a space (glue before the numero interpolation)", () => {
+    // The trailing space lets `${PREFIX}${numero}` render as "n° 1234"
+    // without manual spacing. A drop would render "n°1234".
+    expect(CARD_FOOTER_NUMERO_PREFIX.endsWith(" ")).toBe(true);
+  });
+
+  it("DATE_SEPARATOR uses middle-dot U+00B7 (not ASCII period)", () => {
+    // The middle-dot " · " (U+00B7) is the visual separator used
+    // across the app (FreshnessBanner, AN libellé prefix span,
+    // and Card footer). A drift to ASCII period "." would change
+    // the typography.
+    expect(CARD_FOOTER_DATE_SEPARATOR).toContain("·");
+    // Defense-in-depth: middle char is U+00B7
+    expect(CARD_FOOTER_DATE_SEPARATOR.charCodeAt(1)).toBe(0x00B7);
+  });
+
+  it("DATE_SEPARATOR is padded with single spaces on both sides", () => {
+    // Cadence-pinning: " · " — one space on each side around the
+    // middle-dot. Pin so a tweak doesn't lose padding or use
+    // non-breaking spaces.
+    expect(CARD_FOOTER_DATE_SEPARATOR.startsWith(" ")).toBe(true);
+    expect(CARD_FOOTER_DATE_SEPARATOR.endsWith(" ")).toBe(true);
+    expect(CARD_FOOTER_DATE_SEPARATOR.length).toBe(3);
   });
 });
 

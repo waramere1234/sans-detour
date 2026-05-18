@@ -4272,3 +4272,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `RESULT_PERSONNALITES_EXCLUSIONS_NOTE\|METHODE_S04_RANK_ORDINAL_MARKER\|METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX` src/ tests/ → 15+ résultats
 - [ ] grep `"Mélenchon, Philippe, Glucksmann"\|"Bardella, élu en 2024"\|"son suppléant vote"` src/ tests/ → 1-2 résultats (déclaration uniquement, pas de pin-the-value inline)
 - [ ] grep `~1078 tests` CLAUDE.md → 0 résultat (aligné sur ~1093)
+
+## Session 183 — 2026-05-18
+
+### Vérification session 182
+
+- [VERIFIED] 40 occurrences des nouveaux exports (RESULT_PERSONNALITES_EXCLUSIONS_NOTE + METHODE_S04_RANK_ORDINAL_MARKER + METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX)
+- [VERIFIED] 0 occurrences inline literals (clean — consts use multiline string concat so escape regex)
+- [VERIFIED] CLAUDE.md "~1078 tests" → 0 résultat (aligné sur ~1093)
+- 1093/1093 tests verts, typecheck clean
+
+### Bugs fixés (H1_ACCENT_PERIOD + RESULT_H1_PERCENT_WRAPPER_PREFIX/_SUFFIX + CARD_FOOTER_NUMERO_PREFIX/_DATE_SEPARATOR)
+
+- [FIXED] H1 accent-period `<span style={{ color: "var(--accent)" }}>.</span>` literal `.` répété 3× dans Cover.tsx (l.160), Methode.tsx (l.145), Result.tsx (l.174) inline + untested. Drift surface : brand-finish convention — l'accent-colored period termine les 3 primary h1's identiquement. Centralization candidate : 3 duplicate inline literals + 3 identical span styles. Un tweak (e.g., typo ".." ou switch en em-dash) propagerait via la const à 1 site. Fix : export `H1_ACCENT_PERIOD`. Les 3 routes utilisent la const dans le span. Aria-labels tests : 3 (pin-the-value + exactly-1-char anti-overgrowth + period-character anti-replace guard). · `src/types/index.ts`, `src/routes/Cover.tsx`, `src/routes/Methode.tsx`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Result.tsx h1 percent wrapper `" ("` + `"%)"` inline (split autour de `{top.pct}`) + untested. Drift surface : compositional bracket discipline + load-bearing "%" unit-marker. Le PREFIX " (" sépare du party-name span ET ouvre la parenthese ; le SUFFIX "%)" applique le percent sign ET ferme la parenthese. Un drop d'une moitié rendrait une parenthèse unbalanced + perdrait le percent unit marker (e.g., "(42)" lit comme un vote count, pas 42%). Fix : export `RESULT_H1_PERCENT_WRAPPER_PREFIX` + `RESULT_H1_PERCENT_WRAPPER_SUFFIX`. Result.tsx utilise la composition `{PREFIX}{top.pct}{SUFFIX}`. Aria-labels tests : 6 (canonical PREFIX + canonical SUFFIX + PREFIX startsWith space anti-jamming + balanced "(" + ")" discipline + SUFFIX contains "%" unit-marker anti-drop + exactly-1-open-paren/1-close-paren no-nesting count guard). · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Card.tsx recto footer + shared header `"n° "` + `" · "` inline glue autour des numero + date interpolations + untested. Drift surface : "n° " utilise le degree sign U+00B0 (French scrutin-number convention), PAS un ASCII "o" lookalike — un drift en "no " visualiserait approximativement mais rendrait wrong glyph at smaller sizes + screen-reader incorrectly. Le DATE_SEPARATOR " · " utilise middle-dot U+00B7 — le même visual separator utilisé partout dans l'app (FreshnessBanner, AN libellé prefix span, Card footer). Un drift en ASCII period changerait la typography. Fix : export `CARD_FOOTER_NUMERO_PREFIX` + `CARD_FOOTER_DATE_SEPARATOR`. Card.tsx utilise les consts dans 2 sites (recto footer numero-only + shared header numero+date). Card tests : 2 nouveau tests (regex round-trip sur numero + composed-pattern findByContent matching). Aria-labels tests : 7 (canonical PREFIX + canonical SEPARATOR + NUMERO_PREFIX contains "°" + charCodeAt(1) === 0x00B0 degree-sign defense-in-depth + NUMERO_PREFIX endsWith " " glue-cadence + DATE_SEPARATOR contains "·" + charCodeAt(1) === 0x00B7 middle-dot defense-in-depth + DATE_SEPARATOR padded with single spaces both sides length===3 cadence-pin). · `src/types/index.ts`, `src/components/Card.tsx`, `tests/Card.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 184
+
+- [ ] grep `H1_ACCENT_PERIOD\|RESULT_H1_PERCENT_WRAPPER_PREFIX\|RESULT_H1_PERCENT_WRAPPER_SUFFIX\|CARD_FOOTER_NUMERO_PREFIX\|CARD_FOOTER_DATE_SEPARATOR` src/ tests/ → 20+ résultats
+- [ ] grep `'>\.<'\|"n° "\|" · "` src/ tests/ → ~3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~1093 tests` CLAUDE.md → 0 résultat (aligné sur ~1110)

@@ -10,6 +10,7 @@ import {
   CARD_ANALYSE_CONCERNES_HEADER,
   CARD_ANALYSE_CONCERNES_POSITIFS, CARD_ANALYSE_CONCERNES_NEGATIFS, CARD_ANALYSE_CONCERNES_NEUTRES,
   CARD_VERSO_FLIP_BACK_HINT, CARD_NO_ANALYSE_FALLBACK_BODY,
+  CARD_FOOTER_NUMERO_PREFIX, CARD_FOOTER_DATE_SEPARATOR,
   type Scrutin,
 } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
@@ -195,7 +196,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
           }}>
             <span>{new Date(scrutin.date).toLocaleDateString(APP_LOCALE)}</span>
             {scrutin.url_an_officielle
-              ? <span>n° {scrutin.numero}</span>
+              ? <span>{CARD_FOOTER_NUMERO_PREFIX}{scrutin.numero}</span>
               : <span style={{ color: "var(--accent)" }}>{DEMO_FALLBACK_SHORT_LABEL}</span>}
           </div>
         </div>
@@ -224,7 +225,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             paddingBottom: 8, borderBottom: "1px solid var(--line)",
           }}>
             <span style={{ color: "var(--accent)" }}>{scrutin.chapeau}</span>
-            <span>n° {scrutin.numero} · {new Date(scrutin.date).toLocaleDateString(APP_LOCALE)}</span>
+            <span>{CARD_FOOTER_NUMERO_PREFIX}{scrutin.numero}{CARD_FOOTER_DATE_SEPARATOR}{new Date(scrutin.date).toLocaleDateString(APP_LOCALE)}</span>
           </div>
 
           {/* Contexte LLM (or friendly fallback if absent) */}

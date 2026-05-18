@@ -20,6 +20,7 @@ import {
   coverProgressChipText, COVER_HERO_PARAGRAPH,
   COVER_SECONDARY_NAV_LABEL, COVER_EYEBROW_SUFFIX,
   TAGLINE_PART_1, TAGLINE_PART_2,
+  H1_ACCENT_PERIOD,
 } from "../types";
 
 export default function Cover() {
@@ -157,7 +158,7 @@ export default function Cover() {
             {TAGLINE_PART_1}.
             <br />
             <span style={{ color: "var(--accent)" }}>{TAGLINE_PART_2}</span>
-            <span style={{ color: "var(--accent)" }}>.</span>
+            <span style={{ color: "var(--accent)" }}>{H1_ACCENT_PERIOD}</span>
           </h1>
           <p style={{
             fontSize: 15, lineHeight: 1.55,

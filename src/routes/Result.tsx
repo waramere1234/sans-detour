@@ -24,6 +24,8 @@ import {
   RESULT_TOP_LEAD, RESULT_GROUPS_H2, RESULT_PERSONNALITES_H2,
   RESULT_EMPTY_POOL_MESSAGE,
   RESULT_PERSONNALITES_EXCLUSIONS_NOTE,
+  H1_ACCENT_PERIOD,
+  RESULT_H1_PERCENT_WRAPPER_PREFIX, RESULT_H1_PERCENT_WRAPPER_SUFFIX,
   type Scrutin, type GroupCode,
 } from "../types";
 
@@ -170,8 +172,8 @@ export default function Result() {
         }}>
           {RESULT_TOP_LEAD}{" "}
           <span style={{ color: getPartyColorVar(top.group) }}>{getParty(top.group).name}</span>
-          {" "}({top.pct}%)
-          <span style={{ color: "var(--accent)" }}>.</span>
+          {RESULT_H1_PERCENT_WRAPPER_PREFIX}{top.pct}{RESULT_H1_PERCENT_WRAPPER_SUFFIX}
+          <span style={{ color: "var(--accent)" }}>{H1_ACCENT_PERIOD}</span>
         </h1>
         <p style={{
           fontSize: 13, color: "var(--ink-2)",

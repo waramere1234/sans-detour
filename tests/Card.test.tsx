@@ -4,6 +4,7 @@ import { Card } from "../src/components/Card";
 import {
   CARD_VERSO_SEPARATOR_LABEL, CARD_AN_LIBELLE_PREFIX_LABEL,
   CARD_VERSO_FLIP_BACK_HINT, CARD_NO_ANALYSE_FALLBACK_BODY,
+  CARD_FOOTER_NUMERO_PREFIX, CARD_FOOTER_DATE_SEPARATOR,
   cardAriaLabel,
   type Scrutin,
 } from "../src/types";
@@ -189,6 +190,30 @@ describe("Card a11y", () => {
     };
     render(<Card scrutin={scrutin} topMost={true} />);
     expect(screen.queryByRole("button", { name: /voir l'analyse/i })).not.toBeInTheDocument();
+  });
+
+  it("recto footer renders CARD_FOOTER_NUMERO_PREFIX before the numero (round-trip)", () => {
+    const sc = mkScrutin();
+    sc.url_an_officielle = "https://an.example/1234";
+    render(<Card scrutin={sc} topMost={true} />);
+    // The recto footer shows "n° 1234" via {PREFIX}{numero}. Locate
+    // any text containing the composed pattern — catches a drop of
+    // the prefix or a drift to a different separator/glyph.
+    const expected = new RegExp(`${CARD_FOOTER_NUMERO_PREFIX.replace("°", "°")}${sc.numero}`);
+    expect(screen.getAllByText(expected).length).toBeGreaterThan(0);
+  });
+
+  it("shared header renders CARD_FOOTER_NUMERO_PREFIX + CARD_FOOTER_DATE_SEPARATOR between numero and date (round-trip)", () => {
+    render(<Card scrutin={mkScrutin()} topMost={true} />);
+    // The shared header at top of both faces renders "n° N · DATE".
+    // Round-trip via both consts so a tweak to either glue propagates
+    // to source + test in lockstep.
+    const numeroPrefix = CARD_FOOTER_NUMERO_PREFIX;
+    const dateSep = CARD_FOOTER_DATE_SEPARATOR;
+    const matchers = Array.from(document.querySelectorAll("span")).filter(
+      (el) => el.textContent?.includes(numeroPrefix) && el.textContent?.includes(dateSep),
+    );
+    expect(matchers.length).toBeGreaterThan(0);
   });
 
   it("verso renders CARD_VERSO_FLIP_BACK_HINT in the shared footer (round-trip)", () => {

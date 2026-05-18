@@ -1124,6 +1124,34 @@ export const METHODE_S04_RANK_ORDINAL_MARKER = "e";
  *  drop the "." → no sentence terminator. */
 export const METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX = ").";
 
+/** Accent-colored h1 terminator — the `.` literal rendered inside
+ *  `<span style={{ color: "var(--accent)" }}>` at the end of the 3
+ *  primary h1 headings (Cover, Methode, Result). Replicated identical
+ *  across all 3 routes; centralised so a future tweak (e.g., a typo
+ *  like ".." or a switch to em-dash) propagates to one site. The
+ *  accent-period is the brand-finish convention. */
+export const H1_ACCENT_PERIOD = ".";
+
+/** Result.tsx h1 percent wrapper — split into prefix + suffix around
+ *  the `{top.pct}` JSX interpolation. The full h1 reads:
+ *  "{RESULT_TOP_LEAD} {GroupName} ({pct}%)" — PREFIX " (" opens the
+ *  parenthesis after the party-name span; SUFFIX "%)" appends the
+ *  percent sign and closes the parenthesis. Pin the bracket discipline
+ *  so a future copy tweak that loses one half doesn't render an
+ *  unbalanced parenthesis. */
+export const RESULT_H1_PERCENT_WRAPPER_PREFIX = " (";
+export const RESULT_H1_PERCENT_WRAPPER_SUFFIX = "%)";
+
+/** Card recto footer numero+date line — split into 2 small glues
+ *  around `{scrutin.numero}` and `{date.toLocaleDateString}`. The
+ *  full line reads: "n° {numero} · {date}". The "n° " prefix is
+ *  the French scrutin-number convention (degree sign U+00B0,
+ *  not an ASCII "o"); the middle-dot separator " · " matches the
+ *  Freshness banner + the AN libellé prefix span. Pin both halves
+ *  so a typographic tweak (e.g., asciifying "n°" to "n.") surfaces. */
+export const CARD_FOOTER_NUMERO_PREFIX = "n° ";
+export const CARD_FOOTER_DATE_SEPARATOR = " · ";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use
