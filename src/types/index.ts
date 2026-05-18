@@ -1235,6 +1235,39 @@ export const BUTTON_ARROW_RIGHT_PREFIX = "→ ";
 export const BACK_ARROW_PREFIX_GLYPH = "‹ ";
 export const BACK_ARROW_SUFFIX_GLYPH = " ‹";
 
+/** Right-arrow suffix glyph " →" — used in Cover start CTA (l.231)
+ *  and Play deck-exhausted "Mon résultat" link (l.323). 2 sites,
+ *  same forward-navigation affordance (suffix-style: label trails
+ *  arrow). Pair to BUTTON_ARROW_RIGHT_PREFIX (prefix-style "→ ").
+ *  Same arrow glyph U+2192 as VOTE_GLYPH_POUR (which is also " →"
+ *  by value) — kept as a separate const so the vote-button semantic
+ *  remains distinct from forward-navigation. A future tweak that
+ *  changes one shouldn't silently change the other. */
+export const BUTTON_ARROW_RIGHT_SUFFIX = " →";
+
+/** Result share-button icon glyph "📤 " — outbox emoji + space
+ *  rendered inside the share button's aria-hidden span. Distinct
+ *  from BUTTON_ICON_RESTART (the only other Result button icon)
+ *  because share semantics use an outbox metaphor, not a cycle.
+ *  Pinned because emoji rendering can vary across platforms; a drift
+ *  to "🔼" or "↗" would change the share-affordance semantics. */
+export const BUTTON_ICON_SHARE = "📤 ";
+
+/** MethodeSheet report-error mail-icon glyph "✉ " — envelope U+2709
+ *  rendered before the report-error link label. Monochrome glyph
+ *  (NOT emoji) so it inherits the surrounding text color. A drift
+ *  to "📧" or "📨" would change the rendering register to color-
+ *  coded emoji ignoring the text color. */
+export const BUTTON_ICON_MAIL = "✉ ";
+
+/** Card.tsx recto IA-chip sparkle glyph "✨" — sparkles emoji
+ *  rendered inside the chip's aria-hidden span before "IA". Distinct
+ *  from BUTTON_ICON_* glyphs because the chip has no trailing space
+ *  (the "IA" text wraps flush to the glyph for compactness on the
+ *  small chip). A trailing-space drift would break the chip's
+ *  tight layout. */
+export const CARD_IA_CHIP_GLYPH = "✨";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

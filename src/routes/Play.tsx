@@ -23,6 +23,7 @@ import {
   VOTE_ARIA_CONTRE, VOTE_ARIA_SKIP, VOTE_ARIA_POUR,
   PLAY_DECK_EXHAUSTED_MESSAGE, PLAY_EMPTY_POOL_MESSAGE, PLAY_SR_HEADING,
   VOTE_GLYPH_CONTRE, VOTE_GLYPH_SKIP, VOTE_GLYPH_POUR,
+  BUTTON_ARROW_RIGHT_SUFFIX,
   type Scrutin, type UserVote, type GroupCode, type GroupAlignment,
 } from "../types";
 
@@ -320,7 +321,7 @@ export default function Play() {
               cursor: "pointer",
             }}
           >
-            {MENU_RESULT_LABEL}<span aria-hidden="true"> →</span>
+            {MENU_RESULT_LABEL}<span aria-hidden="true">{BUTTON_ARROW_RIGHT_SUFFIX}</span>
           </button>
         )}
       </div>

@@ -13,6 +13,7 @@ import {
   CARD_FOOTER_NUMERO_PREFIX, CARD_FOOTER_DATE_SEPARATOR,
   MIDDLE_DOT_SEPARATOR,
   BACK_ARROW_SUFFIX_GLYPH,
+  CARD_IA_CHIP_GLYPH,
   type Scrutin,
 } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
@@ -156,7 +157,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
                     textUnderlineOffset: 3,
                     textDecorationStyle: "dotted",
                   }}
-                ><span aria-hidden="true">✨</span>IA</button>
+                ><span aria-hidden="true">{CARD_IA_CHIP_GLYPH}</span>IA</button>
               </>
             )}
           </div>

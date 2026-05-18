@@ -10,7 +10,7 @@ import {
   METHODESHEET_CLAUDE_MISSION_STRONG,
   METHODESHEET_AN_BLOCK_BODY, METHODESHEET_CLAUDE_NO_AI_IN_SCORE,
   METHODESHEET_CLAUDE_TASKS_BODY, METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY,
-  BUTTON_ARROW_RIGHT_PREFIX,
+  BUTTON_ARROW_RIGHT_PREFIX, BUTTON_ICON_MAIL,
 } from "../types";
 import { useModalA11y } from "../hooks/useModalA11y";
 
@@ -127,7 +127,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
                 href={mailto(ERROR_REPORT_SUBJECT)}
                 onClick={onClose}
                 style={btnSecondary()}
-              ><span aria-hidden="true">✉ </span>{METHODESHEET_REPORT_ERROR_LINK_LABEL}</a>
+              ><span aria-hidden="true">{BUTTON_ICON_MAIL}</span>{METHODESHEET_REPORT_ERROR_LINK_LABEL}</a>
             </div>
           </motion.div>
         </>

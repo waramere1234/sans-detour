@@ -110,6 +110,9 @@ import {
   AUDIT_GLYPH_ALIGNED, AUDIT_GLYPH_PARTIAL, AUDIT_GLYPH_OPPOSED, AUDIT_GLYPH_DIVIDED,
   BUTTON_ARROW_RIGHT_PREFIX,
   BACK_ARROW_PREFIX_GLYPH, BACK_ARROW_SUFFIX_GLYPH,
+  BUTTON_ARROW_RIGHT_SUFFIX,
+  BUTTON_ICON_SHARE, BUTTON_ICON_MAIL,
+  CARD_IA_CHIP_GLYPH,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -3405,6 +3408,94 @@ describe("BACK_ARROW_PREFIX_GLYPH + BACK_ARROW_SUFFIX_GLYPH — back-navigation 
     // collapses them into one shared const would render incorrect
     // cadence at one of the 2 sites.
     expect(BACK_ARROW_PREFIX_GLYPH).not.toBe(BACK_ARROW_SUFFIX_GLYPH);
+  });
+});
+
+describe("BUTTON_ARROW_RIGHT_SUFFIX — ' →' forward-nav suffix glyph (Cover start + Play deck-exhausted result link)", () => {
+  it("matches the canonical ' →' (pin-the-value)", () => {
+    expect(BUTTON_ARROW_RIGHT_SUFFIX).toBe(" →");
+  });
+
+  it("uses right-arrow U+2192 (matches BUTTON_ARROW_RIGHT_PREFIX's arrow)", () => {
+    // Same arrow as PREFIX, but trailing instead of leading. Pin so
+    // a future tweak (e.g., to ⇒ or »→) lands on both consts together.
+    expect(BUTTON_ARROW_RIGHT_SUFFIX.charCodeAt(1)).toBe(0x2192);
+  });
+
+  it("equals VOTE_GLYPH_POUR by value but kept distinct for semantic clarity", () => {
+    // VOTE_GLYPH_POUR (" →") is for the vote-button "pour" affordance;
+    // BUTTON_ARROW_RIGHT_SUFFIX (" →") is for non-vote forward-nav.
+    // Same value, different semantic name. A future tweak to one
+    // shouldn't silently change the other.
+    expect(BUTTON_ARROW_RIGHT_SUFFIX).toBe(VOTE_GLYPH_POUR);
+  });
+
+  it("is suffix-style (leading space + arrow), distinct from BUTTON_ARROW_RIGHT_PREFIX prefix-style", () => {
+    expect(BUTTON_ARROW_RIGHT_SUFFIX.startsWith(" ")).toBe(true);
+    expect(BUTTON_ARROW_RIGHT_PREFIX.endsWith(" ")).toBe(true);
+    expect(BUTTON_ARROW_RIGHT_SUFFIX).not.toBe(BUTTON_ARROW_RIGHT_PREFIX);
+  });
+
+  it("is exactly 2 chars long", () => {
+    expect(BUTTON_ARROW_RIGHT_SUFFIX).toHaveLength(2);
+  });
+});
+
+describe("BUTTON_ICON_SHARE — Result share button outbox glyph", () => {
+  it("matches the canonical '📤 ' (pin-the-value)", () => {
+    expect(BUTTON_ICON_SHARE).toBe("📤 ");
+  });
+
+  it("contains outbox emoji U+1F4E4 (anti-drift to other share glyphs)", () => {
+    // The outbox-tray emoji 📤 (U+1F4E4) signals "share/send".
+    // A drift to 🔼 (U+1F53C upward) or ↗ (U+2197 NE arrow) would
+    // change the share affordance semantics.
+    expect(BUTTON_ICON_SHARE.codePointAt(0)).toBe(0x1F4E4);
+  });
+
+  it("ends with trailing space (glue cadence before SHARE_LABEL)", () => {
+    expect(BUTTON_ICON_SHARE.endsWith(" ")).toBe(true);
+  });
+});
+
+describe("BUTTON_ICON_MAIL — MethodeSheet report-error envelope glyph", () => {
+  it("matches the canonical '✉ ' (pin-the-value)", () => {
+    expect(BUTTON_ICON_MAIL).toBe("✉ ");
+  });
+
+  it("uses envelope U+2709 (monochrome, NOT emoji envelope U+1F4E7)", () => {
+    // U+2709 ✉ is a monochrome dingbat that inherits text color.
+    // U+1F4E7 📧 is a color-coded emoji that ignores text color.
+    // We use the monochrome form so the glyph color matches the
+    // surrounding link text. Pin the codepoint so a drift to emoji
+    // surfaces.
+    expect(BUTTON_ICON_MAIL.charCodeAt(0)).toBe(0x2709);
+  });
+
+  it("ends with trailing space (glue cadence before the link label)", () => {
+    expect(BUTTON_ICON_MAIL.endsWith(" ")).toBe(true);
+  });
+});
+
+describe("CARD_IA_CHIP_GLYPH — Card recto IA-chip sparkles glyph", () => {
+  it("matches the canonical '✨' (pin-the-value)", () => {
+    expect(CARD_IA_CHIP_GLYPH).toBe("✨");
+  });
+
+  it("uses sparkles emoji U+2728 (anti-drift to other AI glyphs)", () => {
+    // U+2728 ✨ is the conventional "AI/generated content" sparkle
+    // signal. A drift to 🤖 (robot) or 🪄 (wand) would change the
+    // signaling — sparkles is the industry convention.
+    expect(CARD_IA_CHIP_GLYPH.codePointAt(0)).toBe(0x2728);
+  });
+
+  it("has NO trailing space (chip is compact — 'IA' wraps flush)", () => {
+    // Unlike BUTTON_ICON_* which have trailing spaces, the IA chip
+    // is intentionally tight. Pin the no-trailing-space so a future
+    // edit doesn't accidentally add one and break the chip's layout.
+    expect(CARD_IA_CHIP_GLYPH.endsWith(" ")).toBe(false);
+    // U+2728 ✨ is in the BMP — single UTF-16 code unit (length 1).
+    expect(CARD_IA_CHIP_GLYPH).toHaveLength(1);
   });
 });
 

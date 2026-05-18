@@ -21,6 +21,7 @@ import {
   COVER_SECONDARY_NAV_LABEL, COVER_EYEBROW_SUFFIX,
   TAGLINE_PART_1, TAGLINE_PART_2,
   H1_ACCENT_PERIOD,
+  BUTTON_ARROW_RIGHT_SUFFIX,
 } from "../types";
 
 export default function Cover() {
@@ -228,7 +229,7 @@ export default function Cover() {
                 hasCompleted ? "completed" : hasInProgress ? "inProgress" : "fresh",
                 votesCount, TARGET, remainingVotes,
               )}
-              <span aria-hidden="true"> →</span>
+              <span aria-hidden="true">{BUTTON_ARROW_RIGHT_SUFFIX}</span>
             </span>
           </button>
 

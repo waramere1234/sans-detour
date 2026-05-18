@@ -4354,3 +4354,23 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `AUDIT_GLYPH_ALIGNED\|AUDIT_GLYPH_PARTIAL\|AUDIT_GLYPH_OPPOSED\|AUDIT_GLYPH_DIVIDED\|BUTTON_ARROW_RIGHT_PREFIX\|BACK_ARROW_PREFIX_GLYPH\|BACK_ARROW_SUFFIX_GLYPH` src/ tests/ → 20+ résultats
 - [ ] grep `'"✓ "'\|'"≈ "'\|'"✕ "'\|'"÷ "'\|'"‹ "'\|'" ‹"'` src/ tests/ → ~3-5 résultats (declarations + pin-the-value)
 - [ ] grep `~1135 tests` CLAUDE.md → 0 résultat (aligné sur ~1155)
+
+## Session 187 — 2026-05-18
+
+### Vérification session 186
+
+- [VERIFIED] 57 occurrences des nouveaux exports (AUDIT_GLYPH_ALIGNED/_PARTIAL/_OPPOSED/_DIVIDED + BUTTON_ARROW_RIGHT_PREFIX + BACK_ARROW_PREFIX_GLYPH/_SUFFIX_GLYPH)
+- [VERIFIED] CLAUDE.md "~1135 tests" → 0 résultat (aligné sur ~1155)
+- 1155/1155 tests verts, typecheck clean
+
+### Bugs fixés (BUTTON_ARROW_RIGHT_SUFFIX + BUTTON_ICON_SHARE/_MAIL + CARD_IA_CHIP_GLYPH)
+
+- [FIXED] Right-arrow suffix glyph `" →"` inline 2× (Cover.tsx l.231 start CTA + Play.tsx l.323 deck-exhausted result link) + untested. Drift surface : forward-navigation suffix-style affordance (label trails arrow). Pair to BUTTON_ARROW_RIGHT_PREFIX. Même value que VOTE_GLYPH_POUR (les 2 sont " →") mais kept distinct pour semantic clarity — vote-button "pour" vs non-vote forward-nav. Un future tweak à un ne doit pas silently changer l'autre. Fix : export `BUTTON_ARROW_RIGHT_SUFFIX`. Cover.tsx + Play.tsx utilisent la const. Aria-labels tests : 5 (canonical + U+2192 charCodeAt sync-with-PREFIX + value-equals-VOTE_GLYPH_POUR but-kept-distinct semantic cross-check + suffix-vs-prefix-style anti-collapse + exactly-2-chars). · `src/types/index.ts`, `src/routes/Cover.tsx`, `src/routes/Play.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Result.tsx share-button icon `"📤 "` (l.278) + MethodeSheet.tsx report-error icon `"✉ "` (l.130) inline + untested. Drift surface : 2 button-icon glyphs distincts mais related (action affordances pour share + mail). Share utilise outbox-tray emoji U+1F4E4 — un drift vers 🔼 (U+1F53C upward) ou ↗ (U+2197 NE arrow) changerait share-affordance semantics. Mail utilise monochrome envelope U+2709 (NOT emoji envelope U+1F4E7) so glyph inherits text color — un drift vers 📧 ou 📨 changerait le rendering register en color-coded emoji ignoring text color. Fix : export `BUTTON_ICON_SHARE` + `BUTTON_ICON_MAIL`. Result.tsx + MethodeSheet.tsx utilisent les consts. Aria-labels tests : 6 (canonical × 2 + U+1F4E4 outbox codePointAt + U+2709 monochrome-envelope charCodeAt distinct-from-emoji-U+1F4E7 + trailing-space cadence × 2). · `src/types/index.ts`, `src/routes/Result.tsx`, `src/components/MethodeSheet.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Card.tsx recto IA-chip sparkles `"✨"` (l.160) inline + untested. Drift surface : la conventional "AI/generated content" sparkle signal (industry convention pour AI/LLM badges). Un drift vers 🤖 (robot) ou 🪄 (wand) changerait le signaling. Distinct from BUTTON_ICON_* glyphs because chip is compact — "IA" wraps flush sans trailing space. Fix : export `CARD_IA_CHIP_GLYPH`. Card.tsx utilise la const dans le chip. Aria-labels tests : 3 (canonical + U+2728 sparkles codePointAt anti-drift-to-other-AI-glyphs + NO-trailing-space + length === 1 BMP-character cadence anti-overgrowth guard). · `src/types/index.ts`, `src/components/Card.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 188
+
+- [ ] grep `BUTTON_ARROW_RIGHT_SUFFIX\|BUTTON_ICON_SHARE\|BUTTON_ICON_MAIL\|CARD_IA_CHIP_GLYPH` src/ tests/ → 15+ résultats
+- [ ] grep `'"📤 "'\|'"✉ "'\|'"✨"'\|'" →"'` src/ tests/ → ~3-5 résultats (declarations + pin-the-value uniquement)
+- [ ] grep `~1155 tests` CLAUDE.md → 0 résultat (aligné sur ~1169)
