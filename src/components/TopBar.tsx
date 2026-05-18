@@ -13,6 +13,7 @@ import {
   MENU_RESULT_LABEL, MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
   MENU_OPEN_LABEL, MENU_CLOSE_LABEL, MAIN_MENU_LABEL,
   TOPBAR_VERSION_LABEL,
+  EXTERNAL_LINK_GLYPH,
 } from "../types";
 
 
@@ -303,7 +304,7 @@ function MenuLink(props: {
           <span aria-hidden="true" style={{
             fontFamily: "var(--font-mono)", fontSize: 11,
             color: "var(--ink-3)",
-          }}>↗</span>
+          }}>{EXTERNAL_LINK_GLYPH}</span>
         )}
       </span>
     </>

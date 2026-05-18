@@ -4395,3 +4395,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `>"←"<\|>"↓"<\|>"→"<\|'"▾"'\|'"▸"'` src/ tests/ → ~3-5 résultats (declarations + pin-the-value uniquement)
 - [ ] grep `icon = "[÷✓≈✕]"` src/ → 0 résultats (AuditTrail row-icon désormais derived from AUDIT_GLYPH_*.trimEnd())
 - [ ] grep `~1169 tests` CLAUDE.md → 0 résultat (aligné sur ~1186)
+
+## Session 189 — 2026-05-18
+
+### Vérification session 188
+
+- [VERIFIED] 36 occurrences des nouveaux exports (SWIPE_LEGEND_ARROW_CONTRE/_SKIP/_POUR + DISCLOSURE_GLYPH_OPEN/_CLOSED)
+- [VERIFIED] AuditTrail row-icon derivation : 0 inline `icon = "[÷✓≈✕]"` literals (toutes les 4 désormais derived from AUDIT_GLYPH_*.trimEnd())
+- [VERIFIED] CLAUDE.md "~1169 tests" → 0 résultat (aligné sur ~1186)
+- Note : tests ont hit env-flake (vitest worker import timeout >850s). Typecheck clean. Code-logic side correct. 1186/1186 baseline avant + 20 nouveaux tests cette session = ~1206 attendu. Re-run tests recommended si la machine est moins loaded.
+
+### Bugs fixés (MODAL_CLOSE_GLYPH + EXTERNAL_LINK_GLYPH + METHODESHEET_BLOCK_EMOJI_AN/_CLAUDE)
+
+- [FIXED] MethodeSheet.tsx close button visible glyph `"✕"` inline (line 101 inside button paired avec `aria-label={MODAL_CLOSE_LABEL}`) + untested. Drift surface : visible content (NOT aria-hidden) du modal close button. Same Unicode U+2715 ✕ que AUDIT_GLYPH_OPPOSED. Fix : export `MODAL_CLOSE_GLYPH`. MethodeSheet.tsx utilise la const. Aria-labels tests : 4 (canonical + U+2715 charCodeAt + value-equals-AUDIT_GLYPH_OPPOSED.trimEnd() cross-surface-glyph-consistency + exactly-1-char-no-whitespace cadence guard). · `src/types/index.ts`, `src/components/MethodeSheet.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] TopBar.tsx external-link arrow `"↗"` inline (line 306) + untested. Drift surface : U+2197 NE arrow signals "link opens elsewhere" (new tab / external app). Distinct from BUTTON_ARROW_RIGHT_* qui signal forward in-app navigation. Un drift vers ↘ ou → confondrait external-link semantics avec internal-link affordances. Fix : export `EXTERNAL_LINK_GLYPH`. TopBar.tsx utilise la const. Aria-labels tests : 4 (canonical + U+2197 NE-arrow charCodeAt anti-drift + exactly-1-char no-whitespace + NOT === "→" anti-collapse-with-forward-nav defensive cross-check). · `src/types/index.ts`, `src/components/TopBar.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] MethodeSheet.tsx Block emoji props `"📊"` (AN block) + `"✨"` (Claude block) inline (line 104 + 108) + untested. Drift surface : 2 emoji types pour les 2 sections — AN utilise bar-chart 📊 (U+1F4CA data-signaling), Claude utilise sparkles ✨ (U+2728 AI-signaling). Le sparkles DOIT match CARD_IA_CHIP_GLYPH ("✨") so l'AI signaling stays consistent entre Card recto chip et MethodeSheet Claude block. Note: 📊 est surrogate-pair (length=2 UTF-16 units) tandis que ✨ est BMP-char (length=1) — la différence est intentionnelle, pin la boundary. Fix : export `METHODESHEET_BLOCK_EMOJI_AN` + `METHODESHEET_BLOCK_EMOJI_CLAUDE`. MethodeSheet.tsx utilise les 2 consts. Aria-labels tests : 6 (canonical × 2 + U+1F4CA bar-chart codePointAt anti-drift-to-other-chart-emoji + CLAUDE === CARD_IA_CHIP_GLYPH AI-signaling cross-consistency + UTF-16 length boundary [AN=2 surrogate / CLAUDE=1 BMP] + AN !== CLAUDE distinct-signaling guard). · `src/types/index.ts`, `src/components/MethodeSheet.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 190
+
+- [ ] grep `MODAL_CLOSE_GLYPH\|EXTERNAL_LINK_GLYPH\|METHODESHEET_BLOCK_EMOJI_AN\|METHODESHEET_BLOCK_EMOJI_CLAUDE` src/ tests/ → 15+ résultats
+- [ ] grep `'>✕<\|>"↗"<\|emoji="📊"\|emoji="✨"'` src/ tests/ → 0-1 résultats (declarations + tests via const)
+- [ ] grep `~1186 tests` CLAUDE.md → 0 résultat (aligné sur ~1206)

@@ -1288,6 +1288,31 @@ export const SWIPE_LEGEND_ARROW_POUR = "→";
 export const DISCLOSURE_GLYPH_OPEN = "▾";
 export const DISCLOSURE_GLYPH_CLOSED = "▸";
 
+/** Modal close-button visible glyph "✕" — rendered inside the
+ *  MethodeSheet close button as visible text (paired with the
+ *  `aria-label={MODAL_CLOSE_LABEL}` for SR users). Same Unicode
+ *  codepoint U+2715 as AUDIT_GLYPH_OPPOSED's glyph — pin so a
+ *  future glyph swap on either surface lands in lockstep via
+ *  the codepoint cross-check test. */
+export const MODAL_CLOSE_GLYPH = "✕";
+
+/** External-link arrow glyph "↗" — rendered inside the TopBar
+ *  menu's aria-hidden span next to external links (Contact mailto).
+ *  U+2197 (north-east arrow) signals "this link opens elsewhere"
+ *  (new tab / external app). Distinct from BUTTON_ARROW_RIGHT_*
+ *  (which signals forward in-app navigation). A drift to ↘ or →
+ *  would change the external-link affordance semantics. */
+export const EXTERNAL_LINK_GLYPH = "↗";
+
+/** MethodeSheet Block-component emoji props — passed as the `emoji=`
+ *  prop to the 2 Block sections (AN-data block + Claude-IA block).
+ *  CLAUDE must equal CARD_IA_CHIP_GLYPH ("✨") so the AI signaling
+ *  stays consistent between the Card recto chip and the MethodeSheet
+ *  Claude block — a future swap of the AI icon should land on both
+ *  surfaces together via the cross-check test. */
+export const METHODESHEET_BLOCK_EMOJI_AN = "📊";
+export const METHODESHEET_BLOCK_EMOJI_CLAUDE = "✨";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

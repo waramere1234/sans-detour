@@ -11,6 +11,8 @@ import {
   METHODESHEET_AN_BLOCK_BODY, METHODESHEET_CLAUDE_NO_AI_IN_SCORE,
   METHODESHEET_CLAUDE_TASKS_BODY, METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY,
   BUTTON_ARROW_RIGHT_PREFIX, BUTTON_ICON_MAIL,
+  MODAL_CLOSE_GLYPH,
+  METHODESHEET_BLOCK_EMOJI_AN, METHODESHEET_BLOCK_EMOJI_CLAUDE,
 } from "../types";
 import { useModalA11y } from "../hooks/useModalA11y";
 
@@ -98,14 +100,14 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
                   cursor: "pointer", fontFamily: "var(--font-mono)", fontSize: 14,
                   lineHeight: 1,
                 }}
-              >✕</button>
+              >{MODAL_CLOSE_GLYPH}</button>
             </div>
 
-            <Block emoji="📊" title={METHODESHEET_AN_BLOCK_TITLE}>
+            <Block emoji={METHODESHEET_BLOCK_EMOJI_AN} title={METHODESHEET_AN_BLOCK_TITLE}>
               {METHODESHEET_AN_BLOCK_BODY}
             </Block>
 
-            <Block emoji="✨" title={METHODESHEET_CLAUDE_BLOCK_TITLE}>
+            <Block emoji={METHODESHEET_BLOCK_EMOJI_CLAUDE} title={METHODESHEET_CLAUDE_BLOCK_TITLE}>
               <p style={{ margin: "0 0 10px" }}>
                 {METHODESHEET_CLAUDE_TASKS_BODY}
               </p>

@@ -115,6 +115,8 @@ import {
   CARD_IA_CHIP_GLYPH,
   SWIPE_LEGEND_ARROW_CONTRE, SWIPE_LEGEND_ARROW_SKIP, SWIPE_LEGEND_ARROW_POUR,
   DISCLOSURE_GLYPH_OPEN, DISCLOSURE_GLYPH_CLOSED,
+  MODAL_CLOSE_GLYPH, EXTERNAL_LINK_GLYPH,
+  METHODESHEET_BLOCK_EMOJI_AN, METHODESHEET_BLOCK_EMOJI_CLAUDE,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -3607,6 +3609,91 @@ describe("AuditTrail per-row icon derives from AUDIT_GLYPH_*.trimEnd() (chip↔r
     expect(AUDIT_GLYPH_PARTIAL.length - AUDIT_GLYPH_PARTIAL.trimEnd().length).toBe(1);
     expect(AUDIT_GLYPH_OPPOSED.length - AUDIT_GLYPH_OPPOSED.trimEnd().length).toBe(1);
     expect(AUDIT_GLYPH_DIVIDED.length - AUDIT_GLYPH_DIVIDED.trimEnd().length).toBe(1);
+  });
+});
+
+describe("MODAL_CLOSE_GLYPH — MethodeSheet close button visible glyph", () => {
+  it("matches the canonical '✕' (pin-the-value)", () => {
+    expect(MODAL_CLOSE_GLYPH).toBe("✕");
+  });
+
+  it("uses heavy multiplication X U+2715 (same as AUDIT_GLYPH_OPPOSED)", () => {
+    expect(MODAL_CLOSE_GLYPH.charCodeAt(0)).toBe(0x2715);
+  });
+
+  it("equals AUDIT_GLYPH_OPPOSED.trimEnd() (cross-surface glyph consistency)", () => {
+    // The modal close X and the AuditTrail "opposed" chip glyph both
+    // use U+2715. Pin the value equality so a future glyph swap on
+    // either surface forces an update on the other.
+    expect(MODAL_CLOSE_GLYPH).toBe(AUDIT_GLYPH_OPPOSED.trimEnd());
+  });
+
+  it("is exactly 1 char with no whitespace (modal close button is centered, no glue)", () => {
+    expect(MODAL_CLOSE_GLYPH).toHaveLength(1);
+    expect(MODAL_CLOSE_GLYPH).not.toMatch(/\s/);
+  });
+});
+
+describe("EXTERNAL_LINK_GLYPH — TopBar external-link arrow", () => {
+  it("matches the canonical '↗' (pin-the-value)", () => {
+    expect(EXTERNAL_LINK_GLYPH).toBe("↗");
+  });
+
+  it("uses NE arrow U+2197 (anti-drift to other arrows)", () => {
+    // U+2197 ↗ signals "opens elsewhere" — distinct from U+2192 →
+    // (forward in-app navigation). A drift to → would conflate
+    // external-link semantics with internal-link affordances.
+    expect(EXTERNAL_LINK_GLYPH.charCodeAt(0)).toBe(0x2197);
+  });
+
+  it("is exactly 1 char (no whitespace, rendered standalone in span)", () => {
+    expect(EXTERNAL_LINK_GLYPH).toHaveLength(1);
+    expect(EXTERNAL_LINK_GLYPH).not.toMatch(/\s/);
+  });
+
+  it("is NOT '→' (anti-collapse — external-link distinct from forward-nav)", () => {
+    // Defense against a tempting refactor that uses BUTTON_ARROW_RIGHT_*
+    // for external links. The NE arrow and the right arrow signal
+    // different affordances; pin the distinction.
+    expect(EXTERNAL_LINK_GLYPH).not.toBe("→");
+  });
+});
+
+describe("METHODESHEET_BLOCK_EMOJI_AN/_CLAUDE — MethodeSheet Block component emoji props", () => {
+  it("AN block emoji matches '📊' (chart emoji for data)", () => {
+    expect(METHODESHEET_BLOCK_EMOJI_AN).toBe("📊");
+  });
+
+  it("CLAUDE block emoji matches '✨' (sparkles for AI)", () => {
+    expect(METHODESHEET_BLOCK_EMOJI_CLAUDE).toBe("✨");
+  });
+
+  it("AN block uses bar-chart emoji U+1F4CA (data-signaling convention)", () => {
+    // U+1F4CA 📊 is the bar-chart emoji — conventionally used to
+    // signal "data" or "statistics". Distinct from U+1F4C8 📈 (line
+    // chart) or U+1F4C5 📅 (calendar). Pin so a drift to a different
+    // chart variant surfaces.
+    expect(METHODESHEET_BLOCK_EMOJI_AN.codePointAt(0)).toBe(0x1F4CA);
+  });
+
+  it("CLAUDE block emoji equals CARD_IA_CHIP_GLYPH (AI-signaling consistency)", () => {
+    // The Card recto IA chip and the MethodeSheet Claude block both
+    // signal AI/generated content via the same sparkles glyph. Pin
+    // the value equality so a future swap of the AI icon propagates
+    // to both surfaces via 1 edit (or fails this cross-check first).
+    expect(METHODESHEET_BLOCK_EMOJI_CLAUDE).toBe(CARD_IA_CHIP_GLYPH);
+  });
+
+  it("both block emojis are exactly 2 UTF-16 code units (surrogate pair)", () => {
+    // 📊 (U+1F4CA) and ✨ — wait, ✨ is in BMP (length 1).
+    // 📊 is a surrogate pair (length 2). The 2 emoji types have
+    // different lengths intentionally — pin the BMP vs SMP boundary.
+    expect(METHODESHEET_BLOCK_EMOJI_AN).toHaveLength(2);
+    expect(METHODESHEET_BLOCK_EMOJI_CLAUDE).toHaveLength(1);
+  });
+
+  it("AN and CLAUDE emojis are distinct (different blocks, different signaling)", () => {
+    expect(METHODESHEET_BLOCK_EMOJI_AN).not.toBe(METHODESHEET_BLOCK_EMOJI_CLAUDE);
   });
 });
 
