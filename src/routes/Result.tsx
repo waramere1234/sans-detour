@@ -22,6 +22,7 @@ import {
   resultEyebrowText, resultHeaderBodyLineText,
   resultPersonnalitesIndexedCountText, continueTestRemainingSuffix,
   RESULT_TOP_LEAD, RESULT_GROUPS_H2, RESULT_PERSONNALITES_H2,
+  RESULT_EMPTY_POOL_MESSAGE,
   type Scrutin, type GroupCode,
 } from "../types";
 
@@ -106,7 +107,7 @@ export default function Result() {
   if (poolLoaded && pool.length === 0) {
     return (
       <RetryError
-        message="Impossible de calculer ton alignement : aucun scrutin disponible. Réessaie dans quelques minutes."
+        message={RESULT_EMPTY_POOL_MESSAGE}
         onRetry={() => setLoadTick((t) => t + 1)}
       />
     );

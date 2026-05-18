@@ -16,6 +16,8 @@ import {
   LEGAL_ANALYTICS_DESCRIPTION, LEGAL_DATA_LICENSE_LABEL,
   LEGAL_PERSONAL_DATA_BODY,
   LEGAL_INDEPENDANCE_BODY,
+  LEGAL_SOURCES_DONNEES_OPENER_PREFIX, LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR,
+  LEGAL_CODE_SOURCE_OPENER_PREFIX,
 } from "../src/types";
 import { BACK_LINK_LABEL } from "../src/components/ReadingPageHeader";
 
@@ -129,6 +131,20 @@ describe("Legal — RGPD-required content", () => {
     renderLegal();
     const body = document.body.textContent || "";
     expect(body).toContain(LEGAL_INDEPENDANCE_BODY);
+  });
+
+  it("sources block surfaces LEGAL_SOURCES_DONNEES_OPENER_PREFIX + SEPARATOR around the AN link (round-trip)", () => {
+    renderLegal();
+    const body = document.body.textContent || "";
+    // Trim "(" / "), " so jsdom's flattened text matches.
+    expect(body).toContain(LEGAL_SOURCES_DONNEES_OPENER_PREFIX.replace("(", "").trim());
+    expect(body).toContain(LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR.trim());
+  });
+
+  it("code-source block surfaces LEGAL_CODE_SOURCE_OPENER_PREFIX (MIT-license claim)", () => {
+    renderLegal();
+    const body = document.body.textContent || "";
+    expect(body).toContain(LEGAL_CODE_SOURCE_OPENER_PREFIX.trim());
   });
 });
 

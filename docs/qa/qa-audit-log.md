@@ -4188,3 +4188,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `METHODESHEET_CLAUDE_TASKS_BODY\|METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY\|ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX` src/ tests/ → 15+ résultats
 - [ ] grep `"Le titre court reformulé"\|"Claude reçoit le libellé brut"\|"Si ça persiste"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~1006 tests` CLAUDE.md → 0 résultat (aligné sur ~1023)
+
+## Session 179 — 2026-05-18
+
+### Vérification session 178
+
+- [VERIFIED] 38 occurrences des nouveaux exports (METHODESHEET_CLAUDE_TASKS_BODY + METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY + ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX)
+- [VERIFIED] 3 occurrences inline literals = 1 comment + 1 export const + 1 pin-the-value test (clean)
+- [VERIFIED] CLAUDE.md "~1006 tests" → 0 résultat (aligné sur ~1023)
+- 1023/1023 tests verts, typecheck clean
+
+### Bugs fixés (RESULT_EMPTY_POOL_MESSAGE + LEGAL_SOURCES_DONNEES_OPENER_PREFIX/_LINK_TO_LICENSE_SEPARATOR + LEGAL_CODE_SOURCE_OPENER_PREFIX)
+
+- [FIXED] Result.tsx empty-pool RetryError message `"Impossible de calculer ton alignement : aucun scrutin disponible. Réessaie dans quelques minutes."` inline + untested. Drift surface : parallel à PLAY_EMPTY_POOL_MESSAGE sur la route Play. Les 2 messages documentent la même failure class (empty pool) sur des écrans différents avec page-specific framing. Result framings en termes du goal "calculer ton alignement" (page-specific), Play framings en termes neutres "Aucun scrutin disponible". Sans pin, un copy-paste depuis PLAY_EMPTY_POOL_MESSAGE perdrait le page-specific framing. Fix : export `RESULT_EMPTY_POOL_MESSAGE`. Result.tsx utilise la const. Aria-labels tests : 5 (canonical + startsWith "Impossible de calculer ton alignement" page-specific framing + contains "aucun scrutin disponible" shared condition phrase + endsWith "dans quelques minutes." retry-guidance anti-soften + `!==` PLAY_EMPTY_POOL_MESSAGE anti-collapse guard). · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Legal.tsx §sources opener `"Open data officiel de l'Assemblée Nationale ("` + `"), "` inline (split autour du AN open-data link + le LEGAL_DATA_LICENSE_LABEL) + untested. Drift surface : load-bearing source-attribution claim — le mot "officiel" commit l'app à utiliser le feed AN officiel (pas un third-party proxy ou scrape). Un softening en "données" ou "open data" alone perdrait le official-source anchor qui backs la data-provenance claim dans la méthodologie. Le SEPARATOR `"), "` (comma + space typo entre la parenthese fermante et le license noun) est cadence-load-bearing. Fix : export `LEGAL_SOURCES_DONNEES_OPENER_PREFIX` + `LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR`. Legal.tsx utilise la composition `{PREFIX}<a>...</a>{SEPARATOR}{LICENSE}.`. Legal test : 1 toContain × 2. Aria-labels tests : 7 (canonical PREFIX + canonical SEPARATOR + contains "officiel" anti-soften source-attribution + contains "Assemblée Nationale" institutional source + PREFIX endsWith "(" parenthesis-opener + SEPARATOR startsWith ")" parenthesis-closer + SEPARATOR === "), " exact-cadence pin). · `src/types/index.ts`, `src/routes/Legal.tsx`, `tests/Legal.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Legal.tsx §code-source opener `"Open source sous licence MIT, disponible sur "` inline (split avant le GitHub link interpolation) + untested. Drift surface : load-bearing MIT-license claim paired avec les Methode §06 + §07 MIT-license annotations et les GITHUB_REPO_URL/DISPLAY constants. Un softening en "Open source" alone (dropping "MIT") affaiblirait le legal commitment. La phrasing "sous licence MIT" est le formal French legal form ; "open source MIT" affaiblirait le legal register attendu sur une Mentions Légales page. Ce claim est actuellement un production-blocker car le real repo est private à waramere1234/sans-detour. Fix : export `LEGAL_CODE_SOURCE_OPENER_PREFIX`. Legal.tsx utilise la const. Legal test : 1 toContain. Aria-labels tests : 5 (canonical + contains "MIT" license-claim anti-soften + contains "sous licence" formal-French-legal-form + endsWith "disponible sur " link-prefix-cadence trailing-space + exactly-1-comma anti-drift guard). · `src/types/index.ts`, `src/routes/Legal.tsx`, `tests/Legal.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 180
+
+- [ ] grep `RESULT_EMPTY_POOL_MESSAGE\|LEGAL_SOURCES_DONNEES_OPENER_PREFIX\|LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR\|LEGAL_CODE_SOURCE_OPENER_PREFIX` src/ tests/ → 15+ résultats
+- [ ] grep `"Impossible de calculer ton alignement"\|"Open data officiel"\|"Open source sous licence MIT"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~1023 tests` CLAUDE.md → 0 résultat (aligné sur ~1041)

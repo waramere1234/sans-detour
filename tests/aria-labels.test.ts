@@ -86,6 +86,9 @@ import {
   METHODESHEET_AN_BLOCK_BODY, METHODESHEET_CLAUDE_NO_AI_IN_SCORE,
   METHODESHEET_CLAUDE_TASKS_BODY, METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY,
   ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX,
+  RESULT_EMPTY_POOL_MESSAGE,
+  LEGAL_SOURCES_DONNEES_OPENER_PREFIX, LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR,
+  LEGAL_CODE_SOURCE_OPENER_PREFIX,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -2558,6 +2561,130 @@ describe("ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX — ErrorBoundary conditional c
     // The trailing space allows the JSX-interpolated CONTACT_EMAIL
     // mailto link to render flush without manual spacing in the JSX.
     expect(ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX.endsWith(" : ")).toBe(true);
+  });
+});
+
+describe("RESULT_EMPTY_POOL_MESSAGE — Result.tsx empty-pool RetryError message", () => {
+  it("matches the canonical wording (pin-the-value)", () => {
+    expect(RESULT_EMPTY_POOL_MESSAGE).toBe(
+      "Impossible de calculer ton alignement : aucun scrutin disponible. Réessaie dans quelques minutes.",
+    );
+  });
+
+  it("opens with 'Impossible de calculer ton alignement' (page-specific framing)", () => {
+    // The Result-page empty-pool message frames the failure in terms
+    // of the user's goal on /result ("calculer ton alignement"), not
+    // the generic "Aucun scrutin disponible" framing used by Play.
+    // A copy paste from PLAY_EMPTY_POOL_MESSAGE would lose this
+    // page-specific framing — pin so they stay distinct.
+    expect(RESULT_EMPTY_POOL_MESSAGE.startsWith("Impossible de calculer ton alignement")).toBe(true);
+  });
+
+  it("contains 'aucun scrutin disponible' (load-bearing condition phrase)", () => {
+    // The condition phrase mirrors PLAY_EMPTY_POOL_MESSAGE ("Aucun
+    // scrutin disponible"). The 2 surfaces are the same failure
+    // class (empty pool) on different pages — the condition phrase
+    // must stay shared even though the framing differs.
+    expect(RESULT_EMPTY_POOL_MESSAGE.toLowerCase()).toContain("aucun scrutin disponible");
+  });
+
+  it("ends with 'dans quelques minutes.' (anti-soften guard for retry guidance)", () => {
+    // Tells the user when to retry — "dans quelques minutes" is the
+    // specific guidance. A drop to just "Réessaie." would leave the
+    // user with no time-frame and a worse UX.
+    expect(RESULT_EMPTY_POOL_MESSAGE.endsWith("dans quelques minutes.")).toBe(true);
+  });
+
+  it("is distinct from PLAY_EMPTY_POOL_MESSAGE (anti-collapse guard)", () => {
+    // The 2 messages document the same failure class on different
+    // pages but with page-specific framing. A future refactor that
+    // collapses them into one shared const would lose the Result
+    // page's "calculer ton alignement" framing. Pin so they stay
+    // intentionally divergent.
+    expect(RESULT_EMPTY_POOL_MESSAGE).not.toBe(PLAY_EMPTY_POOL_MESSAGE);
+  });
+});
+
+describe("LEGAL_SOURCES_DONNEES_OPENER_PREFIX + _LINK_TO_LICENSE_SEPARATOR — Legal §sources wrapping the AN open-data link", () => {
+  it("PREFIX matches the canonical opener (pin-the-value)", () => {
+    expect(LEGAL_SOURCES_DONNEES_OPENER_PREFIX).toBe(
+      "Open data officiel de l'Assemblée Nationale (",
+    );
+  });
+
+  it("SEPARATOR matches the canonical closer-into-license (pin-the-value)", () => {
+    expect(LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR).toBe("), ");
+  });
+
+  it("PREFIX contains 'officiel' (load-bearing source-attribution anchor)", () => {
+    // "officiel" commits the app to using the *official* AN feed, not
+    // a third-party proxy or scrape. A softening to "données" or
+    // "open data" alone would lose the official-source anchor that
+    // backs the data-provenance claim in the methodology.
+    expect(LEGAL_SOURCES_DONNEES_OPENER_PREFIX).toContain("officiel");
+  });
+
+  it("PREFIX contains 'Assemblée Nationale' (the institutional source)", () => {
+    expect(LEGAL_SOURCES_DONNEES_OPENER_PREFIX).toContain("Assemblée Nationale");
+  });
+
+  it("PREFIX ends with '(' opening parenthesis for the link", () => {
+    // Compositional: PREFIX + AN_LINK + SEPARATOR + LICENSE_LABEL +
+    // ".". The PREFIX must end with '(' to open the parenthesis the
+    // SEPARATOR will close.
+    expect(LEGAL_SOURCES_DONNEES_OPENER_PREFIX.endsWith("(")).toBe(true);
+  });
+
+  it("SEPARATOR starts with ')' (closes the link parenthesis)", () => {
+    expect(LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR.startsWith(")")).toBe(true);
+  });
+
+  it("SEPARATOR is exactly '), ' (comma + space before license label)", () => {
+    // Cadence-pinning: the comma + space gives the typographic
+    // breathing room between the parenthesized link and the license
+    // noun. A drop to "), " → "). " would change the cadence.
+    expect(LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR).toBe("), ");
+  });
+});
+
+describe("LEGAL_CODE_SOURCE_OPENER_PREFIX — Legal §code-source MIT-license opener", () => {
+  it("matches the canonical opener (pin-the-value)", () => {
+    expect(LEGAL_CODE_SOURCE_OPENER_PREFIX).toBe(
+      "Open source sous licence MIT, disponible sur ",
+    );
+  });
+
+  it("contains 'MIT' (load-bearing license claim)", () => {
+    // "MIT" commits the project to a specific permissive license.
+    // A softening to "Open source" alone (dropping "MIT") would
+    // weaken the legal commitment and break the symmetric claim
+    // with the Methode §06 + §07 MIT-license annotations.
+    expect(LEGAL_CODE_SOURCE_OPENER_PREFIX).toContain("MIT");
+  });
+
+  it("contains 'sous licence' (proper licensing phrasing)", () => {
+    // The phrasing "sous licence MIT" is the formal French legal
+    // form. A drop to just "open source MIT" would weaken the
+    // legal register expected on a Mentions Légales page.
+    expect(LEGAL_CODE_SOURCE_OPENER_PREFIX).toContain("sous licence");
+  });
+
+  it("ends with 'disponible sur ' (link-prefix cadence with trailing space)", () => {
+    // The trailing space lets the GitHub link render flush after
+    // the prefix in JSX without manual spacing. Pin so a future
+    // edit that drops the space doesn't silently jam the link
+    // text against "sur".
+    expect(LEGAL_CODE_SOURCE_OPENER_PREFIX.endsWith("disponible sur ")).toBe(true);
+  });
+
+  it("contains exactly 1 comma (the MIT/disponible split)", () => {
+    // The opener reads "Open source sous licence MIT, disponible
+    // sur " — one comma between the license claim and the link
+    // pointer. A future tweak that adds a clause (e.g., "Open
+    // source, sous licence MIT, disponible sur") would change
+    // the cadence.
+    const commaCount = (LEGAL_CODE_SOURCE_OPENER_PREFIX.match(/,/g) || []).length;
+    expect(commaCount).toBe(1);
   });
 });
 

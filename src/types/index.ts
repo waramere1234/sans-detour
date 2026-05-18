@@ -989,6 +989,42 @@ export const METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY =
  *  defeating the reload-first recovery flow. */
 export const ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX = "Si ça persiste : ";
 
+/** Result.tsx empty-pool RetryError message — surfaced when Supabase
+ *  returns zero rows (or every row is filtered out) on the result
+ *  screen. Parallel to PLAY_EMPTY_POOL_MESSAGE on the Play route;
+ *  the 2 messages document the same "no data" failure path on
+ *  different screens. Distinct from RETRY_FETCH_FAILED_MESSAGE
+ *  (that one is for fetch-rejected, not empty-pool). */
+export const RESULT_EMPTY_POOL_MESSAGE =
+  "Impossible de calculer ton alignement : aucun scrutin disponible. Réessaie dans quelques minutes.";
+
+/** Legal §sources opener — split into prefix + separator around the
+ *  AN open-data link AND the LEGAL_DATA_LICENSE_LABEL JSX
+ *  interpolation. The full sentence reads:
+ *  "Open data officiel de l'Assemblée Nationale ({AN_LINK}),
+ *   {LEGAL_DATA_LICENSE_LABEL}."
+ *  PREFIX opens the parenthesis around the link; SEPARATOR closes
+ *  it and reads ", " into the license-label noun. Pin so a future
+ *  rewording that loses the "officiel" anchor (the load-bearing
+ *  claim that we use the *official* AN feed, not a third-party
+ *  proxy) surfaces. */
+export const LEGAL_SOURCES_DONNEES_OPENER_PREFIX =
+  "Open data officiel de l'Assemblée Nationale (";
+export const LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR = "), ";
+
+/** Legal §code-source opener — split before the GitHub link
+ *  interpolation. The full sentence reads:
+ *  "Open source sous licence MIT, disponible sur {GITHUB_LINK}."
+ *  The "MIT" license claim is load-bearing: paired with the
+ *  Methode §06 + §07 MIT-license annotations and the
+ *  GITHUB_REPO_URL/DISPLAY constants. A softening to "open source"
+ *  alone (dropping "MIT") would weaken the legal commitment.
+ *  This claim is currently a production-blocker because the actual
+ *  repo is private at waramere1234/sans-detour — see the TODO
+ *  comment in Legal.tsx. */
+export const LEGAL_CODE_SOURCE_OPENER_PREFIX =
+  "Open source sous licence MIT, disponible sur ";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use
