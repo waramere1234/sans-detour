@@ -1,5 +1,5 @@
 // src/lib/session.ts
-import type { SessionState, UserVote } from "../types";
+import { COVER_STORAGE_TRUE_VALUE, type SessionState, type UserVote } from "../types";
 
 // Exported so tests can prime / inspect storage without re-hardcoding the
 // strings (previously duplicated 5× in tests/session.test.ts and 3× in
@@ -121,7 +121,7 @@ export function hasSeenCover(): boolean {
   // Same throw-on-read defense as loadSession — return false (= treat as
   // not seen) when storage is unavailable so the Cover keeps rendering.
   try {
-    return localStorage.getItem(COVER_KEY) === "true";
+    return localStorage.getItem(COVER_KEY) === COVER_STORAGE_TRUE_VALUE;
   } catch {
     return false;
   }
@@ -129,7 +129,7 @@ export function hasSeenCover(): boolean {
 
 export function markCoverSeen(): void {
   try {
-    localStorage.setItem(COVER_KEY, "true");
+    localStorage.setItem(COVER_KEY, COVER_STORAGE_TRUE_VALUE);
   } catch {
     // Same Safari-private-mode / quota guard as saveSession — keep the
     // user moving rather than throwing out of `start()`.

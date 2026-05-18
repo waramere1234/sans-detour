@@ -6,6 +6,7 @@ import {
   ERROR_FALLBACK_MESSAGE,
   ERROR_FALLBACK_RELOAD_LABEL,
   ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX,
+  ERROR_STACK_TRACE_MAX_LENGTH,
 } from "../types";
 
 interface State { hasError: boolean; }
@@ -20,7 +21,7 @@ export class ErrorBoundary extends React.Component<{ children: ReactNode }, Stat
   componentDidCatch(err: Error, info: { componentStack: string }) {
     track("error", {
       msg: err.message,
-      stack: info.componentStack.slice(0, 200),
+      stack: info.componentStack.slice(0, ERROR_STACK_TRACE_MAX_LENGTH),
     });
   }
 

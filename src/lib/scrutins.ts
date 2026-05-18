@@ -2,6 +2,7 @@
 import { supabase } from "./supabase";
 import {
   SCRUTINS_TABLE_NAME, SCRUTINS_COL_POINTS_CLES, SCRUTINS_COL_INGERE_LE,
+  SCRUTINS_COL_DATE,
   type Scrutin, type FreshnessInfo,
 } from "../types";
 import fixtures from "../../supabase/seed/dev-fixtures.json";
@@ -18,7 +19,7 @@ export async function fetchScrutins(): Promise<Scrutin[]> {
     .from(SCRUTINS_TABLE_NAME)
     .select("*")
     .not(SCRUTINS_COL_POINTS_CLES, "is", null)
-    .order("date", { ascending: false });
+    .order(SCRUTINS_COL_DATE, { ascending: false });
   if (error) throw error;
   return (data ?? []) as Scrutin[];
 }

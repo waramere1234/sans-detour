@@ -1436,6 +1436,27 @@ export const SCRUTINS_COL_POINTS_CLES = "points_cles";
  *  rename surfaces alongside the migration. */
 export const SCRUTINS_COL_INGERE_LE = "ingere_le";
 
+/** Supabase column name for the scrutin vote date — used 1× in
+ *  fetchScrutins as the `.order("date", { ascending: false })`
+ *  sort key. Completes the SCRUTINS_COL_* set (alongside POINTS_CLES
+ *  and INGERE_LE). Pin so a schema migration renaming this column
+ *  surfaces alongside the migration. */
+export const SCRUTINS_COL_DATE = "date";
+
+/** Boolean-as-string value written/read for COVER_STORAGE_KEY in
+ *  src/lib/session.ts. Used as both the value passed to setItem
+ *  (markCoverSeen) AND the value compared on read (hasSeenCover ===
+ *  comparison). A drift on either side silently breaks the read-write
+ *  contract — pin so both sites stay in sync via 1 edit. */
+export const COVER_STORAGE_TRUE_VALUE = "true";
+
+/** Max length for the `componentStack` slice in ErrorBoundary's
+ *  analytics payload. Pulls the magic number out of the inline
+ *  `info.componentStack.slice(0, 200)` so a future tweak (e.g.,
+ *  bumping to 500 for richer error reports, or trimming to 100
+ *  to fit Plausible's 2kB prop limit) propagates from one edit. */
+export const ERROR_STACK_TRACE_MAX_LENGTH = 200;
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

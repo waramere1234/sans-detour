@@ -127,6 +127,7 @@ import {
   METHODE_SECTION_ID_PREFIX, METHODE_SECTION_HEADING_ID_PREFIX,
   AUDIT_TRAIL_HEADING_ID_PREFIX, AUDIT_TRAIL_PANEL_ID_PREFIX,
   SCRUTINS_TABLE_NAME, SCRUTINS_COL_POINTS_CLES, SCRUTINS_COL_INGERE_LE,
+  SCRUTINS_COL_DATE, COVER_STORAGE_TRUE_VALUE, ERROR_STACK_TRACE_MAX_LENGTH,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -3995,6 +3996,60 @@ describe("SCRUTINS_TABLE_NAME + SCRUTINS_COL_* — Supabase schema identifiers",
     for (const id of [SCRUTINS_TABLE_NAME, SCRUTINS_COL_POINTS_CLES, SCRUTINS_COL_INGERE_LE]) {
       expect(id).not.toMatch(/[\s"']/);
     }
+  });
+});
+
+describe("SCRUTINS_COL_DATE — Supabase scrutin-date sort column", () => {
+  it("matches 'date' (pin-the-value, schema-anchored)", () => {
+    expect(SCRUTINS_COL_DATE).toBe("date");
+  });
+
+  it("is lowercase + has no whitespace/quote (SQL-safe identifier)", () => {
+    expect(SCRUTINS_COL_DATE).toBe(SCRUTINS_COL_DATE.toLowerCase());
+    expect(SCRUTINS_COL_DATE).not.toMatch(/[\s"']/);
+  });
+
+  it("is distinct from the other SCRUTINS_COL_* identifiers (anti-collision)", () => {
+    const cols = new Set([SCRUTINS_COL_DATE, SCRUTINS_COL_POINTS_CLES, SCRUTINS_COL_INGERE_LE]);
+    expect(cols.size).toBe(3);
+  });
+});
+
+describe("COVER_STORAGE_TRUE_VALUE — bool-as-string for COVER_STORAGE_KEY", () => {
+  it("matches 'true' (pin-the-value)", () => {
+    expect(COVER_STORAGE_TRUE_VALUE).toBe("true");
+  });
+
+  it("is a string (localStorage stores strings only, NOT a JS boolean)", () => {
+    // localStorage.setItem coerces non-strings via toString(), but
+    // assigning a JS boolean here would silently convert at runtime
+    // and confuse the read-side === comparison if ever refactored
+    // to typeof checks. Pin string type explicitly.
+    expect(typeof COVER_STORAGE_TRUE_VALUE).toBe("string");
+  });
+
+  it("equals lowercase 'true' (anti-capitalize for boolean-string convention)", () => {
+    // JavaScript's String(true) returns "true" — match that exact
+    // form so the value round-trips through any boolean-coerced read.
+    expect(COVER_STORAGE_TRUE_VALUE).toBe(String(true));
+  });
+});
+
+describe("ERROR_STACK_TRACE_MAX_LENGTH — ErrorBoundary stack truncation", () => {
+  it("matches 200 (pin-the-value)", () => {
+    expect(ERROR_STACK_TRACE_MAX_LENGTH).toBe(200);
+  });
+
+  it("is a positive integer", () => {
+    expect(Number.isInteger(ERROR_STACK_TRACE_MAX_LENGTH)).toBe(true);
+    expect(ERROR_STACK_TRACE_MAX_LENGTH).toBeGreaterThan(0);
+  });
+
+  it("fits within Plausible's 2kB prop limit (safety margin)", () => {
+    // Plausible custom-prop values cap at 2000 chars. 200 leaves
+    // ample room for the surrounding `msg` field + JSON encoding
+    // overhead. Pin so a future bump stays within the limit.
+    expect(ERROR_STACK_TRACE_MAX_LENGTH).toBeLessThan(2000);
   });
 });
 

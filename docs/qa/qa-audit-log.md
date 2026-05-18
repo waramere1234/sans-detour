@@ -4496,3 +4496,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `SCRUTINS_TABLE_NAME\|SCRUTINS_COL_POINTS_CLES\|SCRUTINS_COL_INGERE_LE` src/ tests/ → 12+ résultats
 - [ ] grep `'\.from\("scrutins"\)\|"points_cles"\|"ingere_le"'` src/lib/scrutins.ts → 0 résultats (tous via les consts)
 - [ ] grep `~1245 tests` CLAUDE.md → 0 résultat (aligné sur ~1252)
+
+## Session 194 — 2026-05-18
+
+### Vérification session 193
+
+- [VERIFIED] 24 occurrences des nouveaux exports (SCRUTINS_TABLE_NAME + SCRUTINS_COL_POINTS_CLES + SCRUTINS_COL_INGERE_LE)
+- [VERIFIED] scrutins.ts : 0 inline literals (toutes les 8 références Supabase utilisent les consts)
+- [VERIFIED] CLAUDE.md "~1245 tests" → 0 résultat (aligné sur ~1252)
+- 1252/1252 tests verts, typecheck clean
+
+### Bugs fixés (SCRUTINS_COL_DATE + COVER_STORAGE_TRUE_VALUE + ERROR_STACK_TRACE_MAX_LENGTH)
+
+- [FIXED] Supabase column `"date"` inline 1× dans scrutins.ts (`.order("date", { ascending: false })` dans fetchScrutins). Drift surface : complete le SCRUTINS_COL_* set initié en session 193 (POINTS_CLES + INGERE_LE). Un schema migration renaming la column doit propager via la const. Fix : export `SCRUTINS_COL_DATE`. scrutins.ts utilise la const. Aria-labels tests : 3 (canonical + lowercase + SQL-safe-identifier no-whitespace/no-quote + 3-distinct anti-collision Set check contre les 2 autres SCRUTINS_COL_*). · `src/types/index.ts`, `src/lib/scrutins.ts`, `tests/aria-labels.test.ts`
+- [FIXED] localStorage bool-as-string `"true"` inline 2× dans session.ts (`setItem(COVER_KEY, "true")` write + `getItem(COVER_KEY) === "true"` read comparison). Drift surface : read-write contract — si un site drift en `"1"` ou `"yes"`, la comparaison silently breaks (hasSeenCover toujours retourne false). Fix : export `COVER_STORAGE_TRUE_VALUE`. session.ts utilise la const dans les 2 sites paired. Aria-labels tests : 3 (canonical + typeof === "string" anti-coerce-from-boolean + equals String(true) round-trip-with-JS-coercion). · `src/types/index.ts`, `src/lib/session.ts`, `tests/aria-labels.test.ts`
+- [FIXED] ErrorBoundary magic number `200` inline (componentStack truncation length pour Plausible analytics payload, ErrorBoundary.tsx ligne 23). Drift surface : magic-number truncation length pour fit dans Plausible's 2kB prop limit. Un bump à 500 pour richer error reports ou un trim à 100 doit propager via la const. Fix : export `ERROR_STACK_TRACE_MAX_LENGTH`. ErrorBoundary.tsx utilise la const dans le .slice(0, ...). Aria-labels tests : 3 (canonical 200 + positive-integer guard + less-than-2000 Plausible-limit-fit safety check). · `src/types/index.ts`, `src/components/ErrorBoundary.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 195
+
+- [ ] grep `SCRUTINS_COL_DATE\|COVER_STORAGE_TRUE_VALUE\|ERROR_STACK_TRACE_MAX_LENGTH` src/ tests/ → 12+ résultats
+- [ ] grep `'\.order\("date"\|"true"\)\|slice\(0, 200\)'` src/ → 0 résultats (tous via les consts)
+- [ ] grep `~1252 tests` CLAUDE.md → 0 résultat (aligné sur ~1261)
