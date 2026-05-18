@@ -1,5 +1,5 @@
 // src/components/FreshnessBanner.tsx
-import { MIDDLE_DOT_SEPARATOR, type FreshnessInfo } from "../types";
+import { MIDDLE_DOT_SEPARATOR, MS_PER_DAY, type FreshnessInfo } from "../types";
 
 // new Date("…").getTime() returns NaN when the string isn't a valid ISO
 // date. Without the isNaN check, the banner ends up rendering "MAJ il y a
@@ -8,12 +8,12 @@ import { MIDDLE_DOT_SEPARATOR, type FreshnessInfo } from "../types";
 function diffDays(target: string, base: number = Date.now()): number {
   const t = new Date(target).getTime();
   if (isNaN(t)) return 0;
-  return Math.max(0, Math.floor((t - base) / 86400_000));
+  return Math.max(0, Math.floor((t - base) / MS_PER_DAY));
 }
 function pastDays(target: string, base: number = Date.now()): number {
   const t = new Date(target).getTime();
   if (isNaN(t)) return 0;
-  return Math.max(0, Math.floor((base - t) / 86400_000));
+  return Math.max(0, Math.floor((base - t) / MS_PER_DAY));
 }
 
 /** Sync cadence is weekly (cf. Methode §01). Above this many days, the

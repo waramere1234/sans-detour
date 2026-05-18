@@ -1457,6 +1457,29 @@ export const COVER_STORAGE_TRUE_VALUE = "true";
  *  to fit Plausible's 2kB prop limit) propagates from one edit. */
 export const ERROR_STACK_TRACE_MAX_LENGTH = 200;
 
+/** Milliseconds per day — `24 * 60 * 60 * 1000`. Used 4× across the
+ *  app: FreshnessBanner's diffDays + pastDays helpers (banner display),
+ *  and scrutins.ts's fetchFreshness next_sync_eta computation (2 sites
+ *  for the supabase-OK + supabase-null branches). Centralised so a
+ *  refactor to a Temporal-API based date math (Date.UTC, etc.) can
+ *  ship via 1 edit instead of 4 in-lockstep changes. */
+export const MS_PER_DAY = 86_400_000;
+
+/** Sync cadence in days — the ingest pipeline runs weekly (see
+ *  Methode §01 + METHODE_S01_UPDATE_CADENCE). fetchFreshness uses
+ *  this for the +N-days next_sync_eta computation in 2 sites. Pin
+ *  so a cadence change (weekly → biweekly) propagates from 1 edit.
+ *  Pairs with STALE_AFTER_DAYS (10 = cadence + 3-day grace period). */
+export const SYNC_CADENCE_DAYS = 7;
+
+/** Deck-seed range exponent — `Math.floor(Math.random() * 2 ** N)`
+ *  generates the seed for mulberry32 in deck.ts (composeDeck +
+ *  drawNext). 2**31 keeps the seed in 32-bit signed-int range,
+ *  matching mulberry32's expected input domain. A drift to 2**52
+ *  would still work but couples the seed to JS Number precision in
+ *  a way mulberry32 doesn't promise. */
+export const DECK_SEED_RANGE_EXPONENT = 31;
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

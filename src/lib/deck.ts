@@ -1,5 +1,5 @@
 // src/lib/deck.ts
-import type { Scrutin } from "../types";
+import { DECK_SEED_RANGE_EXPONENT, type Scrutin } from "../types";
 
 /** Deck composition caps used by both Play.tsx (initial compose + draws
  *  on swipe) and the deck test suites. Exported here so a future bump
@@ -72,7 +72,7 @@ export function chapeauPrefix(s: Scrutin): string {
  *  Themes are taken from `scrutin.theme`; scrutins without a theme fall into
  *  an "autre" bucket so older rows (pre-migration 0005) still flow through. */
 export function composeDeck(pool: Scrutin[], opts: ComposeOptions): Scrutin[] {
-  const seed = opts.seed ?? Math.floor(Math.random() * 2 ** 31);
+  const seed = opts.seed ?? Math.floor(Math.random() * 2 ** DECK_SEED_RANGE_EXPONENT);
   const rng = mulberry32(seed);
   const counts = new Map<string, number>(opts.seenDossierCounts ?? []);
   const prefixCounts = new Map<string, number>(opts.seenChapeauPrefixCounts ?? []);
@@ -135,7 +135,7 @@ export function drawNext(
   seenIds: Set<string>,
   opts: DrawNextOptions,
 ): Scrutin | null {
-  const seed = opts.seed ?? Math.floor(Math.random() * 2 ** 31);
+  const seed = opts.seed ?? Math.floor(Math.random() * 2 ** DECK_SEED_RANGE_EXPONENT);
   const rng = mulberry32(seed);
   const shuffled = shuffle(pool, rng);
   // Resolve the prefix-counts map once, with the same default-empty pattern

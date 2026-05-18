@@ -4517,3 +4517,23 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `SCRUTINS_COL_DATE\|COVER_STORAGE_TRUE_VALUE\|ERROR_STACK_TRACE_MAX_LENGTH` src/ tests/ → 12+ résultats
 - [ ] grep `'\.order\("date"\|"true"\)\|slice\(0, 200\)'` src/ → 0 résultats (tous via les consts)
 - [ ] grep `~1252 tests` CLAUDE.md → 0 résultat (aligné sur ~1261)
+
+## Session 195 — 2026-05-18
+
+### Vérification session 194
+
+- [VERIFIED] 25 occurrences des nouveaux exports (SCRUTINS_COL_DATE + COVER_STORAGE_TRUE_VALUE + ERROR_STACK_TRACE_MAX_LENGTH)
+- [VERIFIED] CLAUDE.md "~1252 tests" → 0 résultat (aligné sur ~1261)
+- 1261/1261 tests verts, typecheck clean
+
+### Bugs fixés (MS_PER_DAY + SYNC_CADENCE_DAYS + DECK_SEED_RANGE_EXPONENT)
+
+- [FIXED] Magic number `86_400_000` (milliseconds-per-day) inline 4× (FreshnessBanner.tsx diffDays + pastDays + scrutins.ts fetchFreshness 2 branches). Drift surface : ms-per-day arithmetic répliqué partout dans le date math. Un refactor vers Temporal-API ou autres helpers doit propager. Fix : export `MS_PER_DAY`. FreshnessBanner.tsx + scrutins.ts utilisent la const. Aria-labels tests : 3 (canonical 86_400_000 + compositional invariant === 24*60*60*1000 + positive-integer). · `src/types/index.ts`, `src/components/FreshnessBanner.tsx`, `src/lib/scrutins.ts`, `tests/aria-labels.test.ts`
+- [FIXED] Magic number `7` (sync cadence days) inline 2× dans scrutins.ts fetchFreshness (+SYNC_CADENCE_DAYS * MS_PER_DAY pour next_sync_eta). Drift surface : weekly cadence référencée dans Methode §01 + METHODE_S01_UPDATE_CADENCE. Une cadence change (weekly → biweekly = 14) doit propager + force un update de STALE_AFTER_DAYS threshold. Pairs avec STALE_AFTER_DAYS via cadence < threshold invariant (grace period). Fix : export `SYNC_CADENCE_DAYS`. scrutins.ts utilise la const dans les 2 sites. Aria-labels tests : 3 (canonical 7 + positive-integer + cadence < STALE_AFTER_DAYS cross-const grace-period invariant). · `src/types/index.ts`, `src/lib/scrutins.ts`, `tests/aria-labels.test.ts`
+- [FIXED] Magic number `31` (deck-seed bit-width) inline 2× dans deck.ts (composeDeck + drawNext via `Math.floor(Math.random() * 2 ** 31)`). Drift surface : 32-bit signed-int range pour mulberry32 seed. Un drift à 53 fonctionnerait mais couplerait le seed à JS Number precision en dehors du mulberry32 expected domain. Pin paired avec mulberry32's `let t = seed >>> 0` unsigned-int32 coercion. Fix : export `DECK_SEED_RANGE_EXPONENT`. deck.ts utilise la const dans les 2 sites. Aria-labels tests : 4 (canonical 31 + positive-integer + 2 ** N < Number.MAX_SAFE_INTEGER precision-safe + ≤ 32 mulberry32-domain-compatibility). · `src/types/index.ts`, `src/lib/deck.ts`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 196
+
+- [ ] grep `MS_PER_DAY\|SYNC_CADENCE_DAYS\|DECK_SEED_RANGE_EXPONENT` src/ tests/ → 15+ résultats
+- [ ] grep `'86400_000\|86_400_000\|2 \*\* 31'` src/ → 0 résultats (tous via les consts)
+- [ ] grep `~1261 tests` CLAUDE.md → 0 résultat (aligné sur ~1271)

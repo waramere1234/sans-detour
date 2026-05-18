@@ -2,7 +2,7 @@
 import { supabase } from "./supabase";
 import {
   SCRUTINS_TABLE_NAME, SCRUTINS_COL_POINTS_CLES, SCRUTINS_COL_INGERE_LE,
-  SCRUTINS_COL_DATE,
+  SCRUTINS_COL_DATE, MS_PER_DAY, SYNC_CADENCE_DAYS,
   type Scrutin, type FreshnessInfo,
 } from "../types";
 import fixtures from "../../supabase/seed/dev-fixtures.json";
@@ -29,7 +29,7 @@ export async function fetchFreshness(): Promise<FreshnessInfo> {
     return {
       total_scrutins: (fixtures as Scrutin[]).length,
       last_sync_at: new Date().toISOString(),
-      next_sync_eta: new Date(Date.now() + 7 * 86400_000).toISOString(),
+      next_sync_eta: new Date(Date.now() + SYNC_CADENCE_DAYS * MS_PER_DAY).toISOString(),
     };
   }
   // The two queries are independent — parallelise so the banner shows
@@ -64,6 +64,6 @@ export async function fetchFreshness(): Promise<FreshnessInfo> {
   return {
     total_scrutins: countRes.count ?? 0,
     last_sync_at: lastSync,
-    next_sync_eta: new Date(baseMs + 7 * 86400_000).toISOString(),
+    next_sync_eta: new Date(baseMs + SYNC_CADENCE_DAYS * MS_PER_DAY).toISOString(),
   };
 }

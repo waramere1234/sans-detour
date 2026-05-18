@@ -128,6 +128,7 @@ import {
   AUDIT_TRAIL_HEADING_ID_PREFIX, AUDIT_TRAIL_PANEL_ID_PREFIX,
   SCRUTINS_TABLE_NAME, SCRUTINS_COL_POINTS_CLES, SCRUTINS_COL_INGERE_LE,
   SCRUTINS_COL_DATE, COVER_STORAGE_TRUE_VALUE, ERROR_STACK_TRACE_MAX_LENGTH,
+  MS_PER_DAY, SYNC_CADENCE_DAYS, DECK_SEED_RANGE_EXPONENT,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -156,7 +157,7 @@ import {
 } from "../src/routes/Methode";
 import { VOTE_FEEDBACK_LABELS } from "../src/lib/vote-feedback";
 import { RETRY_DEFAULT_LABEL } from "../src/components/RetryError";
-import { freshnessTotalScrutinsPhrase } from "../src/components/FreshnessBanner";
+import { freshnessTotalScrutinsPhrase, STALE_AFTER_DAYS } from "../src/components/FreshnessBanner";
 
 // Centralised aria-labels for cross-route a11y consistency. Used by:
 //   - WORDMARK_HOME_LABEL: TopBar wordmark + Cover/Methode/Legal back links (4 sites)
@@ -4050,6 +4051,70 @@ describe("ERROR_STACK_TRACE_MAX_LENGTH — ErrorBoundary stack truncation", () =
     // ample room for the surrounding `msg` field + JSON encoding
     // overhead. Pin so a future bump stays within the limit.
     expect(ERROR_STACK_TRACE_MAX_LENGTH).toBeLessThan(2000);
+  });
+});
+
+describe("MS_PER_DAY — milliseconds-per-day constant", () => {
+  it("matches 86_400_000 (pin-the-value)", () => {
+    expect(MS_PER_DAY).toBe(86_400_000);
+  });
+
+  it("equals 24 * 60 * 60 * 1000 (compositional invariant)", () => {
+    // The constant decomposes into hours/minutes/seconds/ms. Pin the
+    // identity so a future refactor (e.g., to a Temporal-API based
+    // computation) stays equivalent.
+    expect(MS_PER_DAY).toBe(24 * 60 * 60 * 1000);
+  });
+
+  it("is a positive integer", () => {
+    expect(Number.isInteger(MS_PER_DAY)).toBe(true);
+    expect(MS_PER_DAY).toBeGreaterThan(0);
+  });
+});
+
+describe("SYNC_CADENCE_DAYS — weekly ingest-pipeline cadence", () => {
+  it("matches 7 (pin-the-value, weekly cadence)", () => {
+    expect(SYNC_CADENCE_DAYS).toBe(7);
+  });
+
+  it("is a positive integer", () => {
+    expect(Number.isInteger(SYNC_CADENCE_DAYS)).toBe(true);
+    expect(SYNC_CADENCE_DAYS).toBeGreaterThan(0);
+  });
+
+  it("is strictly less than STALE_AFTER_DAYS (cadence + grace period contract)", () => {
+    // STALE_AFTER_DAYS is the threshold beyond which the banner
+    // drops the "à jour" framing. It must be ≥ the cadence + a
+    // grace period — otherwise the banner would lie before the
+    // next scheduled sync. Pin the cadence < threshold invariant
+    // so a future cadence bump (weekly → biweekly = 14) forces a
+    // matching threshold update.
+    expect(SYNC_CADENCE_DAYS).toBeLessThan(STALE_AFTER_DAYS);
+  });
+});
+
+describe("DECK_SEED_RANGE_EXPONENT — mulberry32 seed range bit-width", () => {
+  it("matches 31 (pin-the-value, 32-bit signed-int range)", () => {
+    expect(DECK_SEED_RANGE_EXPONENT).toBe(31);
+  });
+
+  it("is a positive integer", () => {
+    expect(Number.isInteger(DECK_SEED_RANGE_EXPONENT)).toBe(true);
+    expect(DECK_SEED_RANGE_EXPONENT).toBeGreaterThan(0);
+  });
+
+  it("yields a seed within JS Number-safe range", () => {
+    // 2 ** N must stay below Number.MAX_SAFE_INTEGER (2^53 - 1) so
+    // the seed math doesn't lose precision. Pin so a future bump
+    // (e.g., 53) catches the boundary.
+    expect(2 ** DECK_SEED_RANGE_EXPONENT).toBeLessThan(Number.MAX_SAFE_INTEGER);
+  });
+
+  it("stays within mulberry32's expected 32-bit-unsigned input domain", () => {
+    // mulberry32 starts with `let t = seed >>> 0` (unsigned-int32
+    // coercion). A seed below 2^32 round-trips losslessly through
+    // the `>>> 0` mask; pin so the exponent stays ≤ 32.
+    expect(DECK_SEED_RANGE_EXPONENT).toBeLessThanOrEqual(32);
   });
 });
 
