@@ -137,6 +137,8 @@ import {
   EASE_OUT_QUART, CARD_FLIP_DURATION_S, CARD_FLIP_ROTATE_DEGREES,
   MENU_TRIGGER_GLYPH, POPOVER_BACKDROP_FADE_DURATION_S,
   TOPBAR_TRIGGER_TRANSITION_DURATION_MS,
+  EXTRACT_CONCRETE_MARKERS, STRIP_VOTE_RESULT_MARKERS,
+  ACTIVE_MODAL_SELECTOR,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -4521,6 +4523,95 @@ describe("TOPBAR_TRIGGER_TRANSITION_DURATION_MS — TopBar trigger button hover/
     // future tweak that breaks the composition surfaces here.
     const expected = `color ${TOPBAR_TRIGGER_TRANSITION_DURATION_MS}ms ease, background ${TOPBAR_TRIGGER_TRANSITION_DURATION_MS}ms ease, border-color ${TOPBAR_TRIGGER_TRANSITION_DURATION_MS}ms ease`;
     expect(expected).toBe("color 140ms ease, background 140ms ease, border-color 140ms ease");
+  });
+});
+
+describe("EXTRACT_CONCRETE_MARKERS — LLM-output markers for concrete-example bullet", () => {
+  it("matches the canonical 2-marker array (pin-the-value)", () => {
+    expect(EXTRACT_CONCRETE_MARKERS).toEqual(["Concrètement", "Par exemple"]);
+  });
+
+  it("has exactly 2 markers (anti-shrink/grow guard)", () => {
+    // A drop to 1 marker would silently fail to extract one of the
+    // 2 LLM output variations; an unchecked add (e.g., "Notamment")
+    // would expand the contract without test coverage. Pin the count.
+    expect(EXTRACT_CONCRETE_MARKERS).toHaveLength(2);
+  });
+
+  it("contains 'Concrètement' (primary LLM marker)", () => {
+    expect(EXTRACT_CONCRETE_MARKERS).toContain("Concrètement");
+  });
+
+  it("contains 'Par exemple' (LLM variation marker)", () => {
+    expect(EXTRACT_CONCRETE_MARKERS).toContain("Par exemple");
+  });
+
+  it("'Concrètement' uses è accent (anti-asciify guard)", () => {
+    // The accent ensures the regex match is exact — an ASCII drift
+    // to "Concretement" would silently miss the marker. Pin the
+    // accented form defensively.
+    expect(EXTRACT_CONCRETE_MARKERS[0]).toContain("è");
+  });
+});
+
+describe("STRIP_VOTE_RESULT_MARKERS — LLM-output markers for vote-result appendage", () => {
+  it("matches the canonical 2-marker array (pin-the-value)", () => {
+    expect(STRIP_VOTE_RESULT_MARKERS).toEqual(["Vote", "Résultat"]);
+  });
+
+  it("has exactly 2 markers (anti-shrink/grow guard)", () => {
+    expect(STRIP_VOTE_RESULT_MARKERS).toHaveLength(2);
+  });
+
+  it("contains 'Vote' (primary LLM appendage marker)", () => {
+    expect(STRIP_VOTE_RESULT_MARKERS).toContain("Vote");
+  });
+
+  it("contains 'Résultat' (LLM appendage variation marker)", () => {
+    expect(STRIP_VOTE_RESULT_MARKERS).toContain("Résultat");
+  });
+
+  it("'Résultat' uses é accent (anti-asciify guard)", () => {
+    expect(STRIP_VOTE_RESULT_MARKERS[1]).toContain("é");
+  });
+
+  it("each marker is a Capitalized first letter (LLM output convention)", () => {
+    // The LLM writes "Vote :" + "Résultat :" with capital initial.
+    // A lowercase drift would silently miss the case-sensitive
+    // regex (the /i flag handles it, but the marker form is still
+    // the canonical capitalized version).
+    for (const m of STRIP_VOTE_RESULT_MARKERS) {
+      expect(m[0]).toBe(m[0].toUpperCase());
+    }
+  });
+});
+
+describe("ACTIVE_MODAL_SELECTOR — Card.tsx Escape-guard query selector", () => {
+  it("matches '[role=\"dialog\"][aria-modal=\"true\"]' (pin-the-value)", () => {
+    expect(ACTIVE_MODAL_SELECTOR).toBe('[role="dialog"][aria-modal="true"]');
+  });
+
+  it("contains both role=dialog AND aria-modal=true attribute selectors", () => {
+    // The combined selector matches ONLY modal dialogs (role=dialog
+    // alone could match non-modal popups). Pin both anchors so a
+    // future drift that drops one would silently let Escape unflip
+    // a card behind a popup that doesn't claim modal semantics.
+    expect(ACTIVE_MODAL_SELECTOR).toContain('role="dialog"');
+    expect(ACTIVE_MODAL_SELECTOR).toContain('aria-modal="true"');
+  });
+
+  it("is a valid querySelector syntax (parses via DOM API)", () => {
+    // jsdom validates the selector at query time. Pin so a future
+    // edit that introduces a typo (e.g., unmatched bracket) surfaces
+    // in CI immediately.
+    expect(() => document.querySelectorAll(ACTIVE_MODAL_SELECTOR)).not.toThrow();
+  });
+
+  it("uses double-quoted attribute values (CSS spec compliant)", () => {
+    // CSS attribute selectors require quoted values. Single quotes
+    // also work but the JSX inline form used double quotes — pin
+    // for consistency with the React render output.
+    expect(ACTIVE_MODAL_SELECTOR).toMatch(/="[^"]+"/);
   });
 });
 

@@ -1605,6 +1605,29 @@ export const POPOVER_BACKDROP_FADE_DURATION_S = 0.12;
  *  future tweak propagates to all 3 properties via 1 edit. */
 export const TOPBAR_TRIGGER_TRANSITION_DURATION_MS = 140;
 
+/** LLM-output markers for the concrete-example sentence — Anthropic
+ *  Claude tags one sentence in `contexte` with "Concrètement :" or
+ *  "Par exemple :" so AuditTrail can extract a bullet. The 2 markers
+ *  cover the LLM's actual output variations; a 3rd marker would need
+ *  to land here AND in extractConcrete's regex. Exported for tests
+ *  to round-trip via the const instead of duplicating the literals. */
+export const EXTRACT_CONCRETE_MARKERS: readonly string[] = ["Concrètement", "Par exemple"];
+
+/** LLM-output appendage markers for the vote-result sentence — Claude
+ *  sometimes appends "Vote :" or "Résultat :" with the actual vote
+ *  outcome at the end of `contexte`. stripVoteResult trims everything
+ *  from these markers onward because the outcome is computed elsewhere
+ *  and naming it here would spoil the user's own vote. */
+export const STRIP_VOTE_RESULT_MARKERS: readonly string[] = ["Vote", "Résultat"];
+
+/** Active-modal CSS selector — Card.tsx queries
+ *  `document.querySelector(ACTIVE_MODAL_SELECTOR)` to skip the Escape-
+ *  to-unflip handler when a modal dialog is open in front of the
+ *  flipped card. Pin so a future drift (e.g., dropping the
+ *  `[aria-modal="true"]` attribute selector) doesn't silently let
+ *  Escape unflip a card the user can't see. */
+export const ACTIVE_MODAL_SELECTOR = '[role="dialog"][aria-modal="true"]';
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

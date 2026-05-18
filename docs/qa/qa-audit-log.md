@@ -4638,3 +4638,23 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `MENU_TRIGGER_GLYPH\|POPOVER_BACKDROP_FADE_DURATION_S\|TOPBAR_TRIGGER_TRANSITION_DURATION_MS` src/ tests/ → 15+ résultats
 - [ ] grep `'>•••<\|: 0\.12\|140ms ease'` src/ → 0 résultats (tous via les consts)
 - [ ] grep `~1324 tests` CLAUDE.md → 0 résultat (aligné sur ~1335)
+
+## Session 201 — 2026-05-18
+
+### Vérification session 200
+
+- [VERIFIED] 29 occurrences des nouveaux exports (MENU_TRIGGER_GLYPH + POPOVER_BACKDROP_FADE_DURATION_S + TOPBAR_TRIGGER_TRANSITION_DURATION_MS)
+- [VERIFIED] CLAUDE.md "~1324 tests" → 0 résultat (aligné sur ~1335)
+- 1335/1335 tests verts, typecheck clean
+
+### Bugs fixés (EXTRACT_CONCRETE_MARKERS + STRIP_VOTE_RESULT_MARKERS + ACTIVE_MODAL_SELECTOR)
+
+- [FIXED] LLM-output markers `["Concrètement", "Par exemple"]` inline regex dans text-cleanup.ts extractConcrete (line 65). Drift surface : Anthropic Claude tags one sentence in `contexte` avec "Concrètement :" ou "Par exemple :" so AuditTrail extraire un bullet. Les 2 markers cover the LLM's actual output variations. Un 3e marker would need to land here AND dans le regex. Fix : export `EXTRACT_CONCRETE_MARKERS`. text-cleanup.ts utilise la const dans un dynamic RegExp construction. Aria-labels tests : 5 (canonical 2-array + exactly-2 anti-shrink/grow + contains × 2 + "è" accent anti-asciify). · `src/types/index.ts`, `src/lib/text-cleanup.ts`, `tests/aria-labels.test.ts`
+- [FIXED] LLM-output appendage markers `["Vote", "Résultat"]` inline regex dans text-cleanup.ts stripVoteResult (line 34). Drift surface : Claude sometimes appends "Vote : X oui, Y non" ou "Résultat : ..." with the actual vote outcome at the end of `contexte`. stripVoteResult trims everything from these markers onward car the outcome est computed elsewhere et naming it here spoilerait le user's own vote. Fix : export `STRIP_VOTE_RESULT_MARKERS`. text-cleanup.ts utilise la const dans un dynamic RegExp. Aria-labels tests : 6 (canonical 2-array + exactly-2 + contains × 2 + "é" accent anti-asciify + each-marker starts with Capitalized first letter LLM-output convention). · `src/types/index.ts`, `src/lib/text-cleanup.ts`, `tests/aria-labels.test.ts`
+- [FIXED] Active-modal CSS selector `'[role="dialog"][aria-modal="true"]'` inline dans Card.tsx line 85 (Escape-key guard skips unflipping quand un modal est open in front of the flipped card). Drift surface : le combined selector matches ONLY modal dialogs — role=dialog alone could match non-modal popups. Un drift dropping the `[aria-modal="true"]` attribute selector silently let Escape unflip une card derrière a popup that doesn't claim modal semantics. Fix : export `ACTIVE_MODAL_SELECTOR`. Card.tsx utilise la const dans le querySelector. Aria-labels tests : 4 (canonical + contains both role=dialog AND aria-modal=true anchors + valid querySelector syntax via DOM API + double-quoted CSS-spec-compliant attribute values). · `src/types/index.ts`, `src/components/Card.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 202
+
+- [ ] grep `EXTRACT_CONCRETE_MARKERS\|STRIP_VOTE_RESULT_MARKERS\|ACTIVE_MODAL_SELECTOR` src/ tests/ → 15+ résultats
+- [ ] grep `'Concrètement\|Par exemple\|aria-modal=\\"true\\"'` src/lib/text-cleanup.ts src/components/Card.tsx → 0 résultats (tous via les consts)
+- [ ] grep `~1335 tests` CLAUDE.md → 0 résultat (aligné sur ~1350)

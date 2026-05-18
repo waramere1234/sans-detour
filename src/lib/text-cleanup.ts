@@ -7,6 +7,8 @@
 // malformed `<cite>` without a matching `</cite>` would leak into the
 // AuditTrail row. Centralising keeps the two sites in lockstep.
 
+import { EXTRACT_CONCRETE_MARKERS, STRIP_VOTE_RESULT_MARKERS } from "../types";
+
 /** Strip Anthropic web_search citation markup like
  *  `<cite index="20-2,20-3">text</cite>` — preserve the inner text, drop
  *  the wrapper. Also drops any orphan opening/closing tags (a model that
@@ -31,7 +33,8 @@ export function stripCitations(text: string): string {
  *  usage like "passer un texte sans vote." which truncates the contexte
  *  mid-sentence. */
 export function stripVoteResult(text: string): string {
-  const m = text.match(/\s+(Vote|Résultat)\s*:/i);
+  const pattern = new RegExp(`\\s+(${STRIP_VOTE_RESULT_MARKERS.join("|")})\\s*:`, "i");
+  const m = text.match(pattern);
   if (!m || m.index === undefined) return text;
   return text.slice(0, m.index).trim();
 }
@@ -62,7 +65,11 @@ export function extractConcrete(contexte?: string): string | null {
   // stripCitations handles both wrapped `<cite>…</cite>` and orphan
   // opening/closing tags (LLM mid-token cut).
   const cleaned = stripCitations(contexte);
-  const m = cleaned.match(/(?:Concrètement|Par exemple)\s*[:,]?\s*([^]+?)(?=\.\s+[A-Z]|\.?$)/i);
+  const pattern = new RegExp(
+    `(?:${EXTRACT_CONCRETE_MARKERS.join("|")})\\s*[:,]?\\s*([^]+?)(?=\\.\\s+[A-Z]|\\.?$)`,
+    "i",
+  );
+  const m = cleaned.match(pattern);
   if (!m) return null;
   const sentence = m[1].trim().replace(/\.$/, "");
   // AuditTrail row is dense — bold markup adds noise without emphasis value.
