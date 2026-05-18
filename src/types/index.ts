@@ -861,6 +861,25 @@ export const METHODE_S02_GARDE_FOU_SUJET_SUFFIX = " scrutins du même sujet";
  *  is rendered separately via inline JSX and not part of this const. */
 export const METHODE_S04_RANK_THRESHOLD_SUFFIX = " scrutin compté";
 
+/** Cover.tsx eyebrow tagline suffix — the uppercase mono text rendered
+ *  after the LEGISLATURE_LABEL prefix as "{LEGISLATURE_LABEL} — {EYEBROW_SUFFIX}".
+ *  Load-bearing because it frames the whole page as a personal-alignment
+ *  experience (vs e.g. a generic political quiz). */
+export const COVER_EYEBROW_SUFFIX = "TON ALIGNEMENT RÉEL";
+
+/** Methode page-lead prose tail — the closing sentence of the page-lead
+ *  paragraph that follows the strong-tagged "pure math" guarantee and
+ *  introduces the section-07 cross-reference. Documents the IA-vs-math
+ *  split + the section-07 navigation hint. */
+export const METHODE_PAGE_LEAD_TAIL =
+  "En revanche, les résumés, les points clés et les synthèses des scrutins sont mis en forme par Claude (voir ";
+
+/** Methode page-lead cross-reference link text — "section 07" — paired
+ *  with the inline `<a href="#methode-07">` anchor. The visible text is
+ *  what SR users hear; the href is structural. Pin so a rewording that
+ *  drops the number or changes "section" to "partie" surfaces. */
+export const METHODE_PAGE_LEAD_SECTION_07_REF = "section 07";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

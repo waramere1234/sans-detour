@@ -18,7 +18,7 @@ import {
   MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
   COVER_SOURCE_ATTRIBUTION_AN, COVER_SOURCE_ATTRIBUTION_CLAUDE,
   coverProgressChipText, COVER_HERO_PARAGRAPH,
-  COVER_SECONDARY_NAV_LABEL,
+  COVER_SECONDARY_NAV_LABEL, COVER_EYEBROW_SUFFIX,
 } from "../types";
 
 export default function Cover() {
@@ -147,7 +147,7 @@ export default function Cover() {
             fontFamily: "var(--font-mono)", fontSize: 10.5,
             color: "var(--accent)", fontWeight: 500,
             letterSpacing: "0.12em", textTransform: "uppercase",
-          }}>{LEGISLATURE_LABEL} — TON ALIGNEMENT RÉEL</span>
+          }}>{LEGISLATURE_LABEL} — {COVER_EYEBROW_SUFFIX}</span>
           <h1 style={{
             fontFamily: "var(--font-sans)", fontWeight: 700,
             fontSize: 38, lineHeight: 1.05, letterSpacing: "-0.022em",

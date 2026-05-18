@@ -4081,3 +4081,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `METHODE_S02_RANDOM_AVOIDANCE\|METHODE_S02_GARDE_FOUS_LEAD\|METHODE_S02_GARDE_FOU_DOSSIER_SUFFIX\|METHODE_S04_RANK_THRESHOLD_SUFFIX` src/ tests/ → 25+ résultats
 - [ ] grep `"plutôt qu.au hasard pur"\|"avec deux garde-fous"\|"jamais plus de "\|"scrutin compté"` src/ tests/ → 6-8 résultats (déclarations + pin-the-value)
 - [ ] grep `~932 tests` CLAUDE.md → 0 résultat (aligné sur ~946)
+
+---
+
+## Session 174 — 2026-05-18
+
+### Vérification session 173
+
+- [VERIFIED] 33 occurrences des nouveaux exports (METHODE_S02_RANDOM_AVOIDANCE + GARDE_FOUS_LEAD + GARDE_FOU_DOSSIER_SUFFIX + METHODE_S04_RANK_THRESHOLD_SUFFIX)
+- [VERIFIED] 9 occurrences inline literals = 5 déclarations/comments + 4 pin-the-value tests (clean)
+- [VERIFIED] CLAUDE.md "~946 tests"
+- 946/946 tests verts, typecheck clean
+
+### Bugs fixés (COVER_EYEBROW_SUFFIX + METHODE_PAGE_LEAD_TAIL + METHODE_PAGE_LEAD_SECTION_07_REF)
+
+- [FIXED] Cover.tsx eyebrow tagline `"TON ALIGNEMENT RÉEL"` inline + untested (rendu après `{LEGISLATURE_LABEL} — `) · Drift surface : load-bearing product-pitch anchor au-dessus du h1. Sans pin, un rewording silencieux pourrait drop le mot "ALIGNEMENT" qui est le product noun central. Fix : export `COVER_EYEBROW_SUFFIX`. Cover.tsx utilise la const. Cover test : 1 getByText regex. Aria-labels tests : 3 (pin-the-value + uppercase eyebrow-styling convention + contains "ALIGNEMENT" product-noun guard). · `src/types/index.ts`, `src/routes/Cover.tsx`, `tests/Cover.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode page-lead tail `"En revanche, les résumés, les points clés et les synthèses des scrutins sont mis en forme par Claude (voir "` inline + untested (split entre METHODE_PAGE_LEAD_PURE_MATH strong-tag + inline `<a href="#methode-07">` link) · Drift surface : load-bearing IA-attribution claim qui documente les 3 IA outputs (résumés + points clés + synthèses) — paired avec METHODE_S07_CLAUDE_TASKS_*. Un drop d'un des 3 outputs desyncerait la lead paragraph avec §07's task list. Fix : export `METHODE_PAGE_LEAD_TAIL`. Methode test : 1 toContain. Aria-labels tests : 3 (canonical wording + 3-IA-output anti-drop guard + endsWith "(voir " compositional-integrity guard). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode page-lead `<a>` link text `"section 07"` inline + untested (paired avec inline `href="#methode-07"`) · Drift surface : cross-reference link text qui doit rester aligné avec METHODE_SECTIONS[6][0] = "07". Si §07 est renuméroté (e.g., new section 03 added → §07 becomes §08), la const + le href + METHODE_SECTIONS doivent être updated in lockstep. Fix : export `METHODE_PAGE_LEAD_SECTION_07_REF`. Methode test : 1 getByRole("link", { name: ... }) round-trip + toHaveAttribute href check. Aria-labels tests : 2 (canonical wording + contains "07" anti-renumber guard). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 175
+
+- [ ] grep `COVER_EYEBROW_SUFFIX\|METHODE_PAGE_LEAD_TAIL\|METHODE_PAGE_LEAD_SECTION_07_REF` src/ tests/ → 15+ résultats
+- [ ] grep `"TON ALIGNEMENT RÉEL"\|"En revanche, les résumés"\|"section 07"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~946 tests` CLAUDE.md → 0 résultat (aligné sur ~956)

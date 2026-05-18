@@ -49,6 +49,7 @@ import {
   METHODE_S02_GARDE_FOU_LEAD,
   METHODE_S02_GARDE_FOU_DOSSIER_SUFFIX, METHODE_S02_GARDE_FOU_SUJET_SUFFIX,
   METHODE_S04_RANK_THRESHOLD_SUFFIX,
+  METHODE_PAGE_LEAD_TAIL, METHODE_PAGE_LEAD_SECTION_07_REF,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -134,7 +135,7 @@ export default function Methode() {
           lineHeight: 1.15, letterSpacing: "-0.022em", margin: "10px 0 0",
         }}>{METHODE_PAGE_H1}<span style={{ color: "var(--accent)" }}>.</span></h1>
         <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.55, marginTop: 12 }}>
-          {METHODE_PAGE_LEAD_INTRO} <strong>{METHODE_PAGE_LEAD_PURE_MATH}</strong> En revanche, les résumés, les points clés et les synthèses des scrutins sont mis en forme par Claude (voir <a href="#methode-07" style={{ color: "var(--accent)" }}>section 07</a>).
+          {METHODE_PAGE_LEAD_INTRO} <strong>{METHODE_PAGE_LEAD_PURE_MATH}</strong> {METHODE_PAGE_LEAD_TAIL}<a href="#methode-07" style={{ color: "var(--accent)" }}>{METHODE_PAGE_LEAD_SECTION_07_REF}</a>).
         </p>
       </header>
 

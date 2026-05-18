@@ -15,6 +15,7 @@ import {
   restartConfirmMessage,
   MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
   COVER_SOURCE_ATTRIBUTION_AN, COVER_SOURCE_ATTRIBUTION_CLAUDE,
+  COVER_EYEBROW_SUFFIX,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -50,6 +51,11 @@ describe("Cover", () => {
   it("renders the LEGISLATURE_LABEL in the header eyebrow (rename-safe via const)", () => {
     renderCover();
     expect(screen.getByText(new RegExp(LEGISLATURE_LABEL))).toBeInTheDocument();
+  });
+
+  it("renders COVER_EYEBROW_SUFFIX in the header eyebrow (after LEGISLATURE_LABEL ' — ')", () => {
+    renderCover();
+    expect(screen.getByText(new RegExp(COVER_EYEBROW_SUFFIX))).toBeInTheDocument();
   });
 
   it("hero <h1> textContent concatenates to TAGLINE (split JSX for the accent styling)", () => {

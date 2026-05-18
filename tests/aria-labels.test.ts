@@ -89,6 +89,8 @@ import {
   METHODE_S02_GARDE_FOU_LEAD,
   METHODE_S02_GARDE_FOU_DOSSIER_SUFFIX, METHODE_S02_GARDE_FOU_SUJET_SUFFIX,
   METHODE_S04_RANK_THRESHOLD_SUFFIX,
+  METHODE_PAGE_LEAD_TAIL, METHODE_PAGE_LEAD_SECTION_07_REF,
+  COVER_EYEBROW_SUFFIX,
   COVER_SECONDARY_NAV_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
@@ -2033,6 +2035,59 @@ describe("METHODE_S04_RANK_THRESHOLD_SUFFIX — ordinal-marker companion", () =>
     // regression to "scrutins comptés" would mis-pluralize.
     expect(METHODE_S04_RANK_THRESHOLD_SUFFIX).toContain("scrutin compté");
     expect(METHODE_S04_RANK_THRESHOLD_SUFFIX).not.toContain("scrutins comptés");
+  });
+});
+
+describe("COVER_EYEBROW_SUFFIX — Cover header eyebrow", () => {
+  it("matches 'TON ALIGNEMENT RÉEL'", () => {
+    expect(COVER_EYEBROW_SUFFIX).toBe("TON ALIGNEMENT RÉEL");
+  });
+
+  it("is uppercase (eyebrow styling convention)", () => {
+    expect(COVER_EYEBROW_SUFFIX).toBe(COVER_EYEBROW_SUFFIX.toUpperCase());
+  });
+
+  it("contains 'ALIGNEMENT' (the load-bearing product noun)", () => {
+    // The whole product is about computing political alignment.
+    // A rewording that swaps "ALIGNEMENT" for a generic noun would
+    // lose the product-pitch anchor.
+    expect(COVER_EYEBROW_SUFFIX).toContain("ALIGNEMENT");
+  });
+});
+
+describe("METHODE_PAGE_LEAD_TAIL + SECTION_07_REF — page-lead cross-reference", () => {
+  it("TAIL matches the canonical IA-attribution wording", () => {
+    expect(METHODE_PAGE_LEAD_TAIL).toBe(
+      "En revanche, les résumés, les points clés et les synthèses des scrutins sont mis en forme par Claude (voir ",
+    );
+  });
+
+  it("TAIL contains 'résumés' + 'points clés' + 'synthèses' (3-IA-output anti-drop guard)", () => {
+    // The 3 IA outputs documented here are the actual 3 things the
+    // LLM produces (paired with METHODE_S07_CLAUDE_TASKS_*). A drop
+    // of any one would desync this lead paragraph from §07's task list.
+    expect(METHODE_PAGE_LEAD_TAIL).toContain("résumés");
+    expect(METHODE_PAGE_LEAD_TAIL).toContain("points clés");
+    expect(METHODE_PAGE_LEAD_TAIL).toContain("synthèses");
+  });
+
+  it("TAIL ends with '(voir ' (opens parenthesis + link prefix)", () => {
+    // The TAIL ends right before the inline <a> link to section 07.
+    // The "(voir " prefix opens the parenthesis that closes after
+    // the link text in JSX. Pin the exact trailing for round-trip
+    // compositional integrity.
+    expect(METHODE_PAGE_LEAD_TAIL.endsWith("(voir ")).toBe(true);
+  });
+
+  it("SECTION_07_REF matches 'section 07'", () => {
+    expect(METHODE_PAGE_LEAD_SECTION_07_REF).toBe("section 07");
+  });
+
+  it("SECTION_07_REF contains '07' (anti-renumber guard)", () => {
+    // The §07 number must stay aligned with METHODE_SECTIONS[6][0]
+    // (the 7th entry). If §07 is renumbered, this const + the href
+    // + METHODE_SECTIONS must update in lockstep.
+    expect(METHODE_PAGE_LEAD_SECTION_07_REF).toContain("07");
   });
 });
 

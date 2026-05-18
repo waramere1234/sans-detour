@@ -38,6 +38,7 @@ import {
   METHODE_S02_GARDE_FOU_LEAD,
   METHODE_S02_GARDE_FOU_DOSSIER_SUFFIX, METHODE_S02_GARDE_FOU_SUJET_SUFFIX,
   METHODE_S04_RANK_THRESHOLD_SUFFIX,
+  METHODE_PAGE_LEAD_TAIL, METHODE_PAGE_LEAD_SECTION_07_REF,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -285,6 +286,15 @@ describe("Methode — section structure", () => {
     renderMethode();
     const section = document.getElementById("methode-04")!;
     expect(section.textContent).toContain(METHODE_S04_RANK_THRESHOLD_SUFFIX);
+  });
+
+  it("page-lead surfaces METHODE_PAGE_LEAD_TAIL + SECTION_07_REF link", () => {
+    renderMethode();
+    const body = document.body.textContent || "";
+    expect(body).toContain(METHODE_PAGE_LEAD_TAIL.trim());
+    // The link text round-trips via the const.
+    const link = screen.getByRole("link", { name: METHODE_PAGE_LEAD_SECTION_07_REF });
+    expect(link).toHaveAttribute("href", "#methode-07");
   });
 
   it("the number of rendered Section bodies matches METHODE_SECTIONS.length (no orphan body)", () => {
