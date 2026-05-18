@@ -960,6 +960,35 @@ export const METHODESHEET_AN_BLOCK_BODY =
 export const METHODESHEET_CLAUDE_NO_AI_IN_SCORE =
   "Le calcul d'alignement, lui, est une formule mathématique pure — aucune IA dans le score.";
 
+/** MethodeSheet Claude block 1st paragraph — lists the 4 outputs Claude
+ *  produces from the AN libellé brut (titre court reformulé, points
+ *  clés, résumé, synthèse du texte officiel). Paired with
+ *  METHODE_S07_CLAUDE_TASKS_PREFIX/SUFFIX on the full methode page —
+ *  both surfaces document the same 4-output contract. If we add or
+ *  drop a Claude output (e.g., we start asking Claude to generate
+ *  metaphors), both surfaces must move in lockstep. */
+export const METHODESHEET_CLAUDE_TASKS_BODY =
+  "Le titre court reformulé, les points clés, le résumé, la synthèse du texte officiel.";
+
+/** MethodeSheet Claude block 2nd paragraph (prefix sans le strong tag) —
+ *  load-bearing prompt-input neutrality claim: documents what Claude
+ *  receives (libellé brut AN + web search results) AND what's
+ *  deliberately excluded from the prompt (no human opinion, no
+ *  political orientation). Paired with METHODE_S07_CADRE_BIAIS_PREFIX/SUFFIX
+ *  (same contract, different register). The "+" between "libellé brut"
+ *  and "résultats de recherche web" is intentional typography that
+ *  reads as composition. */
+export const METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY =
+  "Claude reçoit le libellé brut de l'AN + des résultats de recherche web. Pas d'opinion humaine ni d'orientation politique dans son prompt.";
+
+/** ErrorBoundary "Si ça persiste : " prefix — split around the
+ *  `{CONTACT_EMAIL}` JSX interpolation that renders the mailto link.
+ *  Documents the conditional fallback framing (contact only if reload
+ *  doesn't help). A rewording that drops "Si ça persiste" would lose
+ *  the conditional framing and push users to email on every error,
+ *  defeating the reload-first recovery flow. */
+export const ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX = "Si ça persiste : ";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

@@ -5,6 +5,7 @@ import {
   ERROR_FALLBACK_HEADING,
   ERROR_FALLBACK_MESSAGE,
   ERROR_FALLBACK_RELOAD_LABEL,
+  ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX,
 } from "../types";
 
 interface State { hasError: boolean; }
@@ -55,7 +56,7 @@ function ErrorFallback() {
         }}
       >{ERROR_FALLBACK_RELOAD_LABEL}</button>
       <p style={{ fontSize: 12, color: "var(--ink-3)", marginTop: 8 }}>
-        Si ça persiste : <a href={mailto()} style={{ color: "var(--accent)" }}>{CONTACT_EMAIL}</a>
+        {ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX}<a href={mailto()} style={{ color: "var(--accent)" }}>{CONTACT_EMAIL}</a>
       </p>
     </section>
   );

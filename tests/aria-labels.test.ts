@@ -84,6 +84,8 @@ import {
   METHODESHEET_CLAUDE_MISSION_STRONG,
   PLAY_SR_HEADING,
   METHODESHEET_AN_BLOCK_BODY, METHODESHEET_CLAUDE_NO_AI_IN_SCORE,
+  METHODESHEET_CLAUDE_TASKS_BODY, METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY,
+  ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -2439,6 +2441,123 @@ describe("METHODESHEET_CLAUDE_NO_AI_IN_SCORE — load-bearing no-AI-in-scoring c
     // generalize the claim and lose the specificity that ties it
     // back to "Le calcul d'alignement" at sentence start.
     expect(METHODESHEET_CLAUDE_NO_AI_IN_SCORE.endsWith("score.")).toBe(true);
+  });
+});
+
+describe("METHODESHEET_CLAUDE_TASKS_BODY — MethodeSheet 1st Claude paragraph (4-output contract)", () => {
+  it("matches the canonical 4-output listing (pin-the-value)", () => {
+    expect(METHODESHEET_CLAUDE_TASKS_BODY).toBe(
+      "Le titre court reformulé, les points clés, le résumé, la synthèse du texte officiel.",
+    );
+  });
+
+  it("enumerates the 4 Claude outputs (anti-drop guard)", () => {
+    // Paired with METHODE_S07_CLAUDE_TASKS_PREFIX/SUFFIX which document
+    // the same 4 outputs on the full Methode page. A drop here would
+    // desync the sheet from the long-form methodology.
+    expect(METHODESHEET_CLAUDE_TASKS_BODY).toContain("titre court reformulé");
+    expect(METHODESHEET_CLAUDE_TASKS_BODY).toContain("points clés");
+    expect(METHODESHEET_CLAUDE_TASKS_BODY).toContain("résumé");
+    expect(METHODESHEET_CLAUDE_TASKS_BODY).toContain("synthèse du texte officiel");
+  });
+
+  it("contains exactly 3 commas (anti-count-drift guard for the 4-output comma list)", () => {
+    // 4 outputs separated by 3 commas. A future add (5th output) or
+    // drop (3 outputs) would change the count and surface here.
+    const commaCount = (METHODESHEET_CLAUDE_TASKS_BODY.match(/,/g) || []).length;
+    expect(commaCount).toBe(3);
+  });
+
+  it("uses 'synthèse du texte officiel' (anti-soften guard for the most ambitious output)", () => {
+    // The 4th output — the LLM-generated synthesis of the AN libellé —
+    // is the most editorially-loaded. "synthèse du texte officiel"
+    // anchors it to the source document; a softening to "résumé long"
+    // or "explication" would lose the textuel-officiel anchor that
+    // distinguishes the synthesis from the recto's titre_pedago.
+    expect(METHODESHEET_CLAUDE_TASKS_BODY).toContain("synthèse du texte officiel");
+  });
+});
+
+describe("METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY — MethodeSheet 2nd Claude paragraph (prompt-input contract)", () => {
+  it("matches the canonical 2-sentence body (pin-the-value)", () => {
+    expect(METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY).toBe(
+      "Claude reçoit le libellé brut de l'AN + des résultats de recherche web. Pas d'opinion humaine ni d'orientation politique dans son prompt.",
+    );
+  });
+
+  it("opens with 'Claude reçoit' (subject-first prompt-input framing)", () => {
+    // The sentence structure documents WHAT Claude gets — agent-first
+    // framing. A rewording to "Le prompt inclut..." would obscure
+    // the actor (Claude) and weaken the agency trail.
+    expect(METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY.startsWith("Claude reçoit")).toBe(true);
+  });
+
+  it("contains 'libellé brut de l'AN' (the input anchor)", () => {
+    // Pairs with METHODESHEET_AN_BLOCK_BODY ("libellé brut du scrutin")
+    // and METHODE_S07_LIBELLE_BRUT_GUARANTEE. The "libellé brut"
+    // qualifier is non-negotiable — it commits to feeding the raw,
+    // unedited AN text to Claude rather than a curated summary.
+    expect(METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY).toContain("libellé brut");
+  });
+
+  it("contains 'résultats de recherche web' (the 2nd input documented)", () => {
+    // Claude receives 2 inputs: libellé brut + web search results.
+    // Both must be named explicitly; dropping one would misrepresent
+    // the actual prompt composition.
+    expect(METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY).toContain("résultats de recherche web");
+  });
+
+  it("contains 'Pas d'opinion humaine' (negative claim, anti-soften)", () => {
+    // The 2nd sentence is the negative half of the prompt-neutrality
+    // contract. "Pas d'opinion humaine" is the strongest possible
+    // statement against editorial injection; a softening to
+    // "peu d'opinion" or "opinion limitée" would weaken the
+    // transparency guarantee.
+    expect(METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY).toContain("Pas d'opinion humaine");
+  });
+
+  it("contains 'orientation politique' (anti-partisan claim)", () => {
+    // Paired with the LEGAL_INDEPENDANCE_BODY and §06 independence
+    // claim. Explicitly stating no political orientation in the
+    // prompt is what backs the brand-independence contract at the
+    // technical level.
+    expect(METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY).toContain("orientation politique");
+  });
+
+  it("is exactly 2 sentences (anti-overgrowth guard)", () => {
+    // The body deliberately splits into a 2-sentence structure:
+    // (1) what goes IN, (2) what does NOT go in. Adding a 3rd
+    // sentence would dilute the contrast.
+    const sentenceCount = (METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY.match(/\./g) || []).length;
+    expect(sentenceCount).toBe(2);
+  });
+});
+
+describe("ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX — ErrorBoundary conditional contact prefix", () => {
+  it("matches the canonical 'Si ça persiste : ' prefix (pin-the-value)", () => {
+    expect(ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX).toBe("Si ça persiste : ");
+  });
+
+  it("starts with 'Si' (conditional framing — only contact if reload fails)", () => {
+    // The conditional "Si" frames the email as a *fallback* path,
+    // not a primary action. A rewording to "Pour signaler : " or
+    // "Contact : " would lose the conditional framing and push
+    // users to email on every error.
+    expect(ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX.startsWith("Si")).toBe(true);
+  });
+
+  it("contains 'persiste' (the load-bearing condition word)", () => {
+    // "persiste" anchors the condition to: error survives a reload.
+    // A softening to "Si vous avez un problème" would generalize the
+    // condition and lose the post-reload specificity.
+    expect(ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX).toContain("persiste");
+  });
+
+  it("ends with ' : ' (French colon with spaces, before the mailto link)", () => {
+    // French typography requires a space before AND after the colon.
+    // The trailing space allows the JSX-interpolated CONTACT_EMAIL
+    // mailto link to render flush without manual spacing in the JSX.
+    expect(ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX.endsWith(" : ")).toBe(true);
   });
 });
 

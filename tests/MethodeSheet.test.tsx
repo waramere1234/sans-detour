@@ -8,6 +8,7 @@ import {
   METHODESHEET_REPORT_ERROR_LINK_LABEL,
   METHODESHEET_CLAUDE_MISSION_STRONG,
   METHODESHEET_AN_BLOCK_BODY, METHODESHEET_CLAUDE_NO_AI_IN_SCORE,
+  METHODESHEET_CLAUDE_TASKS_BODY, METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY,
 } from "../src/types";
 
 function renderSheet(open: boolean, onClose = vi.fn()) {
@@ -59,6 +60,26 @@ describe("MethodeSheet", () => {
     const mailLink = screen.getByRole("link", { name: new RegExp(METHODESHEET_REPORT_ERROR_LINK_LABEL, "i") });
     expect(mailLink).toHaveAttribute("href", expect.stringContaining("mailto:"));
     expect(screen.getByRole("link", { name: new RegExp(METHODESHEET_FULL_METHODE_LINK_LABEL, "i") })).toBeInTheDocument();
+  });
+
+  it("surfaces METHODESHEET_CLAUDE_TASKS_BODY in the Claude block (round-trip)", () => {
+    renderSheet(true);
+    // The 4-output listing in the 1st Claude block paragraph. Round-trip
+    // via the const so a future add/drop of a Claude output propagates
+    // to source + test in one edit.
+    expect(screen.getByText(METHODESHEET_CLAUDE_TASKS_BODY)).toBeInTheDocument();
+  });
+
+  it("surfaces METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY in the Claude block (round-trip)", () => {
+    renderSheet(true);
+    // The 2-sentence prompt-input neutrality claim. The JSX renders
+    // it as `{BODY} <strong>{MISSION_STRONG}</strong>` — so the text
+    // appears followed by a space + the strong tag. getByText with
+    // a regex anchored to the body text round-trips through the const.
+    const match = Array.from(document.querySelectorAll("p")).find(
+      (p) => p.textContent?.startsWith(METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY),
+    );
+    expect(match).toBeDefined();
   });
 
   it("surfaces METHODESHEET_AN_BLOCK_BODY in the AN block (round-trip)", () => {

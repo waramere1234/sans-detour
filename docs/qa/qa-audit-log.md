@@ -4167,3 +4167,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `PLAY_SR_HEADING\|METHODESHEET_AN_BLOCK_BODY\|METHODESHEET_CLAUDE_NO_AI_IN_SCORE` src/ tests/ → 10+ résultats
 - [ ] grep `"Voter sur les scrutins"\|"vote des députés"\|"aucune IA dans le score"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~992 tests` CLAUDE.md → 0 résultat (aligné sur ~1006)
+
+## Session 178 — 2026-05-18
+
+### Vérification session 177
+
+- [VERIFIED] 34 occurrences des nouveaux exports (PLAY_SR_HEADING + METHODESHEET_AN_BLOCK_BODY + METHODESHEET_CLAUDE_NO_AI_IN_SCORE)
+- [VERIFIED] 5 occurrences inline literals = 1 déclaration + 1 pin-the-value test + 1 invariant assertion + 2 comments (clean)
+- [VERIFIED] CLAUDE.md "~992 tests" → 0 résultat (aligné sur ~1006)
+- 1006/1006 tests verts, typecheck clean
+
+### Bugs fixés (METHODESHEET_CLAUDE_TASKS_BODY + METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY + ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX)
+
+- [FIXED] MethodeSheet.tsx 1st Claude block paragraph `"Le titre court reformulé, les points clés, le résumé, la synthèse du texte officiel."` inline + untested. Drift surface : liste des 4 outputs Claude (titre court reformulé / points clés / résumé / synthèse du texte officiel) paired avec METHODE_S07_CLAUDE_TASKS_PREFIX/SUFFIX sur la page methode complète. Les 2 surfaces documentent le même 4-output contract — si on add/drop un Claude output (e.g., on commence à demander à Claude de générer des métaphores), les 2 surfaces doivent bouger en lockstep. Fix : export `METHODESHEET_CLAUDE_TASKS_BODY`. MethodeSheet.tsx utilise la const. MethodeSheet test : 1 getByText round-trip. Aria-labels tests : 4 (canonical + 4-output anti-drop + exactly-3-commas anti-count-drift + "synthèse du texte officiel" anti-soften guard). · `src/types/index.ts`, `src/components/MethodeSheet.tsx`, `tests/MethodeSheet.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] MethodeSheet.tsx 2nd Claude block paragraph prefix `"Claude reçoit le libellé brut de l'AN + des résultats de recherche web. Pas d'opinion humaine ni d'orientation politique dans son prompt."` (2 sentences before the strong tag) inline + untested. Drift surface : load-bearing prompt-input neutrality claim — documente WHAT Claude reçoit (libellé brut AN + web search results) AND ce qui est délibérément exclu du prompt (pas d'opinion humaine / pas d'orientation politique). Paired avec METHODE_S07_CADRE_BIAIS_PREFIX/SUFFIX (même contrat, register différent). Un softening en "peu d'opinion" ou "opinion limitée" affaiblirait la transparency guarantee. Fix : export `METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY`. MethodeSheet.tsx utilise `{BODY} <strong>{MISSION_STRONG}</strong>`. MethodeSheet test : 1 querySelectorAll("p") + find startsWith round-trip. Aria-labels tests : 7 (canonical + startsWith "Claude reçoit" subject-first framing + contains "libellé brut" anchor + contains "résultats de recherche web" 2nd input + "Pas d'opinion humaine" anti-soften + "orientation politique" anti-partisan + exactly-2-sentence anti-overgrowth guard). · `src/types/index.ts`, `src/components/MethodeSheet.tsx`, `tests/MethodeSheet.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] ErrorBoundary.tsx `"Si ça persiste : "` prefix avant `{CONTACT_EMAIL}` JSX interpolation inline + untested. Drift surface : seule place qui documente le email-as-fallback contract sur l'écran d'erreur. La conditional "Si" frame l'email comme un fallback path (pas une primary action) ; un rewording en "Pour signaler : " ou "Contact : " perdrait la conditional framing et pousserait users à emailer sur chaque erreur, defeating le reload-first recovery flow. Le " : " (espace + colon + espace) est French typography exact + le trailing space permet le JSX-interpolated link flush sans manual spacing. Fix : export `ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX`. ErrorBoundary.tsx utilise la const. ErrorBoundary test : 1 querySelectorAll("p") + find startsWith round-trip. Aria-labels tests : 4 (canonical + startsWith "Si" conditional framing + contains "persiste" load-bearing condition word + endsWith " : " French-colon typography guard). · `src/types/index.ts`, `src/components/ErrorBoundary.tsx`, `tests/ErrorBoundary.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 179
+
+- [ ] grep `METHODESHEET_CLAUDE_TASKS_BODY\|METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY\|ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX` src/ tests/ → 15+ résultats
+- [ ] grep `"Le titre court reformulé"\|"Claude reçoit le libellé brut"\|"Si ça persiste"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~1006 tests` CLAUDE.md → 0 résultat (aligné sur ~1023)

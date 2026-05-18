@@ -9,6 +9,7 @@ import {
   METHODESHEET_FULL_METHODE_LINK_LABEL, METHODESHEET_REPORT_ERROR_LINK_LABEL,
   METHODESHEET_CLAUDE_MISSION_STRONG,
   METHODESHEET_AN_BLOCK_BODY, METHODESHEET_CLAUDE_NO_AI_IN_SCORE,
+  METHODESHEET_CLAUDE_TASKS_BODY, METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY,
 } from "../types";
 import { useModalA11y } from "../hooks/useModalA11y";
 
@@ -105,13 +106,10 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
 
             <Block emoji="✨" title={METHODESHEET_CLAUDE_BLOCK_TITLE}>
               <p style={{ margin: "0 0 10px" }}>
-                Le titre court reformulé, les points clés, le résumé, la
-                synthèse du texte officiel.
+                {METHODESHEET_CLAUDE_TASKS_BODY}
               </p>
               <p style={{ margin: "0 0 10px" }}>
-                Claude reçoit le libellé brut de l'AN + des résultats de
-                recherche web. Pas d'opinion humaine ni d'orientation
-                politique dans son prompt. <strong>{METHODESHEET_CLAUDE_MISSION_STRONG}</strong>
+                {METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY} <strong>{METHODESHEET_CLAUDE_MISSION_STRONG}</strong>
               </p>
               <p style={{ margin: 0 }}>
                 {METHODESHEET_CLAUDE_NO_AI_IN_SCORE}

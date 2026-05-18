@@ -4,6 +4,7 @@ import { ErrorBoundary } from "../src/components/ErrorBoundary";
 import {
   ERROR_FALLBACK_MESSAGE,
   ERROR_FALLBACK_RELOAD_LABEL,
+  ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -42,6 +43,13 @@ describe("ErrorBoundary", () => {
     );
     expect(screen.getByText(new RegExp(ERROR_FALLBACK_MESSAGE.slice(0, 30), "i"))).toBeInTheDocument();
     expect(screen.getByRole("button", { name: new RegExp(ERROR_FALLBACK_RELOAD_LABEL, "i") })).toBeInTheDocument();
+    // Conditional fallback help-text prefix surfaces above the mailto
+    // link. Round-trip via the const so a softening of "Si ça persiste"
+    // propagates to source + test in one edit.
+    const persistenceMatch = Array.from(document.querySelectorAll("p")).find(
+      (p) => p.textContent?.startsWith(ERROR_FALLBACK_PERSISTENCE_HELP_PREFIX.trim()),
+    );
+    expect(persistenceMatch).toBeDefined();
   });
 
   it("calls track('error', ...) when a child throws", () => {
