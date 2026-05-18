@@ -89,6 +89,10 @@ import {
   RESULT_EMPTY_POOL_MESSAGE,
   LEGAL_SOURCES_DONNEES_OPENER_PREFIX, LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR,
   LEGAL_CODE_SOURCE_OPENER_PREFIX,
+  METHODE_S03_DIVIDED_STRONG_LABEL,
+  METHODE_S01_DATA_SOURCE_OPENER_PREFIX, METHODE_S01_DATA_SOURCE_TO_CODE_SEPARATOR,
+  METHODE_S02_KEPT_OPENER_PREFIX,
+  type GroupPosition,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -2687,4 +2691,108 @@ describe("LEGAL_CODE_SOURCE_OPENER_PREFIX — Legal §code-source MIT-license op
     expect(commaCount).toBe(1);
   });
 });
+
+describe("METHODE_S03_DIVIDED_STRONG_LABEL — Methode §03 <strong>divisé</strong> matching GroupPosition discriminant", () => {
+  it("matches the canonical 'divisé' wording (pin-the-value)", () => {
+    expect(METHODE_S03_DIVIDED_STRONG_LABEL).toBe("divisé");
+  });
+
+  it("is a valid GroupPosition discriminant (anti-rename guard)", () => {
+    // The matching algorithm in src/lib/matching.ts checks
+    // `groupPos === "divisé"` to exclude divided groups from scoring.
+    // The strong-tagged label here MUST be exactly the discriminant
+    // value — if a TypeScript rename changes the type, the visible
+    // copy must update in lockstep.
+    const valid: GroupPosition[] = ["pour", "contre", "abstention", "divisé"];
+    expect(valid).toContain(METHODE_S03_DIVIDED_STRONG_LABEL as GroupPosition);
+  });
+
+  it("is lowercase (anti-capitalize guard)", () => {
+    // GroupPosition values are lowercase strings. A capitalization
+    // tweak ("Divisé") would render but no longer match the
+    // discriminant, silently misclaiming the algorithm's behavior.
+    expect(METHODE_S03_DIVIDED_STRONG_LABEL).toBe(
+      METHODE_S03_DIVIDED_STRONG_LABEL.toLowerCase(),
+    );
+  });
+
+  it("contains the é accent (anti-asciify guard)", () => {
+    // The actual GroupPosition value uses é (U+00E9). An accidental
+    // ASCII swap to "divise" would break the strict equality check
+    // in matching.ts and the divided-exclusion branch.
+    expect(METHODE_S03_DIVIDED_STRONG_LABEL).toContain("é");
+  });
+});
+
+describe("METHODE_S01_DATA_SOURCE_OPENER_PREFIX + TO_CODE_SEPARATOR — Methode §01 data-source claim opener", () => {
+  it("PREFIX matches the canonical opener (pin-the-value)", () => {
+    expect(METHODE_S01_DATA_SOURCE_OPENER_PREFIX).toBe("Les votes proviennent de ");
+  });
+
+  it("SEPARATOR matches the canonical strong-to-code separator (pin-the-value)", () => {
+    expect(METHODE_S01_DATA_SOURCE_TO_CODE_SEPARATOR).toBe(", exposé sur ");
+  });
+
+  it("PREFIX contains 'proviennent' (data-provenance verb anti-soften)", () => {
+    // "proviennent de" is the load-bearing data-provenance verb.
+    // A softening to "viennent de" or "sont issus de" would weaken
+    // the institutional-source attribution the §01 paragraph rests on.
+    expect(METHODE_S01_DATA_SOURCE_OPENER_PREFIX).toContain("proviennent");
+  });
+
+  it("PREFIX ends with ' de ' (link-to-strong glue cadence)", () => {
+    // The prefix ends with a trailing space so the strong tag
+    // renders flush. "de " (preposition + space) is the gluing
+    // pattern; a drop to "proviennent" alone would jam the
+    // strong content right against the verb.
+    expect(METHODE_S01_DATA_SOURCE_OPENER_PREFIX.endsWith("de ")).toBe(true);
+  });
+
+  it("SEPARATOR contains 'exposé sur' (institutional-publication verb)", () => {
+    // "exposé sur" anchors the technical-publication step: the AN
+    // publishes the data on a specific feed (the hostname rendered
+    // inside the <code> tag). A softening to "disponible sur" would
+    // lose the "exposed-as-API" connotation.
+    expect(METHODE_S01_DATA_SOURCE_TO_CODE_SEPARATOR).toContain("exposé sur");
+  });
+
+  it("SEPARATOR starts with ', ' (comma-space transitioning from the strong tag)", () => {
+    // French typography: comma + space after the strong-tagged
+    // source name, before the next clause. Pin so a future edit
+    // that loses the comma doesn't run the strong content into
+    // the separator phrase.
+    expect(METHODE_S01_DATA_SOURCE_TO_CODE_SEPARATOR.startsWith(", ")).toBe(true);
+  });
+});
+
+describe("METHODE_S02_KEPT_OPENER_PREFIX — Methode §02 inclusion-policy opener", () => {
+  it("matches the canonical 'On garde les ' opener (pin-the-value)", () => {
+    expect(METHODE_S02_KEPT_OPENER_PREFIX).toBe("On garde les ");
+  });
+
+  it("starts with 'On' (informal first-person plural register)", () => {
+    // The methodology page uses an editorial "on" (active voice,
+    // informal first-person plural) to feel plain-French rather
+    // than RGPD-formal. A rewording to "Nous gardons" or
+    // "Sont conservés" would shift the register and clash with
+    // the rest of Methode's tone.
+    expect(METHODE_S02_KEPT_OPENER_PREFIX.startsWith("On ")).toBe(true);
+  });
+
+  it("contains 'garde' (the load-bearing inclusion verb)", () => {
+    // "garde" frames the policy as active inclusion ("we keep these")
+    // not passive filtering ("these are kept"). The verb choice
+    // matters for tone — pin so a softening surfaces.
+    expect(METHODE_S02_KEPT_OPENER_PREFIX).toContain("garde");
+  });
+
+  it("ends with trailing space before the strong-tagged scrutin type", () => {
+    // The prefix ends with " " (space after "les") so the strong tag
+    // renders flush in JSX without manual spacing. Pin so a future
+    // edit that drops the trailing space doesn't jam the strong
+    // content against "les".
+    expect(METHODE_S02_KEPT_OPENER_PREFIX.endsWith(" ")).toBe(true);
+  });
+});
+
 

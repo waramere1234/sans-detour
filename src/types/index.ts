@@ -1025,6 +1025,41 @@ export const LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR = "), ";
 export const LEGAL_CODE_SOURCE_OPENER_PREFIX =
   "Open source sous licence MIT, disponible sur ";
 
+/** Methode §03 strong-tagged "divisé" label — must match the
+ *  GroupPosition discriminant exactly. The matching algorithm in
+ *  src/lib/matching.ts checks `groupPos === "divisé"` to exclude
+ *  divided groups from scoring; the strong-tagged user-visible
+ *  label here documents that same value. A rewording that
+ *  capitalized ("Divisé") or pluralized ("divisés") would desync
+ *  the methodology page from the actual logic.
+ *
+ *  An invariant test asserts METHODE_S03_DIVIDED_STRONG_LABEL
+ *  matches a GroupPosition value so a type rename forces a
+ *  visible-copy update in lockstep. */
+export const METHODE_S03_DIVIDED_STRONG_LABEL = "divisé";
+
+/** Methode §01 data-source opener — splits into prefix + separator
+ *  around the strong-tagged METHODE_S01_DATA_SOURCE_STRONG and the
+ *  code-tagged AN_OPEN_DATA_HOSTNAME JSX interpolations. The full
+ *  rendered sentence reads:
+ *  "Les votes proviennent de <strong>{S01_DATA_SOURCE_STRONG}</strong>,
+ *   exposé sur <code>{AN_OPEN_DATA_HOSTNAME}</code>. ..."
+ *  PREFIX opens the data-attribution claim; SEPARATOR transitions
+ *  from the strong-tagged source name into the code-tagged hostname.
+ *  Pin so a future rewording that loses "proviennent de" (the
+ *  data-provenance verb) surfaces. */
+export const METHODE_S01_DATA_SOURCE_OPENER_PREFIX = "Les votes proviennent de ";
+export const METHODE_S01_DATA_SOURCE_TO_CODE_SEPARATOR = ", exposé sur ";
+
+/** Methode §02 kept-scrutins opener — leads the inclusion-policy
+ *  paragraph that lists the 5 scrutin types we keep (SPS, SOR,
+ *  censure, référendaires, propositions). The opener "On garde
+ *  les " uses the active-voice editorial first-person plural ("on")
+ *  that distinguishes this app's tone from formal RGPD prose. A
+ *  rewording to "Nous gardons" or "Sont conservés" would shift the
+ *  register and weaken the methodology page's plain-French tone. */
+export const METHODE_S02_KEPT_OPENER_PREFIX = "On garde les ";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

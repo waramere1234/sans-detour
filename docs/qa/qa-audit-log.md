@@ -4209,3 +4209,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `RESULT_EMPTY_POOL_MESSAGE\|LEGAL_SOURCES_DONNEES_OPENER_PREFIX\|LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR\|LEGAL_CODE_SOURCE_OPENER_PREFIX` src/ tests/ → 15+ résultats
 - [ ] grep `"Impossible de calculer ton alignement"\|"Open data officiel"\|"Open source sous licence MIT"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~1023 tests` CLAUDE.md → 0 résultat (aligné sur ~1041)
+
+## Session 180 — 2026-05-18
+
+### Vérification session 179
+
+- [VERIFIED] 40 occurrences des nouveaux exports (RESULT_EMPTY_POOL_MESSAGE + LEGAL_SOURCES_DONNEES_OPENER_PREFIX/_LINK_TO_LICENSE_SEPARATOR + LEGAL_CODE_SOURCE_OPENER_PREFIX)
+- [VERIFIED] 1 occurrence inline literal = 1 pin-the-value test (clean — declaration côté types/index.ts utilise multiline so escape from regex)
+- [VERIFIED] CLAUDE.md "~1023 tests" → 0 résultat (aligné sur ~1041)
+- 1041/1041 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_S03_DIVIDED_STRONG_LABEL + METHODE_S01_DATA_SOURCE_OPENER_PREFIX/_TO_CODE_SEPARATOR + METHODE_S02_KEPT_OPENER_PREFIX)
+
+- [FIXED] Methode.tsx §03 `<strong>divisé</strong>` literal inline + untested. Drift surface : le strong-tagged user-visible label DOIT matcher la GroupPosition discriminant exactement. matching.ts vérifie `groupPos === "divisé"` pour exclure les groupes divisés du scoring ; compute-positions.ts retourne `"divisé"` pour les cas seuil. Un rewording UI qui capitaliserait ("Divisé") ou asciifierait ("divise") rendrait visuellement OK mais perdrait la match avec le discriminant, silencieusement misclaiming l'algorithme. Fix : export `METHODE_S03_DIVIDED_STRONG_LABEL`. Methode.tsx utilise la const dans le `<strong>`. Methode test : 1 querySelectorAll("strong") + find par textContent === const (catches accidental `<em>` swap or unwrap). Aria-labels tests : 4 (pin-the-value + GroupPosition discriminant inclusion check anti-rename + isLowercase anti-capitalize + contains "é" accent anti-asciify guard). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode.tsx §01 data-source opener `"Les votes proviennent de "` + `", exposé sur "` inline (split autour du strong-tagged METHODE_S01_DATA_SOURCE_STRONG + le code-tagged AN_OPEN_DATA_HOSTNAME) + untested. Drift surface : load-bearing data-provenance opener qui frame le §01 paragraph entier. "proviennent de" est le verbe data-provenance non-négociable — un softening en "viennent de" ou "sont issus de" affaiblirait l'institutional-source attribution. "exposé sur" anchors le technical-publication step (l'AN expose un feed) — un softening en "disponible sur" perdrait la "exposed-as-API" connotation. Fix : export `METHODE_S01_DATA_SOURCE_OPENER_PREFIX` + `METHODE_S01_DATA_SOURCE_TO_CODE_SEPARATOR`. Methode.tsx utilise la composition. Methode test : 1 toContain × 2. Aria-labels tests : 6 (canonical PREFIX + canonical SEPARATOR + contains "proviennent" anti-soften verb + PREFIX endsWith " de " glue-cadence + SEPARATOR contains "exposé sur" institutional-publication + SEPARATOR startsWith ", " French-typography guard). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode.tsx §02 inclusion-policy opener `"On garde les "` inline + untested. Drift surface : leads le paragraphe qui liste les 5 scrutin types we keep (SPS, SOR, censure, référendaires, propositions). L'editorial "on" (active-voice informal first-person plural) distingue ce app's tone du formal RGPD prose. Un rewording en "Nous gardons" ou "Sont conservés" shift le register et clash avec le rest du Methode tone. Fix : export `METHODE_S02_KEPT_OPENER_PREFIX`. Methode.tsx utilise la const. Methode test : 1 toContain. Aria-labels tests : 4 (canonical + startsWith "On " informal-first-person-plural register + contains "garde" active-voice-inclusion-verb + endsWith trailing-space glue-cadence guard). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 181
+
+- [ ] grep `METHODE_S03_DIVIDED_STRONG_LABEL\|METHODE_S01_DATA_SOURCE_OPENER_PREFIX\|METHODE_S01_DATA_SOURCE_TO_CODE_SEPARATOR\|METHODE_S02_KEPT_OPENER_PREFIX` src/ tests/ → 15+ résultats
+- [ ] grep `"Les votes proviennent de"\|"On garde les"\|">divisé<"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~1041 tests` CLAUDE.md → 0 résultat (aligné sur ~1059)

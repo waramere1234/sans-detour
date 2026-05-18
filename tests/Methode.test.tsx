@@ -15,6 +15,9 @@ import {
   METHODE_S06_HOSTING_FUNDING_BODY,
   METHODE_S06_INDEPENDENCE_OPENER_PREFIX, METHODE_S06_INDEPENDENCE_STRONG,
   METHODE_S06_INDEPENDENCE_OPENER_SUFFIX,
+  METHODE_S03_DIVIDED_STRONG_LABEL,
+  METHODE_S01_DATA_SOURCE_OPENER_PREFIX, METHODE_S01_DATA_SOURCE_TO_CODE_SEPARATOR,
+  METHODE_S02_KEPT_OPENER_PREFIX,
   METHODE_S01_UPDATE_CADENCE,
   METHODE_S05_NO_TRACKING_PHRASE,
   METHODE_S03_GROUP_INTRO,
@@ -112,6 +115,33 @@ describe("Methode — section structure", () => {
     const sectionIds = METHODE_SECTIONS.map(([n]) => n);
     const titleIds = Object.keys(METHODE_SECTION_BODY_TITLES);
     expect(titleIds.sort()).toEqual(sectionIds.slice().sort());
+  });
+
+  it("§01 surfaces METHODE_S01_DATA_SOURCE_OPENER_PREFIX + TO_CODE_SEPARATOR (data-provenance opener glue)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-01")!;
+    expect(section.textContent).toContain(METHODE_S01_DATA_SOURCE_OPENER_PREFIX.trim());
+    expect(section.textContent).toContain(METHODE_S01_DATA_SOURCE_TO_CODE_SEPARATOR.trim());
+  });
+
+  it("§02 surfaces METHODE_S02_KEPT_OPENER_PREFIX (inclusion-policy opener)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-02")!;
+    expect(section.textContent).toContain(METHODE_S02_KEPT_OPENER_PREFIX.trim());
+  });
+
+  it("§03 surfaces METHODE_S03_DIVIDED_STRONG_LABEL inside a <strong> (matches GroupPosition discriminant)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-03")!;
+    // The literal must render inside a <strong> AND equal the
+    // GroupPosition discriminant verbatim. Source-side <strong>
+    // round-trip catches an accidental <em> swap or unwrap; the
+    // textContent round-trip catches accent / capitalization drift.
+    const strongs = Array.from(section.querySelectorAll("strong"));
+    const dividedStrong = strongs.find(
+      (el) => el.textContent === METHODE_S03_DIVIDED_STRONG_LABEL,
+    );
+    expect(dividedStrong).toBeDefined();
   });
 
   it("§06 surfaces METHODE_S06_INDEPENDENCE_OPENER_* (brand independence opener wrapping <strong>indépendant</strong>)", () => {
