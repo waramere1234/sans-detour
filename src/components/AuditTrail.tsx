@@ -39,10 +39,15 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
       let icon: string;
       let color: string;
       let label: string;
-      if (score === null) { icon = "÷"; color = "var(--ink-4)"; label = AUDIT_TRAIL_LABEL_DIVIDED; }
-      else if (score === 1) { icon = "✓"; color = "var(--pour)"; label = AUDIT_TRAIL_LABEL_ALIGNED; }
-      else if (score === 0.5) { icon = "≈"; color = "var(--warn)"; label = AUDIT_TRAIL_LABEL_PARTIAL; }
-      else { icon = "✕"; color = "var(--contre)"; label = AUDIT_TRAIL_LABEL_OPPOSED; }
+      // Per-row icons are derived from AUDIT_GLYPH_* (chip glyphs)
+      // via .trimEnd() — the chip-vs-row split is purely a cadence
+      // difference (chip has trailing space for inline glue; row icon
+      // is standalone). Deriving keeps the 2 surfaces in sync so a
+      // future glyph swap propagates to both via one edit.
+      if (score === null) { icon = AUDIT_GLYPH_DIVIDED.trimEnd(); color = "var(--ink-4)"; label = AUDIT_TRAIL_LABEL_DIVIDED; }
+      else if (score === 1) { icon = AUDIT_GLYPH_ALIGNED.trimEnd(); color = "var(--pour)"; label = AUDIT_TRAIL_LABEL_ALIGNED; }
+      else if (score === 0.5) { icon = AUDIT_GLYPH_PARTIAL.trimEnd(); color = "var(--warn)"; label = AUDIT_TRAIL_LABEL_PARTIAL; }
+      else { icon = AUDIT_GLYPH_OPPOSED.trimEnd(); color = "var(--contre)"; label = AUDIT_TRAIL_LABEL_OPPOSED; }
       return { v, sc, groupPos, score, icon, color, label };
     })
     .filter((x): x is NonNullable<typeof x> => x !== null);

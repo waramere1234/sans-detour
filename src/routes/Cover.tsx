@@ -22,6 +22,7 @@ import {
   TAGLINE_PART_1, TAGLINE_PART_2,
   H1_ACCENT_PERIOD,
   BUTTON_ARROW_RIGHT_SUFFIX,
+  SWIPE_LEGEND_ARROW_CONTRE, SWIPE_LEGEND_ARROW_SKIP, SWIPE_LEGEND_ARROW_POUR,
 } from "../types";
 
 export default function Cover() {
@@ -187,9 +188,9 @@ export default function Cover() {
           }}
         >
           {[
-            { lbl: VOTE_LABEL_CONTRE, arr: "←", color: "var(--contre)" },
-            { lbl: VOTE_LABEL_SKIP, arr: "↓", color: "var(--ink-2)" },
-            { lbl: VOTE_LABEL_POUR, arr: "→", color: "var(--pour)" },
+            { lbl: VOTE_LABEL_CONTRE, arr: SWIPE_LEGEND_ARROW_CONTRE, color: "var(--contre)" },
+            { lbl: VOTE_LABEL_SKIP, arr: SWIPE_LEGEND_ARROW_SKIP, color: "var(--ink-2)" },
+            { lbl: VOTE_LABEL_POUR, arr: SWIPE_LEGEND_ARROW_POUR, color: "var(--pour)" },
           ].map(g => (
             <div key={g.lbl} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 18, color: g.color }}>{g.arr}</span>

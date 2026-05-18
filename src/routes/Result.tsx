@@ -29,6 +29,7 @@ import {
   BUTTON_ICON_RESTART,
   RESULT_CONTINUE_TEST_PAREN_PREFIX, RESULT_CONTINUE_TEST_PAREN_SUFFIX,
   BUTTON_ARROW_RIGHT_PREFIX, BUTTON_ICON_SHARE,
+  DISCLOSURE_GLYPH_OPEN, DISCLOSURE_GLYPH_CLOSED,
   type Scrutin, type GroupCode,
 } from "../types";
 
@@ -234,7 +235,7 @@ export default function Result() {
             // combos — same fix session 87 applied to PartyRow.
             aria-controls={showPersonnalites ? "personnalites-panel" : undefined}
           >
-            <span><span aria-hidden="true">{showPersonnalites ? "▾" : "▸"} </span>{PERSONNALITES_TOGGLE_LABEL}</span>
+            <span><span aria-hidden="true">{showPersonnalites ? DISCLOSURE_GLYPH_OPEN : DISCLOSURE_GLYPH_CLOSED} </span>{PERSONNALITES_TOGGLE_LABEL}</span>
             <span style={{
               fontFamily: "var(--font-mono)", fontSize: 10.5,
               color: "var(--ink-3)", letterSpacing: "0.04em",

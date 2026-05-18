@@ -1268,6 +1268,26 @@ export const BUTTON_ICON_MAIL = "✉ ";
  *  tight layout. */
 export const CARD_IA_CHIP_GLYPH = "✨";
 
+/** Cover swipe-legend bare arrows — 3 single-char glyphs rendered
+ *  standalone (not paired with text on the same line) in the
+ *  swipe-gesture legend. Distinct from VOTE_GLYPH_* which have
+ *  trailing/leading spaces for label glue; these are bare arrows
+ *  for the standalone visual. Pin so a tweak to the arrow style
+ *  (e.g., switching from monochrome to filled triangles) propagates
+ *  to all 3 affordance previews in lockstep. */
+export const SWIPE_LEGEND_ARROW_CONTRE = "←";
+export const SWIPE_LEGEND_ARROW_SKIP = "↓";
+export const SWIPE_LEGEND_ARROW_POUR = "→";
+
+/** Result.tsx personnalites disclosure-toggle glyphs — the
+ *  expanded/collapsed indicator rendered before the toggle button
+ *  label. Down-triangle "▾" (U+25BE) signals "expanded" (content
+ *  visible below); right-triangle "▸" (U+25B8) signals "collapsed"
+ *  (content hidden, click to expand). Pair so a future swap of
+ *  conventions (e.g., chevrons ↓/→) lands on both consts together. */
+export const DISCLOSURE_GLYPH_OPEN = "▾";
+export const DISCLOSURE_GLYPH_CLOSED = "▸";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

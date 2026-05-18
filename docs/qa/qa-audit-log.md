@@ -4374,3 +4374,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `BUTTON_ARROW_RIGHT_SUFFIX\|BUTTON_ICON_SHARE\|BUTTON_ICON_MAIL\|CARD_IA_CHIP_GLYPH` src/ tests/ → 15+ résultats
 - [ ] grep `'"📤 "'\|'"✉ "'\|'"✨"'\|'" →"'` src/ tests/ → ~3-5 résultats (declarations + pin-the-value uniquement)
 - [ ] grep `~1155 tests` CLAUDE.md → 0 résultat (aligné sur ~1169)
+
+## Session 188 — 2026-05-18
+
+### Vérification session 187
+
+- [VERIFIED] 38 occurrences des nouveaux exports (BUTTON_ARROW_RIGHT_SUFFIX + BUTTON_ICON_SHARE/_MAIL + CARD_IA_CHIP_GLYPH)
+- [VERIFIED] CLAUDE.md "~1155 tests" → 0 résultat (aligné sur ~1169)
+- 1169/1169 tests verts, typecheck clean
+
+### Bugs fixés (SWIPE_LEGEND_ARROW_CONTRE/_SKIP/_POUR + DISCLOSURE_GLYPH_OPEN/_CLOSED + AuditTrail row-icon derivation)
+
+- [FIXED] Cover.tsx swipe-legend bare arrow glyphs `"←"` + `"↓"` + `"→"` inline 3 sites (line 190-192 array) + untested. Drift surface : 3 bare arrows rendered standalone (large mono span) in la swipe-gesture legend, distinct from VOTE_GLYPH_* qui ont trailing/leading spaces pour le label glue. Les codepoints DOIVENT match VOTE_GLYPH_* — un drift desyncerait l'affordance preview de Cover du vote-button actual sur Play. Fix : export `SWIPE_LEGEND_ARROW_CONTRE` + `SWIPE_LEGEND_ARROW_SKIP` + `SWIPE_LEGEND_ARROW_POUR`. Cover.tsx utilise les 3 consts dans l'array. Aria-labels tests : 5 (canonical × 3 + Unicode codepoint sync-with-VOTE_GLYPH_* cross-check + exactly-1-char no-space + NOT-equal-to-VOTE_GLYPH_* cadence-distinction anti-collapse). · `src/types/index.ts`, `src/routes/Cover.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Result.tsx personnalites disclosure-toggle glyphs `"▾"` (expanded) / `"▸"` (collapsed) inline (ternary line 237) + untested. Drift surface : down-triangle U+25BE signals expanded content below ; right-triangle U+25B8 signals collapsed content (click to expand). Convention de l'affordance: triangle points TOWARD the revealed content. Un swap OPEN/CLOSED dans source inverterait la disclosure UX. Fix : export `DISCLOSURE_GLYPH_OPEN` + `DISCLOSURE_GLYPH_CLOSED`. Result.tsx utilise la ternary `{showPersonnalites ? OPEN : CLOSED}`. Aria-labels tests : 6 (canonical × 2 + U+25BE/U+25B8 charCodeAt × 2 + direction-semantics × 2 + OPEN !== CLOSED anti-collapse + exactly-1-char × 2). · `src/types/index.ts`, `src/routes/Result.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] AuditTrail.tsx per-row icon map `"÷"` / `"✓"` / `"≈"` / `"✕"` inline (lines 42-45 score-keyed if-else) + untested. Drift surface : 4 bare glyphs assignés par score (null=divided, 1=aligned, 0.5=partial, 0=opposed) — MUST stay in sync avec AUDIT_GLYPH_* (chip glyphs). Pure cadence difference (chip has trailing space, row icon standalone). Au lieu d'extraire 4 nouveaux consts, **derive** row-icon depuis `AUDIT_GLYPH_*.trimEnd()` — 1 source of truth pour les 2 surfaces. Fix : AuditTrail.tsx remplace 4 inline literals par 4 derivations `.trimEnd()`. Aria-labels tests : 5 (derived-value pin-the-value × 4 + trailing-space-count-equals-1 cadence-invariant guard pour les 4 glyphs). · `src/components/AuditTrail.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 189
+
+- [ ] grep `SWIPE_LEGEND_ARROW_CONTRE\|SWIPE_LEGEND_ARROW_SKIP\|SWIPE_LEGEND_ARROW_POUR\|DISCLOSURE_GLYPH_OPEN\|DISCLOSURE_GLYPH_CLOSED` src/ tests/ → 15+ résultats
+- [ ] grep `>"←"<\|>"↓"<\|>"→"<\|'"▾"'\|'"▸"'` src/ tests/ → ~3-5 résultats (declarations + pin-the-value uniquement)
+- [ ] grep `icon = "[÷✓≈✕]"` src/ → 0 résultats (AuditTrail row-icon désormais derived from AUDIT_GLYPH_*.trimEnd())
+- [ ] grep `~1169 tests` CLAUDE.md → 0 résultat (aligné sur ~1186)

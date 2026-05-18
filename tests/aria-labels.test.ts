@@ -113,6 +113,8 @@ import {
   BUTTON_ARROW_RIGHT_SUFFIX,
   BUTTON_ICON_SHARE, BUTTON_ICON_MAIL,
   CARD_IA_CHIP_GLYPH,
+  SWIPE_LEGEND_ARROW_CONTRE, SWIPE_LEGEND_ARROW_SKIP, SWIPE_LEGEND_ARROW_POUR,
+  DISCLOSURE_GLYPH_OPEN, DISCLOSURE_GLYPH_CLOSED,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -3496,6 +3498,115 @@ describe("CARD_IA_CHIP_GLYPH — Card recto IA-chip sparkles glyph", () => {
     expect(CARD_IA_CHIP_GLYPH.endsWith(" ")).toBe(false);
     // U+2728 ✨ is in the BMP — single UTF-16 code unit (length 1).
     expect(CARD_IA_CHIP_GLYPH).toHaveLength(1);
+  });
+});
+
+describe("SWIPE_LEGEND_ARROW_CONTRE/_SKIP/_POUR — Cover swipe-legend bare arrows", () => {
+  it("CONTRE matches '←' (left-arrow, no spaces)", () => {
+    expect(SWIPE_LEGEND_ARROW_CONTRE).toBe("←");
+  });
+
+  it("SKIP matches '↓' (down-arrow, no spaces)", () => {
+    expect(SWIPE_LEGEND_ARROW_SKIP).toBe("↓");
+  });
+
+  it("POUR matches '→' (right-arrow, no spaces)", () => {
+    expect(SWIPE_LEGEND_ARROW_POUR).toBe("→");
+  });
+
+  it("each arrow uses the same Unicode codepoint as the matching VOTE_GLYPH_*", () => {
+    // The swipe-legend arrows and the vote-button glyphs MUST use
+    // the same arrow Unicode so the affordance preview matches the
+    // actual button. Pin the codepoint equality so a future drift
+    // on one surface fails CI against the other.
+    expect(SWIPE_LEGEND_ARROW_CONTRE.charCodeAt(0)).toBe(VOTE_GLYPH_CONTRE.charCodeAt(0)); // U+2190
+    expect(SWIPE_LEGEND_ARROW_SKIP.charCodeAt(0)).toBe(VOTE_GLYPH_SKIP.charCodeAt(0)); // U+2193
+    expect(SWIPE_LEGEND_ARROW_POUR.charCodeAt(0)).toBe(VOTE_GLYPH_POUR.charCodeAt(1)); // U+2192 (POUR is " →", arrow at idx 1)
+  });
+
+  it("each arrow is exactly 1 char (no trailing space, distinct from VOTE_GLYPH_*)", () => {
+    // Swipe-legend renders the arrows standalone (large mono span);
+    // vote-button glyphs render inline with the label text. The
+    // legend variant has no space — pin so a future edit doesn't
+    // accidentally add space and break the legend's centering.
+    expect(SWIPE_LEGEND_ARROW_CONTRE).toHaveLength(1);
+    expect(SWIPE_LEGEND_ARROW_SKIP).toHaveLength(1);
+    expect(SWIPE_LEGEND_ARROW_POUR).toHaveLength(1);
+  });
+
+  it("legend arrows are NOT equal to VOTE_GLYPH_* (different cadence: bare vs with-space)", () => {
+    expect(SWIPE_LEGEND_ARROW_CONTRE).not.toBe(VOTE_GLYPH_CONTRE);
+    expect(SWIPE_LEGEND_ARROW_SKIP).not.toBe(VOTE_GLYPH_SKIP);
+    expect(SWIPE_LEGEND_ARROW_POUR).not.toBe(VOTE_GLYPH_POUR);
+  });
+});
+
+describe("DISCLOSURE_GLYPH_OPEN/_CLOSED — Result personnalites toggle indicators", () => {
+  it("OPEN matches '▾' (down-pointing triangle, U+25BE)", () => {
+    expect(DISCLOSURE_GLYPH_OPEN).toBe("▾");
+    expect(DISCLOSURE_GLYPH_OPEN.charCodeAt(0)).toBe(0x25BE);
+  });
+
+  it("CLOSED matches '▸' (right-pointing triangle, U+25B8)", () => {
+    expect(DISCLOSURE_GLYPH_CLOSED).toBe("▸");
+    expect(DISCLOSURE_GLYPH_CLOSED.charCodeAt(0)).toBe(0x25B8);
+  });
+
+  it("OPEN points down (expanded content sits below the toggle)", () => {
+    // Disclosure convention: the triangle points TOWARD the
+    // revealed content. Open state has content below → arrow ↓
+    // (triangle ▾). Pin the direction semantics so a swap of
+    // OPEN/CLOSED in source surfaces.
+    expect(DISCLOSURE_GLYPH_OPEN).toContain("▾");
+  });
+
+  it("CLOSED points right (content is hidden, will reveal to the right/down)", () => {
+    expect(DISCLOSURE_GLYPH_CLOSED).toContain("▸");
+  });
+
+  it("OPEN !== CLOSED (anti-collapse — the 2 states need distinct glyphs)", () => {
+    // A future refactor that collapses both into one shared const
+    // would render identical glyphs for both states — defeating the
+    // visual affordance.
+    expect(DISCLOSURE_GLYPH_OPEN).not.toBe(DISCLOSURE_GLYPH_CLOSED);
+  });
+
+  it("both glyphs are exactly 1 char (BMP triangles)", () => {
+    expect(DISCLOSURE_GLYPH_OPEN).toHaveLength(1);
+    expect(DISCLOSURE_GLYPH_CLOSED).toHaveLength(1);
+  });
+});
+
+describe("AuditTrail per-row icon derives from AUDIT_GLYPH_*.trimEnd() (chip↔row sync)", () => {
+  it("AUDIT_GLYPH_ALIGNED trims to '✓' (matches the row-icon for score=1)", () => {
+    // The chip glyph "✓ " and the row icon "✓" must stay in sync —
+    // both signal "aligned vote". Deriving the row icon from the
+    // chip glyph via .trimEnd() makes that explicit. A future
+    // emoji/glyph swap on the chip propagates to the row icon
+    // automatically.
+    expect(AUDIT_GLYPH_ALIGNED.trimEnd()).toBe("✓");
+  });
+
+  it("AUDIT_GLYPH_PARTIAL trims to '≈' (matches the row-icon for score=0.5)", () => {
+    expect(AUDIT_GLYPH_PARTIAL.trimEnd()).toBe("≈");
+  });
+
+  it("AUDIT_GLYPH_OPPOSED trims to '✕' (matches the row-icon for score=0)", () => {
+    expect(AUDIT_GLYPH_OPPOSED.trimEnd()).toBe("✕");
+  });
+
+  it("AUDIT_GLYPH_DIVIDED trims to '÷' (matches the row-icon for score=null)", () => {
+    expect(AUDIT_GLYPH_DIVIDED.trimEnd()).toBe("÷");
+  });
+
+  it("all 4 chip glyphs have exactly 1 trailing space (so .trimEnd shortens by 1)", () => {
+    // Pin the chip-vs-row cadence-only difference: chip has 1
+    // trailing space, row has none. The .trimEnd() derivation must
+    // remove exactly 1 char.
+    expect(AUDIT_GLYPH_ALIGNED.length - AUDIT_GLYPH_ALIGNED.trimEnd().length).toBe(1);
+    expect(AUDIT_GLYPH_PARTIAL.length - AUDIT_GLYPH_PARTIAL.trimEnd().length).toBe(1);
+    expect(AUDIT_GLYPH_OPPOSED.length - AUDIT_GLYPH_OPPOSED.trimEnd().length).toBe(1);
+    expect(AUDIT_GLYPH_DIVIDED.length - AUDIT_GLYPH_DIVIDED.trimEnd().length).toBe(1);
   });
 });
 
