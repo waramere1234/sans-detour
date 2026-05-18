@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import { TopBar } from "./components/TopBar";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { SAFE_AREA_VIEWPORT_HEIGHT } from "./types";
 
 export default function App({ children }: { children: ReactNode }) {
   // ErrorBoundary is a class component without its own routing awareness.
@@ -18,8 +19,7 @@ export default function App({ children }: { children: ReactNode }) {
       // overflowing body by ~81px on iPhone 13 PWA (pushing the Cover
       // CTA / Play bottom buttons below the visible fold). The fallback
       // `0px` keeps non-notched devices at exactly 100dvh.
-      minHeight:
-        "calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))",
+      minHeight: SAFE_AREA_VIEWPORT_HEIGHT,
       display: "flex",
       flexDirection: "column",
       background: "var(--bg)",

@@ -133,6 +133,7 @@ import {
   MATCHING_SCALE, PCT_MULTIPLIER,
   EXTERNAL_LINK_TARGET, EXTERNAL_LINK_REL,
   DECK_VISIBLE_DEPTH, SWIPE_THRESHOLD,
+  SAFE_AREA_VIEWPORT_HEIGHT, BACKDROP_FADE_DURATION_S, MAILTO_SCHEME,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -4294,6 +4295,76 @@ describe("SWIPE_THRESHOLD — Card swipe-recognition drag distance", () => {
     // stays in the empirically-validated zone.
     expect(SWIPE_THRESHOLD).toBeGreaterThanOrEqual(50);
     expect(SWIPE_THRESHOLD).toBeLessThanOrEqual(300);
+  });
+});
+
+describe("SAFE_AREA_VIEWPORT_HEIGHT — calc(100dvh − safe-area) shared layout value", () => {
+  it("matches the canonical calc(...) expression (pin-the-value)", () => {
+    expect(SAFE_AREA_VIEWPORT_HEIGHT).toBe(
+      "calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))",
+    );
+  });
+
+  it("uses 100dvh (dynamic viewport unit, not legacy 100vh)", () => {
+    // dvh accounts for the iOS Safari URL bar showing/hiding;
+    // 100vh would overflow when the bar is visible. Pin so a
+    // refactor to vh doesn't ship the legacy bug.
+    expect(SAFE_AREA_VIEWPORT_HEIGHT).toContain("100dvh");
+    expect(SAFE_AREA_VIEWPORT_HEIGHT).not.toContain("100vh ");
+  });
+
+  it("subtracts both safe-area-inset-top + safe-area-inset-bottom", () => {
+    // Both insets are required for iPhone X+ PWA — the notch eats
+    // top space, the home indicator eats bottom. Pin both anchors.
+    expect(SAFE_AREA_VIEWPORT_HEIGHT).toContain("safe-area-inset-top");
+    expect(SAFE_AREA_VIEWPORT_HEIGHT).toContain("safe-area-inset-bottom");
+  });
+
+  it("has '0px' fallbacks for non-notched browsers", () => {
+    // env(...) returns 0 on non-notched browsers as long as the
+    // fallback is specified. Without the explicit '0px' fallback,
+    // calc(100dvh - env(...)) would resolve to invalid on some
+    // older browsers and the layout would silently break.
+    const fallbackCount = (SAFE_AREA_VIEWPORT_HEIGHT.match(/0px/g) || []).length;
+    expect(fallbackCount).toBe(2);
+  });
+});
+
+describe("BACKDROP_FADE_DURATION_S — modal backdrop fade duration", () => {
+  it("matches 0.16 (pin-the-value, seconds)", () => {
+    expect(BACKDROP_FADE_DURATION_S).toBe(0.16);
+  });
+
+  it("is in a reasonable modal-perception range (50-300 ms)", () => {
+    // 50ms = barely perceptible; 300ms = sluggish. Pin so a future
+    // tweak stays in the UX-validated zone.
+    expect(BACKDROP_FADE_DURATION_S).toBeGreaterThanOrEqual(0.05);
+    expect(BACKDROP_FADE_DURATION_S).toBeLessThanOrEqual(0.3);
+  });
+
+  it("is a positive finite number (no NaN, no infinity)", () => {
+    expect(Number.isFinite(BACKDROP_FADE_DURATION_S)).toBe(true);
+    expect(BACKDROP_FADE_DURATION_S).toBeGreaterThan(0);
+  });
+});
+
+describe("MAILTO_SCHEME — URI scheme prefix for mailto() helper", () => {
+  it("matches 'mailto:' (pin-the-value)", () => {
+    expect(MAILTO_SCHEME).toBe("mailto:");
+  });
+
+  it("ends with ':' (URI scheme separator)", () => {
+    // The colon is part of the scheme per RFC 3986. Pin so a future
+    // edit that drops the colon doesn't ship a broken href.
+    expect(MAILTO_SCHEME.endsWith(":")).toBe(true);
+  });
+
+  it("is lowercase (URI-scheme canonical form per RFC 3986)", () => {
+    expect(MAILTO_SCHEME).toBe(MAILTO_SCHEME.toLowerCase());
+  });
+
+  it("contains no whitespace (URI-scheme syntax)", () => {
+    expect(MAILTO_SCHEME).not.toMatch(/\s/);
   });
 });
 

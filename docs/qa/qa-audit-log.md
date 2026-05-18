@@ -4578,3 +4578,23 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `EXTERNAL_LINK_TARGET\|EXTERNAL_LINK_REL\|DECK_VISIBLE_DEPTH\|SWIPE_THRESHOLD` src/ tests/ → 15+ résultats
 - [ ] grep `'target="_blank"\|rel="noopener noreferrer"\|\.slice\(0, 3\)'` src/ → 0 résultats (tous via les consts)
 - [ ] grep `~1289 tests` CLAUDE.md → 0 résultat (aligné sur ~1301)
+
+## Session 198 — 2026-05-18
+
+### Vérification session 197
+
+- [VERIFIED] 43 occurrences des nouveaux exports (EXTERNAL_LINK_TARGET/_REL + DECK_VISIBLE_DEPTH + SWIPE_THRESHOLD)
+- [VERIFIED] CLAUDE.md "~1289 tests" → 0 résultat (aligné sur ~1301)
+- 1301/1301 tests verts, typecheck clean
+
+### Bugs fixés (SAFE_AREA_VIEWPORT_HEIGHT + BACKDROP_FADE_DURATION_S + MAILTO_SCHEME)
+
+- [FIXED] CSS calc viewport height `"calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))"` inline identique 2× (App.tsx outer wrapper line 22 + Cover.tsx hero section line 101). Drift surface : layout-critical pour iPhone X+ PWA (notch + home indicator). Le Play.tsx variant a un extra `- 60px` TopBar offset — kept distinct car different reference point. Une refactor (e.g., dropping safe-area handling sur non-notch rebuild, ou switching dvh→svh) doit propager. Fix : export `SAFE_AREA_VIEWPORT_HEIGHT`. App.tsx + Cover.tsx utilisent la const. Aria-labels tests : 4 (canonical + 100dvh-not-100vh anti-legacy-bug + both safe-area-inset-top + -bottom anchors + exactly-2 "0px" fallbacks pour non-notched-browser-compat). · `src/types/index.ts`, `src/App.tsx`, `src/routes/Cover.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Modal backdrop fade duration `0.16` inline identique 2× (RankingOverlay.tsx line 32 + MethodeSheet.tsx line 45). Drift surface : Framer Motion transition duration pour les role=dialog backdrops. 0.16s empirical sweet spot (fast enough on tap, slow enough that user perceives the modal as appearing not popping). Paired avec `reducedMotion ? 0 : N` pour prefers-reduced-motion users. TopBar line 154 utilise 0.12s pour un popover different (non-modal) — kept distinct. Fix : export `BACKDROP_FADE_DURATION_S`. RankingOverlay.tsx + MethodeSheet.tsx utilisent la const. Aria-labels tests : 3 (canonical 0.16 + UX-perception range [0.05, 0.3]s + positive-finite-number). · `src/types/index.ts`, `src/components/RankingOverlay.tsx`, `src/components/MethodeSheet.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] mailto: URI scheme prefix `"mailto:"` inline 2× dans contact.ts `mailto()` helper (no-subject branch + with-subject branch template literals). Drift surface : URI scheme prefix per RFC 3986. Une future migration vers un different scheme (e.g., `web+mailto` custom protocol ou contact-form URL) doit propager. Fix : export `MAILTO_SCHEME`. contact.ts utilise la const dans les 2 template literals. Aria-labels tests : 4 (canonical + endsWith ":" scheme-separator RFC 3986 + lowercase canonical-form + no-whitespace URI-syntax). · `src/types/index.ts`, `src/lib/contact.ts`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 199
+
+- [ ] grep `SAFE_AREA_VIEWPORT_HEIGHT\|BACKDROP_FADE_DURATION_S\|MAILTO_SCHEME` src/ tests/ → 15+ résultats
+- [ ] grep `'calc\(100dvh -|: 0\.16\|mailto:\\${CONTACT_EMAIL}'` src/ → 0 résultats (tous via les consts)
+- [ ] grep `~1301 tests` CLAUDE.md → 0 résultat (aligné sur ~1312)

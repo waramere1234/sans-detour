@@ -2,6 +2,7 @@
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   RANKING_OVERLAY_LABEL, MODAL_CLOSE_LABEL, rankingOverlayHeaderText,
+  BACKDROP_FADE_DURATION_S,
   type GroupAlignment, type GroupCode,
 } from "../types";
 import { PartyRow } from "./PartyRow";
@@ -29,7 +30,7 @@ export function RankingOverlay({ open, alignments, countedTotal, onClose }: Rank
         <>
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            transition={{ duration: reducedMotion ? 0 : 0.16 }}
+            transition={{ duration: reducedMotion ? 0 : BACKDROP_FADE_DURATION_S }}
             onClick={onClose}
             style={{
               position: "fixed", inset: 0,

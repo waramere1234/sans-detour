@@ -1534,6 +1534,32 @@ export const DECK_VISIBLE_DEPTH = 3;
  *  instead of duplicating the magic number. */
 export const SWIPE_THRESHOLD = 120;
 
+/** Safe-area-aware viewport height CSS value — used identically on the
+ *  App outer wrapper + the Cover hero section so the layout doesn't
+ *  overflow body padding on iPhone PWA (where env(safe-area-inset-*)
+ *  pushes the visible area below the notch). Centralised so a future
+ *  layout tweak (e.g., dropping safe-area handling on a non-notch
+ *  rebuild) propagates from one edit instead of 2 in-lockstep. Note:
+ *  the Play.tsx variant has an extra `- 60px` TopBar offset; that
+ *  one stays distinct because it has a different reference point. */
+export const SAFE_AREA_VIEWPORT_HEIGHT =
+  "calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))";
+
+/** Modal backdrop fade duration in seconds — used identically in
+ *  RankingOverlay + MethodeSheet for the opacity-fade transition on
+ *  the role=dialog backdrop. 0.16s is the empirical sweet spot:
+ *  fast enough to feel responsive on tap, slow enough that the
+ *  user perceives the modal as appearing (not popping). Paired with
+ *  `reducedMotion ? 0 : BACKDROP_FADE_DURATION_S` so accessibility
+ *  prefers-reduced-motion users skip the animation. */
+export const BACKDROP_FADE_DURATION_S = 0.16;
+
+/** `mailto:` URI scheme prefix — used 2× in contact.ts's `mailto()`
+ *  helper (the no-subject branch + the with-subject branch). Pin so
+ *  a future migration to a different scheme (e.g., a `web+mailto`
+ *  custom protocol or a contact-form URL) propagates from one edit. */
+export const MAILTO_SCHEME = "mailto:";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

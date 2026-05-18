@@ -14,6 +14,7 @@ import {
   MODAL_CLOSE_GLYPH,
   METHODESHEET_BLOCK_EMOJI_AN, METHODESHEET_BLOCK_EMOJI_CLAUDE,
   METHODE_SHEET_BACKDROP_TESTID, METHODE_SHEET_TITLE_ID,
+  BACKDROP_FADE_DURATION_S,
 } from "../types";
 import { useModalA11y } from "../hooks/useModalA11y";
 
@@ -42,7 +43,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: reducedMotion ? 0 : 0.16 }}
+            transition={{ duration: reducedMotion ? 0 : BACKDROP_FADE_DURATION_S }}
             onClick={onClose}
             aria-hidden="true"
             style={{

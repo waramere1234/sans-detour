@@ -24,6 +24,7 @@ import {
   BUTTON_ARROW_RIGHT_SUFFIX,
   SWIPE_LEGEND_ARROW_CONTRE, SWIPE_LEGEND_ARROW_SKIP, SWIPE_LEGEND_ARROW_POUR,
   NAV_TARGET_METHODE, NAV_TARGET_LEGAL, NAV_TARGET_CONTACT,
+  SAFE_AREA_VIEWPORT_HEIGHT,
 } from "../types";
 
 export default function Cover() {
@@ -96,8 +97,7 @@ export default function Cover() {
       // the notch + home indicator, the section fills the remaining
       // visible area so the "Commencer" CTA stays above the fold on
       // iPhone X+ PWA. fallback 0px = identical to "100dvh" on non-notched.
-      minHeight:
-        "calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))",
+      minHeight: SAFE_AREA_VIEWPORT_HEIGHT,
     }}>
       <header style={{
         display: "flex",

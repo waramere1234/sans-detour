@@ -6,7 +6,7 @@
 // changing the address (or fronting a contact form one day) forced six
 // edits with drift risk.
 
-import { BRAND_NAME, PROD_HOSTNAME } from "../types";
+import { BRAND_NAME, PROD_HOSTNAME, MAILTO_SCHEME } from "../types";
 
 /** Local-part of the contact mailbox. The full address composes
  *  `${CONTACT_EMAIL_LOCAL}@${PROD_HOSTNAME}` so a domain rebrand
@@ -26,6 +26,6 @@ export const ERROR_REPORT_SUBJECT = `${BRAND_NAME} — Signalement d'une erreur 
  *  Subject is `encodeURIComponent`-ed so spaces, accents, and `:` survive
  *  the URL — Safari and Gmail both decode `%20` / `%C3%A9` correctly. */
 export function mailto(subject?: string): string {
-  if (!subject) return `mailto:${CONTACT_EMAIL}`;
-  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}`;
+  if (!subject) return `${MAILTO_SCHEME}${CONTACT_EMAIL}`;
+  return `${MAILTO_SCHEME}${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}`;
 }
