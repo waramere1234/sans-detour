@@ -82,6 +82,8 @@ import {
   METHODE_S06_INDEPENDENCE_OPENER_PREFIX, METHODE_S06_INDEPENDENCE_STRONG,
   METHODE_S06_INDEPENDENCE_OPENER_SUFFIX,
   METHODESHEET_CLAUDE_MISSION_STRONG,
+  PLAY_SR_HEADING,
+  METHODESHEET_AN_BLOCK_BODY, METHODESHEET_CLAUDE_NO_AI_IN_SCORE,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -2340,6 +2342,103 @@ describe("METHODESHEET_CLAUDE_MISSION_STRONG — load-bearing AI-role-boundary c
     // and weaken the parallel rendre/pas-commenter structure.
     const commaCount = (METHODESHEET_CLAUDE_MISSION_STRONG.match(/,/g) || []).length;
     expect(commaCount).toBe(1);
+  });
+});
+
+describe("PLAY_SR_HEADING — Play.tsx visually-hidden h1 (SR landmark for heading rotor)", () => {
+  it("matches the canonical wording (pin-the-value)", () => {
+    expect(PLAY_SR_HEADING).toBe("Voter sur les scrutins");
+  });
+
+  it("starts with an imperative verb 'Voter' (action-framing for SR users)", () => {
+    // SR-only landmarks should describe what the user does on the
+    // page, not what the page is. "Voter sur..." frames /play as
+    // an active task — a rewording to "Liste des scrutins" or
+    // "Cartes" would weaken the page-mission cue.
+    expect(PLAY_SR_HEADING.startsWith("Voter")).toBe(true);
+  });
+
+  it("contains 'scrutins' (the load-bearing domain noun)", () => {
+    // "scrutins" is the AN-specific term for parliamentary votes —
+    // a softening to "votes" alone would lose the institutional
+    // specificity that distinguishes this app from generic poll tools.
+    expect(PLAY_SR_HEADING).toContain("scrutins");
+  });
+});
+
+describe("METHODESHEET_AN_BLOCK_BODY — MethodeSheet AN block body (data contract listing)", () => {
+  it("matches the canonical AN-data listing (pin-the-value)", () => {
+    expect(METHODESHEET_AN_BLOCK_BODY).toBe(
+      "Date, numéro, vote des députés, libellé brut du scrutin, position des groupes parlementaires.",
+    );
+  });
+
+  it("enumerates the 5 AN data fields (anti-drop guard)", () => {
+    // The 5 fields documented here (date, numéro, vote des députés,
+    // libellé brut, position des groupes) mirror the actual columns
+    // Sans Détour reads from data.assemblee-nationale.fr. A drop
+    // would silently desync the user-facing claim from the ingestion
+    // schema. Pin all 5 anchors.
+    expect(METHODESHEET_AN_BLOCK_BODY).toContain("Date");
+    expect(METHODESHEET_AN_BLOCK_BODY).toContain("numéro");
+    expect(METHODESHEET_AN_BLOCK_BODY).toContain("vote des députés");
+    expect(METHODESHEET_AN_BLOCK_BODY).toContain("libellé brut");
+    expect(METHODESHEET_AN_BLOCK_BODY).toContain("position des groupes");
+  });
+
+  it("uses 'libellé brut' (anti-soften guard for transparency claim)", () => {
+    // "libellé brut" — the raw, unedited AN title — is the
+    // transparency anchor paired with METHODE_S07_LIBELLE_BRUT_GUARANTEE.
+    // A softening to "titre" or "intitulé" would lose the
+    // unedited/verbatim signal that lets users verify the synthesis.
+    expect(METHODESHEET_AN_BLOCK_BODY).toContain("libellé brut");
+  });
+
+  it("contains exactly 4 commas (anti-count-drift guard for the 5-field comma list)", () => {
+    // 5 fields separated by 4 commas. A future add (6th field) or
+    // drop (4 fields) would change the count and surface here.
+    const commaCount = (METHODESHEET_AN_BLOCK_BODY.match(/,/g) || []).length;
+    expect(commaCount).toBe(4);
+  });
+});
+
+describe("METHODESHEET_CLAUDE_NO_AI_IN_SCORE — load-bearing no-AI-in-scoring contract", () => {
+  it("matches the canonical wording (pin-the-value)", () => {
+    expect(METHODESHEET_CLAUDE_NO_AI_IN_SCORE).toBe(
+      "Le calcul d'alignement, lui, est une formule mathématique pure — aucune IA dans le score.",
+    );
+  });
+
+  it("contains 'formule mathématique pure' (load-bearing positive claim)", () => {
+    // The score is a deterministic formula, not an LLM inference.
+    // "pure" is non-negotiable — a softening to "principalement"
+    // or "essentiellement" would weaken the determinism guarantee.
+    expect(METHODESHEET_CLAUDE_NO_AI_IN_SCORE).toContain("formule mathématique pure");
+  });
+
+  it("contains 'aucune IA dans le score' (the negative anti-AI claim)", () => {
+    // The MUST-NOT-DO half of the AI-role-boundary contract paired
+    // with METHODESHEET_CLAUDE_MISSION_STRONG (Claude renders but
+    // does not comment). "aucune IA" is the strongest possible
+    // negation — anything weaker ("pas d'IA" / "sans IA") would
+    // soften the transparency claim.
+    expect(METHODESHEET_CLAUDE_NO_AI_IN_SCORE).toContain("aucune IA dans le score");
+  });
+
+  it("uses an em-dash to join the positive + negative halves (anti-merge guard)", () => {
+    // The 2 halves (positive: "formule mathématique pure" /
+    // negative: "aucune IA dans le score") are joined by an em-dash
+    // for visual parity. A merge into a single comma-joined clause
+    // would degrade the typographic emphasis on the negation.
+    expect(METHODESHEET_CLAUDE_NO_AI_IN_SCORE).toContain(" — ");
+  });
+
+  it("ends with 'score.' (anti-truncation guard — the noun must close the contract)", () => {
+    // "score" is the noun the negation hangs on. A truncation that
+    // drops the final word ("aucune IA dans le calcul") would
+    // generalize the claim and lose the specificity that ties it
+    // back to "Le calcul d'alignement" at sentence start.
+    expect(METHODESHEET_CLAUDE_NO_AI_IN_SCORE.endsWith("score.")).toBe(true);
   });
 });
 

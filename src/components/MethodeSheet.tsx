@@ -8,6 +8,7 @@ import {
   METHODESHEET_TITLE,
   METHODESHEET_FULL_METHODE_LINK_LABEL, METHODESHEET_REPORT_ERROR_LINK_LABEL,
   METHODESHEET_CLAUDE_MISSION_STRONG,
+  METHODESHEET_AN_BLOCK_BODY, METHODESHEET_CLAUDE_NO_AI_IN_SCORE,
 } from "../types";
 import { useModalA11y } from "../hooks/useModalA11y";
 
@@ -99,8 +100,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
             </div>
 
             <Block emoji="📊" title={METHODESHEET_AN_BLOCK_TITLE}>
-              Date, numéro, vote des députés, libellé brut du scrutin,
-              position des groupes parlementaires.
+              {METHODESHEET_AN_BLOCK_BODY}
             </Block>
 
             <Block emoji="✨" title={METHODESHEET_CLAUDE_BLOCK_TITLE}>
@@ -114,8 +114,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
                 politique dans son prompt. <strong>{METHODESHEET_CLAUDE_MISSION_STRONG}</strong>
               </p>
               <p style={{ margin: 0 }}>
-                Le calcul d'alignement, lui, est une formule mathématique
-                pure — aucune IA dans le score.
+                {METHODESHEET_CLAUDE_NO_AI_IN_SCORE}
               </p>
             </Block>
 

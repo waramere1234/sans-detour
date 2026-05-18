@@ -21,7 +21,7 @@ import {
   MENU_RESULT_LABEL,
   VOTE_LABEL_CONTRE, VOTE_LABEL_SKIP, VOTE_LABEL_POUR,
   VOTE_ARIA_CONTRE, VOTE_ARIA_SKIP, VOTE_ARIA_POUR,
-  PLAY_DECK_EXHAUSTED_MESSAGE, PLAY_EMPTY_POOL_MESSAGE,
+  PLAY_DECK_EXHAUSTED_MESSAGE, PLAY_EMPTY_POOL_MESSAGE, PLAY_SR_HEADING,
   type Scrutin, type UserVote, type GroupCode, type GroupAlignment,
 } from "../types";
 
@@ -276,7 +276,7 @@ export default function Play() {
       {/* Visually-hidden h1 so the Play page has a navigable landmark in
         the SR heading rotor — the visible UI is interactive (deck) with
         no on-screen title, but SR users need a way to identify the page. */}
-      <h1 className="sr-only">Voter sur les scrutins</h1>
+      <h1 className="sr-only">{PLAY_SR_HEADING}</h1>
       <div
         style={{
           display: "flex",

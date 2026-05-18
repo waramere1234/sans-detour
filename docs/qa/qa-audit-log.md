@@ -4146,3 +4146,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `TAGLINE_PART_\|METHODE_S06_INDEPENDENCE_\|METHODESHEET_CLAUDE_MISSION_STRONG` src/ tests/ → 20+ résultats
 - [ ] grep `"Pas les programmes"\|"Sans Détour est un projet"\|"Sa mission : rendre lisible"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value uniquement)
 - [ ] grep `~973 tests` CLAUDE.md → 0 résultat (aligné sur ~992)
+
+## Session 177 — 2026-05-18
+
+### Vérification session 176
+
+- [VERIFIED] 59 occurrences des nouveaux exports (TAGLINE_PART_1/2 + METHODE_S06_INDEPENDENCE_OPENER_*/STRONG + METHODESHEET_CLAUDE_MISSION_STRONG)
+- [VERIFIED] 2 occurrences inline literals = 1 déclaration + 1 pin-the-value test (clean)
+- [VERIFIED] CLAUDE.md "~973 tests" → 0 résultat (aligné sur ~992)
+- 992/992 tests verts, typecheck clean
+
+### Bugs fixés (PLAY_SR_HEADING + METHODESHEET_AN_BLOCK_BODY + METHODESHEET_CLAUDE_NO_AI_IN_SCORE)
+
+- [FIXED] Play.tsx visually-hidden `<h1 className="sr-only">Voter sur les scrutins</h1>` inline + untested. Drift surface : seul page-level landmark pour SR users sur /play (le visible UI est interactive deck cards sans titre on-screen). Documents la page mission "Voter sur les scrutins". Un rewording qui casserait l'action-framing ("Liste des scrutins" / "Cartes") affaiblirait la page-mission cue pour SR navigation. Fix : export `PLAY_SR_HEADING`. Play.tsx utilise la const. Aria-labels tests : 3 (pin-the-value + startsWith "Voter" imperative-verb-action-framing + contains "scrutins" load-bearing domain noun anti-soften). · `src/types/index.ts`, `src/routes/Play.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] MethodeSheet.tsx AN block body `"Date, numéro, vote des députés, libellé brut du scrutin, position des groupes parlementaires."` inline + untested. Drift surface : liste comma-separated des 5 fields ingérés depuis data.assemblee-nationale.fr. Si le schema d'ingestion change (e.g., on commence à ingérer vote-time metadata, ou on retire une colonne), la user-facing claim désync silencieusement de la réalité. Pin les 5 anchors (Date + numéro + vote des députés + libellé brut + position des groupes) + exact comma-count anti-drift. Fix : export `METHODESHEET_AN_BLOCK_BODY`. MethodeSheet.tsx utilise la const. MethodeSheet test : 1 getByText round-trip. Aria-labels tests : 4 (canonical + 5-anchor anti-drop + "libellé brut" anti-soften transparency-anchor + exactly-4-commas count guard). · `src/types/index.ts`, `src/components/MethodeSheet.tsx`, `tests/MethodeSheet.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] MethodeSheet.tsx Claude block "no AI in score" paragraph `"Le calcul d'alignement, lui, est une formule mathématique pure — aucune IA dans le score."` inline + untested. Drift surface : load-bearing no-AI-in-scoring contract paired avec METHODESHEET_CLAUDE_MISSION_STRONG (Claude renders but does not comment). Le mot "pure" et "aucune IA" sont non-négociables — un softening en "principalement mathématique" ou "essentiellement formule" affaiblirait la transparency contract qui distingue ce produit d'outils black-box politiques. Le em-dash sépare les 2 halves (positive: formule mathématique pure / negative: aucune IA dans le score) avec parité typographique. Fix : export `METHODESHEET_CLAUDE_NO_AI_IN_SCORE`. MethodeSheet.tsx utilise la const. MethodeSheet test : 1 getByText round-trip. Aria-labels tests : 5 (canonical + contains "formule mathématique pure" positive + contains "aucune IA dans le score" negative anti-soften + em-dash anti-merge + endsWith "score." anti-truncation guard). · `src/types/index.ts`, `src/components/MethodeSheet.tsx`, `tests/MethodeSheet.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 178
+
+- [ ] grep `PLAY_SR_HEADING\|METHODESHEET_AN_BLOCK_BODY\|METHODESHEET_CLAUDE_NO_AI_IN_SCORE` src/ tests/ → 10+ résultats
+- [ ] grep `"Voter sur les scrutins"\|"vote des députés"\|"aucune IA dans le score"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~992 tests` CLAUDE.md → 0 résultat (aligné sur ~1006)

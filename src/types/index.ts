@@ -933,6 +933,33 @@ export const METHODE_S06_INDEPENDENCE_OPENER_SUFFIX = ". ";
 export const METHODESHEET_CLAUDE_MISSION_STRONG =
   "Sa mission : rendre lisible, pas commenter.";
 
+/** Play.tsx visually-hidden h1 — the only page-level landmark for SR
+ *  users on /play (the visible UI is interactive deck cards with no
+ *  on-screen title). Documents the SR heading-rotor entry point. A
+ *  rewording that broke the page-mission framing (e.g., "Page de
+ *  votes" / "Cartes") would degrade SR navigation. */
+export const PLAY_SR_HEADING = "Voter sur les scrutins";
+
+/** MethodeSheet AN block body — the comma-separated list of fields
+ *  Sans Détour reads from the AN open-data feed. Paired with
+ *  METHODESHEET_AN_BLOCK_TITLE and the §01 prose on Methode that
+ *  documents the same data contract. Pin so a future schema change
+ *  (e.g., we start ingesting vote-time metadata or remove a column)
+ *  surfaces here before drifting from the rest of the methodology. */
+export const METHODESHEET_AN_BLOCK_BODY =
+  "Date, numéro, vote des députés, libellé brut du scrutin, position des groupes parlementaires.";
+
+/** MethodeSheet Claude block "no AI in score" claim — the load-bearing
+ *  contract that the alignment computation is a pure mathematical
+ *  formula, NOT inferred by Claude. Pairs with
+ *  METHODESHEET_CLAUDE_MISSION_STRONG (AI renders, but does not
+ *  comment) and METHODE_S04_OPENER (the formule mathématique pure
+ *  promise). A softening to "principalement mathématique" or
+ *  "essentiellement formule" would weaken the transparency contract
+ *  that distinguishes this product from black-box political AI tools. */
+export const METHODESHEET_CLAUDE_NO_AI_IN_SCORE =
+  "Le calcul d'alignement, lui, est une formule mathématique pure — aucune IA dans le score.";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

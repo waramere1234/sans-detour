@@ -7,6 +7,7 @@ import {
   METHODESHEET_FULL_METHODE_LINK_LABEL,
   METHODESHEET_REPORT_ERROR_LINK_LABEL,
   METHODESHEET_CLAUDE_MISSION_STRONG,
+  METHODESHEET_AN_BLOCK_BODY, METHODESHEET_CLAUDE_NO_AI_IN_SCORE,
 } from "../src/types";
 
 function renderSheet(open: boolean, onClose = vi.fn()) {
@@ -58,6 +59,22 @@ describe("MethodeSheet", () => {
     const mailLink = screen.getByRole("link", { name: new RegExp(METHODESHEET_REPORT_ERROR_LINK_LABEL, "i") });
     expect(mailLink).toHaveAttribute("href", expect.stringContaining("mailto:"));
     expect(screen.getByRole("link", { name: new RegExp(METHODESHEET_FULL_METHODE_LINK_LABEL, "i") })).toBeInTheDocument();
+  });
+
+  it("surfaces METHODESHEET_AN_BLOCK_BODY in the AN block (round-trip)", () => {
+    renderSheet(true);
+    // The AN block lists the 5 fields ingested from data.assemblee-nationale.fr.
+    // Round-trip via the const so a schema change propagates to source +
+    // test in one edit.
+    expect(screen.getByText(METHODESHEET_AN_BLOCK_BODY)).toBeInTheDocument();
+  });
+
+  it("surfaces METHODESHEET_CLAUDE_NO_AI_IN_SCORE in the Claude block (round-trip)", () => {
+    renderSheet(true);
+    // The no-AI-in-scoring contract paragraph closes the Claude block.
+    // Round-trip via the const so a softening of "formule mathématique
+    // pure" or "aucune IA dans le score" propagates to source + test.
+    expect(screen.getByText(METHODESHEET_CLAUDE_NO_AI_IN_SCORE)).toBeInTheDocument();
   });
 
   it("surfaces METHODESHEET_CLAUDE_MISSION_STRONG inside a <strong> (AI-role-boundary contract)", () => {
