@@ -807,6 +807,37 @@ export const METHODE_S02_THEMES_EXAMPLES = "santé, immigration, fiscalité…";
 export const METHODE_S03_ABSENTS_EXCLUSION =
   "(absents et non-votants exclus du calcul)";
 
+/** Methode §02 5 strong-tagged scrutin types Sans Détour KEEPS — the
+ *  positive list paired with METHODE_S02_EXCLUSIONS_SUFFIX (the
+ *  negative list). These 5 categories drive the user-facing filter
+ *  documentation; they must stay synchronized with the rules in
+ *  `isEligibleScrutin` (scripts/lib/an-filter.ts). */
+export const METHODE_S02_KEPT_SOLENNELS = "scrutins solennels";
+export const METHODE_S02_KEPT_VOTES_FINAUX = "votes finaux sur l'ensemble d'une loi";
+export const METHODE_S02_KEPT_CENSURE = "motions de censure";
+export const METHODE_S02_KEPT_REFERENDAIRES = "motions référendaires";
+export const METHODE_S02_KEPT_PROPOSITIONS = "propositions de résolution";
+
+/** Methode §04 alignment-formula 5 lines — the per-scrutin scoring
+ *  math + the aggregation formula. Must stay synchronized with
+ *  `alignmentScore` (src/lib/matching.ts). Pinned as a tuple to
+ *  make the line-count invariant explicit. */
+export const METHODE_S04_FORMULA_LINES = [
+  "Score par scrutin :",
+  "+1 si ton vote = position du groupe",
+  "+0,5 si l'un des deux s'abstient et l'autre vote",
+  "0 si désaccord net (pour vs contre)",
+  "Somme des scores ÷ nombre de scrutins comptés × 100 = % affiché",
+] as const;
+
+/** Methode §03 Formula threshold-rule line — the strict-majority
+ *  rule that turns per-député votes into a group position. Must
+ *  stay synchronized with THRESHOLD in src/lib/compute-positions.ts.
+ *  The "→" arrow signals the rule's then-branch. */
+export const METHODE_S03_THRESHOLD_RULE_SUFFIX =
+  "% des votants effectifs du groupe → pour / contre / abstention";
+export const METHODE_S03_THRESHOLD_RULE_ELSE = "sinon → groupe divisé";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

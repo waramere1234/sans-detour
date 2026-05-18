@@ -4035,3 +4035,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `METHODE_S01_SAME_FILES_CLAIM\|METHODE_S02_THEMES_EXAMPLES\|METHODE_S03_ABSENTS_EXCLUSION` src/ tests/ → 15+ résultats
 - [ ] grep `"mêmes fichiers que ceux utilisés par"\|"santé, immigration, fiscalité"\|"absents et non-votants exclus"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~908 tests` CLAUDE.md → 0 résultat (aligné sur ~919)
+
+---
+
+## Session 172 — 2026-05-18
+
+### Vérification session 171
+
+- [VERIFIED] 38 occurrences des 3 nouveaux exports (METHODE_S01_SAME_FILES_CLAIM + METHODE_S02_THEMES_EXAMPLES + METHODE_S03_ABSENTS_EXCLUSION)
+- [VERIFIED] 0 inline literal matches (tous migrés vers consts)
+- [VERIFIED] CLAUDE.md "~919 tests"
+- 919/919 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_S02_KEPT_* × 5 + METHODE_S04_FORMULA_LINES + METHODE_S03_THRESHOLD_RULE_SUFFIX/ELSE)
+
+- [FIXED] Methode §02 5 strong-tagged kept-scrutin types (`scrutins solennels` + `votes finaux sur l'ensemble d'une loi` + `motions de censure` + `motions référendaires` + `propositions de résolution`) inline + untested · Drift surface : ces 5 categories drive le user-facing filter doc et doivent rester synchronized avec `isEligibleScrutin` dans scripts/lib/an-filter.ts. Sans pin, un drift entre la doc Methode et la filter logic réelle laisserait users avec des claims faux. Fix : export `METHODE_S02_KEPT_SOLENNELS` + `_VOTES_FINAUX` + `_CENSURE` + `_REFERENDAIRES` + `_PROPOSITIONS`. Methode.tsx utilise les 5 consts comme `<strong>` content. Methode test : 1 toContain × 5 sites. Aria-labels tests : 2 (canonical-wording × 5 + distinct-set anti-clone). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §04 Formula alignment-math 5 lines inline + untested · Drift surface : these 5 lines document the actual `alignmentScore` function en src/lib/matching.ts (header + 3 branches { +1, +0.5, 0 } + aggregation). Sans pin, un drift entre la math doc et la code réelle laisserait users mislead. Fix : export `METHODE_S04_FORMULA_LINES` as a 5-tuple `as const`. Methode.tsx itère `METHODE_S04_FORMULA_LINES[0..4]`. Methode test : iterate-and-toContain × 5. Aria-labels tests : 4 (length-5 anti-count-drift, header ends-with-":", 3-branch math + ×100 percent-scale invariant). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §03 Formula threshold-rule 2 lines (`"% des votants effectifs du groupe → pour / contre / abstention"` + `"sinon → groupe divisé"`) inline + untested · Drift surface : these 2 lines document `computePosition` en src/lib/compute-positions.ts. Le SUFFIX inclut tout sauf le `{Math.round(THRESHOLD * 100)}` interpolation. Le ELSE branch mappe directement à AUDIT_TRAIL_LABEL_DIVIDED ("Groupe divisé, non compté") — un cross-surface invariant. Fix : export `METHODE_S03_THRESHOLD_RULE_SUFFIX` + `_ELSE`. Methode.tsx render via interpolation. Methode test : 1 toContain × 2. Aria-labels tests : 4 (canonical wording × 2 + both contain "→" formula-arrow convention + ELSE-contains-"divisé" cross-surface invariant). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 173
+
+- [ ] grep `METHODE_S02_KEPT_SOLENNELS\|METHODE_S04_FORMULA_LINES\|METHODE_S03_THRESHOLD_RULE_SUFFIX` src/ tests/ → 20+ résultats
+- [ ] grep `"scrutins solennels"\|"Somme des scores"\|"votants effectifs du groupe"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
+- [ ] grep `~919 tests` CLAUDE.md → 0 résultat (aligné sur ~932)

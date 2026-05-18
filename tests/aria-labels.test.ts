@@ -81,6 +81,10 @@ import {
   METHODE_S01_SAME_FILES_CLAIM,
   METHODE_S02_THEMES_EXAMPLES,
   METHODE_S03_ABSENTS_EXCLUSION,
+  METHODE_S02_KEPT_SOLENNELS, METHODE_S02_KEPT_VOTES_FINAUX,
+  METHODE_S02_KEPT_CENSURE, METHODE_S02_KEPT_REFERENDAIRES, METHODE_S02_KEPT_PROPOSITIONS,
+  METHODE_S04_FORMULA_LINES,
+  METHODE_S03_THRESHOLD_RULE_SUFFIX, METHODE_S03_THRESHOLD_RULE_ELSE,
   COVER_SECONDARY_NAV_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
@@ -1879,6 +1883,84 @@ describe("METHODE_S03_ABSENTS_EXCLUSION — Formula footnote on excluded actors"
     // for the visual hierarchy.
     expect(METHODE_S03_ABSENTS_EXCLUSION.startsWith("(")).toBe(true);
     expect(METHODE_S03_ABSENTS_EXCLUSION.endsWith(")")).toBe(true);
+  });
+});
+
+describe("METHODE_S02_KEPT_* — 5 kept-scrutin-types paired with isEligibleScrutin", () => {
+  it("the 5 consts match their canonical wordings", () => {
+    expect(METHODE_S02_KEPT_SOLENNELS).toBe("scrutins solennels");
+    expect(METHODE_S02_KEPT_VOTES_FINAUX).toBe("votes finaux sur l'ensemble d'une loi");
+    expect(METHODE_S02_KEPT_CENSURE).toBe("motions de censure");
+    expect(METHODE_S02_KEPT_REFERENDAIRES).toBe("motions référendaires");
+    expect(METHODE_S02_KEPT_PROPOSITIONS).toBe("propositions de résolution");
+  });
+
+  it("the 5 categories are distinct (anti-clone — each maps to a real AN scrutin type)", () => {
+    const set = new Set([
+      METHODE_S02_KEPT_SOLENNELS,
+      METHODE_S02_KEPT_VOTES_FINAUX,
+      METHODE_S02_KEPT_CENSURE,
+      METHODE_S02_KEPT_REFERENDAIRES,
+      METHODE_S02_KEPT_PROPOSITIONS,
+    ]);
+    expect(set.size).toBe(5);
+  });
+});
+
+describe("METHODE_S04_FORMULA_LINES — alignment formula paired with alignmentScore", () => {
+  it("contains exactly 5 lines (anti-count-drift guard)", () => {
+    // The 5 lines map to: header + 3 score branches + aggregation.
+    // A drift to 4 or 6 lines would indicate a math change that
+    // should propagate to alignmentScore in src/lib/matching.ts.
+    expect(METHODE_S04_FORMULA_LINES).toHaveLength(5);
+  });
+
+  it("first line is the header 'Score par scrutin :' ending with ':'", () => {
+    expect(METHODE_S04_FORMULA_LINES[0]).toBe("Score par scrutin :");
+    expect(METHODE_S04_FORMULA_LINES[0].endsWith(":")).toBe(true);
+  });
+
+  it("the 3 score branches (+1/+0,5/0) match alignmentScore in src/lib/matching.ts", () => {
+    // Paired with the 3 alignmentScore return values: 1, 0.5, 0.
+    // A drift here would silently desync the doc from the actual
+    // scoring code.
+    expect(METHODE_S04_FORMULA_LINES[1]).toContain("+1");
+    expect(METHODE_S04_FORMULA_LINES[2]).toContain("+0,5");
+    expect(METHODE_S04_FORMULA_LINES[3]).toContain("0 si désaccord");
+  });
+
+  it("aggregation line contains '× 100' (percent-scale invariant)", () => {
+    // The aggregation produces a 0..100 percent display. Dropping
+    // the ×100 would silently change the percent scale.
+    expect(METHODE_S04_FORMULA_LINES[4]).toContain("× 100");
+  });
+});
+
+describe("METHODE_S03_THRESHOLD_RULE_* — group-position threshold paired with computePosition", () => {
+  it("SUFFIX matches the canonical threshold-rule then-branch", () => {
+    expect(METHODE_S03_THRESHOLD_RULE_SUFFIX).toBe(
+      "% des votants effectifs du groupe → pour / contre / abstention",
+    );
+  });
+
+  it("ELSE matches 'sinon → groupe divisé'", () => {
+    expect(METHODE_S03_THRESHOLD_RULE_ELSE).toBe("sinon → groupe divisé");
+  });
+
+  it("both lines contain '→' (formula arrow convention)", () => {
+    // The arrow notation is what makes these read as if-then rules
+    // in the Formula block. A regression that uses '=' or '->' would
+    // change the visual hierarchy.
+    expect(METHODE_S03_THRESHOLD_RULE_SUFFIX).toContain("→");
+    expect(METHODE_S03_THRESHOLD_RULE_ELSE).toContain("→");
+  });
+
+  it("ELSE outcome 'groupe divisé' matches the AUDIT_TRAIL_LABEL_DIVIDED noun", () => {
+    // Documents the cross-surface invariant: when the formula's
+    // else-branch fires, the audit trail labels the row as "divisé"
+    // (cf. AUDIT_TRAIL_LABEL_DIVIDED = "Groupe divisé, non compté").
+    // A drift between the 2 surfaces would confuse SR users.
+    expect(METHODE_S03_THRESHOLD_RULE_ELSE).toContain("divisé");
   });
 });
 

@@ -41,6 +41,10 @@ import {
   METHODE_S01_SAME_FILES_CLAIM,
   METHODE_S02_THEMES_EXAMPLES,
   METHODE_S03_ABSENTS_EXCLUSION,
+  METHODE_S02_KEPT_SOLENNELS, METHODE_S02_KEPT_VOTES_FINAUX,
+  METHODE_S02_KEPT_CENSURE, METHODE_S02_KEPT_REFERENDAIRES, METHODE_S02_KEPT_PROPOSITIONS,
+  METHODE_S04_FORMULA_LINES,
+  METHODE_S03_THRESHOLD_RULE_SUFFIX, METHODE_S03_THRESHOLD_RULE_ELSE,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -168,15 +172,15 @@ export default function Methode() {
       </Section>
 
       <Section n="02" title={METHODE_SECTION_BODY_TITLES["02"]}>
-        <p>On garde les <strong>scrutins solennels</strong> (SPS), les <strong>votes finaux sur l'ensemble d'une loi</strong> (SOR), les <strong>motions de censure</strong>, les <strong>motions référendaires</strong> et les <strong>propositions de résolution</strong>. {METHODE_S02_EXCLUSIONS_SUFFIX}</p>
+        <p>On garde les <strong>{METHODE_S02_KEPT_SOLENNELS}</strong> (SPS), les <strong>{METHODE_S02_KEPT_VOTES_FINAUX}</strong> (SOR), les <strong>{METHODE_S02_KEPT_CENSURE}</strong>, les <strong>{METHODE_S02_KEPT_REFERENDAIRES}</strong> et les <strong>{METHODE_S02_KEPT_PROPOSITIONS}</strong>. {METHODE_S02_EXCLUSIONS_SUFFIX}</p>
         <p>Pour chaque session, on en tire <strong>{TARGET}</strong> en équilibrant les thèmes ({METHODE_S02_THEMES_EXAMPLES}) plutôt qu'au hasard pur, avec deux garde-fous : <strong>jamais plus de {DEFAULT_CAP_PER_DOSSIER} scrutins du même dossier législatif</strong> et <strong>jamais plus de {DEFAULT_CAP_PER_CHAPEAU_PREFIX} scrutins du même sujet</strong> ({METHODE_S02_CAPS_EXAMPLE}).</p>
       </Section>
 
       <Section n="03" title={METHODE_SECTION_BODY_TITLES["03"]}>
         <p>{METHODE_S03_GROUP_INTRO}</p>
         <Formula>
-          si ≥ {Math.round(THRESHOLD * 100)}% des votants effectifs du groupe → pour / contre / abstention<br/>
-          sinon → groupe divisé<br/>
+          si ≥ {Math.round(THRESHOLD * 100)}{METHODE_S03_THRESHOLD_RULE_SUFFIX}<br/>
+          {METHODE_S03_THRESHOLD_RULE_ELSE}<br/>
           {METHODE_S03_ABSENTS_EXCLUSION}
         </Formula>
         <p>{METHODE_S03_DIVIDED_RULE_BODY}<strong>divisé</strong>{METHODE_S03_DIVIDED_RULE_TAIL}</p>
@@ -185,12 +189,12 @@ export default function Methode() {
       <Section n="04" title={METHODE_SECTION_BODY_TITLES["04"]}>
         <p>{METHODE_S04_OPENER}</p>
         <Formula>
-          Score par scrutin :<br/>
-          &nbsp;&nbsp;+1 si ton vote = position du groupe<br/>
-          &nbsp;&nbsp;+0,5 si l'un des deux s'abstient et l'autre vote<br/>
-          &nbsp;&nbsp;0 si désaccord net (pour vs contre)<br/>
+          {METHODE_S04_FORMULA_LINES[0]}<br/>
+          &nbsp;&nbsp;{METHODE_S04_FORMULA_LINES[1]}<br/>
+          &nbsp;&nbsp;{METHODE_S04_FORMULA_LINES[2]}<br/>
+          &nbsp;&nbsp;{METHODE_S04_FORMULA_LINES[3]}<br/>
           <br/>
-          Somme des scores ÷ nombre de scrutins comptés × 100 = % affiché
+          {METHODE_S04_FORMULA_LINES[4]}
         </Formula>
         <p>Le ranking apparaît à partir du <strong>{MIN_FOR_RANKING}<sup>e</sup> scrutin compté</strong> — {METHODE_S04_RANK_NOISE_EXPLANATION}.</p>
       </Section>

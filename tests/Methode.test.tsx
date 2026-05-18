@@ -30,6 +30,10 @@ import {
   METHODE_S01_SAME_FILES_CLAIM,
   METHODE_S02_THEMES_EXAMPLES,
   METHODE_S03_ABSENTS_EXCLUSION,
+  METHODE_S02_KEPT_SOLENNELS, METHODE_S02_KEPT_VOTES_FINAUX,
+  METHODE_S02_KEPT_CENSURE, METHODE_S02_KEPT_REFERENDAIRES, METHODE_S02_KEPT_PROPOSITIONS,
+  METHODE_S04_FORMULA_LINES,
+  METHODE_S03_THRESHOLD_RULE_SUFFIX, METHODE_S03_THRESHOLD_RULE_ELSE,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -231,6 +235,31 @@ describe("Methode — section structure", () => {
     renderMethode();
     const section = document.getElementById("methode-03")!;
     expect(section.textContent).toContain(METHODE_S03_ABSENTS_EXCLUSION);
+  });
+
+  it("§02 surfaces all 5 METHODE_S02_KEPT_* scrutin types (paired with isEligibleScrutin)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-02")!;
+    expect(section.textContent).toContain(METHODE_S02_KEPT_SOLENNELS);
+    expect(section.textContent).toContain(METHODE_S02_KEPT_VOTES_FINAUX);
+    expect(section.textContent).toContain(METHODE_S02_KEPT_CENSURE);
+    expect(section.textContent).toContain(METHODE_S02_KEPT_REFERENDAIRES);
+    expect(section.textContent).toContain(METHODE_S02_KEPT_PROPOSITIONS);
+  });
+
+  it("§04 surfaces all 5 METHODE_S04_FORMULA_LINES (paired with alignmentScore)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-04")!;
+    for (const line of METHODE_S04_FORMULA_LINES) {
+      expect(section.textContent).toContain(line);
+    }
+  });
+
+  it("§03 surfaces METHODE_S03_THRESHOLD_RULE_SUFFIX + ELSE (paired with computePosition)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-03")!;
+    expect(section.textContent).toContain(METHODE_S03_THRESHOLD_RULE_SUFFIX);
+    expect(section.textContent).toContain(METHODE_S03_THRESHOLD_RULE_ELSE);
   });
 
   it("the number of rendered Section bodies matches METHODE_SECTIONS.length (no orphan body)", () => {
