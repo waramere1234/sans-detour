@@ -45,6 +45,10 @@ import {
   METHODE_S02_KEPT_CENSURE, METHODE_S02_KEPT_REFERENDAIRES, METHODE_S02_KEPT_PROPOSITIONS,
   METHODE_S04_FORMULA_LINES,
   METHODE_S03_THRESHOLD_RULE_SUFFIX, METHODE_S03_THRESHOLD_RULE_ELSE,
+  METHODE_S02_RANDOM_AVOIDANCE, METHODE_S02_GARDE_FOUS_LEAD,
+  METHODE_S02_GARDE_FOU_LEAD,
+  METHODE_S02_GARDE_FOU_DOSSIER_SUFFIX, METHODE_S02_GARDE_FOU_SUJET_SUFFIX,
+  METHODE_S04_RANK_THRESHOLD_SUFFIX,
 } from "../types";
 
 /** Section ids + short TOC labels. Single source of truth for both the
@@ -173,7 +177,7 @@ export default function Methode() {
 
       <Section n="02" title={METHODE_SECTION_BODY_TITLES["02"]}>
         <p>On garde les <strong>{METHODE_S02_KEPT_SOLENNELS}</strong> (SPS), les <strong>{METHODE_S02_KEPT_VOTES_FINAUX}</strong> (SOR), les <strong>{METHODE_S02_KEPT_CENSURE}</strong>, les <strong>{METHODE_S02_KEPT_REFERENDAIRES}</strong> et les <strong>{METHODE_S02_KEPT_PROPOSITIONS}</strong>. {METHODE_S02_EXCLUSIONS_SUFFIX}</p>
-        <p>Pour chaque session, on en tire <strong>{TARGET}</strong> en équilibrant les thèmes ({METHODE_S02_THEMES_EXAMPLES}) plutôt qu'au hasard pur, avec deux garde-fous : <strong>jamais plus de {DEFAULT_CAP_PER_DOSSIER} scrutins du même dossier législatif</strong> et <strong>jamais plus de {DEFAULT_CAP_PER_CHAPEAU_PREFIX} scrutins du même sujet</strong> ({METHODE_S02_CAPS_EXAMPLE}).</p>
+        <p>Pour chaque session, on en tire <strong>{TARGET}</strong> en équilibrant les thèmes ({METHODE_S02_THEMES_EXAMPLES}) {METHODE_S02_RANDOM_AVOIDANCE}, {METHODE_S02_GARDE_FOUS_LEAD} : <strong>{METHODE_S02_GARDE_FOU_LEAD}{DEFAULT_CAP_PER_DOSSIER}{METHODE_S02_GARDE_FOU_DOSSIER_SUFFIX}</strong> et <strong>{METHODE_S02_GARDE_FOU_LEAD}{DEFAULT_CAP_PER_CHAPEAU_PREFIX}{METHODE_S02_GARDE_FOU_SUJET_SUFFIX}</strong> ({METHODE_S02_CAPS_EXAMPLE}).</p>
       </Section>
 
       <Section n="03" title={METHODE_SECTION_BODY_TITLES["03"]}>
@@ -196,7 +200,7 @@ export default function Methode() {
           <br/>
           {METHODE_S04_FORMULA_LINES[4]}
         </Formula>
-        <p>Le ranking apparaît à partir du <strong>{MIN_FOR_RANKING}<sup>e</sup> scrutin compté</strong> — {METHODE_S04_RANK_NOISE_EXPLANATION}.</p>
+        <p>Le ranking apparaît à partir du <strong>{MIN_FOR_RANKING}<sup>e</sup>{METHODE_S04_RANK_THRESHOLD_SUFFIX}</strong> — {METHODE_S04_RANK_NOISE_EXPLANATION}.</p>
       </Section>
 
       <Section n="05" title={METHODE_SECTION_BODY_TITLES["05"]}>

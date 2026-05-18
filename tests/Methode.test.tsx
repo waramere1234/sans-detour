@@ -34,6 +34,10 @@ import {
   METHODE_S02_KEPT_CENSURE, METHODE_S02_KEPT_REFERENDAIRES, METHODE_S02_KEPT_PROPOSITIONS,
   METHODE_S04_FORMULA_LINES,
   METHODE_S03_THRESHOLD_RULE_SUFFIX, METHODE_S03_THRESHOLD_RULE_ELSE,
+  METHODE_S02_RANDOM_AVOIDANCE, METHODE_S02_GARDE_FOUS_LEAD,
+  METHODE_S02_GARDE_FOU_LEAD,
+  METHODE_S02_GARDE_FOU_DOSSIER_SUFFIX, METHODE_S02_GARDE_FOU_SUJET_SUFFIX,
+  METHODE_S04_RANK_THRESHOLD_SUFFIX,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -260,6 +264,27 @@ describe("Methode — section structure", () => {
     const section = document.getElementById("methode-03")!;
     expect(section.textContent).toContain(METHODE_S03_THRESHOLD_RULE_SUFFIX);
     expect(section.textContent).toContain(METHODE_S03_THRESHOLD_RULE_ELSE);
+  });
+
+  it("§02 surfaces METHODE_S02_RANDOM_AVOIDANCE + GARDE_FOUS_LEAD (theme-balance commitments)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-02")!;
+    expect(section.textContent).toContain(METHODE_S02_RANDOM_AVOIDANCE);
+    expect(section.textContent).toContain(METHODE_S02_GARDE_FOUS_LEAD);
+  });
+
+  it("§02 surfaces both garde-fou suffixes (paired with DEFAULT_CAP_PER_DOSSIER + DEFAULT_CAP_PER_CHAPEAU_PREFIX)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-02")!;
+    expect(section.textContent).toContain(METHODE_S02_GARDE_FOU_LEAD);
+    expect(section.textContent).toContain(METHODE_S02_GARDE_FOU_DOSSIER_SUFFIX);
+    expect(section.textContent).toContain(METHODE_S02_GARDE_FOU_SUJET_SUFFIX);
+  });
+
+  it("§04 surfaces METHODE_S04_RANK_THRESHOLD_SUFFIX (ordinal-marker companion)", () => {
+    renderMethode();
+    const section = document.getElementById("methode-04")!;
+    expect(section.textContent).toContain(METHODE_S04_RANK_THRESHOLD_SUFFIX);
   });
 
   it("the number of rendered Section bodies matches METHODE_SECTIONS.length (no orphan body)", () => {

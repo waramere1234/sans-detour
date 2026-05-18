@@ -4058,3 +4058,26 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `METHODE_S02_KEPT_SOLENNELS\|METHODE_S04_FORMULA_LINES\|METHODE_S03_THRESHOLD_RULE_SUFFIX` src/ tests/ → 20+ résultats
 - [ ] grep `"scrutins solennels"\|"Somme des scores"\|"votants effectifs du groupe"` src/ tests/ → 3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~919 tests` CLAUDE.md → 0 résultat (aligné sur ~932)
+
+---
+
+## Session 173 — 2026-05-18
+
+### Vérification session 172
+
+- [VERIFIED] 36 occurrences des 3 representative new exports (METHODE_S02_KEPT_SOLENNELS + METHODE_S04_FORMULA_LINES + METHODE_S03_THRESHOLD_RULE_SUFFIX)
+- [VERIFIED] 2 inline literal occurrences = 1 déclaration + 1 pin-the-value test (clean)
+- [VERIFIED] CLAUDE.md "~932 tests"
+- 932/932 tests verts, typecheck clean
+
+### Bugs fixés (METHODE_S02_RANDOM_AVOIDANCE + GARDE_FOUS_LEAD + METHODE_S02_GARDE_FOU_LEAD/DOSSIER_SUFFIX/SUJET_SUFFIX + METHODE_S04_RANK_THRESHOLD_SUFFIX)
+
+- [FIXED] Methode §02 theme-balance commitments inline + untested : `"plutôt qu'au hasard pur"` (random-avoidance commitment) + `"avec deux garde-fous"` (2-cap-rule commitment) · Drift surface : 2 load-bearing claims documenting le diversity-vs-random strategy + le 2-rule cap count. Un soften ("presque au hasard") affaibrait le strategy claim ; un "trois" silently rajoutant un 3e cap demanderait de mettre à jour deck.ts. Fix : export `METHODE_S02_RANDOM_AVOIDANCE` + `METHODE_S02_GARDE_FOUS_LEAD`. Methode test : 1 toContain × 2. Aria-labels tests : 4 (canonical wording × 2 + anti-soften "hasard pur" + anti-count-drift "deux" guard). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §02 per-cap garde-fou suffixes inline + untested : "jamais plus de N scrutins du même dossier législatif" + "jamais plus de N scrutins du même sujet" · Drift surface : 2 paired cap claims avec shared "jamais plus de " lead + distinct suffixes (per-dossier vs per-chapeau semantic split). Paired avec composeDeck dans src/lib/deck.ts. Un merge des 2 suffixes hideerait le per-dossier vs per-chapeau distinction. Fix : export `METHODE_S02_GARDE_FOU_LEAD` (shared prefix) + `_DOSSIER_SUFFIX` + `_SUJET_SUFFIX`. Methode test : 1 toContain × 3. Aria-labels tests : 5 (canonical wording × 3 + distinct anti-merge + startsWith " scrutins " common-noun convention). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Methode §04 rank-threshold strong-tag suffix `" scrutin compté"` (after `{MIN_FOR_RANKING}<sup>e</sup>`) inline + untested · Drift surface : load-bearing ordinal-marker companion to MIN_FOR_RANKING. Le singular "scrutin compté" (vs plural "scrutins comptés") est requis car l'ordinal designe un specific Nth element. Un mis-pluralization changerait le math semantic. Fix : export `METHODE_S04_RANK_THRESHOLD_SUFFIX`. Methode test : 1 toContain. Aria-labels tests : 2 (canonical wording + singular-vs-plural anti-mis-pluralization guard). · `src/types/index.ts`, `src/routes/Methode.tsx`, `tests/Methode.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 174
+
+- [ ] grep `METHODE_S02_RANDOM_AVOIDANCE\|METHODE_S02_GARDE_FOUS_LEAD\|METHODE_S02_GARDE_FOU_DOSSIER_SUFFIX\|METHODE_S04_RANK_THRESHOLD_SUFFIX` src/ tests/ → 25+ résultats
+- [ ] grep `"plutôt qu.au hasard pur"\|"avec deux garde-fous"\|"jamais plus de "\|"scrutin compté"` src/ tests/ → 6-8 résultats (déclarations + pin-the-value)
+- [ ] grep `~932 tests` CLAUDE.md → 0 résultat (aligné sur ~946)

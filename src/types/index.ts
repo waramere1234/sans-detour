@@ -838,6 +838,29 @@ export const METHODE_S03_THRESHOLD_RULE_SUFFIX =
   "% des votants effectifs du groupe → pour / contre / abstention";
 export const METHODE_S03_THRESHOLD_RULE_ELSE = "sinon → groupe divisé";
 
+/** Methode §02 theme-balance load-bearing phrases — document the
+ *  diversity-vs-random commitment ("plutôt qu'au hasard pur") and
+ *  the cap-rules count commitment ("avec deux garde-fous"). Paired
+ *  with the round-robin composition logic in src/lib/deck.ts. */
+export const METHODE_S02_RANDOM_AVOIDANCE = "plutôt qu'au hasard pur";
+export const METHODE_S02_GARDE_FOUS_LEAD = "avec deux garde-fous";
+
+/** Methode §02 per-cap garde-fou suffixes — the strong-tagged
+ *  text that follows each cap number ({DEFAULT_CAP_PER_DOSSIER} /
+ *  {DEFAULT_CAP_PER_CHAPEAU_PREFIX}). The 2 caps are paired in
+ *  composeDeck (src/lib/deck.ts) and share the "jamais plus de N"
+ *  prefix structure. Pinning the suffixes separately enforces the
+ *  per-vs-per-sujet contract distinction. */
+export const METHODE_S02_GARDE_FOU_LEAD = "jamais plus de ";
+export const METHODE_S02_GARDE_FOU_DOSSIER_SUFFIX = " scrutins du même dossier législatif";
+export const METHODE_S02_GARDE_FOU_SUJET_SUFFIX = " scrutins du même sujet";
+
+/** Methode §04 rank-threshold strong-tag suffix — follows the
+ *  {MIN_FOR_RANKING}<sup>e</sup> interpolation as " scrutin compté".
+ *  The "e" superscript (French ordinal marker, e.g., "8e" = "8th")
+ *  is rendered separately via inline JSX and not part of this const. */
+export const METHODE_S04_RANK_THRESHOLD_SUFFIX = " scrutin compté";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

@@ -85,6 +85,10 @@ import {
   METHODE_S02_KEPT_CENSURE, METHODE_S02_KEPT_REFERENDAIRES, METHODE_S02_KEPT_PROPOSITIONS,
   METHODE_S04_FORMULA_LINES,
   METHODE_S03_THRESHOLD_RULE_SUFFIX, METHODE_S03_THRESHOLD_RULE_ELSE,
+  METHODE_S02_RANDOM_AVOIDANCE, METHODE_S02_GARDE_FOUS_LEAD,
+  METHODE_S02_GARDE_FOU_LEAD,
+  METHODE_S02_GARDE_FOU_DOSSIER_SUFFIX, METHODE_S02_GARDE_FOU_SUJET_SUFFIX,
+  METHODE_S04_RANK_THRESHOLD_SUFFIX,
   COVER_SECONDARY_NAV_LABEL,
   LEGISLATURE_LABEL,
 } from "../src/types";
@@ -1961,6 +1965,74 @@ describe("METHODE_S03_THRESHOLD_RULE_* — group-position threshold paired with 
     // (cf. AUDIT_TRAIL_LABEL_DIVIDED = "Groupe divisé, non compté").
     // A drift between the 2 surfaces would confuse SR users.
     expect(METHODE_S03_THRESHOLD_RULE_ELSE).toContain("divisé");
+  });
+});
+
+describe("METHODE_S02_RANDOM_AVOIDANCE + GARDE_FOUS_LEAD — theme-balance commitments", () => {
+  it("RANDOM_AVOIDANCE matches 'plutôt qu'au hasard pur'", () => {
+    expect(METHODE_S02_RANDOM_AVOIDANCE).toBe("plutôt qu'au hasard pur");
+  });
+
+  it("RANDOM_AVOIDANCE contains 'hasard pur' (anti-soften guard)", () => {
+    // The wording explicitly rejects "pure randomness" as a strategy
+    // — round-robin theme balance is the alternative. A soften to
+    // "presque au hasard" would imply randomness is mostly used.
+    expect(METHODE_S02_RANDOM_AVOIDANCE).toContain("hasard pur");
+  });
+
+  it("GARDE_FOUS_LEAD matches 'avec deux garde-fous'", () => {
+    expect(METHODE_S02_GARDE_FOUS_LEAD).toBe("avec deux garde-fous");
+  });
+
+  it("GARDE_FOUS_LEAD contains 'deux' (anti-count-drift guard for 2 cap rules)", () => {
+    // The "deux" number commits the doc to exactly 2 cap rules
+    // (per-dossier + per-chapeau). Adding a 3rd cap requires
+    // updating this const + the matching prose. A regression
+    // that says "trois" or "deux ou trois" would silently drift.
+    expect(METHODE_S02_GARDE_FOUS_LEAD).toContain("deux");
+  });
+});
+
+describe("METHODE_S02_GARDE_FOU_* — per-cap garde-fou claims", () => {
+  it("LEAD matches the shared 'jamais plus de ' prefix", () => {
+    expect(METHODE_S02_GARDE_FOU_LEAD).toBe("jamais plus de ");
+  });
+
+  it("DOSSIER_SUFFIX matches ' scrutins du même dossier législatif'", () => {
+    expect(METHODE_S02_GARDE_FOU_DOSSIER_SUFFIX).toBe(
+      " scrutins du même dossier législatif",
+    );
+  });
+
+  it("SUJET_SUFFIX matches ' scrutins du même sujet'", () => {
+    expect(METHODE_S02_GARDE_FOU_SUJET_SUFFIX).toBe(" scrutins du même sujet");
+  });
+
+  it("the 2 suffixes are distinct (per-dossier vs per-chapeau semantic split)", () => {
+    // The 2 caps target different things: per-dossier (a single
+    // legislative file) vs per-chapeau (a thematic cluster). The
+    // 2 SUFFIX consts must remain distinct — a merge would silently
+    // hide the per-dossier vs per-chapeau distinction in deck.ts.
+    expect(METHODE_S02_GARDE_FOU_DOSSIER_SUFFIX).not.toBe(METHODE_S02_GARDE_FOU_SUJET_SUFFIX);
+  });
+
+  it("both suffixes start with ' scrutins ' (common-noun convention)", () => {
+    expect(METHODE_S02_GARDE_FOU_DOSSIER_SUFFIX.startsWith(" scrutins ")).toBe(true);
+    expect(METHODE_S02_GARDE_FOU_SUJET_SUFFIX.startsWith(" scrutins ")).toBe(true);
+  });
+});
+
+describe("METHODE_S04_RANK_THRESHOLD_SUFFIX — ordinal-marker companion", () => {
+  it("matches ' scrutin compté' (singular noun + past participle)", () => {
+    expect(METHODE_S04_RANK_THRESHOLD_SUFFIX).toBe(" scrutin compté");
+  });
+
+  it("uses singular 'scrutin' (the ordinal designates the Nth element)", () => {
+    // The strong-tag renders "Ne scrutin compté" — singular because
+    // the ordinal designates a specific N, not a count of N. A
+    // regression to "scrutins comptés" would mis-pluralize.
+    expect(METHODE_S04_RANK_THRESHOLD_SUFFIX).toContain("scrutin compté");
+    expect(METHODE_S04_RANK_THRESHOLD_SUFFIX).not.toContain("scrutins comptés");
   });
 });
 
