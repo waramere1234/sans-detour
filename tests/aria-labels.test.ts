@@ -131,6 +131,8 @@ import {
   MS_PER_DAY, SYNC_CADENCE_DAYS, DECK_SEED_RANGE_EXPONENT,
   SCORE_PERFECT, SCORE_PARTIAL, SCORE_CONFLICT,
   MATCHING_SCALE, PCT_MULTIPLIER,
+  EXTERNAL_LINK_TARGET, EXTERNAL_LINK_REL,
+  DECK_VISIBLE_DEPTH, SWIPE_THRESHOLD,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -4213,6 +4215,85 @@ describe("PCT_MULTIPLIER — percent conversion factor", () => {
     // future drift (e.g., to permille = 1000) catches the
     // related copy/UI assumptions.
     expect(SCORE_PARTIAL * PCT_MULTIPLIER).toBe(50);
+  });
+});
+
+describe("EXTERNAL_LINK_TARGET + EXTERNAL_LINK_REL — security-relevant link attrs", () => {
+  it("TARGET matches '_blank' (pin-the-value)", () => {
+    expect(EXTERNAL_LINK_TARGET).toBe("_blank");
+  });
+
+  it("REL matches 'noopener noreferrer' (pin-the-value)", () => {
+    expect(EXTERNAL_LINK_REL).toBe("noopener noreferrer");
+  });
+
+  it("REL contains 'noopener' (tabnabbing prevention — primary defense)", () => {
+    // noopener prevents window.opener access from the new tab,
+    // so the new tab can't navigate the parent window. Without
+    // it, a malicious external link could redirect the user's
+    // tab to a phishing page. Pin so a future tweak that drops
+    // noopener surfaces in CI as a security regression.
+    expect(EXTERNAL_LINK_REL).toContain("noopener");
+  });
+
+  it("REL contains 'noreferrer' (defense-in-depth — also nulls window.opener in some browsers)", () => {
+    // noreferrer additionally suppresses the Referer header. In
+    // older browsers it doubles as the noopener guard. Keep
+    // both for maximum compatibility.
+    expect(EXTERNAL_LINK_REL).toContain("noreferrer");
+  });
+
+  it("REL is space-separated (HTML rel-attribute syntax)", () => {
+    // Multiple rel values are space-separated per HTML spec.
+    // Pin so a refactor doesn't accidentally use comma-separation
+    // (which would parse as a single invalid token).
+    expect(EXTERNAL_LINK_REL.split(" ").length).toBe(2);
+  });
+
+  it("TARGET starts with '_' (HTML reserved-target convention)", () => {
+    // HTML reserved targets are prefixed with "_" (_blank, _self,
+    // _parent, _top). Pin so a drift to a custom target like
+    // "external" doesn't open in a new tab unexpectedly.
+    expect(EXTERNAL_LINK_TARGET.startsWith("_")).toBe(true);
+  });
+});
+
+describe("DECK_VISIBLE_DEPTH — DeckStack visible-card slice depth", () => {
+  it("matches 3 (pin-the-value, top card + 2 backdrop layers)", () => {
+    expect(DECK_VISIBLE_DEPTH).toBe(3);
+  });
+
+  it("is a positive integer", () => {
+    expect(Number.isInteger(DECK_VISIBLE_DEPTH)).toBe(true);
+    expect(DECK_VISIBLE_DEPTH).toBeGreaterThan(0);
+  });
+
+  it("is small enough to keep DOM lightweight (≤ 5)", () => {
+    // The stacked-card visual works best with a small number of
+    // background cards (too many = visual noise + DOM weight).
+    // Pin so a future bump to 10 would require an opacity-ternary
+    // expansion AND surface here as a design-decision flag.
+    expect(DECK_VISIBLE_DEPTH).toBeLessThanOrEqual(5);
+  });
+});
+
+describe("SWIPE_THRESHOLD — Card swipe-recognition drag distance", () => {
+  it("matches 120 (pin-the-value, px)", () => {
+    expect(SWIPE_THRESHOLD).toBe(120);
+  });
+
+  it("is a positive integer (px distance)", () => {
+    expect(Number.isInteger(SWIPE_THRESHOLD)).toBe(true);
+    expect(SWIPE_THRESHOLD).toBeGreaterThan(0);
+  });
+
+  it("is in a UX-reasonable range (50-300 px)", () => {
+    // Below 50 px the swipe triggers on accidental tap drift;
+    // above 300 the user has to drag more than half the card
+    // width on a typical phone. Pin the range so a future tweak
+    // stays in the empirically-validated zone.
+    expect(SWIPE_THRESHOLD).toBeGreaterThanOrEqual(50);
+    expect(SWIPE_THRESHOLD).toBeLessThanOrEqual(300);
   });
 });
 

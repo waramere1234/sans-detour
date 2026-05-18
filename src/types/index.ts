@@ -1509,6 +1509,31 @@ export const MATCHING_SCALE: Record<"pour" | "contre" | "abstention", number> = 
  *  finer granularity) propagates from one edit. */
 export const PCT_MULTIPLIER = 100;
 
+/** Standard external-link attrs — `target="_blank"` for new-tab opening
+ *  AND `rel="noopener noreferrer"` for tabnabbing prevention (the
+ *  opened tab can't access window.opener to navigate the parent away
+ *  to a phishing page). The 2 attrs are paired across 5 sites:
+ *  Card.tsx AN link + AuditTrail.tsx AN link + Legal.tsx 2 links +
+ *  Methode.tsx 3 links. A drift dropping `rel` would silently
+ *  reintroduce the reverse-tabnabbing vector. */
+export const EXTERNAL_LINK_TARGET = "_blank";
+export const EXTERNAL_LINK_REL = "noopener noreferrer";
+
+/** DeckStack visible-stack depth — slice the top N cards for the
+ *  stacked-card visual on /play. 3 keeps the visual readable
+ *  (top + 2 backdrop layers) without flooding the DOM with cards
+ *  the user can't interact with. A bump would also need to extend
+ *  the opacity ternary in DeckStack.tsx (currently 3-arm: 1 / 0.75 / 0.45). */
+export const DECK_VISIBLE_DEPTH = 3;
+
+/** Card swipe-recognition threshold in px — drag distance past which a
+ *  pan gesture is committed as a vote (left = contre, right = pour,
+ *  down = skip). Below the threshold, the card snaps back. 120 px is
+ *  the empirical sweet spot from V1 user testing; centralised so the
+ *  test suite can derive `+/- SWIPE_THRESHOLD + 1` boundary inputs
+ *  instead of duplicating the magic number. */
+export const SWIPE_THRESHOLD = 120;
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

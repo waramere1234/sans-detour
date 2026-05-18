@@ -1,5 +1,5 @@
 // src/components/DeckStack.tsx
-import type { Scrutin, UserVote } from "../types";
+import { DECK_VISIBLE_DEPTH, type Scrutin, type UserVote } from "../types";
 import { Card } from "./Card";
 
 export interface DeckStackProps {
@@ -10,7 +10,7 @@ export interface DeckStackProps {
 
 export function DeckStack({ scrutins, onVote, onOpenMethode }: DeckStackProps) {
   if (scrutins.length === 0) return null;
-  const visible = scrutins.slice(0, 3);
+  const visible = scrutins.slice(0, DECK_VISIBLE_DEPTH);
 
   function handleSwipe(s: Scrutin, dir: "left" | "right" | "down") {
     const choice: UserVote = dir === "left" ? "contre" : dir === "right" ? "pour" : "skip";

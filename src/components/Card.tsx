@@ -14,6 +14,7 @@ import {
   MIDDLE_DOT_SEPARATOR,
   BACK_ARROW_SUFFIX_GLYPH,
   CARD_IA_CHIP_GLYPH, CARD_POINTS_CLES_BULLET_GLYPH,
+  EXTERNAL_LINK_TARGET, EXTERNAL_LINK_REL, SWIPE_THRESHOLD,
   type Scrutin,
 } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
@@ -32,8 +33,6 @@ export interface CardProps {
   onSwipe?: (dir: "left" | "right" | "down") => void;
   onOpenMethode?: () => void;
 }
-
-const SWIPE_THRESHOLD = 120;
 
 // Shared card-face style so front and back have identical visual dimensions.
 const FACE_STYLE: React.CSSProperties = {
@@ -293,8 +292,8 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             {scrutin.url_an_officielle
               ? <a
                   href={scrutin.url_an_officielle}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  target={EXTERNAL_LINK_TARGET}
+                  rel={EXTERNAL_LINK_REL}
                   aria-label={anScrutinViewAriaLabel(scrutin.numero)}
                   style={{ color: "var(--accent)", textDecoration: "none" }}
                 >

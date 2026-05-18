@@ -46,6 +46,7 @@ import {
   METHODE_S04_RANK_ORDINAL_MARKER, METHODE_PAGE_LEAD_LINK_CLOSER_SUFFIX,
   H1_ACCENT_PERIOD,
   METHODE_SECTION_ID_PREFIX, METHODE_SECTION_HEADING_ID_PREFIX,
+  EXTERNAL_LINK_TARGET, EXTERNAL_LINK_REL,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -224,14 +225,14 @@ export default function Methode() {
         <p>{METHODE_S06_INDEPENDENCE_OPENER_PREFIX}<strong>{METHODE_S06_INDEPENDENCE_STRONG}</strong>{METHODE_S06_INDEPENDENCE_OPENER_SUFFIX}{METHODE_S06_NO_AFFILIATION_PHRASE}</p>
         <p>{METHODE_S06_HOSTING_FUNDING_BODY}</p>
         <ul style={{ paddingLeft: 18, color: "var(--ink-2)" }}>
-          <li><a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(AN_OPEN_DATA_HOSTNAME)}>{AN_OPEN_DATA_HOSTNAME}</a> — {METHODE_LINK_ANNOTATION_OPEN_DATA}</li>
+          <li><a href={AN_OPEN_DATA_URL} target={EXTERNAL_LINK_TARGET} rel={EXTERNAL_LINK_REL} aria-label={externalLinkLabel(AN_OPEN_DATA_HOSTNAME)}>{AN_OPEN_DATA_HOSTNAME}</a> — {METHODE_LINK_ANNOTATION_OPEN_DATA}</li>
           {/* TODO production-blocker · github.com/sansdetour is a 404 today
               (real repo is private at waramere1234/sans-detour per CLAUDE.md)
               AND no LICENSE file exists despite the "MIT" claim. Either
               publish under the sansdetour org with a LICENSE.md, or drop
               this bullet until the repo is public. Same TODO in §07 below
               and in Legal.tsx — keep them in sync. */}
-          <li><a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a> — {METHODE_LINK_ANNOTATION_CODE_SOURCE_MIT}</li>
+          <li><a href={GITHUB_REPO_URL} target={EXTERNAL_LINK_TARGET} rel={EXTERNAL_LINK_REL} aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a> — {METHODE_LINK_ANNOTATION_CODE_SOURCE_MIT}</li>
           <li><a href={mailto()}>{CONTACT_EMAIL}</a> — {METHODE_LINK_ANNOTATION_SIGNALER_ERREUR}</li>
         </ul>
       </Section>
@@ -249,7 +250,7 @@ export default function Methode() {
           {/* TODO production-blocker · same broken github.com/sansdetour
               link as §06 above. The "prompt et code source publics" claim
               is aspirational until the repo is published. */}
-          <li><a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a> — {METHODE_LINK_ANNOTATION_PROMPT_CODE_PUBLIC}</li>
+          <li><a href={GITHUB_REPO_URL} target={EXTERNAL_LINK_TARGET} rel={EXTERNAL_LINK_REL} aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a> — {METHODE_LINK_ANNOTATION_PROMPT_CODE_PUBLIC}</li>
           <li>{METHODE_S07_MODEL_DISCLOSURE}</li>
         </ul>
       </Section>

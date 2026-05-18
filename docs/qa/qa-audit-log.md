@@ -4558,3 +4558,23 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `SCORE_PERFECT\|SCORE_PARTIAL\|SCORE_CONFLICT\|MATCHING_SCALE\|PCT_MULTIPLIER` src/ tests/ → 20+ résultats
 - [ ] grep `'score === 1\|score === 0\.5\|\* 100\b\|\* 0\.5\b'` src/lib/matching.ts → 0 résultats (tous via les consts)
 - [ ] grep `~1271 tests` CLAUDE.md → 0 résultat (aligné sur ~1289)
+
+## Session 197 — 2026-05-18
+
+### Vérification session 196
+
+- [VERIFIED] 50 occurrences des nouveaux exports (SCORE_PERFECT/_PARTIAL/_CONFLICT + MATCHING_SCALE + PCT_MULTIPLIER)
+- [VERIFIED] CLAUDE.md "~1271 tests" → 0 résultat (aligné sur ~1289)
+- 1289/1289 tests verts, typecheck clean
+
+### Bugs fixés (EXTERNAL_LINK_TARGET/_REL + DECK_VISIBLE_DEPTH + SWIPE_THRESHOLD)
+
+- [FIXED] External-link security attrs `target="_blank" rel="noopener noreferrer"` inline 5× (Card.tsx AN link + AuditTrail.tsx AN link + Legal.tsx 2 links + Methode.tsx 3 links). Drift surface : `rel="noopener noreferrer"` est une defense critique anti-tabnabbing — sans noopener, le new tab peut access window.opener et naviguer le parent vers une phishing page. Un drift dropping `rel` réintroduirait silently le reverse-tabnabbing vector. Pair `target="_blank"` (new-tab) + `rel="noopener noreferrer"` (security defense). Fix : export `EXTERNAL_LINK_TARGET` + `EXTERNAL_LINK_REL`. Card.tsx + AuditTrail.tsx + Legal.tsx + Methode.tsx (3 sites) utilisent les 2 consts. Aria-labels tests : 6 (canonical × 2 + REL contains "noopener" primary tabnabbing defense + REL contains "noreferrer" defense-in-depth + REL space-separated HTML-spec + TARGET starts with "_" reserved-target-convention). · `src/types/index.ts`, `src/components/Card.tsx`, `src/components/AuditTrail.tsx`, `src/routes/Legal.tsx`, `src/routes/Methode.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] DeckStack visible-stack depth `3` inline (line 13 `.slice(0, 3)`) + untested. Drift surface : top card + 2 backdrop layers pour le stacked-card visual sur /play. Un bump à 5 nécessiterait également d'étendre l'opacity ternary (line 30, currently 3-arm: 1 / 0.75 / 0.45). Fix : export `DECK_VISIBLE_DEPTH`. DeckStack.tsx utilise la const. Aria-labels tests : 3 (canonical + positive-integer + ≤ 5 design-decision-flag boundary). · `src/types/index.ts`, `src/components/DeckStack.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Card swipe threshold `SWIPE_THRESHOLD = 120` file-private const dans Card.tsx (line 36, used 3× in handleDragEnd). Drift surface : drag distance past which swipe gestures commit comme votes. 120px empirical sweet spot from V1 user testing. Currently inaccessible aux tests externes — exporting permettrait test suites de derive boundary inputs (`+/- SWIPE_THRESHOLD + 1`) au lieu de duplicating le magic number. Fix : export `SWIPE_THRESHOLD` from types, drop the local const dans Card.tsx. Aria-labels tests : 3 (canonical 120 + positive-integer-px + UX-reasonable range [50, 300] empirical-zone guard). · `src/types/index.ts`, `src/components/Card.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 198
+
+- [ ] grep `EXTERNAL_LINK_TARGET\|EXTERNAL_LINK_REL\|DECK_VISIBLE_DEPTH\|SWIPE_THRESHOLD` src/ tests/ → 15+ résultats
+- [ ] grep `'target="_blank"\|rel="noopener noreferrer"\|\.slice\(0, 3\)'` src/ → 0 résultats (tous via les consts)
+- [ ] grep `~1289 tests` CLAUDE.md → 0 résultat (aligné sur ~1301)

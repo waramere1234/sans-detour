@@ -16,6 +16,7 @@ import {
   LEGAL_INDEPENDANCE_BODY,
   LEGAL_SOURCES_DONNEES_OPENER_PREFIX, LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR,
   LEGAL_CODE_SOURCE_OPENER_PREFIX,
+  EXTERNAL_LINK_TARGET, EXTERNAL_LINK_REL,
 } from "../types";
 
 export default function Legal() {
@@ -50,7 +51,7 @@ export default function Legal() {
 
         <p><strong>{LEGAL_RGPD_HEADING_INDEPENDANCE}</strong> — {LEGAL_INDEPENDANCE_BODY}</p>
 
-        <p><strong>{LEGAL_RGPD_HEADING_SOURCES_DONNEES}</strong> — {LEGAL_SOURCES_DONNEES_OPENER_PREFIX}<a href={AN_OPEN_DATA_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(AN_OPEN_DATA_HOSTNAME)}>{AN_OPEN_DATA_HOSTNAME}</a>{LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR}{LEGAL_DATA_LICENSE_LABEL}.</p>
+        <p><strong>{LEGAL_RGPD_HEADING_SOURCES_DONNEES}</strong> — {LEGAL_SOURCES_DONNEES_OPENER_PREFIX}<a href={AN_OPEN_DATA_URL} target={EXTERNAL_LINK_TARGET} rel={EXTERNAL_LINK_REL} aria-label={externalLinkLabel(AN_OPEN_DATA_HOSTNAME)}>{AN_OPEN_DATA_HOSTNAME}</a>{LEGAL_SOURCES_DONNEES_LINK_TO_LICENSE_SEPARATOR}{LEGAL_DATA_LICENSE_LABEL}.</p>
 
         {/* TODO production-blocker · same broken github.com/sansdetour
             link as Methode §06 + §07 (real repo is private at
@@ -59,7 +60,7 @@ export default function Legal() {
             is published, also add LICENSE.md before exposing this link
             (RGPD/legal cleanliness). Drop this <p> entirely if the open-
             source path is deferred. */}
-        <p><strong>{LEGAL_RGPD_HEADING_CODE_SOURCE}</strong> — {LEGAL_CODE_SOURCE_OPENER_PREFIX}<a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a>.</p>
+        <p><strong>{LEGAL_RGPD_HEADING_CODE_SOURCE}</strong> — {LEGAL_CODE_SOURCE_OPENER_PREFIX}<a href={GITHUB_REPO_URL} target={EXTERNAL_LINK_TARGET} rel={EXTERNAL_LINK_REL} aria-label={externalLinkLabel(GITHUB_REPO_DISPLAY)}>{GITHUB_REPO_DISPLAY}</a>.</p>
       </div>
     </section>
   );

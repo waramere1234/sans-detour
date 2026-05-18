@@ -5,6 +5,7 @@ import {
   DEMO_FALLBACK_TITLE_SUFFIX, DEMO_FALLBACK_ARIA_SUFFIX,
   AUDIT_GLYPH_ALIGNED, AUDIT_GLYPH_PARTIAL, AUDIT_GLYPH_OPPOSED, AUDIT_GLYPH_DIVIDED,
   AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX, AUDIT_TRAIL_HEADING_ID_PREFIX,
+  EXTERNAL_LINK_TARGET, EXTERNAL_LINK_REL,
   AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
   AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
   auditTrailChipNoun, AN_LINK_SHORT_LABEL,
@@ -125,8 +126,8 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
             {r.sc.url_an_officielle ? (
               <a
                 href={r.sc.url_an_officielle}
-                target="_blank"
-                rel="noopener noreferrer"
+                target={EXTERNAL_LINK_TARGET}
+                rel={EXTERNAL_LINK_REL}
                 aria-label={anScrutinViewAriaLabel(r.sc.numero)}
                 style={{
                   fontFamily: "var(--font-mono)", fontSize: 10,
