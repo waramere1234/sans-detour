@@ -120,6 +120,9 @@ import {
   CARD_POINTS_CLES_BULLET_GLYPH,
   WORDMARK_PART_1, WORDMARK_SLASH, WORDMARK_PART_2,
   AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX,
+  NAV_TARGET_RESULT, NAV_TARGET_METHODE, NAV_TARGET_LEGAL, NAV_TARGET_CONTACT,
+  SKELETON_SHIMMER_CLASS,
+  METHODE_SHEET_BACKDROP_TESTID,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -3792,6 +3795,68 @@ describe("AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX — AuditTrail h3 span party-name
 
   it("is exactly 2 chars (1 dot + 1 space)", () => {
     expect(AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX).toHaveLength(2);
+  });
+});
+
+describe("NAV_TARGET_* — analytics target slugs for topbar_nav + cover_footer_nav", () => {
+  it("RESULT matches 'result' (pin-the-value)", () => {
+    expect(NAV_TARGET_RESULT).toBe("result");
+  });
+
+  it("METHODE matches 'methode' (no accent — analytics slug, not French)", () => {
+    expect(NAV_TARGET_METHODE).toBe("methode");
+  });
+
+  it("LEGAL matches 'legal' (no accent)", () => {
+    expect(NAV_TARGET_LEGAL).toBe("legal");
+  });
+
+  it("CONTACT matches 'contact' (pin-the-value)", () => {
+    expect(NAV_TARGET_CONTACT).toBe("contact");
+  });
+
+  it("all 4 slugs are lowercase ASCII (anti-accent guard for analytics)", () => {
+    // Analytics dashboards expect lowercase ASCII slugs (Plausible
+    // would group "methode" + "méthode" + "Méthode" as 3 different
+    // events). A drift to accented or capitalized would silently
+    // fragment the metric.
+    for (const slug of [NAV_TARGET_RESULT, NAV_TARGET_METHODE, NAV_TARGET_LEGAL, NAV_TARGET_CONTACT]) {
+      expect(slug).toBe(slug.toLowerCase());
+      expect(slug).toMatch(/^[a-z]+$/);
+    }
+  });
+
+  it("all 4 slugs are distinct (anti-collapse guard)", () => {
+    const slugs = new Set([NAV_TARGET_RESULT, NAV_TARGET_METHODE, NAV_TARGET_LEGAL, NAV_TARGET_CONTACT]);
+    expect(slugs.size).toBe(4);
+  });
+});
+
+describe("SKELETON_SHIMMER_CLASS — CSS class for skeleton placeholders", () => {
+  it("matches the canonical 'skeleton-shimmer' (pin-the-value)", () => {
+    expect(SKELETON_SHIMMER_CLASS).toBe("skeleton-shimmer");
+  });
+
+  it("is kebab-case (CSS-class naming convention)", () => {
+    expect(SKELETON_SHIMMER_CLASS).toMatch(/^[a-z]+-[a-z]+$/);
+  });
+
+  it("has no whitespace (it's a single class name)", () => {
+    expect(SKELETON_SHIMMER_CLASS).not.toMatch(/\s/);
+  });
+});
+
+describe("METHODE_SHEET_BACKDROP_TESTID — paired source/test selector", () => {
+  it("matches the canonical 'methode-sheet-backdrop' (pin-the-value)", () => {
+    expect(METHODE_SHEET_BACKDROP_TESTID).toBe("methode-sheet-backdrop");
+  });
+
+  it("is kebab-case (test-id naming convention)", () => {
+    expect(METHODE_SHEET_BACKDROP_TESTID).toMatch(/^[a-z]+(-[a-z]+)+$/);
+  });
+
+  it("has no whitespace (single attribute value)", () => {
+    expect(METHODE_SHEET_BACKDROP_TESTID).not.toMatch(/\s/);
   });
 });
 

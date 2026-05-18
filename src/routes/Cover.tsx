@@ -23,6 +23,7 @@ import {
   H1_ACCENT_PERIOD,
   BUTTON_ARROW_RIGHT_SUFFIX,
   SWIPE_LEGEND_ARROW_CONTRE, SWIPE_LEGEND_ARROW_SKIP, SWIPE_LEGEND_ARROW_POUR,
+  NAV_TARGET_METHODE, NAV_TARGET_LEGAL, NAV_TARGET_CONTACT,
 } from "../types";
 
 export default function Cover() {
@@ -309,9 +310,9 @@ export default function Cover() {
             };
             return (
               <>
-                <Link to={ROUTES.methode} onClick={() => track("cover_footer_nav", { target: "methode" })} style={linkStyle}>{MENU_METHODE_LABEL}</Link>
-                <Link to={ROUTES.legal} onClick={() => track("cover_footer_nav", { target: "legal" })} style={linkStyle}>{MENU_LEGAL_LABEL}</Link>
-                <a href={mailto()} onClick={() => track("cover_footer_nav", { target: "contact" })} style={linkStyle}>{MENU_CONTACT_LABEL}</a>
+                <Link to={ROUTES.methode} onClick={() => track("cover_footer_nav", { target: NAV_TARGET_METHODE })} style={linkStyle}>{MENU_METHODE_LABEL}</Link>
+                <Link to={ROUTES.legal} onClick={() => track("cover_footer_nav", { target: NAV_TARGET_LEGAL })} style={linkStyle}>{MENU_LEGAL_LABEL}</Link>
+                <a href={mailto()} onClick={() => track("cover_footer_nav", { target: NAV_TARGET_CONTACT })} style={linkStyle}>{MENU_CONTACT_LABEL}</a>
               </>
             );
           })()}

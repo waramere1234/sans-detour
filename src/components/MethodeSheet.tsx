@@ -13,6 +13,7 @@ import {
   BUTTON_ARROW_RIGHT_PREFIX, BUTTON_ICON_MAIL,
   MODAL_CLOSE_GLYPH,
   METHODESHEET_BLOCK_EMOJI_AN, METHODESHEET_BLOCK_EMOJI_CLAUDE,
+  METHODE_SHEET_BACKDROP_TESTID,
 } from "../types";
 import { useModalA11y } from "../hooks/useModalA11y";
 
@@ -37,7 +38,7 @@ export function MethodeSheet({ open, onClose }: MethodeSheetProps) {
       {open && (
         <>
           <motion.div
-            data-testid="methode-sheet-backdrop"
+            data-testid={METHODE_SHEET_BACKDROP_TESTID}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

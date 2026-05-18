@@ -1,4 +1,4 @@
-import { GROUP_CODES, SKELETON_RESULT_LOADING_LABEL } from "../types";
+import { GROUP_CODES, SKELETON_RESULT_LOADING_LABEL, SKELETON_SHIMMER_CLASS } from "../types";
 
 // Row count anchored on GROUP_CODES.length so the skeleton renders as many
 // placeholders as the real Result page (which maps `ranked.map(...)` over all
@@ -16,9 +16,9 @@ export function ResultSkeleton() {
       }}
     >
       <header style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <div className="skeleton-shimmer" style={{ width: 120, height: 10 }} />
-        <div className="skeleton-shimmer" style={{ width: "85%", height: 28 }} />
-        <div className="skeleton-shimmer" style={{ width: "50%", height: 12 }} />
+        <div className={SKELETON_SHIMMER_CLASS} style={{ width: 120, height: 10 }} />
+        <div className={SKELETON_SHIMMER_CLASS} style={{ width: "85%", height: 28 }} />
+        <div className={SKELETON_SHIMMER_CLASS} style={{ width: "50%", height: 12 }} />
       </header>
 
       {Array.from({ length: GROUP_CODES.length }).map((_, i) => (
@@ -27,9 +27,9 @@ export function ResultSkeleton() {
           padding: "12px 14px",
           border: "1px solid var(--line)", borderRadius: 4,
         }}>
-          <div className="skeleton-shimmer" style={{ width: 12, height: 12, borderRadius: "50%" }} />
-          <div className="skeleton-shimmer" style={{ flex: 1, height: 13 }} />
-          <div className="skeleton-shimmer" style={{ width: 36, height: 13 }} />
+          <div className={SKELETON_SHIMMER_CLASS} style={{ width: 12, height: 12, borderRadius: "50%" }} />
+          <div className={SKELETON_SHIMMER_CLASS} style={{ flex: 1, height: 13 }} />
+          <div className={SKELETON_SHIMMER_CLASS} style={{ width: 36, height: 13 }} />
         </div>
       ))}
     </section>

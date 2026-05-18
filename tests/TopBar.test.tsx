@@ -9,6 +9,7 @@ import {
   MENU_RESULT_LABEL, MENU_METHODE_LABEL, MENU_LEGAL_LABEL, MENU_CONTACT_LABEL,
   MENU_OPEN_LABEL, MENU_CLOSE_LABEL,
   WORDMARK_HOME_LABEL,
+  NAV_TARGET_RESULT, NAV_TARGET_METHODE, NAV_TARGET_LEGAL, NAV_TARGET_CONTACT,
 } from "../src/types";
 import * as analytics from "../src/lib/analytics";
 
@@ -177,21 +178,21 @@ describe("TopBar — topbar_nav analytics (target = result/methode/legal/contact
     renderTopBar(ROUTES.play);
     fireEvent.click(screen.getByRole("button", { name: new RegExp(MENU_OPEN_LABEL) }));
     fireEvent.click(screen.getByRole("menuitem", { name: new RegExp(MENU_METHODE_LABEL) }));
-    expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: "methode" });
+    expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: NAV_TARGET_METHODE });
   });
 
   it("fires topbar_nav with target=legal on the Mentions menuitem click", () => {
     renderTopBar(ROUTES.play);
     fireEvent.click(screen.getByRole("button", { name: new RegExp(MENU_OPEN_LABEL) }));
     fireEvent.click(screen.getByRole("menuitem", { name: new RegExp(MENU_LEGAL_LABEL) }));
-    expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: "legal" });
+    expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: NAV_TARGET_LEGAL });
   });
 
   it("fires topbar_nav with target=contact on the Contact menuitem click", () => {
     renderTopBar(ROUTES.play);
     fireEvent.click(screen.getByRole("button", { name: new RegExp(MENU_OPEN_LABEL) }));
     fireEvent.click(screen.getByRole("menuitem", { name: new RegExp(MENU_CONTACT_LABEL) }));
-    expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: "contact" });
+    expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: NAV_TARGET_CONTACT });
   });
 
   it("fires topbar_nav with target=result on the 'Mon résultat' menuitem click (once MIN_FOR_RANKING reached)", () => {
@@ -200,7 +201,7 @@ describe("TopBar — topbar_nav analytics (target = result/methode/legal/contact
     renderTopBar(ROUTES.play);
     fireEvent.click(screen.getByRole("button", { name: new RegExp(MENU_OPEN_LABEL) }));
     fireEvent.click(screen.getByRole("menuitem", { name: new RegExp(MENU_RESULT_LABEL) }));
-    expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: "result" });
+    expect(trackSpy).toHaveBeenCalledWith("topbar_nav", { target: NAV_TARGET_RESULT });
   });
 });
 // Silence the React act() warnings the AnimatePresence animation otherwise

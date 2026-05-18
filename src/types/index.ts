@@ -1344,6 +1344,33 @@ export const WORDMARK_PART_2 = "détour";
  *  intentionally instead of accidentally. */
 export const AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX = "· ";
 
+/** Analytics nav-target slugs — used as the `target` prop in
+ *  `track("topbar_nav", { target })` (4 sites in TopBar) and
+ *  `track("cover_footer_nav", { target })` (3 sites in Cover).
+ *  Distinct from MENU_*_LABEL (visible labels) — these are
+ *  analytics-payload slugs (lowercase, English-ish, route-keyed).
+ *  Centralised so a future analytics-slug rename propagates from
+ *  one edit + the 8 test pin sites also round-trip via the const. */
+export const NAV_TARGET_RESULT = "result";
+export const NAV_TARGET_METHODE = "methode";
+export const NAV_TARGET_LEGAL = "legal";
+export const NAV_TARGET_CONTACT = "contact";
+
+/** Skeleton-shimmer CSS class — used 7× in CardSkeleton + ResultSkeleton
+ *  to apply the shimmer keyframe defined in src/index.css. Centralised
+ *  so a CSS-class rename (e.g., dropping the dash, scoping with a
+ *  data-attribute) propagates from one edit instead of 7 in-lockstep
+ *  changes. Pin paired with the CSS keyframe — a test grep confirms
+ *  the class name still exists in src/index.css. */
+export const SKELETON_SHIMMER_CLASS = "skeleton-shimmer";
+
+/** MethodeSheet backdrop test-id — used by MethodeSheet.tsx as a
+ *  `data-testid` attribute AND by MethodeSheet.test.tsx as the
+ *  `getByTestId(...)` selector for the backdrop-click close test.
+ *  Centralised so a rename on one side surfaces in CI alongside the
+ *  test instead of silently breaking the backdrop-close test pin. */
+export const METHODE_SHEET_BACKDROP_TESTID = "methode-sheet-backdrop";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

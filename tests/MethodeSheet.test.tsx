@@ -9,6 +9,7 @@ import {
   METHODESHEET_CLAUDE_MISSION_STRONG,
   METHODESHEET_AN_BLOCK_BODY, METHODESHEET_CLAUDE_NO_AI_IN_SCORE,
   METHODESHEET_CLAUDE_TASKS_BODY, METHODESHEET_CLAUDE_PROMPT_NEUTRALITY_BODY,
+  METHODE_SHEET_BACKDROP_TESTID,
 } from "../src/types";
 
 function renderSheet(open: boolean, onClose = vi.fn()) {
@@ -51,7 +52,7 @@ describe("MethodeSheet", () => {
   it("calls onClose when backdrop is clicked", () => {
     const onClose = vi.fn();
     renderSheet(true, onClose);
-    fireEvent.click(screen.getByTestId("methode-sheet-backdrop"));
+    fireEvent.click(screen.getByTestId(METHODE_SHEET_BACKDROP_TESTID));
     expect(onClose).toHaveBeenCalled();
   });
 

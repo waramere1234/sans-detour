@@ -4436,3 +4436,23 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `CARD_POINTS_CLES_BULLET_GLYPH\|WORDMARK_PART_1\|WORDMARK_SLASH\|WORDMARK_PART_2\|AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX` src/ tests/ → 15+ résultats
 - [ ] grep `'>·<\|>sans<\|>détour<\|class="sd-slash">/<\|>· {partyName}<'` src/ tests/ → 1-2 résultats (declarations + tests via const)
 - [ ] grep `~1200 tests` CLAUDE.md → 0 résultat (aligné sur ~1216)
+
+## Session 191 — 2026-05-18
+
+### Vérification session 190
+
+- [VERIFIED] 36 occurrences des nouveaux exports (CARD_POINTS_CLES_BULLET_GLYPH + WORDMARK_PART_1/_SLASH/_PART_2 + AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX)
+- [VERIFIED] CLAUDE.md "~1200 tests" → 0 résultat (aligné sur ~1216)
+- 1216/1216 tests verts, typecheck clean
+
+### Bugs fixés (NAV_TARGET_RESULT/_METHODE/_LEGAL/_CONTACT + SKELETON_SHIMMER_CLASS + METHODE_SHEET_BACKDROP_TESTID)
+
+- [FIXED] Analytics nav-target slugs `"result"` / `"methode"` / `"legal"` / `"contact"` inline 7× source (TopBar lines 217/224/230/236 + Cover lines 312/313/314) + 7× tests (TopBar lines 180/187/194/203 + Cover lines 329/335/341). Drift surface : analytics-payload slugs distincts de MENU_*_LABEL (visible labels). Plausible dashboard groups events par slug — un drift en accent ou capitalization fragmenterait silencieusement les metrics ("methode" + "méthode" + "Méthode" deviendraient 3 events distincts). Fix : export `NAV_TARGET_RESULT` + `NAV_TARGET_METHODE` + `NAV_TARGET_LEGAL` + `NAV_TARGET_CONTACT`. TopBar.tsx + Cover.tsx utilisent les 4 consts. TopBar test + Cover test round-trip via les consts (14 inline → 0 inline). Aria-labels tests : 6 (canonical × 4 + lowercase-ASCII anti-accent guard + 4-distinct anti-collapse Set check). · `src/types/index.ts`, `src/components/TopBar.tsx`, `src/routes/Cover.tsx`, `tests/TopBar.test.tsx`, `tests/Cover.test.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] CSS class `"skeleton-shimmer"` inline 7× (CardSkeleton lines 21/23-27/30-31 + ResultSkeleton lines 19-21/30-32) + untested. Drift surface : CSS class string utilisé partout dans les skeleton placeholders. Une CSS-class rename (e.g., scoped data-attribute) doit propager via la const à 7 sites in lockstep. Fix : export `SKELETON_SHIMMER_CLASS`. CardSkeleton.tsx + ResultSkeleton.tsx utilisent la const. Aria-labels tests : 3 (canonical + kebab-case naming-convention + no-whitespace single-class guard). · `src/types/index.ts`, `src/components/CardSkeleton.tsx`, `src/components/ResultSkeleton.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] data-testid `"methode-sheet-backdrop"` paired source + test (MethodeSheet.tsx line 40 source + MethodeSheet.test.tsx line 54 selector). Drift surface : test depends on exact testid string. Un rename source-side desyncerait silencieusement le backdrop-close test pin. Fix : export `METHODE_SHEET_BACKDROP_TESTID`. MethodeSheet.tsx utilise data-testid={CONST}, MethodeSheet.test.tsx utilise getByTestId(CONST). Aria-labels tests : 3 (canonical + kebab-case naming + no-whitespace). · `src/types/index.ts`, `src/components/MethodeSheet.tsx`, `tests/MethodeSheet.test.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 192
+
+- [ ] grep `NAV_TARGET_RESULT\|NAV_TARGET_METHODE\|NAV_TARGET_LEGAL\|NAV_TARGET_CONTACT\|SKELETON_SHIMMER_CLASS\|METHODE_SHEET_BACKDROP_TESTID` src/ tests/ → 25+ résultats
+- [ ] grep `'target: "[a-z]+"'\|'className="skeleton-shimmer"'\|'"methode-sheet-backdrop"'` src/ tests/ → 0-1 résultats (declarations + pin-the-value tests uniquement)
+- [ ] grep `~1216 tests` CLAUDE.md → 0 résultat (aligné sur ~1228)

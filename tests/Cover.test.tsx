@@ -11,6 +11,7 @@ import { ROUTES } from "../src/lib/routes";
 import {
   TARGET, MIN_FOR_RANKING, LEGISLATURE_LABEL, TAGLINE,
   TAGLINE_PART_1, TAGLINE_PART_2,
+  NAV_TARGET_METHODE, NAV_TARGET_LEGAL, NAV_TARGET_CONTACT,
   START_LABEL, RESUME_LABEL, VIEW_RESULT_LABEL,
   RESTART_LABEL, VIEW_PARTIAL_RESULT_LABEL,
   restartConfirmMessage,
@@ -326,18 +327,18 @@ describe("Cover — footer nav analytics (cover_footer_nav × 3 targets)", () =>
   it("fires cover_footer_nav with target=methode on the Méthode link click", () => {
     renderCover();
     fireEvent.click(screen.getByRole("link", { name: new RegExp(MENU_METHODE_LABEL) }));
-    expect(trackSpy).toHaveBeenCalledWith("cover_footer_nav", { target: "methode" });
+    expect(trackSpy).toHaveBeenCalledWith("cover_footer_nav", { target: NAV_TARGET_METHODE });
   });
 
   it("fires cover_footer_nav with target=legal on the Mentions link click", () => {
     renderCover();
     fireEvent.click(screen.getByRole("link", { name: new RegExp(MENU_LEGAL_LABEL) }));
-    expect(trackSpy).toHaveBeenCalledWith("cover_footer_nav", { target: "legal" });
+    expect(trackSpy).toHaveBeenCalledWith("cover_footer_nav", { target: NAV_TARGET_LEGAL });
   });
 
   it("fires cover_footer_nav with target=contact on the Contact mailto click", () => {
     renderCover();
     fireEvent.click(screen.getByRole("link", { name: new RegExp(MENU_CONTACT_LABEL) }));
-    expect(trackSpy).toHaveBeenCalledWith("cover_footer_nav", { target: "contact" });
+    expect(trackSpy).toHaveBeenCalledWith("cover_footer_nav", { target: NAV_TARGET_CONTACT });
   });
 });

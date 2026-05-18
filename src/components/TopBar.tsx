@@ -14,6 +14,7 @@ import {
   MENU_OPEN_LABEL, MENU_CLOSE_LABEL, MAIN_MENU_LABEL,
   TOPBAR_VERSION_LABEL,
   EXTERNAL_LINK_GLYPH,
+  NAV_TARGET_RESULT, NAV_TARGET_METHODE, NAV_TARGET_LEGAL, NAV_TARGET_CONTACT,
 } from "../types";
 
 
@@ -214,26 +215,26 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
                   label={MENU_RESULT_LABEL}
                   badge={String(votes)}
                   accent
-                  onNavigate={() => { track("topbar_nav", { target: "result" }); onClose(); }}
+                  onNavigate={() => { track("topbar_nav", { target: NAV_TARGET_RESULT }); onClose(); }}
                 />
               )}
               <MenuLink
                 to={ROUTES.methode}
                 label={MENU_METHODE_LABEL}
                 current={location.pathname === ROUTES.methode}
-                onNavigate={() => { track("topbar_nav", { target: "methode" }); onClose(); }}
+                onNavigate={() => { track("topbar_nav", { target: NAV_TARGET_METHODE }); onClose(); }}
               />
               <MenuLink
                 to={ROUTES.legal}
                 label={MENU_LEGAL_LABEL}
                 current={location.pathname === ROUTES.legal}
-                onNavigate={() => { track("topbar_nav", { target: "legal" }); onClose(); }}
+                onNavigate={() => { track("topbar_nav", { target: NAV_TARGET_LEGAL }); onClose(); }}
               />
               <MenuLink
                 href={mailto()}
                 label={MENU_CONTACT_LABEL}
                 external
-                onNavigate={() => { track("topbar_nav", { target: "contact" }); onClose(); }}
+                onNavigate={() => { track("topbar_nav", { target: NAV_TARGET_CONTACT }); onClose(); }}
               />
             </nav>
 
