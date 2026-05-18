@@ -15,6 +15,7 @@ import {
   BACK_ARROW_SUFFIX_GLYPH,
   CARD_IA_CHIP_GLYPH, CARD_POINTS_CLES_BULLET_GLYPH,
   EXTERNAL_LINK_TARGET, EXTERNAL_LINK_REL, SWIPE_THRESHOLD,
+  EASE_OUT_QUART, CARD_FLIP_DURATION_S, CARD_FLIP_ROTATE_DEGREES,
   type Scrutin,
 } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
@@ -113,8 +114,8 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
       }}
     >
       <motion.div
-        animate={{ rotateY: flipped ? 180 : 0 }}
-        transition={reducedMotion ? { duration: 0 } : { duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        animate={{ rotateY: flipped ? CARD_FLIP_ROTATE_DEGREES : 0 }}
+        transition={reducedMotion ? { duration: 0 } : { duration: CARD_FLIP_DURATION_S, ease: EASE_OUT_QUART }}
         style={{
           position: "relative",
           transformStyle: "preserve-3d",
@@ -213,7 +214,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             ...FACE_STYLE,
             position: "absolute",
             inset: 0,
-            transform: "rotateY(180deg)",
+            transform: `rotateY(${CARD_FLIP_ROTATE_DEGREES}deg)`,
             overflow: "auto",
             gap: 16,
           }}

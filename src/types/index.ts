@@ -1560,6 +1560,30 @@ export const BACKDROP_FADE_DURATION_S = 0.16;
  *  custom protocol or a contact-form URL) propagates from one edit. */
 export const MAILTO_SCHEME = "mailto:";
 
+/** Material ease-out-quart cubic-bezier curve — the cubic-bezier
+ *  control points (P1.x=0.22, P1.y=1, P2.x=0.36, P2.y=1) produce an
+ *  "ease-out-quart" timing function: fast start, gentle deceleration.
+ *  Shared by Card flip transition + TopBar popover open/close. The
+ *  4-element tuple shape matches Framer Motion's `ease` prop signature.
+ *  Centralised so a future easing-curve tweak propagates to both
+ *  transitions in lockstep instead of drifting between Card + TopBar. */
+export const EASE_OUT_QUART: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+/** Card flip transition duration in seconds — the rotateY 0↔180
+ *  animation that flips between recto + verso. 0.45s is the empirical
+ *  sweet spot: fast enough to feel snappy on tap, slow enough that
+ *  the 3D flip is visually parseable (the user sees the card turn,
+ *  not just appear). Paired with reducedMotion → 0 for prefers-
+ *  reduced-motion users. */
+export const CARD_FLIP_DURATION_S = 0.45;
+
+/** Card flip target rotation in degrees — `rotateY(180deg)` reveals
+ *  the verso face. The verso face element is statically rotated
+ *  180° (line 216 in Card.tsx) so when the parent flips to 180°,
+ *  the verso reads upright. A drift here (e.g., 90°) would break
+ *  the flip math and show the back face mirrored. */
+export const CARD_FLIP_ROTATE_DEGREES = 180;
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

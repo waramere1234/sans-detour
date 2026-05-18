@@ -4598,3 +4598,23 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `SAFE_AREA_VIEWPORT_HEIGHT\|BACKDROP_FADE_DURATION_S\|MAILTO_SCHEME` src/ tests/ → 15+ résultats
 - [ ] grep `'calc\(100dvh -|: 0\.16\|mailto:\\${CONTACT_EMAIL}'` src/ → 0 résultats (tous via les consts)
 - [ ] grep `~1301 tests` CLAUDE.md → 0 résultat (aligné sur ~1312)
+
+## Session 199 — 2026-05-18
+
+### Vérification session 198
+
+- [VERIFIED] 34 occurrences des nouveaux exports (SAFE_AREA_VIEWPORT_HEIGHT + BACKDROP_FADE_DURATION_S + MAILTO_SCHEME)
+- [VERIFIED] CLAUDE.md "~1301 tests" → 0 résultat (aligné sur ~1312)
+- 1312/1312 tests verts, typecheck clean
+
+### Bugs fixés (EASE_OUT_QUART + CARD_FLIP_DURATION_S + CARD_FLIP_ROTATE_DEGREES)
+
+- [FIXED] Material ease-out-quart cubic-bezier `[0.22, 1, 0.36, 1]` inline 2× (Card.tsx flip transition line 117 + TopBar.tsx popover transition line 171). Drift surface : shared timing curve pour 2 different UI transitions (3D card flip + popover open/close). Un tweak à one site sans the other créerait un visuel-feel mismatch entre 2 animations qui partagent le brand timing. Fix : export `EASE_OUT_QUART` typed as `[number, number, number, number]` matching Framer Motion's `ease` prop signature. Card.tsx + TopBar.tsx utilisent la const. Aria-labels tests : 4 (canonical tuple equality + exactly-4-elements cubic-bezier signature + all in [0,1] valid-control-points range + P1.y === P2.y === 1 ease-out signature invariant). · `src/types/index.ts`, `src/components/Card.tsx`, `src/components/TopBar.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Card flip transition duration `0.45` inline 1× (Card.tsx line 117 `{ duration: 0.45, ease: ... }`). Drift surface : 3D rotateY 0↔180 animation timing. 0.45s empirical sweet spot — fast enough to feel snappy on tap, slow enough que le 3D flip soit visuellement parseable. Paired with reducedMotion → 0. Fix : export `CARD_FLIP_DURATION_S`. Card.tsx utilise la const. Aria-labels tests : 4 (canonical 0.45 + positive-finite + flip-animation-perception range [0.2, 1]s + greater-than-BACKDROP_FADE_DURATION_S 3D-needs-more-perceptual-time cross-const invariant). · `src/types/index.ts`, `src/components/Card.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Card flip target rotation `180` (degrees) inline 2× (Card.tsx line 116 animate rotateY + line 217 verso static rotate transform). Drift surface : `rotateY(180deg)` reveals la verso face. Le verso element est statiquement rotated 180° donc quand le parent flips à 180°, le verso reads upright. Un drift (e.g., 90°) briserait le flip math et show la back face mirrored. Les 2 sites utilisent les mêmes 180° → must match. Fix : export `CARD_FLIP_ROTATE_DEGREES`. Card.tsx utilise la const dans animate + transform template literal. Aria-labels tests : 4 (canonical 180 + exactly-180° anti-drift-to-90/270 defensive pin + positive-integer + compositional `rotateY(${CONST}deg) === "rotateY(180deg)"` round-trip). · `src/types/index.ts`, `src/components/Card.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 200
+
+- [ ] grep `EASE_OUT_QUART\|CARD_FLIP_DURATION_S\|CARD_FLIP_ROTATE_DEGREES` src/ tests/ → 15+ résultats
+- [ ] grep `'\[0.22, 1, 0.36, 1\]\|duration: 0.45\|rotateY(180deg)'` src/ → 0 résultats (tous via les consts)
+- [ ] grep `~1312 tests` CLAUDE.md → 0 résultat (aligné sur ~1324)

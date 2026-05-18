@@ -15,6 +15,7 @@ import {
   TOPBAR_VERSION_LABEL,
   EXTERNAL_LINK_GLYPH,
   NAV_TARGET_RESULT, NAV_TARGET_METHODE, NAV_TARGET_LEGAL, NAV_TARGET_CONTACT,
+  EASE_OUT_QUART,
 } from "../types";
 
 
@@ -168,7 +169,7 @@ function MenuPopover({ open, onClose }: { open: boolean; onClose: () => void }) 
             exit={{ opacity: 0, y: -4, scale: 0.97 }}
             transition={reducedMotion
               ? { duration: 0 }
-              : { duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+              : { duration: 0.16, ease: EASE_OUT_QUART }}
             style={{
               position: "absolute",
               top: "calc(100% + 8px)",

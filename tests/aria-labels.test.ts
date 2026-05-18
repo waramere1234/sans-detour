@@ -134,6 +134,7 @@ import {
   EXTERNAL_LINK_TARGET, EXTERNAL_LINK_REL,
   DECK_VISIBLE_DEPTH, SWIPE_THRESHOLD,
   SAFE_AREA_VIEWPORT_HEIGHT, BACKDROP_FADE_DURATION_S, MAILTO_SCHEME,
+  EASE_OUT_QUART, CARD_FLIP_DURATION_S, CARD_FLIP_ROTATE_DEGREES,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -4365,6 +4366,88 @@ describe("MAILTO_SCHEME — URI scheme prefix for mailto() helper", () => {
 
   it("contains no whitespace (URI-scheme syntax)", () => {
     expect(MAILTO_SCHEME).not.toMatch(/\s/);
+  });
+});
+
+describe("EASE_OUT_QUART — Material ease-out-quart cubic-bezier curve", () => {
+  it("matches [0.22, 1, 0.36, 1] (pin-the-value)", () => {
+    expect(EASE_OUT_QUART).toEqual([0.22, 1, 0.36, 1]);
+  });
+
+  it("is exactly 4 elements (cubic-bezier P1.x P1.y P2.x P2.y signature)", () => {
+    // Framer Motion's `ease` prop accepts a 4-tuple for cubic-bezier.
+    // A length drift would break the easing curve silently (Framer
+    // might silently fall back to a default).
+    expect(EASE_OUT_QUART).toHaveLength(4);
+  });
+
+  it("all 4 control points are in [0, 1] (valid cubic-bezier range)", () => {
+    // CSS cubic-bezier control points are bounded to [0, 1] for x;
+    // y can exceed [0, 1] for overshoot, but our curve stays within.
+    for (const v of EASE_OUT_QUART) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it("P1.y === P2.y === 1 (ease-out signature: starts at 1, lands at 1)", () => {
+    // Both y-control-points at 1 produces the "out" half of the curve:
+    // the animation accelerates fast then decelerates to land smoothly.
+    expect(EASE_OUT_QUART[1]).toBe(1);
+    expect(EASE_OUT_QUART[3]).toBe(1);
+  });
+});
+
+describe("CARD_FLIP_DURATION_S — Card flip transition duration", () => {
+  it("matches 0.45 (pin-the-value, seconds)", () => {
+    expect(CARD_FLIP_DURATION_S).toBe(0.45);
+  });
+
+  it("is positive finite (no NaN, no infinity)", () => {
+    expect(Number.isFinite(CARD_FLIP_DURATION_S)).toBe(true);
+    expect(CARD_FLIP_DURATION_S).toBeGreaterThan(0);
+  });
+
+  it("is in a flip-animation perception range (0.2s–1s)", () => {
+    // Below 0.2s = looks like a teleport; above 1s = sluggish.
+    // 3D flip especially needs the visual time to register depth.
+    // Pin so a future tweak stays in the UX-validated zone.
+    expect(CARD_FLIP_DURATION_S).toBeGreaterThanOrEqual(0.2);
+    expect(CARD_FLIP_DURATION_S).toBeLessThanOrEqual(1);
+  });
+
+  it("is longer than BACKDROP_FADE_DURATION_S (3D flip needs more perceptual time)", () => {
+    // The Card 3D flip is a more complex visual than a backdrop
+    // opacity fade — pin the duration ordering so a future tweak
+    // doesn't accidentally make the flip faster than a fade.
+    expect(CARD_FLIP_DURATION_S).toBeGreaterThan(BACKDROP_FADE_DURATION_S);
+  });
+});
+
+describe("CARD_FLIP_ROTATE_DEGREES — Card rotateY target", () => {
+  it("matches 180 (pin-the-value, degrees)", () => {
+    expect(CARD_FLIP_ROTATE_DEGREES).toBe(180);
+  });
+
+  it("is exactly 180° (half-turn, anti-drift to 90°/270°)", () => {
+    // A drift to 90° would land on the card edge (invisible);
+    // 270° would flip backwards. 180° is the only correct half-
+    // turn for a back-face reveal. Pin defensive against any
+    // copy/paste tweak.
+    expect(CARD_FLIP_ROTATE_DEGREES).toBe(180);
+  });
+
+  it("is a positive integer (degrees, not radians)", () => {
+    expect(Number.isInteger(CARD_FLIP_ROTATE_DEGREES)).toBe(true);
+    expect(CARD_FLIP_ROTATE_DEGREES).toBeGreaterThan(0);
+  });
+
+  it("verso static rotation must equal animation target (compositional invariant)", () => {
+    // The verso face is statically `rotateY(180deg)` so it reads
+    // upright when the parent flips to 180°. Both use the same
+    // const — pin the round-trip so a future tweak forces both
+    // sites to update in lockstep.
+    expect(`rotateY(${CARD_FLIP_ROTATE_DEGREES}deg)`).toBe("rotateY(180deg)");
   });
 });
 
