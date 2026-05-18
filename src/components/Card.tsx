@@ -13,7 +13,7 @@ import {
   CARD_FOOTER_NUMERO_PREFIX, CARD_FOOTER_DATE_SEPARATOR,
   MIDDLE_DOT_SEPARATOR,
   BACK_ARROW_SUFFIX_GLYPH,
-  CARD_IA_CHIP_GLYPH,
+  CARD_IA_CHIP_GLYPH, CARD_POINTS_CLES_BULLET_GLYPH,
   type Scrutin,
 } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
@@ -182,7 +182,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
               }}>
                 {scrutin.points_cles.slice(0, MAX_POINTS_CLES_BULLETS).map((p, i) => (
                   <li key={i} style={{ display: "flex", gap: 8 }}>
-                    <span style={{ color: "var(--accent)", flex: "0 0 auto" }}>·</span>
+                    <span style={{ color: "var(--accent)", flex: "0 0 auto" }}>{CARD_POINTS_CLES_BULLET_GLYPH}</span>
                     <span>{p}</span>
                   </li>
                 ))}

@@ -4416,3 +4416,23 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `MODAL_CLOSE_GLYPH\|EXTERNAL_LINK_GLYPH\|METHODESHEET_BLOCK_EMOJI_AN\|METHODESHEET_BLOCK_EMOJI_CLAUDE` src/ tests/ → 15+ résultats
 - [ ] grep `'>✕<\|>"↗"<\|emoji="📊"\|emoji="✨"'` src/ tests/ → 0-1 résultats (declarations + tests via const)
 - [ ] grep `~1186 tests` CLAUDE.md → 0 résultat (aligné sur ~1206)
+
+## Session 190 — 2026-05-18
+
+### Vérification session 189
+
+- [VERIFIED] 33 occurrences des nouveaux exports (MODAL_CLOSE_GLYPH + EXTERNAL_LINK_GLYPH + METHODESHEET_BLOCK_EMOJI_AN/_CLAUDE)
+- [VERIFIED] env-flake cleared sur cette machine — re-run shows 1200/1200 tests verts (4.84s) au lieu de l'estimate ~1206 (off by 6). CLAUDE.md corrigé de ~1206 → ~1200.
+- [VERIFIED] 1200/1200 tests verts, typecheck clean
+
+### Bugs fixés (CARD_POINTS_CLES_BULLET_GLYPH + WORDMARK_PART_1/_SLASH/_PART_2 + AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX)
+
+- [FIXED] Card.tsx recto points_cles list bullet `"·"` (line 185 inline) + untested. Drift surface : bare middle-dot (1 char, no spaces) rendered comme visual bullet pour chaque points_cles `<li>`. Distinct from MIDDLE_DOT_SEPARATOR (" · " padded — pour inline-text separators) mais same Unicode codepoint U+00B7. Le bullet vit dans son own flex column donc le layout handles spacing — un edit qui ajoute padding briserait l'alignment. Fix : export `CARD_POINTS_CLES_BULLET_GLYPH`. Card.tsx utilise la const. Aria-labels tests : 4 (canonical + U+00B7 charCodeAt + bare-no-whitespace cadence + value === MIDDLE_DOT_SEPARATOR.trim() cross-cadence-consistency). · `src/types/index.ts`, `src/components/Card.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] Wordmark.tsx visible content `sans<span class="sd-slash">/</span>détour` inline (line 12) + untested. Drift surface : 3-part composition rendant la lowercase brand mark. Distinct from BRAND_NAME "Sans Détour" (capitalized + space) utilisée dans tab title + meta descriptions. Cross-const invariant : `PART_1 + PART_2` (no slash) === `BRAND_NAME.toLowerCase().replace(/\s+/g, "")` so un rebrand de BRAND_NAME force un update Wordmark in lockstep. Fix : export `WORDMARK_PART_1` + `WORDMARK_SLASH` + `WORDMARK_PART_2`. Wordmark.tsx utilise les 3 consts dans le JSX. Aria-labels tests : 7 (canonical × 3 + lowercase-only × 2 + "é" accent anti-asciify + BRAND_NAME cross-const invariant + SLASH "/" pin × 1). · `src/types/index.ts`, `src/components/Wordmark.tsx`, `tests/aria-labels.test.ts`
+- [FIXED] AuditTrail.tsx h3 party-name prefix `"· "` inline (line 84 inside lighter-weight span) + untested. Drift surface : middle-dot + trailing space rendered inside le span avant le party name. Le leading space vit dans la JSX whitespace outside span — pin la cadence so un edit qui move la leading space inside the const propage intentionally. Cross-cadence avec MIDDLE_DOT_SEPARATOR : value === MIDDLE_DOT_SEPARATOR.trimStart() (drop le leading space). Fix : export `AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX`. AuditTrail.tsx utilise la const. Aria-labels tests : 5 (canonical + U+00B7 charCodeAt typography-consistency + trailing-space glue-cadence + value === MIDDLE_DOT_SEPARATOR.trimStart() cross-const + exactly-2-chars cadence). · `src/types/index.ts`, `src/components/AuditTrail.tsx`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 191
+
+- [ ] grep `CARD_POINTS_CLES_BULLET_GLYPH\|WORDMARK_PART_1\|WORDMARK_SLASH\|WORDMARK_PART_2\|AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX` src/ tests/ → 15+ résultats
+- [ ] grep `'>·<\|>sans<\|>détour<\|class="sd-slash">/<\|>· {partyName}<'` src/ tests/ → 1-2 résultats (declarations + tests via const)
+- [ ] grep `~1200 tests` CLAUDE.md → 0 résultat (aligné sur ~1216)

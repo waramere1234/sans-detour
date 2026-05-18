@@ -1313,6 +1313,37 @@ export const EXTERNAL_LINK_GLYPH = "↗";
 export const METHODESHEET_BLOCK_EMOJI_AN = "📊";
 export const METHODESHEET_BLOCK_EMOJI_CLAUDE = "✨";
 
+/** Card recto points_cles bullet glyph "·" — bare middle-dot (no
+ *  spaces) used as the visual bullet for each points_cles <li>.
+ *  Distinct from MIDDLE_DOT_SEPARATOR (" · " with spaces) used as
+ *  an inline-text separator. Same Unicode codepoint U+00B7 but
+ *  different cadence — pin the no-spaces shape so a future copy-
+ *  paste tweak that adds spacing doesn't break the flex layout.
+ *  Color is accent (var(--accent)) so the bullet pops while the
+ *  bullet text reads normal. */
+export const CARD_POINTS_CLES_BULLET_GLYPH = "·";
+
+/** Wordmark component visible 3-part composition — the lowercase
+ *  brand mark "sans/détour" rendered as 2 text parts wrapping a
+ *  styled <span class="sd-slash">/</span>. Lowercase is intentional
+ *  (visual brand convention) — the canonical BRAND_NAME "Sans Détour"
+ *  capitalizes both words and joins with a space. Cross-const
+ *  invariant: PART_1 + PART_2 (no slash) should match
+ *  BRAND_NAME.toLowerCase().replace(/\s+/g, "") so a rebrand of
+ *  BRAND_NAME forces an update here. */
+export const WORDMARK_PART_1 = "sans";
+export const WORDMARK_SLASH = "/";
+export const WORDMARK_PART_2 = "détour";
+
+/** AuditTrail h3 party-name prefix "· " — middle-dot + trailing
+ *  space rendered inside the lighter-weight span before the party
+ *  name (e.g., "RN · Rassemblement National"). Pair to
+ *  MIDDLE_DOT_SEPARATOR (" · " with both spaces) but the leading
+ *  space lives in the JSX whitespace outside the span — pin so
+ *  a future edit that moves the cadence into the const propagates
+ *  intentionally instead of accidentally. */
+export const AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX = "· ";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use

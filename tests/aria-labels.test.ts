@@ -117,6 +117,9 @@ import {
   DISCLOSURE_GLYPH_OPEN, DISCLOSURE_GLYPH_CLOSED,
   MODAL_CLOSE_GLYPH, EXTERNAL_LINK_GLYPH,
   METHODESHEET_BLOCK_EMOJI_AN, METHODESHEET_BLOCK_EMOJI_CLAUDE,
+  CARD_POINTS_CLES_BULLET_GLYPH,
+  WORDMARK_PART_1, WORDMARK_SLASH, WORDMARK_PART_2,
+  AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -3694,6 +3697,101 @@ describe("METHODESHEET_BLOCK_EMOJI_AN/_CLAUDE — MethodeSheet Block component e
 
   it("AN and CLAUDE emojis are distinct (different blocks, different signaling)", () => {
     expect(METHODESHEET_BLOCK_EMOJI_AN).not.toBe(METHODESHEET_BLOCK_EMOJI_CLAUDE);
+  });
+});
+
+describe("CARD_POINTS_CLES_BULLET_GLYPH — Card recto points_cles list bullet", () => {
+  it("matches the canonical '·' (pin-the-value)", () => {
+    expect(CARD_POINTS_CLES_BULLET_GLYPH).toBe("·");
+  });
+
+  it("uses middle-dot U+00B7 (same codepoint as MIDDLE_DOT_SEPARATOR)", () => {
+    expect(CARD_POINTS_CLES_BULLET_GLYPH.charCodeAt(0)).toBe(0x00B7);
+  });
+
+  it("is bare middle-dot — no leading/trailing spaces (distinct from MIDDLE_DOT_SEPARATOR)", () => {
+    // MIDDLE_DOT_SEPARATOR = " · " (3 chars, padded) is for inline-text
+    // separators. The bullet glyph is bare (1 char) because it lives
+    // inside its own flex column and the layout handles spacing. A
+    // future edit that adds padding would break the flex alignment.
+    expect(CARD_POINTS_CLES_BULLET_GLYPH).toHaveLength(1);
+    expect(CARD_POINTS_CLES_BULLET_GLYPH).not.toMatch(/\s/);
+  });
+
+  it("matches MIDDLE_DOT_SEPARATOR.trim() (same glyph, different cadence)", () => {
+    // The bullet and the inline-separator use the same U+00B7 dot —
+    // a future glyph swap on either should propagate via the
+    // cross-check test.
+    expect(CARD_POINTS_CLES_BULLET_GLYPH).toBe(MIDDLE_DOT_SEPARATOR.trim());
+  });
+});
+
+describe("WORDMARK_PART_1/_SLASH/_PART_2 — Wordmark visible 3-part composition", () => {
+  it("PART_1 matches 'sans' (lowercase, no-cap)", () => {
+    expect(WORDMARK_PART_1).toBe("sans");
+  });
+
+  it("SLASH matches '/' (the styled-span middle)", () => {
+    expect(WORDMARK_SLASH).toBe("/");
+  });
+
+  it("PART_2 matches 'détour' (lowercase, with accent)", () => {
+    expect(WORDMARK_PART_2).toBe("détour");
+  });
+
+  it("both PART_1 and PART_2 are all-lowercase (anti-capitalize guard)", () => {
+    // The wordmark uses lowercase as a brand convention — distinct
+    // from BRAND_NAME ("Sans Détour", capitalized) used in tab title +
+    // meta descriptions. A future drift to capitalized parts would
+    // break the visual brand mark.
+    expect(WORDMARK_PART_1).toBe(WORDMARK_PART_1.toLowerCase());
+    expect(WORDMARK_PART_2).toBe(WORDMARK_PART_2.toLowerCase());
+  });
+
+  it("PART_2 contains 'é' accent (anti-asciify guard)", () => {
+    // The French "détour" requires the é (U+00E9). An ASCII drift
+    // to "detour" would break the brand spelling.
+    expect(WORDMARK_PART_2).toContain("é");
+  });
+
+  it("PART_1 + PART_2 (no slash) equals BRAND_NAME.toLowerCase() stripped of space (rebrand-safe)", () => {
+    // Cross-const invariant: BRAND_NAME = "Sans Détour". The wordmark
+    // renders the lowercase-joined version of the brand. A future
+    // BRAND_NAME change should force a Wordmark update in lockstep.
+    expect(WORDMARK_PART_1 + WORDMARK_PART_2).toBe(
+      BRAND_NAME.toLowerCase().replace(/\s+/g, ""),
+    );
+  });
+
+  it("SLASH is exactly '/' (anti-replace guard for the styled middle)", () => {
+    expect(WORDMARK_SLASH).toBe("/");
+    expect(WORDMARK_SLASH).toHaveLength(1);
+  });
+});
+
+describe("AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX — AuditTrail h3 span party-name prefix", () => {
+  it("matches the canonical '· ' (pin-the-value)", () => {
+    expect(AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX).toBe("· ");
+  });
+
+  it("uses middle-dot U+00B7 (consistent typography across the app)", () => {
+    expect(AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX.charCodeAt(0)).toBe(0x00B7);
+  });
+
+  it("ends with a trailing space (glue before partyName interpolation)", () => {
+    expect(AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX.endsWith(" ")).toBe(true);
+  });
+
+  it("matches MIDDLE_DOT_SEPARATOR.trimStart() (cross-const cadence consistency)", () => {
+    // The header prefix is the middle-dot + trailing space (the
+    // leading space lives in the JSX whitespace outside the span).
+    // Trimming the leading space from MIDDLE_DOT_SEPARATOR gives
+    // the same shape — pin so a future tweak stays in sync.
+    expect(AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX).toBe(MIDDLE_DOT_SEPARATOR.trimStart());
+  });
+
+  it("is exactly 2 chars (1 dot + 1 space)", () => {
+    expect(AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX).toHaveLength(2);
   });
 });
 

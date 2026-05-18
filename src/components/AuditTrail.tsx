@@ -4,6 +4,7 @@ import {
   DEMO_DATA_LABEL_PREFIX, DEMO_FALLBACK_SHORT_LABEL,
   DEMO_FALLBACK_TITLE_SUFFIX, DEMO_FALLBACK_ARIA_SUFFIX,
   AUDIT_GLYPH_ALIGNED, AUDIT_GLYPH_PARTIAL, AUDIT_GLYPH_OPPOSED, AUDIT_GLYPH_DIVIDED,
+  AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX,
   AUDIT_TRAIL_LABEL_DIVIDED, AUDIT_TRAIL_LABEL_ALIGNED,
   AUDIT_TRAIL_LABEL_PARTIAL, AUDIT_TRAIL_LABEL_OPPOSED,
   auditTrailChipNoun, AN_LINK_SHORT_LABEL,
@@ -81,7 +82,7 @@ export function AuditTrail({ alignment, scrutins, votes, id }: AuditTrailProps) 
           margin: "0 0 4px",
         }}
       >
-        {alignment.group} <span style={{ color: "var(--ink-3)", fontWeight: 400 }}>· {partyName}</span>
+        {alignment.group} <span style={{ color: "var(--ink-3)", fontWeight: 400 }}>{AUDIT_TRAIL_HEADER_PARTY_NAME_PREFIX}{partyName}</span>
       </h3>
 
       {/* Breakdown chips */}
