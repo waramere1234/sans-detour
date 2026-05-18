@@ -4293,3 +4293,24 @@ Format : `[STATUT] type · description · fix commit/file`
 - [ ] grep `H1_ACCENT_PERIOD\|RESULT_H1_PERCENT_WRAPPER_PREFIX\|RESULT_H1_PERCENT_WRAPPER_SUFFIX\|CARD_FOOTER_NUMERO_PREFIX\|CARD_FOOTER_DATE_SEPARATOR` src/ tests/ → 20+ résultats
 - [ ] grep `'>\.<'\|"n° "\|" · "` src/ tests/ → ~3-5 résultats (déclarations + pin-the-value)
 - [ ] grep `~1093 tests` CLAUDE.md → 0 résultat (aligné sur ~1110)
+
+## Session 184 — 2026-05-18
+
+### Vérification session 183
+
+- [VERIFIED] 49 occurrences des nouveaux exports (H1_ACCENT_PERIOD + RESULT_H1_PERCENT_WRAPPER_PREFIX/_SUFFIX + CARD_FOOTER_NUMERO_PREFIX/_DATE_SEPARATOR)
+- [VERIFIED] residual inline " · " literals : 5 dans lib (parsing dans deck.ts) + 1 dans Legal.tsx TODO (escape regex). Visual sites couvertes par CARD_FOOTER_DATE_SEPARATOR + autres consts ; les uses restants sont parsing-semantic (deck chapeau) ou comments.
+- [VERIFIED] CLAUDE.md "~1093 tests" → 0 résultat (aligné sur ~1110)
+- 1110/1110 tests verts, typecheck clean
+
+### Bugs fixés (MIDDLE_DOT_SEPARATOR + SHARE_LEAD_TO_SOURCE_SEPARATOR + SHARE_LEAD_TO_SUMMARY_SEPARATOR)
+
+- [FIXED] Generic middle-dot " · " typography separator inline across 5 sites (Card.tsx l.132 chapeau→IA-chip, Card.tsx l.278 AN-libellé-prefix→titre-brut, FreshnessBanner.tsx l.114 × 2 banner-body-line, share.ts l.61 .join). Drift surface : même typography convention (U+00B7 middle-dot avec single ASCII spaces) répété 5× dans le codebase. Un tweak (e.g., switch en en-dash ou thin-space + dot) propagerait via la const à 1 site instead of 5. Note : CARD_FOOTER_DATE_SEPARATOR semantic-specific reste un alias distinct par cohérence IDE-search. Le deck.ts use " · " est parsing-contract (chapeau LLM format) — laissé inline pour rester adjacent à la regex semantics. Fix : export `MIDDLE_DOT_SEPARATOR`. 4 fichiers utilisent la const. Share tests updated pour round-trip via la const. Aria-labels tests : 4 (pin-the-value + middle-dot U+00B7 charCodeAt defense-in-depth + single-spaces-both-sides length 3 cadence + value-equals-CARD_FOOTER_DATE_SEPARATOR typography-consistency cross-check). · `src/types/index.ts`, `src/components/Card.tsx`, `src/components/FreshnessBanner.tsx`, `src/lib/share.ts`, `tests/share.test.ts`, `tests/aria-labels.test.ts`
+- [FIXED] share.ts lead→source separator `", "` inline (line 67) + untested via const. Drift surface : French typography between SHARE_LEAD_PREFIX/partialParen et SHARE_SOURCE_LINE. Un i18n flip vers en-US ferait pivoter cette séparation. Fix : export `SHARE_LEAD_TO_SOURCE_SEPARATOR`. share.ts utilise la const dans la template literal. share test round-trip updated. Aria-labels tests : 2 (canonical ", " + startsWith "," French-typography comma-before-space). · `src/types/index.ts`, `src/lib/share.ts`, `tests/share.test.ts`, `tests/aria-labels.test.ts`
+- [FIXED] share.ts lead→summary separator `" : "` inline (line 68) + untested via const. Drift surface : French typography colon avec single spaces des deux côtés (PAS ASCII colon sans spaces). Un strip de la leading space rendrait "...AN: 1. ..." typography incorrect. Fix : export `SHARE_LEAD_TO_SUMMARY_SEPARATOR`. share.ts utilise la const dans la template literal. Share test updated pour utiliser const.split() au lieu de literal ' : '.split(). Aria-labels tests : 3 (canonical " : " + single-spaces-both-sides + NOT === SOURCE_SEPARATOR anti-collapse guard pour les 2 separators non-interchangeables). · `src/types/index.ts`, `src/lib/share.ts`, `tests/share.test.ts`, `tests/aria-labels.test.ts`
+
+### Vérifications à faire en session 185
+
+- [ ] grep `MIDDLE_DOT_SEPARATOR\|SHARE_LEAD_TO_SOURCE_SEPARATOR\|SHARE_LEAD_TO_SUMMARY_SEPARATOR` src/ tests/ → 15+ résultats
+- [ ] grep `'" · "'\|'", "'\|'" : "'` src/ tests/ → ~3-5 résultats (declarations + pin-the-value)
+- [ ] grep `~1110 tests` CLAUDE.md → 0 résultat (aligné sur ~1119)

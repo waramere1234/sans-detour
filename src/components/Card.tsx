@@ -11,6 +11,7 @@ import {
   CARD_ANALYSE_CONCERNES_POSITIFS, CARD_ANALYSE_CONCERNES_NEGATIFS, CARD_ANALYSE_CONCERNES_NEUTRES,
   CARD_VERSO_FLIP_BACK_HINT, CARD_NO_ANALYSE_FALLBACK_BODY,
   CARD_FOOTER_NUMERO_PREFIX, CARD_FOOTER_DATE_SEPARATOR,
+  MIDDLE_DOT_SEPARATOR,
   type Scrutin,
 } from "../types";
 import { useFlipCardA11y } from "../hooks/useFlipCardA11y";
@@ -129,7 +130,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             {scrutin.chapeau}
             {topMost && onOpenMethode && (
               <>
-                {" · "}
+                {MIDDLE_DOT_SEPARATOR}
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); onOpenMethode(); }}
@@ -275,7 +276,7 @@ export function Card({ scrutin, topMost, onSwipe, onOpenMethode }: CardProps) {
             color: "var(--ink-3)", letterSpacing: "0.04em",
             lineHeight: 1.5,
           }}>
-            <span style={{ textTransform: "uppercase", letterSpacing: "0.12em" }}>{CARD_AN_LIBELLE_PREFIX_LABEL} · </span>
+            <span style={{ textTransform: "uppercase", letterSpacing: "0.12em" }}>{CARD_AN_LIBELLE_PREFIX_LABEL}{MIDDLE_DOT_SEPARATOR}</span>
             <span style={{ fontFamily: "var(--font-sans)", fontSize: 11.5 }}>{scrutin.titre_brut}</span>
           </div>
 

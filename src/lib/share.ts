@@ -5,7 +5,11 @@
 // lead + numbered separator) is fully testable; the action's
 // navigator.share / clipboard / prompt branches mock cleanly in jsdom.
 
-import { SHARE_SOURCE_LINE, type GroupAlignment } from "../types";
+import {
+  SHARE_SOURCE_LINE, MIDDLE_DOT_SEPARATOR,
+  SHARE_LEAD_TO_SOURCE_SEPARATOR, SHARE_LEAD_TO_SUMMARY_SEPARATOR,
+  type GroupAlignment,
+} from "../types";
 import { getParty } from "./parties";
 
 // SHARE_SOURCE_LINE lives in src/types (DOM-free) so api/share-card.ts
@@ -58,14 +62,14 @@ export function composeShareText(args: {
   const summary = args.ranked
     .slice(0, SHARE_TOP_N)
     .map((a, i) => `${i + 1}. ${getParty(a.group).short} ${a.pct}%`)
-    .join(" · ");
+    .join(MIDDLE_DOT_SEPARATOR);
   // DRY: only the parenthetical suffix differs between the two branches —
   // the prefix + " basées sur…" tail is identical, so build it once.
   const partialParen = args.isPartial
     ? partialResultMarker(args.total, args.target)
     : "";
-  const lead = `${SHARE_LEAD_PREFIX}${partialParen}, ${SHARE_SOURCE_LINE}`;
-  return `${lead} : ${summary}`;
+  const lead = `${SHARE_LEAD_PREFIX}${partialParen}${SHARE_LEAD_TO_SOURCE_SEPARATOR}${SHARE_SOURCE_LINE}`;
+  return `${lead}${SHARE_LEAD_TO_SUMMARY_SEPARATOR}${summary}`;
 }
 
 /** Result of the share action — used by the Result.tsx handler to gate

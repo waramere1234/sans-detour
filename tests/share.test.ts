@@ -4,7 +4,10 @@ import {
   SHARE_LEAD_PREFIX, CLIPBOARD_PROMPT_LABEL, partialResultMarker,
 } from "../src/lib/share";
 import type { GroupAlignment, GroupCode } from "../src/types";
-import { GROUP_CODES, SHARE_SOURCE_LINE } from "../src/types";
+import {
+  GROUP_CODES, SHARE_SOURCE_LINE, MIDDLE_DOT_SEPARATOR,
+  SHARE_LEAD_TO_SOURCE_SEPARATOR, SHARE_LEAD_TO_SUMMARY_SEPARATOR,
+} from "../src/types";
 import { getParty } from "../src/lib/parties";
 
 // src/lib/share.ts is the pure text-composition pulled out of Result.tsx
@@ -30,33 +33,35 @@ describe("composeShareText — happy path (complete session)", () => {
       total: 20,
       target: 20,
     });
-    // The lead segment is everything before " : " (the summary separator).
-    const lead = out.split(" : ")[0];
+    // The lead segment is everything before the summary separator.
+    // Round-trip via SHARE_LEAD_TO_SUMMARY_SEPARATOR so a typography
+    // change propagates to source + test in one edit.
+    const lead = out.split(SHARE_LEAD_TO_SUMMARY_SEPARATOR)[0];
     expect(lead.endsWith(SHARE_SOURCE_LINE)).toBe(true);
   });
 
-  it("includes a lead followed by ' : ' and the numbered summary", () => {
+  it("includes a lead followed by SHARE_LEAD_TO_SUMMARY_SEPARATOR and the numbered summary", () => {
     const out = composeShareText({
       ranked: [mk("RN", 57), mk("EPR", 42), mk("LFI", 30)],
       isPartial: false,
       total: 20,
       target: 20,
     });
-    expect(out).toContain(`${SHARE_LEAD_PREFIX}, ${SHARE_SOURCE_LINE}`);
-    expect(out).toContain(" : ");
+    expect(out).toContain(`${SHARE_LEAD_PREFIX}${SHARE_LEAD_TO_SOURCE_SEPARATOR}${SHARE_SOURCE_LINE}`);
+    expect(out).toContain(SHARE_LEAD_TO_SUMMARY_SEPARATOR);
     expect(out).toContain("1. RN 57%");
     expect(out).toContain("2. EPR 42%");
     expect(out).toContain("3. LFI 30%");
   });
 
-  it("joins entries with ' · ' (em-space dot for tight share previews)", () => {
+  it("joins entries with MIDDLE_DOT_SEPARATOR (em-space dot for tight share previews)", () => {
     const out = composeShareText({
       ranked: [mk("RN", 50), mk("LFI", 40)],
       isPartial: false,
       total: 20,
       target: 20,
     });
-    expect(out).toContain("1. RN 50% · 2. LFI 40%");
+    expect(out).toContain(`1. RN 50%${MIDDLE_DOT_SEPARATOR}2. LFI 40%`);
   });
 
   it("uses the short party label (getParty(...).short) not the full name", () => {
@@ -82,7 +87,7 @@ describe("composeShareText — partial lead branch", () => {
       target: 20,
     });
     expect(out).toContain(partialResultMarker(7, 20).trim());
-    expect(out).not.toContain(`${SHARE_LEAD_PREFIX},`); // complete-branch lead
+    expect(out).not.toContain(`${SHARE_LEAD_PREFIX}${SHARE_LEAD_TO_SOURCE_SEPARATOR.trimEnd()}`); // complete-branch lead
   });
 
   it("does NOT mention 'partiel' when isPartial=false", () => {

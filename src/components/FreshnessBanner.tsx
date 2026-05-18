@@ -1,5 +1,5 @@
 // src/components/FreshnessBanner.tsx
-import type { FreshnessInfo } from "../types";
+import { MIDDLE_DOT_SEPARATOR, type FreshnessInfo } from "../types";
 
 // new Date("…").getTime() returns NaN when the string isn't a valid ISO
 // date. Without the isNaN check, the banner ends up rendering "MAJ il y a
@@ -111,7 +111,7 @@ export function FreshnessBanner({ info }: { info: FreshnessInfo }) {
           fontFamily: "var(--font-mono)", fontSize: 11,
           color: "var(--ink-2)", letterSpacing: "0.04em", marginTop: 3,
         }}>
-          {freshnessTotalScrutinsPhrase(info.total_scrutins)} · {pastPhrase} · {nextPhrase}
+          {freshnessTotalScrutinsPhrase(info.total_scrutins)}{MIDDLE_DOT_SEPARATOR}{pastPhrase}{MIDDLE_DOT_SEPARATOR}{nextPhrase}
         </div>
       </div>
     </div>

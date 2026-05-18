@@ -102,6 +102,8 @@ import {
   H1_ACCENT_PERIOD,
   RESULT_H1_PERCENT_WRAPPER_PREFIX, RESULT_H1_PERCENT_WRAPPER_SUFFIX,
   CARD_FOOTER_NUMERO_PREFIX, CARD_FOOTER_DATE_SEPARATOR,
+  MIDDLE_DOT_SEPARATOR,
+  SHARE_LEAD_TO_SOURCE_SEPARATOR, SHARE_LEAD_TO_SUMMARY_SEPARATOR,
   METHODE_S02_CAPS_EXAMPLE,
   METHODE_S01_DATA_SOURCE_STRONG, METHODE_S01_DATA_SOURCE_QUALITY_CLAIM,
   METHODE_S04_RANK_NOISE_EXPLANATION,
@@ -3128,6 +3130,65 @@ describe("CARD_FOOTER_NUMERO_PREFIX + CARD_FOOTER_DATE_SEPARATOR — Card recto 
     expect(CARD_FOOTER_DATE_SEPARATOR.startsWith(" ")).toBe(true);
     expect(CARD_FOOTER_DATE_SEPARATOR.endsWith(" ")).toBe(true);
     expect(CARD_FOOTER_DATE_SEPARATOR.length).toBe(3);
+  });
+});
+
+describe("MIDDLE_DOT_SEPARATOR — generic typography separator centralization", () => {
+  it("matches the canonical ' · ' (pin-the-value)", () => {
+    expect(MIDDLE_DOT_SEPARATOR).toBe(" · ");
+  });
+
+  it("uses middle-dot U+00B7 (not ASCII period)", () => {
+    // Defense-in-depth: middle char must be U+00B7. An ASCII period
+    // would render visually different at smaller sizes and could be
+    // mistaken for a sentence terminator.
+    expect(MIDDLE_DOT_SEPARATOR.charCodeAt(1)).toBe(0x00B7);
+  });
+
+  it("is padded with single ASCII spaces on both sides (length 3)", () => {
+    expect(MIDDLE_DOT_SEPARATOR.startsWith(" ")).toBe(true);
+    expect(MIDDLE_DOT_SEPARATOR.endsWith(" ")).toBe(true);
+    expect(MIDDLE_DOT_SEPARATOR).toHaveLength(3);
+  });
+
+  it("matches CARD_FOOTER_DATE_SEPARATOR by value (typography consistency cross-check)", () => {
+    // CARD_FOOTER_DATE_SEPARATOR is semantic-specific but uses the
+    // same typography. Pin the value equality so a tweak to the
+    // generic doesn't accidentally desync from the semantic alias.
+    expect(MIDDLE_DOT_SEPARATOR).toBe(CARD_FOOTER_DATE_SEPARATOR);
+  });
+});
+
+describe("SHARE_LEAD_TO_SOURCE_SEPARATOR + SHARE_LEAD_TO_SUMMARY_SEPARATOR — share.ts composition separators", () => {
+  it("SOURCE_SEPARATOR matches the canonical ', ' (pin-the-value)", () => {
+    expect(SHARE_LEAD_TO_SOURCE_SEPARATOR).toBe(", ");
+  });
+
+  it("SUMMARY_SEPARATOR matches the canonical ' : ' (pin-the-value)", () => {
+    expect(SHARE_LEAD_TO_SUMMARY_SEPARATOR).toBe(" : ");
+  });
+
+  it("SOURCE_SEPARATOR starts with ',' (French typography: comma before space)", () => {
+    expect(SHARE_LEAD_TO_SOURCE_SEPARATOR.startsWith(",")).toBe(true);
+    expect(SHARE_LEAD_TO_SOURCE_SEPARATOR.endsWith(" ")).toBe(true);
+  });
+
+  it("SUMMARY_SEPARATOR is the French colon ' : ' with single spaces on both sides", () => {
+    // French typography uses space + colon + space, NOT ASCII colon
+    // without spaces. Pin the exact ' : ' so a future edit that
+    // strips the leading space doesn't render "...AN: 1. ..." which
+    // is incorrect French typography.
+    expect(SHARE_LEAD_TO_SUMMARY_SEPARATOR).toBe(" : ");
+    expect(SHARE_LEAD_TO_SUMMARY_SEPARATOR.startsWith(" ")).toBe(true);
+    expect(SHARE_LEAD_TO_SUMMARY_SEPARATOR.endsWith(" ")).toBe(true);
+  });
+
+  it("SOURCE_SEPARATOR is distinct from SUMMARY_SEPARATOR (anti-collapse guard)", () => {
+    // The 2 separators are NOT interchangeable — ", " separates the
+    // lead phrase from the source line; " : " separates the lead
+    // from the summary. A copy-paste collapse to one shared const
+    // would render incorrect French typography.
+    expect(SHARE_LEAD_TO_SOURCE_SEPARATOR).not.toBe(SHARE_LEAD_TO_SUMMARY_SEPARATOR);
   });
 });
 

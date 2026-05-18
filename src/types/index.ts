@@ -1152,6 +1152,26 @@ export const RESULT_H1_PERCENT_WRAPPER_SUFFIX = "%)";
 export const CARD_FOOTER_NUMERO_PREFIX = "n° ";
 export const CARD_FOOTER_DATE_SEPARATOR = " · ";
 
+/** Generic middle-dot typography separator " · " — the visual
+ *  segment delimiter used across the app: Card chapeau→IA-chip,
+ *  Card AN-libellé-prefix → titre-brut, FreshnessBanner banner-body
+ *  line (between total/past/next phrases), and the share-text rank
+ *  join. Uses the U+00B7 middle-dot character (NOT an ASCII period).
+ *
+ *  Centralised so a future typography tweak (e.g., switch to en-dash
+ *  or thin-space + dot) propagates from 1 edit instead of 5+. The
+ *  semantic-specific CARD_FOOTER_DATE_SEPARATOR remains a distinct
+ *  const for the Card numero+date footer, even though it shares the
+ *  same value — IDE searches can find each site by its semantic name. */
+export const MIDDLE_DOT_SEPARATOR = " · ";
+
+/** share.ts composition separators — split out so the share-text
+ *  composition is fully testable + a future i18n flip (English
+ *  share text uses ", " for both, French uses " : " before the
+ *  summary) propagates from 1 edit each. */
+export const SHARE_LEAD_TO_SOURCE_SEPARATOR = ", ";
+export const SHARE_LEAD_TO_SUMMARY_SEPARATOR = " : ";
+
 /** TopBar menu item labels — passed as `label=` prop to MenuLink for
  *  each entry. Tests pin them via `getByRole("menuitem", { name: /…/ })`,
  *  and the analytics `target` props (track("topbar_nav", { target })) use
